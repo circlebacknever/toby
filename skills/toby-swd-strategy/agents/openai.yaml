@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby SWD Strategy"
+  short_description: "Choose maintainable code changes"
+  default_prompt: "Use $toby-swd-strategy to choose a design path for a code change."

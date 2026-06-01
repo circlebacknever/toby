@@ -1,0 +1,4 @@
+# macOS clutter the validator hard-fails on
+.DS_Store
+# editor swap files
+*.swp

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Simplify Code"
+  short_description: "Tighten changed code without drift"
+  default_prompt: "Use $toby-simplify-code to simplify the code I just changed without altering behavior."

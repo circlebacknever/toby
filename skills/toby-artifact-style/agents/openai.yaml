@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Artifact Style"
+  short_description: "Dense evidence-first artifact design"
+  default_prompt: "Use $toby-artifact-style to design a dense reference card in Toby artifact style."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby SWD Testing"
+  short_description: "Behavior-focused test guidance"
+  default_prompt: "Use $toby-swd-testing to protect behavior with meaningful tests."

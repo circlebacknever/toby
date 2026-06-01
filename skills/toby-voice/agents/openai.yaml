@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Voice"
+  short_description: "Rewrite output in Toby voice"
+  default_prompt: "Use $toby-voice to rewrite this in Toby voice and flag any banned phrasing."

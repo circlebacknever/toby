@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby SWD Docs"
+  short_description: "Module AGENTS.md and README guidance"
+  default_prompt: "Use $toby-swd-docs to update module guidance and README scope."

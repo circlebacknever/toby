@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Feature Dev"
+  short_description: "Ship small feature changes with evidence"
+  default_prompt: "Use $toby-feature-dev to guide a multi-file feature from discovery through implementation."

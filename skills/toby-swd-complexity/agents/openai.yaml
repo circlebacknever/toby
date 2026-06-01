@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby SWD Complexity"
+  short_description: "Simplify errors and performance work"
+  default_prompt: "Use $toby-swd-complexity to simplify error and performance design."

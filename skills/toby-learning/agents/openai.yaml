@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Learning"
+  short_description: "Teach through focused user contributions"
+  default_prompt: "Use $toby-learning while helping me build this so I understand the decisions."

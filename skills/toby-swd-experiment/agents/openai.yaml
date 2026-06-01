@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby SWD Experiment"
+  short_description: "Run disposable experiment loops"
+  default_prompt: "Use $toby-swd-experiment to run a fast experiment loop and retire disposable work afterward."

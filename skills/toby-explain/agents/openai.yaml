@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Explain"
+  short_description: "Explain code decisions while working"
+  default_prompt: "Use $toby-explain to explain the codebase decisions behind this change."

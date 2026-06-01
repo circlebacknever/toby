@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby SWD Interfaces"
+  short_description: "Design callable contracts first"
+  default_prompt: "Use $toby-swd-interfaces to design a callable contract before code."

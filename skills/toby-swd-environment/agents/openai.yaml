@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby SWD Environment"
+  short_description: "Protect local processes and state"
+  default_prompt: "Use $toby-swd-environment to classify commands and protect local state."
