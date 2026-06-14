@@ -33,7 +33,7 @@ public class OrderController extends BaseController {
 }
 ```
 
-What's wrong: applies Check 5. `BaseController` and every `*Controller` share a
+What's wrong: applies the composition-over-inheritance check. `BaseController` and every `*Controller` share a
 two-way coupling. A new field added to the base is visible everywhere; a base
 method's behavior is overridable from any subclass; `currentUser` and
 `lastValidation` are instance variables that both sides mutate. The base class
@@ -126,7 +126,7 @@ caller wants to know. A `getAmount` would mean only "the bytes of the
 field." The class is now deep: a few intent methods, substantial invariant
 enforcement behind them.
 
-This is the same point as Check 8 (depth check): `getX/setX` makes the
+This is the same point as the depth check: `getX/setX` makes the
 interface and the implementation the same shape. That's the definition of a
 shallow module.
 
@@ -183,7 +183,7 @@ methods, `orders` is unaffected because it never asked for them. Depth comes
 from the cost-to-benefit asymmetry: the consumer pays for one method's worth
 of interface and gets whatever the implementation does behind it.
 
-This is the same principle as Check 8 in a different syntax: the interface
+This is the same principle as the depth check in a different syntax: the interface
 should be much smaller than the implementation. Go's convention makes it
 mechanical to enforce.
 
@@ -203,7 +203,7 @@ app.use(injectTenantContext());      // reads req.user, writes req.tenant
 app.use(audit());                    // reads everything written above
 ```
 
-This is temporal decomposition (Check 1). The reason there are seven
+This is temporal decomposition (the decompose-by-knowledge check). The reason there are seven
 middlewares is "first do this, then that, then the next thing." The thing
 being passed between them is `req`, a giant bag that each step reads from and
 writes to. Every middleware knows about fields the previous ones produced —

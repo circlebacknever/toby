@@ -63,7 +63,7 @@ boundary — all hidden. Switching ORMs is one module's problem. Adding a read
 replica is the repository's choice. Domain `Order` is a plain class. The old one
 was a session-bound proxy that explodes if you touch it after commit.
 
-This is the canonical example of pulling complexity downward (Check 3) at the
+This is the canonical example of pulling complexity downward at the
 data layer. The repository is more callers than authors; let it absorb the
 hard part.
 
@@ -86,7 +86,7 @@ public interface UserRepository {
 }
 ```
 
-Check 6 (separate general from special, remove special cases). Each new
+Separate general from special, remove special cases. Each new
 caller's filter combination becomes a new method. The interface grows
 unbounded; two finders that differ in argument order do almost the same query;
 some are unused but no one will delete them. And the meaning of
@@ -176,7 +176,7 @@ domain `User` only carries what the rest of the system needs to know about
 users — a much smaller surface than every row column. Schema secrets stay
 secret.
 
-This is Check 2 (information leakage) at the data layer. One type bound to
+This is information leakage at the data layer. One type bound to
 three concerns is the same defect as one module owning three pieces of
 knowledge.
 
@@ -202,7 +202,7 @@ const order = await db.transaction(async (tx) => {
 ```
 
 Every method along the chain takes a `tx` argument it doesn't use directly
-except to pass to the next call. This is a pass-through variable (Check 4),
+except to pass to the next call. This is a pass-through variable (the different-layer check),
 and it is an unusually costly one — adding the next repository method means
 adding `tx` to every call site that ever touches it.
 
@@ -243,7 +243,7 @@ for o in orders:
 The "interface" of `Order` looks like a normal object. The actual contract
 includes which relations the ORM happens to lazy-load and how many queries
 that produces — a hidden, per-call performance interface. This is the depth
-check (Check 8) failing: callers must know what's expensive, and the cost is
+check failing: callers must know what's expensive, and the cost is
 not visible in any signature.
 
 Two ways to make the interface honest:
@@ -276,4 +276,4 @@ precondition documented nowhere.
   caching because it already owns the data-access contract.
 - **Read models versus write models** become natural splits when one query
   shape is wildly different from the entity shape (reporting, dashboards).
-  That's a deliberate split per Check 7; most apps don't need it.
+  That's a deliberate split per the split/merge check; most apps don't need it.

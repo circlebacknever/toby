@@ -16,7 +16,7 @@ request format. That knowledge is a single design decision living in two
 modules — leakage — and parsing code ends up duplicated. Callers also have to
 invoke two objects in a fixed order.
 
-Fix per checks 1, 2, 6: the knowledge is "the request wire format," and it
+Fix per the decompose-by-knowledge, information-leakage, and split/merge checks: the knowledge is "the request wire format," and it
 should live in one module. Merge into one `Request` module that reads and
 parses behind a single `Request.receive(socket)`. The format knowledge is now in
 one place, the inter-module string-passing interface disappears, and callers
@@ -29,7 +29,7 @@ make one call. The merged module is deeper than either original.
 A retrying transport needs a retry interval. Tactical move: export
 `retry_interval_ms` as a configuration parameter and let operators set it.
 
-Apply check 3. Ask: can the caller pick a better value than the module can? For
+Apply the pull-complexity-down check. Ask: can the caller pick a better value than the module can? For
 a retry interval, almost never — the module sees the actual round-trip times and
 the operator is guessing. So compute it: measure observed response latency and
 use a multiple of it, adapting as conditions change. The parameter leaves the
@@ -48,7 +48,7 @@ simplifies every caller, so pulling it down is correct here.
 `App → Layout → Header → Toolbar → AvatarMenu`, and every intermediate
 component's props list carries `currentUser` though only the leaf uses it.
 
-This is a pass-through variable (check 4). The intermediate components are
+This is a pass-through variable (the different-layer check). The intermediate components are
 forced to know about a value they have no use for, and adding the next such
 value means editing the whole chain again. Fix with a shared object scoped to
 the endpoints: a `CurrentUserContext` provided near `App` and read in
@@ -68,13 +68,13 @@ A list row is split into `<RowContainer>`, `<RowInner>`, `<RowText>`,
 `<RowMeta>`, `<RowChrome>` — five components, each a handful of lines, each only
 ever used by the one above it, none independently meaningful.
 
-Subdivision cost (check 6 / classitis): five interfaces to learn, five files to
+Subdivision cost (the split/merge check / classitis): five interfaces to learn, five files to
 flip between, dependencies hidden across them, and no information hidden by any
 boundary because none owns a distinct piece of knowledge. The relatedness
 signals all point one way — they share state, are always used together, and none
 can be understood alone. Collapse to one `<Row>` component. It is longer but it
 is one coherent deep abstraction with a simple prop interface, which the depth
-check (7) prefers over five shallow ones.
+check prefers over five shallow ones.
 
 Counter-case so this is not read as "never split": if `<Row>` also contained
 the logic for formatting currency across locales, that *is* a distinct body of

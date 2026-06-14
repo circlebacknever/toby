@@ -29,6 +29,8 @@ Four questions, asked early:
 
 The mistake in the other direction is speculative generality — parameters or extension points for futures that never arrive. "Somewhat" is the operative word. Cover today's needs and one or two near-future variants you can name. Stop there.
 
+A parameter is a question you force every caller to answer. Before adding one, check whether the module can compute or decide the value itself. A default lowers the burden and keeps the coupling — the caller still reads the default to know the behavior. Prefer a computed value or a narrower operation over a configurable one.
+
 ## The procedure
 
 ### 1. Decompose by knowledge
@@ -54,6 +56,8 @@ For consequential or exported interfaces, write the interface comment before the
 - A competent caller could use it correctly from the comment alone, including the common error cases.
 
 This bar is checkable by reading. A vague bar collapses into taste; this one doesn't.
+
+The comment test applies to parameter objects too. A short entry-point comment that stays short only because a query or command object absorbs the complexity is not a pass — run the same test on that object's contract.
 
 **For consequential interfaces, write the comment before the body.** The comment is a design tool — the cheapest way to find out the abstraction is wrong. Writing the body first traps you in the structure of whatever you wrote; writing the comment first lets you reject a bad shape while it's still text.
 

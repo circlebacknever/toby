@@ -32,6 +32,8 @@ A good module is deep: a simple interface over substantial work. The interface i
 
 Resist exposing internal mechanics, config knobs, or special cases just because they're the shortest path from where you are. Every parameter a caller must manage is overhead distributed across every future call site. Prefer computing a value internally over exporting a configuration parameter or throwing back to the caller.
 
+Depth is the goal, and small functions serve it only when they deliver it. A split that creates two shallow units in place of one deep one is a loss, however tidy it looks. When the urge to shrink a function fights a deep module, the deep module wins.
+
 ## After writing — reactive investment
 
 You are now inside this code with full context. This is the cheapest moment in the system's life to improve it, and it doesn't come back.

@@ -45,7 +45,7 @@ loading state, cache (there isn't one), refetch on focus (there isn't one
 either), retry on transient failure (nope). The "interface to fetching" is a
 30-line block of `useEffect` machinery duplicated everywhere.
 
-This is information leakage (Check 2) in slow motion. The decisions "how do
+This is information leakage in slow motion. The decisions "how do
 we cancel," "what's the loading state shape," "what counts as an error" are
 encoded in every component. The day you change one — say, you want errors to
 include a `retry-after` hint — is the day you edit fifteen components.
@@ -131,7 +131,7 @@ function withWindowSize<P>(Component: React.ComponentType<P & WindowSize>) {
 export default withWindowSize(withCurrentUser(withTheme(MyComponent)));
 ```
 
-This is Check 5 in non-class clothing. `withWindowSize` and `MyComponent` are
+This is implementation-inheritance leakage in non-class clothing. `withWindowSize` and `MyComponent` are
 in a parent-child relationship where the wrapper invisibly injects props,
 overrides nothing visible, and yet `MyComponent` cannot be understood without
 reading the wrapper. Three wrappers deep ("wrapper hell") and the component's
@@ -200,7 +200,7 @@ The shared behavior is a function the component calls and composes. No
 hidden injection, no wrapper chain. If a component needs three shared
 behaviors, it calls three functions — they appear at the top of the
 component's body where a reader naturally meets them, in the order they
-were called. This is composition, exactly the pattern Check 5 recommends.
+were called. This is composition, exactly the pattern the composition-over-inheritance check recommends.
 
 The same applies to the more substantial cases: data fetching (above),
 form state (below), media queries, intersection observers, undo/redo,
@@ -242,7 +242,7 @@ is the entire state shape exposed by getter and the entire set of mutations
 exposed by name — the interface is the whole state shape, which makes the store
 as shallow as a module gets.
 
-Re-slice by knowledge (Check 1). Each slice owns one body of state and the
+Re-slice by knowledge (the decompose-by-knowledge check). Each slice owns one body of state and the
 operations that maintain its invariants.
 
 ```tsx
@@ -340,7 +340,7 @@ A pattern that compounds for a year and a half:
 />
 ```
 
-This is overexposure (Check 8 / a Check 7 split candidate). The component's
+This is overexposure (the depth check / a split/merge split candidate). The component's
 common case requires a caller to make 20 decisions, most of which are
 irrelevant most of the time. The component owns rendering, filtering,
 keyboard handling, focus management, popover positioning, multi-select,

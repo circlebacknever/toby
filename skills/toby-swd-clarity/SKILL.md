@@ -29,7 +29,7 @@ Use names consistently: one name for one purpose, never that name for a second p
 
 ## Comments
 
-Separate interface comments from implementation comments; keep implementation detail out of the interface.
+Comments come in four kinds, each with its own home: interface (what a caller needs, with no internals), data-structure member (what a non-trivial field holds — units, null meaning, bounds, ownership), implementation intuition (why a non-obvious block does what it does), and cross-module (a decision spanning modules, stated once in a discoverable place and pointed to). Keep implementation detail out of the interface.
 
 An **interface comment** describes behavior, arguments, return value, side effects, exceptions, and caller preconditions — the abstraction. If it has to describe internals to be complete, the module is shallow; that is a redesign signal. Reach for the design, since better wording won't fix a leaky abstraction. Write interface comments before the implementation; they are a design tool.
 
@@ -40,9 +40,13 @@ Comment at a different level than the code. A comment pitched at the code's own 
 
 Delete comments whose content is already obvious from the adjacent code, including comments that just restate the name. Document each decision once, in the most obvious place. Cross-reference a called method from its call site. Re-explaining it there gives you two copies that drift apart. For a design decision that spans modules, put it in one discoverable central place and point to it from the affected sites.
 
+Leave these uncommented: operations the code already shows (`i++ // increment i`), restatements of the name, commented-out code, change history (git holds that), and anything the type already proves.
+
 ## Consistency
 
 Similar things done the same way; dissimilar things done differently — both halves carry weight. Before introducing any convention (naming, structure, error handling, style, test layout), inspect the local file and project and mimic what's already there. Reuse exact names already established for a concept.
+
+Factor code together only when the instances share the same knowledge, so a change to one should change all. Blocks that look alike but answer to different reasons are separate decisions that happen to share text; merging them couples things that should move apart, and the next change tears them back out.
 
 Don't "improve" an existing convention casually. Before introducing an inconsistency, both must be true: you have significant new information that wasn't available when the convention was set, and the new approach is enough better to justify converting every existing use. If you change it, leave no instance of the old convention behind. Half-adopted conventions are worse than either option alone — they destroy a reader's ability to draw safe conclusions from a familiar-looking pattern.
 

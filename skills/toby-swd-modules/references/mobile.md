@@ -34,7 +34,7 @@ function Tabs({ user, navigation }) {
 // ...every screen takes `user` in its route.params and forwards it deeper
 ```
 
-Same defect as web prop drilling (Check 4) — pass-through variable — with
+Same defect as web prop drilling (the different-layer check) — pass-through variable — with
 extra hazards specific to navigation:
 
 - React Navigation params are serialized; passing a complex `user` object
@@ -104,7 +104,7 @@ const themePref = await AsyncStorage.getItem('user.theme.preference') ?? 'system
 await AsyncStorage.multiRemove(['authToken', 'refreshToken', 'feed:cache:v2', 'user.theme.preference']);
 ```
 
-Information-leakage check (Check 2). The decision "what key holds the feed
+Information-leakage check. The decision "what key holds the feed
 cache, what shape it's stored in, what version it is" is reflected in two
 modules (`FeedScreen` and `LogoutFlow`). The same applies to theme prefs, auth
 tokens, onboarding flags. Changing a key requires editing every site that
@@ -184,7 +184,7 @@ useEffect(() => {
 }, []);
 ```
 
-This is a pass-through wrapper (Check 4, Check 8). It does almost nothing but
+This is a pass-through wrapper (the different-layer and depth checks). It does almost nothing but
 expose the platform API verbatim. The screen now owns the protocol — request
 permission, set camera, subscribe, start, stop on unmount — and every screen
 that scans repeats it. iOS and Android differences in permission semantics
@@ -293,6 +293,6 @@ doesn't. The wrong move is to keep `fetch` calls scattered through screens.
   `InheritedWidget` directly is the low-level primitive most apps shouldn't use
   except through one of those wrappers.
 - **Implementation inheritance in mobile native code** (extending
-  `UIViewController`, `Activity`, `Fragment`): same caution as Check 5. The
+  `UIViewController`, `Activity`, `Fragment`): same caution as the composition-over-inheritance check. The
   framework demands one or two override points; resist building a deep family
   tree on top of those for "shared behavior."

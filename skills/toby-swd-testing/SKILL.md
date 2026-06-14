@@ -50,6 +50,16 @@ Useful patterns:
 
 Snapshot blobs that nobody reads are not tests. They are CI noise generators with version control.
 
+Before accepting a snapshot update, read the diff and confirm every change is intended. An unread snapshot update is the same as deleting the test.
+
+## How much to test
+
+Cover the contract's distinct observable outcomes — the success path, each documented failure mode, and the boundary conditions — then stop. One behavioral concept per test; multiple asserts are fine when they prove one behavior.
+
+## Each test stands alone
+
+No shared mutable state between tests, no ordering dependencies, deterministic (control time, randomness, and IO), and self-validating (it asserts; it does not print for a human to read). A test whose result depends on what ran before it is already broken.
+
 ## Test-first, with judgment
 
 Write the test before the implementation when the behavior is well-defined. Two cases qualify:
@@ -101,6 +111,7 @@ In an existing codebase, inspect the tests that already cover the touched behavi
 - **Test fails on a correct refactor.** Coupled to internals.
 - **Test name describes a call.** "calls X with Y" names a mock log. The reader still can't tell what the system is supposed to do.
 - **Snapshot blob.** Large auto-updated string nobody reviews on change.
+- **Flaky test.** Passes on retry, fails at random. It is a broken test; fix the nondeterminism, never loop it until it goes green.
 - **Mock of an internal collaborator.** Verifies the call sequence, which says nothing about what the system produces.
 - **Coverage-driven test.** Written to hit a line. It protects no behavior and reads like the implementation with the word "expect" sprinkled in.
 - **Hard-to-name test.** The abstraction under test is wrong or mixed.

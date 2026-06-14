@@ -16,17 +16,19 @@ Exception handling and performance optimization are two of the largest sources o
 
 The unifying move is simple: reduce the number of places that must carry the extra logic.
 
+Every special case a caller must branch on is complexity. Treat creating one as a design smell before a performance one, and fold it into the general case so no caller has to know it exists.
+
 ## Error and exception design
 
 The cost of an exception is the handling code it forces on every caller, propagating through every stack level it crosses. Work down this ladder; stop at the first rung that applies.
 
-1. **Define the error out of existence.** Before writing any handling, ask whether the operation's semantics can be redefined so the condition is no longer an error. "Delete this variable, fail if absent" becomes "ensure this variable no longer exists." "Throw if an index is out of range" becomes "return the overlap, empty if none." The error case disappears, the API gets simpler, the module gets deeper.
+1. **Define the error out of existence.** Before writing any handling, ask whether the operation's semantics can be redefined so the condition is no longer an error. "Delete this variable, fail if absent" becomes "ensure this variable no longer exists." "Throw if an index is out of range" becomes "return the overlap, empty if none." The error case disappears, the API gets simpler, the module gets deeper. Redefining the semantics is right only when the condition is genuinely a non-event; if a reported success would mask a real bug, the error stays.
 
 2. **Mask it at the lowest level.** If a low-level module can fully handle the condition without the caller ever knowing, handle it there. Masking works best in a widely-used library method, where it removes the most handlers. Transient errors are the canonical case: a network blip, a database deadlock, a rate-limit response — if a bounded retry inside the module turns them into success, the caller never had a failure to handle.
 
 3. **Aggregate.** If it must surface, let it propagate several levels to one handler that addresses the general case — the single handler at the top of a request loop. One handler at the top replaces a handler at every call site.
 
-4. **Just crash.** For errors that are rare and hard or pointless to handle — out of memory, unrecoverable I/O, an internal invariant violated (which means a bug) — print diagnostics and abort, ideally behind one checked wrapper so call sites don't each repeat the check. This is a legitimate complexity reduction; the abort is the correct handling for an error nobody can act on.
+4. **Just crash.** For errors no caller can act on — out of memory, unrecoverable I/O, an internal invariant violated (which means a bug) — print diagnostics and abort, ideally behind one checked wrapper so call sites don't each repeat the check. This is a legitimate complexity reduction; the abort is the correct handling for an error nobody can act on. "Hard to handle" is not a reason to crash.
 
 **Guardrail**: eliminating, masking, or crashing is correct only when the information is not needed outside the module. A module that swallows every network error so callers can't tell a message was lost hasn't reduced complexity; it's made reliable use impossible. Decide what information matters. Hide what callers do not need; surface what they do.
 

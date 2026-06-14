@@ -34,10 +34,10 @@ def get_product_listing(category: str) -> list[Product]:
     # ...same pattern repeated
 ```
 
-Two checks fail at once. Check 2 (information leakage): the cache key schema
+Two checks fail at once. Information leakage: the cache key schema
 (`"product:..."`), the TTL (600 seconds), the serialization format, and the
-invalidation rules are duplicated wherever they're touched. Check 4 (different
-layer, different abstraction): the service is supposed to be about products,
+invalidation rules are duplicated wherever they're touched. The different-layer
+check: the service is supposed to be about products,
 not about Redis, but half the code is Redis bookkeeping. When the team
 introduces a second category-listing endpoint, the new author either
 duplicates the cache machinery or — much worse — forgets to invalidate, and
@@ -65,7 +65,7 @@ a thin caching decorator around an underlying `ProductsStore` it composes).
 Adding a new derived listing means adding a method and an entry to
 `_evict_for`; never editing fifteen services.
 
-This is the canonical place to pull complexity down (Check 3): the cache
+This is the canonical place to pull complexity down: the cache
 serves many callers, and the right author for the hard parts is the module
 that already owns the data.
 
@@ -112,7 +112,7 @@ const products: ProductsStore = new CachedProductsStore(
 cache-key construction, TTL policy, eviction rules, and load-through semantics
 behind `getOrLoad`. The interface (`ProductsStore`) is identical to the
 underlying store — that is correct here, because this is the decorator case
-called out in Check 4 as legitimate. Each implementation adds distinct
+called out in the different-layer check as legitimate. Each implementation adds distinct
 functionality: the cache version adds memoization and invalidation that
 callers cannot see and do not manage.
 
@@ -156,7 +156,7 @@ Three things wrong:
 - A bug in the lock release path takes out the cache for thirty seconds for
   every key that uses this pattern.
 
-This belongs inside the cache (Check 3, pull complexity down):
+This belongs inside the cache (pull complexity down):
 
 ```typescript
 class Cache {
