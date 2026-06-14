@@ -33,7 +33,7 @@ The discipline before adding any cache:
    too narrow) saves nothing and costs added latency on the miss path.
 4. **Estimate the staleness tolerance.** Some data must be fresh
    (account balances). Some can be minutes stale (product catalog).
-   The TTL is a product decision, not a tuning parameter.
+   The TTL is a product decision; set it from the staleness budget.
 
 After this, the cache is either plainly right (slow database query,
 high hit ratio, tolerant of seconds-to-minutes staleness) or plainly
@@ -74,7 +74,7 @@ deciding:
   until the cache warms. If the underlying data store can't handle peak
   traffic alone, the cache restart is now a production incident.
 - **Stampede risk.** A popular key expiring at the same moment thousands
-  of users request it produces a thundering herd. Mitigations exist
+  of users request it sends every miss to the store at once. Mitigations exist
   (single-flight, stale-while-revalidate) but they're additional
   complexity inside the cache layer.
 - **Test complexity.** Tests now need to handle cached vs uncached
@@ -86,7 +86,7 @@ deciding:
 
 The cache adds 5 lines of code at the call site and 50 lines of
 operational reality. The question "is the P99 latency improvement worth
-this?" should be honest about both columns.
+this?" should weigh both columns.
 
 When the answer is yes, ship the cache. When the answer is no but the
 endpoint is truly too slow, the work is somewhere else: optimize
@@ -113,9 +113,9 @@ concurrent requests all miss, all call `load()`, all hit Postgres.
 Postgres now handles 1000 connections for what should be a single query.
 The hot path goes from cached-fast to slower than uncached.
 
-This is a performance problem, not a correctness problem — eventually
-the load succeeds, the cache repopulates, things stabilize. But during
-the herd, the system is far slower than the uncached version, because
+This is a performance problem; the results stay correct — eventually
+the load succeeds, the cache repopulates, things stabilize. During
+the herd, though, the system is far slower than the uncached version, because
 each load contends with 999 others.
 
 Three mitigations, in order of complexity:
@@ -171,7 +171,7 @@ stale-while-revalidate because it sounds clever.
 
 ---
 
-## Example 4 — Cache TTL: a product decision, not a magic number
+## Example 4 — Cache TTL: a product decision
 
 A pattern that produces cache bugs:
 
@@ -203,8 +203,8 @@ await cache.set('user:profile', profile, STALENESS.USER_PROFILE);
 
 Each TTL is documented with the reasoning. Changing the staleness policy
 is a one-line edit at a named location. New caches in the codebase ask
-"which staleness category does this fit?" rather than "what number should
-I put here?"
+"which staleness category does this fit?" The guessing question — "what
+number should I put here?" — stops coming up.
 
 For data that truly shouldn't be cached (every read must be fresh),
 don't cache it. A 1-second TTL is a bug magnet — it caches just long
@@ -253,9 +253,9 @@ The right move depends on the actual goal:
   help — but with a longer TTL (and a willingness to serve up-to-1-hour
   stale profiles) to push hit rate up. The cache earns its complexity
   by actually hitting.
-- If the issue was perceived rather than measured, no cache at all.
+- If the issue was perceived and never measured, no cache at all.
 
-The lesson: caches earn their complexity by *hitting often enough to
+Caches earn their complexity by *hitting often enough to
 matter*. If the access pattern produces low hit rate, the cache is just
 complexity.
 
@@ -274,5 +274,4 @@ complexity.
 
 The cache decision is a complexity decision. Every cache you don't add
 is a system that's simpler to operate, easier to test, and clearer to
-reason about. Caches earn their place by measured improvement, not by
-"feeling like the right move."
+reason about. Caches earn their place by measured improvement.

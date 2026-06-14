@@ -95,22 +95,23 @@ def process(self, payment):
     return self._charge_via_legacy(payment)
 ```
 
-The difference from pure tactical programming is not that you avoided the
-shortcut — you took it. The difference is that the shortcut is now visible,
-bounded, and has a stated exit, so it is a labeled loan instead of a hidden one.
-The strategic move under a deadline is a truthful IOU, not a sound design you
-didn't have time for.
+You took the shortcut. What separates this from pure tactical programming is that
+the shortcut is now visible, bounded, and carries a stated exit, so it reads as a
+labeled loan the next person can see and pay down.
+The strategic move under a deadline is a truthful IOU with a stated exit.
 
 ---
 
 ## How to calibrate the investment
 
 - The target is roughly 10–20% more effort than the tactical path, spent
-  continuously, not a separate "cleanup phase" and not a redesign.
+  continuously through the change. Save it up into a separate "cleanup phase"
+  and it never happens; spend it all at once on a redesign and you have left the
+  band entirely.
 - Proactive spend: trying a second design, choosing names well, writing the
   interface comment first so the abstraction is stable before the code.
-- Reactive spend: fixing a design flaw you hit instead of routing around it,
-  plus one opportunistic improvement to code you were already in.
-- If a "strategic" move would touch large parts of the codebase or blow the
-  effort well past that band, it is no longer strategic — it is the big-bang
-  redesign anti-pattern. Scope down to what you can do well inside this change.
+- Reactive spend: fixing a design flaw the moment you hit it, while you have the
+  context, plus one opportunistic improvement to code you were already in.
+- A "strategic" move that touches large parts of the codebase or blows the
+  effort well past that band has crossed into the big-bang redesign anti-pattern.
+  Scope down to what you can do well inside this change.

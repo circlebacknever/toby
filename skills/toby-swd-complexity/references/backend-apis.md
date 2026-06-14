@@ -64,8 +64,8 @@ async function callApi<T>(path: string, opts?: RequestOpts): Promise<T> {
 What this absorbs (rung 2, mask at lowest level): transient 5xx, 408, 429,
 network blips. What it surfaces: 4xx (caller did something wrong) and
 sustained 5xx (real outage). The thrown `HttpError` carries a `permanent`
-flag so callers don't re-retry; one flag, set in one place, instead of
-re-deriving the categorization at every call site.
+flag so callers don't re-retry; the flag is set in one place, which spares
+every call site from re-deriving the categorization.
 
 Callers handle the typed errors at one place — usually a response
 interceptor that catches `permanent: false` (sustained outage → user-facing
@@ -117,16 +117,17 @@ func retryGRPC[T any](ctx context.Context, maxAttempts int, fn func(context.Cont
 The retryability decision lives in one place (`isRetryableGRPC`), which
 reads the gRPC status code and applies the table above.
 
-Compare to the alternative — every RPC call site writing its own
-retry-or-not logic, getting it slightly wrong, missing the deadline
-propagation, double-retrying on `ABORTED`. The ladder collapses into one
+Per-call-site retry logic is where this goes wrong: each site writes its
+own retry-or-not check, gets it slightly wrong, misses the deadline
+propagation, double-retries on `ABORTED`. The ladder collapses into one
 helper, masking the transient cases. Permanent errors bubble up where the
 caller can act.
 
 Deadline propagation matters: `ctx` carries a deadline; if the deadline
 is near or past, don't retry. `retryGRPC` reads the deadline from `ctx`
 and exits when there isn't enough time for another attempt. This is the
-kind of complexity that lives in the helper, not in 50 call sites.
+kind of complexity that lives in the helper, which is what keeps it out of
+50 call sites.
 
 ---
 
@@ -169,9 +170,9 @@ worse than "give up after 5 seconds."
 
 For non-critical dependencies (the recommendations panel on a page that
 also loads the actual content), the right move is often "render the page
-without it; fetch in the background; insert when it arrives." That is
-not a timeout move — it's a design move that defines the recommendation's
-slowness out of the user's critical path entirely.
+without it; fetch in the background; insert when it arrives." This is a
+design move: it defines the recommendation's slowness out of the user's
+critical path entirely, so the timeout never even comes into play.
 
 This is the same shape as `examples.md` Example 1 ("define the error out
 of existence") applied to latency: the most reliable way to handle a slow
@@ -193,10 +194,10 @@ Libraries: `resilience4j` (Java), `gobreaker` (Go), `cockatiel` (TypeScript).
 When does the complexity pay for itself?
 
 **Earned**:
-- The downstream's failure mode is "slow" rather than "fast error." A
-  retry-and-timeout policy alone causes threads to pile up; the breaker
-  prevents the pile-up by short-circuiting calls when the downstream is
-  unhealthy.
+- The downstream's failure mode is "slow" — calls hang and burn the full
+  timeout. A retry-and-timeout policy alone causes threads to pile up; the
+  breaker prevents the pile-up by short-circuiting calls when the downstream
+  is unhealthy.
 - The downstream is called frequently, so the breaker has signal to act
   on.
 - Backpressure has business value: serving "I can't reach recommendations

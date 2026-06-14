@@ -26,8 +26,8 @@ def remove_session(store, sid):
 
 The error case is gone, every call site loses its handler, and the function is
 deeper. Guardrail check: does any caller need to know the session was already
-absent? If one rare caller does, give it a separate query rather than keeping
-the exception on the common path.
+absent? If one rare caller does, give it a separate query and keep the common
+path exception-free.
 
 ---
 
@@ -44,24 +44,24 @@ Separately, the same server calls `malloc`-equivalent allocation deep in request
 parsing. Out-of-memory is rare and there is nothing useful to do — checking it
 at every allocation is pure complexity. This is the just-crash case: one checked
 allocation wrapper that aborts with a diagnostic. Note the boundary: a corrupt
-request body is *not* a crash case (it is expected and per-request) — it rides
-the aggregation path to the 400.
+request body is expected and per-request, so it rides the aggregation path to
+the 400, well clear of the crash path.
 
 ---
 
-## Example 3 — Frontend: stop the thousand cuts without premature optimization
+## Example 3 — Frontend: stop the thousand cuts at design time
 
 A list view re-fetches the full dataset on every keystroke of a filter box, and
 each row component re-derives a sorted copy of the list. No single line is
 "slow"; together the view is sluggish.
 
-The design-time move, not a measured micro-optimization: typing into a filter is
+The design-time move, made before any measurement: typing into a filter is
 a known-expensive trigger if it crosses the network, so debounce the fetch and
 filter client-side when the set is small — both are as simple as the slow
 version and cost no extra complexity. The per-row re-sort is redundant work on a
 known-hot path; lift the sorted derivation to the parent so it runs once. These
-are naturally-efficient simple choices, the everyday layer, not a profiler
-session.
+are naturally-efficient simple choices, the everyday layer that lands before any
+profiler session.
 
 If after this the view is still slow, then measure: baseline the render, change
 one thing, re-measure, and revert anything with no measurable effect unless it

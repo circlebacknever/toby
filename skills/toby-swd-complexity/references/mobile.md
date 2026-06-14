@@ -97,7 +97,7 @@ on the data hook (same pattern as `web.md` Example 2).
 
 ---
 
-## Example 2 — Native module errors: discriminated state vs untyped exceptions
+## Example 2 — Native module errors: a discriminated result
 
 A direct wrapper around a native module:
 
@@ -165,12 +165,12 @@ Three cases, all named. The wrapper owns:
 - The "USER_CANCELLED is not really an error" convention.
 
 This is the error ladder applied at the bridge layer — mask transient
-errors (retry), define out non-errors (cancellation is a status, not a
-failure), aggregate the rest into a small typed set.
+errors (retry), define out non-errors (cancellation becomes a status and
+never enters the failure path), aggregate the rest into a small typed set.
 
 ---
 
-## Example 3 — Large lists: FlatList vs ScrollView, virtualization earned
+## Example 3 — Large lists: FlatList by default, virtualization earned
 
 A common mistake on a phone:
 
@@ -213,7 +213,8 @@ virtualization here adds complexity for zero perf benefit.
 Performance pitfalls to know without measuring:
 
 - **No `keyExtractor`** or unstable keys → FlatList re-renders rows
-  unnecessarily. Use a stable id, not the array index.
+  unnecessarily. Use a stable id; the array index changes as the list
+  reorders and breaks recycling.
 - **`renderItem` defined inline** as a new function each render → child
   rows re-render. Define it outside the component or memoize it.
 - **Images without `width`/`height`** in styles → layout thrash. Always
@@ -222,9 +223,9 @@ Performance pitfalls to know without measuring:
   no events!) → animations driven by scroll position appear broken.
   Set it to `16` for 60fps.
 
-These aren't speculative optimizations — they're known patterns where the
-naturally-efficient version is no more complex than the slow version.
-Take them on every list you write.
+These are known patterns where the naturally-efficient version is no more
+complex than the slow version, so they sit outside the speculative-
+optimization ban. Take them on every list you write.
 
 ---
 
@@ -271,7 +272,8 @@ no resizing strategy, they OOM the device.
 
 The naturally-efficient choice (use thumbnails) costs no more complexity
 than the slow choice (use originals) when the API supports it. When the
-API doesn't, the right move is at the server / CDN layer, not the client.
+API doesn't, the right move sits at the server / CDN layer, where the
+resize belongs.
 
 ---
 

@@ -22,16 +22,16 @@ Before the procedure, one framing decision that shapes everything downstream. Th
 
 Four questions, asked early:
 
-- **What is the simplest interface that covers all your current needs?** Fewer methods with broader semantics, not more methods with narrower ones.
+- **What is the simplest interface that covers all your current needs?** Fewer methods, each carrying broader semantics, so the surface stays small as needs grow.
 - **In how many situations will this method be used?** A method serving one call site is a candidate for inlining or for redesign into something that serves more.
 - **Is this API easy to use for the common case today?** General-purpose interfaces fail when they make the easy thing hard. A `find(query)` is better than thirty `findByXAndYAndZ` only if `find(...)` is also easy to call for the common case.
 - **Will this generalize without becoming a god interface?** Generality with a clear single purpose is depth. Generality across unrelated purposes is sprawl.
 
-The mistake in the other direction is speculative generality — parameters or extension points for futures that never arrive. "Somewhat" is the operative word. Cover today's needs and one or two near-future variants you can name, not every imaginable one.
+The mistake in the other direction is speculative generality — parameters or extension points for futures that never arrive. "Somewhat" is the operative word. Cover today's needs and one or two near-future variants you can name. Stop there.
 
 ## The procedure
 
-### 1. Decompose by knowledge, not sequence
+### 1. Decompose by knowledge
 
 Before sketching anything, state in one sentence what design decision or piece of knowledge this module exists to encapsulate ("how user sessions are stored and validated", "how the cart total is computed"). If the natural description is an order of steps ("first parse, then validate, then write"), you're doing temporal decomposition. That produces shallow modules and leaks one decision across many. Re-slice around knowledge each module owns.
 
@@ -55,7 +55,7 @@ For consequential or exported interfaces, write the interface comment before the
 
 This bar is checkable by reading. A vague bar collapses into taste; this one doesn't.
 
-**For consequential interfaces, write the comment before the body.** The comment is not decoration. It is a design tool — the cheapest way to find out the abstraction is wrong. Writing the body first traps you in the structure of whatever you wrote; writing the comment first lets you reject a bad shape while it's still text.
+**For consequential interfaces, write the comment before the body.** The comment is a design tool — the cheapest way to find out the abstraction is wrong. Writing the body first traps you in the structure of whatever you wrote; writing the comment first lets you reject a bad shape while it's still text.
 
 ### 4. Default to the cheap path; escalate only when it matters
 
@@ -65,7 +65,7 @@ Escalate to the **design-it-twice loop** only when the interface is consequentia
 
 1. Write one candidate: signatures plus interface comments, bodies empty, describing what and not how.
 2. Run the comment test.
-3. If it fails, name the exact failure ("the comment had to describe the retry buffer"). That named flaw seeds the next candidate — a structurally different decomposition that removes that specific problem, not a rename.
+3. If it fails, name the exact failure ("the comment had to describe the retry buffer"). That named flaw seeds the next candidate — a structurally different decomposition that removes that specific problem. A rename does not count.
 4. Stop as soon as one candidate passes for a routine interface, two pass for a consequential one, or you reach three candidates total. Three is a hard ceiling.
 
 If the ceiling is hit with nothing passing, hand the strongest candidate to the human with the precise blocker named. Spinning past the ceiling burns quota without converging.
@@ -74,9 +74,9 @@ If the ceiling is hit with nothing passing, hand the strongest candidate to the 
 
 A second independent call is the one expensive move here; gate it hard. Make it only when the interface is consequential and two or more candidates passed. For a routine interface, or when only one passed, take the first passing candidate.
 
-When the gate is met and an independent review tool is available, use it as a critique surface. Send it: surviving signatures and interface comments only (no implementations, no hint of your preference), the comment-test predicate, and this rubric in priority order — common-case caller burden first, then generality, then efficiency, then depth without over-hiding (step 7). Ask for one verdict: the chosen candidate, a one-line reason per rubric item, and any over-hiding risk. Treat the verdict as evidence, not authority. Choose deliberately, and fix a real over-hiding risk before writing any body.
+When the gate is met and an independent review tool is available, use it as a critique surface. Send it: surviving signatures and interface comments only (no implementations, no hint of your preference), the comment-test predicate, and this rubric in priority order — common-case caller burden first, then generality, then efficiency, then depth without over-hiding (step 7). Ask for one verdict: the chosen candidate, a one-line reason per rubric item, and any over-hiding risk. Treat the verdict as evidence you weigh. Choose deliberately, and fix a real over-hiding risk before writing any body.
 
-If the human rejects all candidates, treat their stated reason as one new flaw-seed and generate exactly one more directed candidate, then stop. A rejection is a redirect, not a reason to restart the loop.
+If the human rejects all candidates, treat their stated reason as one new flaw-seed and generate exactly one more directed candidate, then stop. A rejection is a redirect that costs you one directed candidate.
 
 ### 6. The comment test is also the redesign trigger
 
@@ -84,7 +84,7 @@ Apply the same test whenever you later change a public interface, before touchin
 
 ### 7. Guardrail: deep, but expose what callers actually need
 
-Hiding complexity is the goal, with a hard limit: information the caller truly needs must stay in the interface. Tunable performance config, errors the caller must handle, durability or visibility guarantees, ordering the caller depends on — hiding these to make the interface look smaller is its own defect and produces modules that can't be used correctly. Where a special case can be removed by redesigning semantics so it does not arise, do that instead of exposing it.
+Hiding complexity is the goal, with a hard limit: information the caller truly needs must stay in the interface. Tunable performance config, errors the caller must handle, durability or visibility guarantees, ordering the caller depends on — hiding these to make the interface look smaller is its own defect and produces modules that can't be used correctly. Where a special case can be removed by redesigning semantics so it does not arise, redesign it away and leave it out of the interface.
 
 ### 8. Then implement
 
@@ -92,20 +92,20 @@ Only now write the bodies. If implementation reveals the abstraction was wrong �
 
 ## Brownfield Work
 
-Before changing an existing callable surface, inspect current callers and the behavior they rely on. If a cleaner interface would reduce caller burden, offer a migration path instead of silently breaking call sites. Keep compatibility when the current surface is public, exported, persisted, or used across a service boundary unless the user approves the break. When the change creates or clarifies a public contract in a meaningful module, offer an AGENTS.md update if none exists nearby.
+Before changing an existing callable surface, inspect current callers and the behavior they rely on. If a cleaner interface would reduce caller burden, offer a migration path so call sites move over without silent breakage. Keep compatibility when the current surface is public, exported, persisted, or used across a service boundary unless the user approves the break. When the change creates or clarifies a public contract in a meaningful module, offer an AGENTS.md update if none exists nearby.
 
 ## Red flags
 
 - **Shallow module**: interface nearly as complex as the implementation.
 - **Overexposure**: callers must understand rarely-used features to use common ones.
 - **Information leakage**: one design decision shows up in several modules; prop drilling; key schemas duplicated across endpoints.
-- **Temporal decomposition**: structure follows execution order, not knowledge.
+- **Temporal decomposition**: structure follows execution order, when it should follow the knowledge each module owns.
 - **Pass-through method**: an entry point that only forwards to another with a near-identical signature.
 - **Implementation in the interface comment**: the comment describes internals.
 - **Hard to describe**: a complete comment for the entry point has to be long.
 - **Getters and setters as the public surface**: a class whose interface is mostly `getFoo`/`setFoo` has an interface the same shape as its implementation — definitionally shallow. Replace with methods that name intent (`reserve()`, `markPaid()`) and enforce invariants; keep fields private.
 - **One method per caller-shape**: a finder/handler/query method per combination of conditions, growing without bound. Compress with a value object or query parameter that lets one method cover the cluster.
-- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy interface adopted because patterns are good, not because the problem has the shape the pattern solves.
+- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy interface adopted on the belief that patterns are good, while the problem lacks the shape the pattern solves.
 
 ## References
 

@@ -38,8 +38,8 @@ The interface comment:
 Eight sentences. SQLAlchemy concepts (Session, Query, expunge,
 DetachedInstanceError) are part of the contract. Callers must know how
 sessions work, how to write SQLAlchemy filters, and how to manage commit
-and detachment. Failure named: this is a SQLAlchemy bindings layer, not a
-domain repository.
+and detachment. Failure named: this is a SQLAlchemy bindings layer pretending
+to be a domain repository.
 
 Redesign with intent methods:
 
@@ -77,7 +77,7 @@ to coordinate.
 
 ## Example 2 — Query object interface design
 
-The "one find method to rule them all" pattern from `toby-swd-modules`
+The "single find method covering every filter" pattern from `toby-swd-modules`
 databases.md needs an interface that doesn't trade the finder-explosion
 for a different problem.
 
@@ -97,7 +97,8 @@ Comment:
 > mismatches throw ClassCastException at runtime. Limit defaults to 200
 > if absent; values over 1000 are silently capped.
 
-Failed: untyped map means runtime errors instead of compile-time, the
+Failed: untyped map pushes type errors to runtime that a typed surface would
+catch at compile time, the
 accepted keys are part of the contract documented in prose, "silently
 capped" is a leak about the implementation.
 
@@ -248,8 +249,8 @@ guarantee separately.
 Guardrail: did anything needed get hidden? Yes — sometimes the caller
 needs to know whether they are inside a transaction (e.g., to avoid
 firing an out-of-process event that would commit independently). For that
-case, expose `UnitOfWork.isActive()` as a one-method check, not a `tx`
-parameter on every method.
+case, expose `UnitOfWork.isActive()` as a one-method check and keep the `tx`
+parameter off every method.
 
 ---
 
@@ -284,7 +285,7 @@ The migration looks simple; its contract isn't. The thing that's leaked
 is the difference between "schema migration" and "data migration" — the
 script does the former and offers no story for the latter.
 
-Redesigning the *interface to migrations*, not this one migration, helps:
+Redesigning the *interface to migrations* — the general shape, beyond this one migration — helps:
 
 ```python
 class Migration:
@@ -303,7 +304,7 @@ This is heavier than what most teams need on day one — most teams ship
 comment test exposes the real interface (schema, data, code coordination
 across deploys), the team can decide whether to invest in the deeper
 abstraction or accept the limits of the shallow one. The choice is now
-informed, not accidental.
+informed.
 
 ---
 
@@ -319,4 +320,4 @@ informed, not accidental.
 | Comment mentions "session", "connection", "cursor" | The underlying driver is leaking; hide it |
 
 When the comment refers to mechanism (sessions, queries, transactions, cursors),
-the repository is shaped around mechanism, not knowledge. Re-slice.
+the repository is shaped around mechanism, when it should be shaped around the knowledge it owns. Re-slice.

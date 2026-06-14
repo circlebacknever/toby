@@ -24,7 +24,7 @@ make one call. The merged module is deeper than either original.
 
 ---
 
-## Example 2 — Backend: pull complexity downward instead of a config knob
+## Example 2 — Backend: pull complexity downward
 
 A retrying transport needs a retry interval. Tactical move: export
 `retry_interval_ms` as a configuration parameter and let operators set it.
@@ -38,7 +38,7 @@ keep it as an optional argument with that computed value as the default, so the
 common case specifies nothing.
 
 Guardrail check: this complexity is related to the transport's own job and it
-simplifies every caller, so pulling it down is correct rather than leakage.
+simplifies every caller, so pulling it down is correct here.
 
 ---
 
@@ -79,7 +79,7 @@ check (7) prefers over five shallow ones.
 Counter-case so this is not read as "never split": if `<Row>` also contained
 the logic for formatting currency across locales, that *is* a distinct body of
 knowledge with reuse elsewhere — extract it as a general-purpose helper. Split
-on a real knowledge boundary, never on line count.
+on a real knowledge boundary. Line count never justifies a split on its own.
 
 ---
 

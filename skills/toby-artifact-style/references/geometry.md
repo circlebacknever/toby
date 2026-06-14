@@ -36,7 +36,7 @@ Each mark has one purpose. Apply at content scale (with the named label) or at d
 | `uncertainty-fan` | Cone widening with distance. Trajectory uncertainty after a perturbation. |
 | `uncertainty-halo` | Ring of decreasing density around a point. Position uncertainty without committing to a direction. |
 | `axis-bracket` | Span markers tagged with a value band. Bracket below an axis names the interval as a thing. |
-| `route-trace` | Dashed path between two anchored points. Marks the trajectory, not its endpoints. |
+| `route-trace` | Dashed path between two anchored points. Marks the trajectory between the two anchored points. |
 | `radial-range` | Two concentric circles defining inner and outer radius. Pair with a label for the band. |
 | `phase-bands` | Horizontal stripes of equal width. Seasonal, diurnal, or threshold-banded phases. |
 | `timeline-ticks` | Linear tick marks with `T+00`, `T+18`, `T+42` labels. Default temporal axis decoration. |
@@ -52,7 +52,7 @@ Each mark has one purpose. Apply at content scale (with the named label) or at d
 
 ## Pairing marks with subject structure
 
-Pick the mark for the structure of the subject, not its name. Some defaults:
+Pick the mark for the structure of the subject. Some defaults:
 
 - A network or graph subject → `matrix-grid` or `triangulation-mesh` as backdrop; `coordinate-stamp` for nodes.
 - A measurement-over-time subject → `timeline-ticks` as axis, `model-envelope` for the fit, `threshold-rail` for the alert band.

@@ -7,7 +7,7 @@ The ladders apply; the framework idioms shape the move.
 
 ---
 
-## Example 1 — Error boundaries: scope by recoverability, not by ambition
+## Example 1 — Error boundaries: scope by recoverability
 
 A common reflex when adding error boundaries to a React app:
 
@@ -25,7 +25,7 @@ position, their open dialog. This is aggregation at the wrong level — the
 boundary aggregates more than it should because no smaller boundary was
 designed.
 
-Better: place boundaries at recoverable units, not at the root.
+Better: place boundaries at recoverable units.
 
 ```tsx
 // App.tsx
@@ -69,7 +69,7 @@ own error pages in SvelteKit).
 
 ---
 
-## Example 2 — Async errors: try/catch in every effect vs Result discriminator
+## Example 2 — Async errors: a typed Result discriminator
 
 The pattern that grows:
 
@@ -95,19 +95,19 @@ function OrderPage({ id }: { id: string }) {
 
 Repeated in every page that loads data, each slightly different about
 which errors get which treatment. Common errors handled at every call site
-instead of one. The error ladder failing at rung 3 (aggregation).
+when one handler would do. The error ladder failing at rung 3 (aggregation).
 
-The cleanest move depends on which errors matter where:
+The right move depends on which errors matter where:
 
 - **NetworkError** is usually transient. Retry inside the API client (rung
   2 — masking at low level). With a sensible retry-with-backoff, a network
   blip never reaches the component.
 - **AuthError** has one global handler — navigate to login, clear session.
   This is aggregation (rung 3) at the API client or response interceptor
-  level, not at each call site.
+  level, which is where the one handler belongs.
 - **NotFoundError** is usually a real "this resource doesn't exist for
   this user" case. Surface it as a typed Result so the component can
-  render a "not found" view instead of "error."
+  render a "not found" view, which is the accurate state for this case.
 - **Unexpected errors** propagate to the route-level error boundary
   (rung 3 again, at the render layer).
 
@@ -181,7 +181,7 @@ The version that earns its complexity:
 
 ```tsx
 function ProductList({ products, filter }: { products: Product[]; filter: string }) {
-  // Genuinely expensive — re-running this scan on every keystroke is the bottleneck.
+  // Expensive — re-running this scan on every keystroke is the bottleneck.
   const filtered = useMemo(() => fuzzyFilter(products, filter), [products, filter]);
   return <>{filtered.map((p) => <ProductCard key={p.id} product={p} />)}</>;
 }
@@ -198,7 +198,7 @@ for most components; resist the urge to add a layer.
 
 ---
 
-## Example 4 — Virtualization: a measured decision, not a default
+## Example 4 — Virtualization: a measured decision
 
 A team is about to render 200 items in a list. Someone says "we should
 virtualize this."
@@ -209,9 +209,9 @@ sweat. No virtualization library needed.
 
 The team renders 2000 items. Things get slower on low-end devices but the
 P95 is still acceptable. Probably no virtualization yet — measure the
-specific bottleneck. Often it's not the number of items but a single
-expensive per-row computation, or a giant image being rendered without
-sizing constraints.
+specific bottleneck. The item count is rarely the cause; the usual culprit
+is a single expensive per-row computation, or a giant image being rendered
+without sizing constraints.
 
 The team renders 50,000 items. Now it's a measured problem. Virtualization
 earns its complexity:
@@ -248,7 +248,7 @@ or framework-specific patterns).
 
 ---
 
-## Example 5 — Render performance: design-time choices over post-hoc memoization
+## Example 5 — Render performance: design-time choices come first
 
 A common slow render the team blames on React, then tries to memo their
 way out of:
@@ -275,9 +275,9 @@ The filter + sort runs on every keystroke. 500 items, two passes (filter,
 sort), one allocation per pass. The team's first instinct is `useMemo` on
 the result. That helps. But the design-time move is cheaper *and* better:
 
-- Pre-lowercase the customer name once when orders are loaded, not on
-  every comparison. (500 string lowercases * keystrokes * keystrokes...)
-- Sort once when orders are loaded, not on every render.
+- Pre-lowercase the customer name once when orders are loaded, so each
+  comparison reuses it. (500 string lowercases * keystrokes * keystrokes...)
+- Sort once when orders are loaded, so every render reads the sorted list.
 - Debounce the filter input. Users don't see results between keystrokes
   anyway; running the filter at 60fps when they're typing is wasted work.
 
@@ -300,8 +300,8 @@ function Dashboard() {
 ```
 
 The `useMemo` is now real — the filter is the only expensive thing left.
-The pre-sort and pre-lowercase happen once at load, not per render. The
-debounce eliminates work the user can't perceive. Three design-time moves,
+The pre-sort and pre-lowercase happen once at load and every render reads
+the result. The debounce eliminates work the user can't perceive. Three design-time moves,
 each almost free, and the slow render disappears without any memoization
 heroics.
 

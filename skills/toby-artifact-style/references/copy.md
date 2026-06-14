@@ -77,7 +77,7 @@ in today's fast-paced world; we all know; let's dive in; it's no secret; at the 
 ### Self-praise of the writing
 cleanly, clearly, honestly, no fluff, in plain English, just the facts, simply put, in a nutshell
 
-The reader can see whether the writing is clean. Saying so converts evidence into theater.
+The reader can see whether the writing holds up. Saying so converts evidence into theater.
 
 ### Reader-state assertions
 you'll love, you'll wonder how you ever, you'll be amazed, you'll find that
@@ -140,7 +140,7 @@ Match the qualifier to the epistemic state. Don't hedge a known claim or strip a
 
 Hero + feature cards + CTA shapes are allowed. The copy inside is not promotional.
 
-- **Hero headline** = what the thing does, not how it makes the reader feel. "Models p95 latency under burst load" passes. "Built for performance you'll love" fails.
+- **Hero headline** = what the thing does. "Models p95 latency under burst load" passes. "Built for performance you'll love" fails.
 - **Feature card** = a concrete behavior + the measurement that backs it. "Detects threshold breach within 50 ms. Tested at n = 10⁴ events/sec."
 - **CTA verb** = the actual next step. "Read the derivation." "Open the worked example." "Run the benchmark." Never "Get started." Never "Start your journey."
 - Testimonials, social-proof counts, and "as seen in" rows are out unless the artifact's purpose is to surface those sources.

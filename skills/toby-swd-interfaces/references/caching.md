@@ -32,11 +32,11 @@ Comment, complete:
 > in set produce undefined behavior.
 
 Seven sentences. Three caller obligations (load-on-miss coordination,
-JSON-only values, TTL fuzziness). The interface is at the level of "wraps
-Redis," not at the level of "owns caching for this app."
+JSON-only values, TTL fuzziness). The interface sits at the level of "wraps
+Redis." It should own caching for this app.
 
-The deeper interface inverts the contract — instead of asking the caller
-to coordinate load-on-miss, the cache does it:
+The deeper interface inverts the contract — the cache coordinates
+load-on-miss itself, so the caller never does:
 
 ```ts
 interface Cache {
@@ -70,7 +70,7 @@ remains hidden; the operation (`warm`) is the named contract.
 
 ---
 
-## Example 2 — Invalidation as part of the data interface, not the cache's
+## Example 2 — Invalidation as part of the data interface
 
 A common attempt at tidy separation:
 
@@ -153,8 +153,8 @@ The cache interface is unchanged. The redesign was at the *composition*
 level — moving the cache from a peer of the service to a decorator of
 the store. This is a recurring pattern: when an interface's natural
 operation has a side effect on a peer module, the side effect probably
-belongs *inside* whichever module owns the underlying decision, not in
-the caller.
+belongs *inside* whichever module owns the underlying decision. The caller
+should never carry it.
 
 ---
 
@@ -231,7 +231,7 @@ If `cache.getOrLoad` throws when Redis is unreachable, the caller now
 must handle "Redis is down" as a failure mode for what looks like a
 product fetch. If `cache.getOrLoad` silently falls back to calling
 `load` directly, the caller doesn't know the cache is failing — and a
-herd of cache misses hitting the database is a different kind of bad day.
+flood of cache misses hitting the database is a different kind of bad day.
 
 The choice is part of the interface. Document it:
 

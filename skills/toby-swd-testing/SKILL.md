@@ -35,7 +35,7 @@ If you can't name the behavior, you don't know what you're testing. That's a des
 
 Tests at the boundary survive refactors. Tests that reach into internals do not.
 
-Concretely: don't import private modules to test them. Don't assert on private state. Don't verify that helper X was called before helper Y unless that call sequence is the observable contract — which is rare. Mock external dependencies at the system boundary, not internal collaborators.
+Concretely: don't import private modules to test them. Don't assert on private state. Don't verify that helper X was called before helper Y unless that call sequence is the observable contract — which is rare. Mock external dependencies at the system boundary. Internal collaborators stay real — mocking them couples the test to current structure.
 
 When a behavior is hard to test through the public interface, the abstraction is usually too coarse. The fix is to extract a smaller module with a real interface, then test through it. Reaching into internals to "make it testable" is the failure mode toby-swd-modules exists to prevent.
 
@@ -99,10 +99,10 @@ In an existing codebase, inspect the tests that already cover the touched behavi
 ## Red flags
 
 - **Test fails on a correct refactor.** Coupled to internals.
-- **Test name describes a call.** "calls X with Y" — that's a mock log, not a behavior.
+- **Test name describes a call.** "calls X with Y" names a mock log. The reader still can't tell what the system is supposed to do.
 - **Snapshot blob.** Large auto-updated string nobody reviews on change.
-- **Mock of an internal collaborator.** Verifies how, not what.
-- **Coverage-driven test.** Written to hit a line, not protect a behavior. Reads like the implementation with the word "expect" sprinkled in.
+- **Mock of an internal collaborator.** Verifies the call sequence, which says nothing about what the system produces.
+- **Coverage-driven test.** Written to hit a line. It protects no behavior and reads like the implementation with the word "expect" sprinkled in.
 - **Hard-to-name test.** The abstraction under test is wrong or mixed.
 - **Test deleted to make the suite green.** Almost always the wrong move; classify first.
 - **Bug fix without a regression test.** The fix is unverified and silent re-breakage is now possible.

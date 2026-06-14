@@ -5,14 +5,15 @@ description: >-
   this. Use this skill when naming, comments, conventions, exported contracts,
   confusing control flow, or obvious-on-read structure are part of a code
   change. It is a focused clarity pass for backend, frontend, scripts, and
-  configs, not a reason to rewrite already-clear surrounding code.
+  configs. It stays scoped to the code being touched and leaves already-clear
+  surrounding code alone.
 ---
 
 # Toby SWD Clarity
 
 Code is read far more than it is written. The decisions you make about names, comments, and consistency compound across every future read — every debug session, every onboarding, every agent that touches this code next. Bad clarity is one of the most durable forms of complexity because it slows everything downstream while never appearing in a diff as the problem.
 
-Correct this before you start: **"Good code is self-documenting" is false.** Only signatures can be expressed in code; the behavior, side effects, units, invariants, and reasons a reader needs live in the designer's head and have no representation in the code itself. Good names reduce the need for comments; they never remove it. Treat comments as the mechanism by which abstraction is delivered, not as an apology for unclear code.
+Correct this before you start: **"Good code is self-documenting" is false.** Only signatures can be expressed in code; the behavior, side effects, units, invariants, and reasons a reader needs live in the designer's head and have no representation in the code itself. Good names reduce the need for comments; they never remove it. Treat comments as the mechanism by which abstraction is delivered. They carry the units, invariants, and reasons that have no home in the code.
 
 ## Naming
 
@@ -30,14 +31,14 @@ Use names consistently: one name for one purpose, never that name for a second p
 
 Separate interface comments from implementation comments; keep implementation detail out of the interface.
 
-An **interface comment** describes behavior, arguments, return value, side effects, exceptions, and caller preconditions — the abstraction. If it has to describe internals to be complete, the module is shallow; that is a redesign signal, not a documentation problem. Write interface comments before the implementation; they are a design tool.
+An **interface comment** describes behavior, arguments, return value, side effects, exceptions, and caller preconditions — the abstraction. If it has to describe internals to be complete, the module is shallow; that is a redesign signal. Reach for the design, since better wording won't fix a leaky abstraction. Write interface comments before the implementation; they are a design tool.
 
-Comment at a different level than the code, never the same level:
+Comment at a different level than the code. A comment pitched at the code's own level just restates it and rots in place:
 
 - **Precision (lower level)**, on fields, arguments, return values: add what the name and type cannot say — units, inclusive or exclusive bounds, what null or empty means, ownership, and invariants. Fields with non-obvious units, ownership, null meaning, bounds, side effects, or invariants get comments. Trivial fields with names and types that already say the whole contract can stay quiet.
 - **Intuition (higher level)**, inside code: why this exists, what a block accomplishes conceptually, why a non-obvious approach was chosen, how a reader got here. For a bug-fix whose purpose isn't obvious, say why and reference the tracker.
 
-Delete comments whose content is already obvious from the adjacent code, including comments that just restate the name. Document each decision once, in the most obvious place. Don't re-explain a called method at its call site — cross-reference instead. For a design decision that spans modules, put it in one discoverable central place and point to it from the affected sites.
+Delete comments whose content is already obvious from the adjacent code, including comments that just restate the name. Document each decision once, in the most obvious place. Cross-reference a called method from its call site. Re-explaining it there gives you two copies that drift apart. For a design decision that spans modules, put it in one discoverable central place and point to it from the affected sites.
 
 ## Consistency
 
@@ -64,7 +65,7 @@ The cheap checks — naming, comment presence, obvious-on-read — apply on ever
 
 ## Brownfield Work
 
-For existing code, first learn the local vocabulary and comment style. Improve unclear names, comments, and obvious-on-read structure in the code already being touched when the cleanup is local. If the same concept is named several ways across the codebase, offer a follow-up rename or convention cleanup instead of changing one island and leaving drift behind. If the clarity issue exposes a module rule agents should remember, offer an AGENTS.md note at the meaningful module root.
+For existing code, first learn the local vocabulary and comment style. Improve unclear names, comments, and obvious-on-read structure in the code already being touched when the cleanup is local. If the same concept is named several ways across the codebase, offer a follow-up rename or convention cleanup. Changing one island leaves the rest drifted and the reader worse off than before. If the clarity issue exposes a module rule agents should remember, offer an AGENTS.md note at the meaningful module root.
 
 ## Red flags
 

@@ -60,8 +60,8 @@ def confirm_order(order_id: str) -> Order:
 
 The ORM, the session, the eager/lazy loading strategy, the transaction
 boundary — all hidden. Switching ORMs is one module's problem. Adding a read
-replica is the repository's choice. Domain `Order` is a plain class, not a
-session-bound proxy that explodes if you look at it after commit.
+replica is the repository's choice. Domain `Order` is a plain class. The old one
+was a session-bound proxy that explodes if you touch it after commit.
 
 This is the canonical example of pulling complexity downward (Check 3) at the
 data layer. The repository is more callers than authors; let it absorb the
@@ -89,7 +89,7 @@ public interface UserRepository {
 Check 6 (separate general from special, remove special cases). Each new
 caller's filter combination becomes a new method. The interface grows
 unbounded; two finders that differ in argument order do almost the same query;
-some are unused but no one will delete them. Worst of all, the meaning of
+some are unused but no one will delete them. And the meaning of
 "active" is encoded in every caller — the day "active" gets redefined (excludes
 suspended? excludes pending verification?) is the day every site needs review.
 
@@ -271,10 +271,9 @@ precondition documented nowhere.
 - **Migration knowledge** belongs in one module. A column rename touched in
   twelve services because each constructs raw SQL or hardcodes a column alias
   is the same leakage pattern as Example 3.
-- **Caching the repository** is properly Example 1 from `caching.md`, not a
-  concern of the service. The repository is the natural home for read-through
+- **Caching the repository** is properly Example 1 from `caching.md`. The
+  service never owns it. The repository is the natural home for read-through
   caching because it already owns the data-access contract.
 - **Read models versus write models** become natural splits when one query
   shape is wildly different from the entity shape (reporting, dashboards).
-  That's a deliberate split per Check 7, not the default — most apps don't
-  need it.
+  That's a deliberate split per Check 7; most apps don't need it.

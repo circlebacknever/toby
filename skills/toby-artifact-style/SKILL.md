@@ -58,12 +58,12 @@ Run this checklist before writing any code or markup.
 1. **Job.** What is this artifact doing — teaching a mechanism, summarizing evidence, providing a reference, walking a process, supporting a decision? The answer determines surface and density.
 2. **Composition mode.** Pick one from below. Not the one you used last time.
 3. **Ink allocation.** Decide before you start which panels or slides use ink and which use paper. Don't let it happen by accident.
-4. **Logo primitive.** Name the shape. It should hint at the structure of the subject, not just the subject's name.
+4. **Logo primitive.** Name the shape. It should hint at the structure of the subject.
 5. **For decks:** identify which slides earn interactivity before writing any slide. The concept governs the interaction type — see `references/decks.md`.
 
 ## Composition modes
 
-Pick one per artifact. Vary across sessions. The mode is a structural commitment, not a color choice — it governs layout logic, density, and how ink and paper are distributed.
+Pick one per artifact. Vary across sessions. The mode is a structural commitment. It governs layout logic, density, and how ink and paper are distributed.
 
 **Dense reference.** Grid of cards, high information density, multiple KV pairs per section, several columns. Rewards 30–45 seconds of attention per panel. Use for protocol references, parameter tables, specification sheets, side-by-side comparisons. Ink panels appear as evidence callouts inside a paper field.
 
@@ -157,7 +157,7 @@ Pattern for a state-tinted panel: background = `*-soft`, border = `*-tint`, left
 - No gradients. No rainbow scales. No glow. No colored shadows.
 - No red as brand accent. Use ink weight, hairline, or position for emphasis.
 - Chart palette is positional — use in fixed order, by series index. Also drives section accents on long pages.
-- **No left-accent-colored cards** as a general decoration (a known AI-slop tell). Exception: alerts/toasts use a single 4px coloured left strip from the callout family — that's a documented pattern, not the forbidden one.
+- **No left-accent-colored cards** as a general decoration (a known AI-slop tell). Exception: alerts/toasts use a single 4px coloured left strip from the callout family — that strip is the documented pattern.
 
 ## Typography
 
@@ -274,7 +274,7 @@ Each artifact gets:
 - One short lowercase Inter-600 word naming the topic.
 - A single red dot as the only color.
 
-**The primitive must be chosen for the structure of the subject, not just its name.** A network topology → crosshair or grid. A recursive algorithm → nested squares. An antenna or wave → orbit arc. A decision process → branching lines or Y-fork. A time series → horizontal rail with a tick. A probability distribution → bell curve outline. A queue or pipeline → stacked horizontal bars.
+**Choose the primitive for the structure of the subject.** A network topology → crosshair or grid. A recursive algorithm → nested squares. An antenna or wave → orbit arc. A decision process → branching lines or Y-fork. A time series → horizontal rail with a tick. A probability distribution → bell curve outline. A queue or pipeline → stacked horizontal bars.
 
 Lazy defaults to refuse: orbit for everything, triangle because it's geometric, square because it's simple. If you cannot name why the shape fits the subject, pick a different shape.
 

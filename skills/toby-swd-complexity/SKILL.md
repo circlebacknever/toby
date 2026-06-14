@@ -24,9 +24,9 @@ The cost of an exception is the handling code it forces on every caller, propaga
 
 2. **Mask it at the lowest level.** If a low-level module can fully handle the condition without the caller ever knowing, handle it there. Masking works best in a widely-used library method, where it removes the most handlers. Transient errors are the canonical case: a network blip, a database deadlock, a rate-limit response — if a bounded retry inside the module turns them into success, the caller never had a failure to handle.
 
-3. **Aggregate.** If it must surface, let it propagate several levels to one handler that addresses the general case — the single handler at the top of a request loop — rather than a handler at every call site.
+3. **Aggregate.** If it must surface, let it propagate several levels to one handler that addresses the general case — the single handler at the top of a request loop. One handler at the top replaces a handler at every call site.
 
-4. **Just crash.** For errors that are rare and hard or pointless to handle — out of memory, unrecoverable I/O, an internal invariant violated (which means a bug) — print diagnostics and abort, ideally behind one checked wrapper so call sites don't each repeat the check. This is a legitimate complexity reduction, not a failure to handle.
+4. **Just crash.** For errors that are rare and hard or pointless to handle — out of memory, unrecoverable I/O, an internal invariant violated (which means a bug) — print diagnostics and abort, ideally behind one checked wrapper so call sites don't each repeat the check. This is a legitimate complexity reduction; the abort is the correct handling for an error nobody can act on.
 
 **Guardrail**: eliminating, masking, or crashing is correct only when the information is not needed outside the module. A module that swallows every network error so callers can't tell a message was lost hasn't reduced complexity; it's made reliable use impossible. Decide what information matters. Hide what callers do not need; surface what they do.
 
@@ -34,15 +34,15 @@ The cost of an exception is the handling code it forces on every caller, propaga
 
 ## Performance design
 
-Clean code tends to be fast: defined-away special cases need no checks, deep modules cross fewer layers. The first performance move is good design. Beyond that, performance work has three layers.
+Tight code tends to be fast: defined-away special cases need no checks, deep modules cross fewer layers. The first performance move is good design. Beyond that, performance work has three layers.
 
-**Always, at design time — know what is expensive.** Develop a feel for the operations that cost orders of magnitude: network round trips, disk I/O, dynamic allocation, cache misses. When a naturally efficient option is no more complex than a slow one, take it — a hash table over an ordered map when ordering isn't needed, one block allocation over many. This costs nothing and prevents the death-by-a-thousand-cuts case where ignoring performance entirely yields a system 5–10x slow with no single fix available.
+**Always, at design time — know what is expensive.** Develop a feel for the operations that cost orders of magnitude: network round trips, disk I/O, dynamic allocation, cache misses. When a naturally efficient option is no more complex than a slow one, take it — reach for a hash table when ordering isn't needed, allocate one block where many would do. This costs nothing and prevents the death-by-a-thousand-cuts case where ignoring performance entirely yields a system 5–10x slow with no single fix available.
 
 **Gate complexity on evidence.** If efficiency requires added complexity that is small and hidden behind the interface, it may be worth it (it's still incremental — be wary). If it is large or complicates an interface, start simple and optimize only if a problem appears. Exception: when there is clear upfront evidence performance will matter for a specific path, implement the fast approach immediately.
 
 **When something is actually slow — measure, then redesign the critical path.** Never optimize on intuition; programmer intuition about what is slow is unreliable regardless of experience. Record a baseline, change one thing, re-measure. A change with no measurable effect gets reverted unless it also simplified the design. Look for a fundamental fix first: a cache, a better algorithm or data structure. Code-level critical-path redesign is the last resort.
 
-When it is needed: describe the smallest code that must run in the common case, ignoring the current structure, and rebuild toward that — one test at the top detects all special cases, the common path then runs with no further branching, and special-case code sits off the path structured for simplicity rather than speed.
+When it is needed: describe the smallest code that must run in the common case, ignoring the current structure, and rebuild toward that — one test at the top detects all special cases, the common path then runs with no further branching, and special-case code sits off the path structured for simplicity, since it no longer runs on the hot path and gains nothing from being fast.
 
 ## Proportionality
 
@@ -55,7 +55,7 @@ In existing code, inspect the current error, validation, retry, cache, batching,
 ## Red flags
 
 - An exception thrown for a condition the API could define away.
-- The same error handled at many call sites instead of one.
+- The same error handled at many call sites when one handler would do.
 - An error eliminated or masked that callers actually needed.
 - Elaborate recovery for a rare unrecoverable error that should just abort.
 - A transient error handled at the caller when an internal retry would erase it.

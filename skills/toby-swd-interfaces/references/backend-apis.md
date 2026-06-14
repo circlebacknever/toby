@@ -132,9 +132,9 @@ Eleven sentences. Order ("First X, then Y"), internal exception names,
 edge-case escape hatches (`skipTaxValidation`), partial-failure semantics
 the caller must know about. Failure named at multiple levels.
 
-Redesign by knowledge. The procedure is "place an order from a cart," and
-the contract should look like one operation, not seven validations the
-caller orchestrates:
+Redesign by knowledge. The procedure is "place an order from a cart," so
+the contract should look like one operation and absorb the seven validations
+the caller currently orchestrates:
 
 ```java
 public sealed interface OrderResult {
@@ -202,8 +202,8 @@ The comment on this interface:
 > with email-only login.
 
 Five methods, five different uses, each describing both behavior and which
-caller-site uses it. Failure named: this is a grab-bag, not an interface.
-It exists to be "convenient" for any future need.
+caller-site uses it. Failure named: this is a grab-bag. It exists to be
+"convenient" for any future need.
 
 Redesign with the actually-needed method only:
 
@@ -321,7 +321,7 @@ form is the default; the bulk form is the exception.
 | Smell | Redesign |
 |---|---|
 | Endpoint with 10+ query parameters | Filter/criteria value object on the wire |
-| Service method with `dryRun`, `skipX`, `useY` flags | Split into operations; encode policy on entities, not flags |
+| Service method with `dryRun`, `skipX`, `useY` flags | Split into operations; encode policy on the entities themselves |
 | Method whose comment lists exceptions to handle | Typed result (`Result<T>` or sealed `Outcome`) |
 | RPC mutation that updates "any subset of these fields" | One RPC per intent; field-mask form only when the bulk case is real |
 | Producer-defined interface with 6+ methods | Consumer-side narrow interfaces |

@@ -43,8 +43,7 @@ introduces a second category-listing endpoint, the new author either
 duplicates the cache machinery or — much worse — forgets to invalidate, and
 stale listings appear in production.
 
-Treat the cache as a layer below the repository, not as code sprinkled into
-the service:
+Treat the cache as a layer below the repository:
 
 ```python
 class ProductsRepository:
@@ -109,7 +108,7 @@ const products: ProductsStore = new CachedProductsStore(
 );
 ```
 
-`CachedProductsStore` is a real module, not a pass-through wrapper. It owns:
+`CachedProductsStore` earns its place as a real module. It owns:
 cache-key construction, TTL policy, eviction rules, and load-through semantics
 behind `getOrLoad`. The interface (`ProductsStore`) is identical to the
 underlying store — that is correct here, because this is the decorator case
@@ -124,7 +123,7 @@ favor of using `cache` directly inside `PostgresProductsStore`.
 
 ---
 
-## Example 3 — Stampede protection inside the cache, not at call sites
+## Example 3 — Stampede protection inside the cache
 
 A high-traffic product page caches an expensive `featuredProducts` query for
 10 minutes. When the cache key expires, a hundred concurrent requests all
@@ -188,7 +187,7 @@ parameters the cache can choose better than the caller stay inside the cache.
 
 ---
 
-## Example 4 — Invalidation owned by the data module, not by callers
+## Example 4 — Invalidation owned by the data module
 
 A reporting service writes a row to `events` and then carefully invalidates
 six cache keys that derive from it:
@@ -230,9 +229,9 @@ func (r *EventsRepository) evictDerivedFrom(ev Event) { ... }
 ```
 
 Now there is one place that knows what derivations exist. Adding a new
-derived view adds an entry there, not edits to every writer. The batch
-importer and the admin tool call `Insert` and get correct invalidation
-automatically.
+derived view adds an entry there. The old form forced an edit in every writer.
+The batch importer and the admin tool call `Insert` and get correct
+invalidation automatically.
 
 For higher-volume systems this same logic moves to an event/CDC stream and a
 worker that invalidates based on database changes. The principle is the same:
@@ -245,7 +244,7 @@ list.
 
 | Layer | Use the cache here? |
 |---|---|
-| HTTP/edge (CDN, reverse proxy) | Yes — for cacheable responses. Owned by infra, not application code. |
+| HTTP/edge (CDN, reverse proxy) | Yes — for cacheable responses. Owned by infra. |
 | Controller/handler | Almost never. Cache logic in handlers is the scattered antipattern of Example 1. |
 | Service | Rarely. Use it here only if the cached value is a service-specific composition that no repository would own. |
 | Repository / data store | The default home. The repository already owns the data contract; caching is part of that contract. |

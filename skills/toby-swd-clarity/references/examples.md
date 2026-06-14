@@ -39,7 +39,8 @@ required — silent data corruption that took months to find.
 Consistency rule: one name, one purpose. Rename to `fileBlock` and `diskBlock`
 so the two cannot be confused at a glance, and better still give them distinct
 types so they cannot be interchanged at all. The clarity fix here is also a
-correctness fix; that is the usual pattern, not a coincidence.
+correctness fix. That pairing shows up again and again: a name that can be
+confused is a value that can be confused.
 
 ---
 

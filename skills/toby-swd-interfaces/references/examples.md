@@ -42,7 +42,7 @@ The complete contract is two sentences and names none of its internals. Tokens,
 refill cadence, and the clock moved inside. The interface shrank while the
 module got deeper. The guardrail check: is anything the caller truly needs
 now hidden? If callers must show a retry-after hint, expose that one value
-(`allow` returns `RetryAfter | None`) rather than re-exposing the bucket.
+(`allow` returns `RetryAfter | None`) and keep the bucket internal.
 
 ---
 
@@ -76,10 +76,10 @@ three real call sites are three named intents:
 // All compose one deep core that owns layout/truncation/theming internally.
 ```
 
-Callers make one decision (which intent), not eight. Theme is read from context
+Callers make one decision (which intent), down from eight. Theme is read from context
 inside the core, so it stops being leaked through props. The core is deep; the
-presets are honest thin wrappers, not pass-through components, because each
-encodes a real distinct intent.
+presets are honest thin wrappers; each encodes a real distinct intent instead
+of forwarding.
 
 ---
 
@@ -93,10 +93,10 @@ Task: an interface for a client to upload a file to storage.
 | B: `upload(bytes, key)` | One call | Medium | Chunking, retries, multipart threshold | Deep, but assumes all-in-memory |
 | C: `upload(source, key)` where source is bytes or a stream | One call | High | Same as B, plus large-file streaming | Deepest; covers current and near needs |
 
-C is not the first idea (A is) and not a tweak of B — it is a different
-decomposition driven by B's flaw (memory blowup on large files). It is the kind
+C is a different decomposition, driven by B's flaw (memory blowup on large
+files). It is the kind
 of synthesis the design-it-twice step is supposed to produce. The interface
 comment for C is short and mentions no internals, so it passes the test.
 Guardrail: if a caller must know whether the upload was durably committed before
 returning, that is a real need — `upload` returns once durably stored, and
-that guarantee goes in the comment rather than being hidden.
+that guarantee goes in the comment.

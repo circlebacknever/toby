@@ -104,8 +104,7 @@ function ProductPage(props: { id: string }) {
 Cancellation, deduping, retry, cache, refetch-on-focus, request waterfalls
 across components — all owned inside one library that's deep by design. The
 component is back to rendering. When the team later decides every error
-deserves a toast, that's one configuration change in one place, not a
-patch across the codebase.
+deserves a toast, that's one configuration change in one place.
 
 Build your own only if you have a reason. "We don't want a dependency" loses
 on cost-benefit by the third component.
@@ -240,7 +239,8 @@ notifications share nothing except a tendency to live globally. Selectors
 get longer and longer, all components subscribe to the same store, every
 mutation can in principle touch anything, and the "interface" of the store
 is the entire state shape exposed by getter and the entire set of mutations
-exposed by name. Maximum shallowness.
+exposed by name — the interface is the whole state shape, which makes the store
+as shallow as a module gets.
 
 Re-slice by knowledge (Check 1). Each slice owns one body of state and the
 operations that maintain its invariants.
@@ -299,14 +299,15 @@ export const Cart = {
 
 Each slice is now a deep module: the interface (`add`, `remove`, `total`,
 `applyCoupon`) expresses intent; the state shape and the invariants live
-inside. Components call `Cart.add(item)`, not `useStore.setState((s) =>
-({ cart: [...s.cart, item] }))`. The "what counts as a duplicate" rule
+inside. Components call `Cart.add(item)`. The grab-bag form made them reach
+into `useStore.setState((s) => ({ cart: [...s.cart, item] }))`. The "what
+counts as a duplicate" rule
 lives once, in `add`. Adding the next state concern (a `wishlist`)
 creates a new slice; it does not extend the same monolith.
 
 Guardrail: don't shatter into so many slices that every component imports
-six. Slice by real knowledge boundary (auth, cart, theme), not per
-field.
+six. Slice by real knowledge boundary (auth, cart, theme). One slice per field
+is the over-split.
 
 ---
 
@@ -408,8 +409,8 @@ function createCombobox<T>(opts: { items: () => T[]; getId: (t: T) => string }) 
 The behavior is one deep module (the hook / composable / factory); the
 presentation is whatever the consumer writes. Each `ProductCombobox`,
 `UserCombobox`, `TagCombobox` is a few lines of presentational code that
-composes the behavior, not 20 props to a black box that tries to be every
-combobox.
+composes the behavior. The mega-prop form crammed 20 props into one black box
+that tries to be every combobox.
 
 This pattern is what Radix, Headless UI, and Melt UI productize. Adopting
 one of those libraries is usually cheaper than writing your own; the

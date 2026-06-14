@@ -195,13 +195,13 @@ db.execute(
 
 For very large batches (10k+ rows in a single insert), chunk: insert in
 batches of 1000 or so to avoid blocking the database with a single huge
-statement. The chunking logic lives inside the bulk method, not at every
-caller.
+statement. The chunking logic lives inside the bulk method, which keeps
+every caller free of it.
 
 For Postgres specifically, `COPY` is dramatically faster than INSERT for
 very large bulk loads (10k+ rows). For MySQL, `LOAD DATA INFILE`. These
-are escalation tiers — reach for them when measured bulk INSERT is the
-bottleneck, not by default.
+are escalation tiers — reach for them once a measured bulk INSERT is the
+bottleneck, and leave them on the shelf until then.
 
 ---
 
@@ -252,7 +252,7 @@ or the query.
 This is design-time naturally-efficient work. The wrong default — no
 indexes, add them when something is slow — produces the death-by-
 thousand-cuts case at scale, when every query is slow and there's no
-single index to add. Index choice is a load-bearing decision at the
+single index to add. Index choice is a high-consequence decision at the
 schema-design stage.
 
 ---
@@ -294,7 +294,7 @@ def handler():
 ```
 
 **A bounded pool with timeouts.** Configure the pool to fail fast when
-exhausted, rather than queue forever:
+exhausted; queuing forever hides the exhaustion as a hang:
 
 ```python
 engine = create_engine(
@@ -306,8 +306,8 @@ engine = create_engine(
 ```
 
 A request that can't get a connection in 2 seconds fails — caller sees
-"service unavailable," which is recoverable, instead of waiting forever
-in the pool queue, which appears as a hang.
+"service unavailable," which is recoverable. The unbounded version waits
+forever in the pool queue, which appears as a hang.
 
 These are the design-time moves. The measurement-driven move comes later
 — if a specific endpoint holds connections too long even after scoping,

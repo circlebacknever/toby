@@ -11,11 +11,11 @@ description: >-
 
 # Toby SWD Strategy
 
-The code you write today is the structure every future change inherits. Most code in any system is written by extending what's already there — which means the highest-yield point in software isn't the algorithm you chose. It's whether the module boundary was sound when the next change arrived.
+The code you write today is the structure every future change inherits. Most code in any system is written by extending what's already there — which means the highest-yield point in software is whether the module boundary holds when the next change arrives.
 
 An autonomous agent is especially prone to pure tactical execution. "Make the test pass" is such a tidy stopping signal that tactical programming feels like discipline. It is not. A large volume of working code that each adds a special case or a hidden dependency is negative progress dressed as velocity.
 
-The deliverable is a system whose design is at least as good after your change as before it. Working code is a necessary by-product, not the target.
+The deliverable is a system whose design is at least as good after your change as before it. The target is a design that survives the next change. Working code falls out of that.
 
 ## Before writing — design pass
 

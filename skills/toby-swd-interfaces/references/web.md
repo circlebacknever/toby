@@ -43,7 +43,7 @@ differently.
 
 Failure named: the contract leaks positional layout the caller must memorize,
 and the discriminator state (loaded? failed? stale?) is encoded in null
-combinations rather than expressed.
+combinations the caller has to decode.
 
 Redesign with a typed result:
 
@@ -166,7 +166,7 @@ the intent's invariants.
 This is the same design-it-twice pattern as the `UserCard` case in
 `examples.md`. The mistake to avoid is treating "named intents over a core"
 as automatic — only do it when the call sites really are three distinct
-intents, not three sets of prop combinations that happen to recur.
+intents. Three sets of prop combinations that happen to recur do not qualify.
 
 ---
 
@@ -203,8 +203,8 @@ shipping) carry invariants the store doesn't enforce. Every caller now owns
 those invariants. The store's interface and its implementation have the
 same shape: it is the canonical shallow module.
 
-Failure named: the slice exposes the state shape, not the operations on it.
-Invariants live in callers.
+Failure named: the slice exposes the state shape and leaves the operations to
+callers. Invariants live in callers.
 
 Redesign — interface expresses intent, slice enforces invariants:
 
@@ -316,7 +316,7 @@ Comment:
 Four sentences. The caller spreads the prop bundles onto their elements and
 renders against `filteredItems`. Keyboard, ARIA, open/close, filter, and
 focus management are all internal. No "callers must" — the hook owns the
-state and exposes it for rendering, not mutation.
+state and exposes it read-only for rendering.
 
 The depth gain is substantial: the implementation runs to a few hundred
 lines (intelligently handling Tab vs Enter, IME composition events, screen
@@ -331,7 +331,7 @@ none of that complexity in their interface comment.
 |---|---|
 | Destructure a positional tuple and remember what each position means | A typed object or discriminated union as the return type |
 | Combine 8+ props to express a single intent | Named preset components over a deep core |
-| Call `setX` after computing what `X` should be | A method that takes the operation, not the new state |
+| Call `setX` after computing what `X` should be | A method that takes the operation and computes the new state internally |
 | Maintain state and pass it back into a hook every render | Hook owns the state; caller reads it for rendering |
 | Wrap effect-based logic the same way in every component | A custom hook/composable/rune for that effect |
 | Pass children-via-props with rigid slots | `children` plus a small subcomponent API (compound components) |

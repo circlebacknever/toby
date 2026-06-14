@@ -10,7 +10,7 @@ description: >-
 
 # Toby SWD Modules
 
-Module structure is not organizational tidying. It is a decision about who owns which knowledge and how much callers must know to do their job. Get it right and future changes land cleanly. Get it wrong and every change racks up interest — a new flag here, a parallel branch there — until the system resists change more than it enables it.
+Module structure decides who owns which knowledge and how much callers must know to do their job. Get it right and future changes land cleanly. Get it wrong and every change racks up interest — a new flag here, a parallel branch there — until the system resists change more than it enables it.
 
 **A good module is deep: a simple interface over substantial functionality.** The interface is the cost the module imposes on the system; the implementation is the benefit. Maximize benefit per unit of interface cost. "More, smaller modules" is the wrong reflex — every extra module is an interface to learn, more pieces to track, and a new risk of duplicated logic. The bar for splitting is higher than instinct suggests.
 
@@ -20,18 +20,18 @@ Before the checks, one framing decision. When you design a module's interface, t
 
 Four questions, asked early:
 
-- What is the simplest interface that covers all your current needs? (Fewer methods, broader semantics — not more methods.)
+- What is the simplest interface that covers all your current needs? (Fewer methods, broader semantics.)
 - In how many situations will this method be used? A method serving one call site is a candidate for inlining or for redesign into something serving more.
 - Is this API easy to use for the common case today? General-purpose interfaces fail when they make the easy thing hard.
 - Will this generalize without becoming a god interface? Generality with a clear single purpose is depth. Generality across unrelated purposes is sprawl.
 
-The mistake to avoid in the other direction is speculative generality — adding parameters or extension points for futures that never arrive. "Somewhat" is the operative word. Cover today's needs and one or two near-future variants that you can name, not every imaginable one.
+The mistake to avoid in the other direction is speculative generality — adding parameters or extension points for futures that never arrive. "Somewhat" is the operative word. Cover today's needs and one or two near-future variants that you can name. Stop there.
 
 ## The checks
 
 Apply these to any boundary decision. They are cheap; run all of them. Reserve full restructuring proposals for modules that are exported, have multiple callers, cross a service boundary, or are costly to change later.
 
-### 1. Decompose by knowledge, not execution order
+### 1. Decompose by knowledge
 
 State the one design decision or piece of knowledge each module encapsulates. If the split is described as a sequence — "first read, then parse, then write" — that is temporal decomposition. It scatters one piece of knowledge across stages and produces shallow modules. Re-slice so each module owns a body of knowledge end to end.
 
@@ -41,7 +41,7 @@ Two pieces belong together when they share knowledge, when using one almost alwa
 
 For each significant design decision or implementation detail — a file format, a wire protocol, a storage layout, a policy — count how many modules would need to change if it changed. More than one is leakage: the boundary is wrong. Move that knowledge so it lives in exactly one module.
 
-Shared signatures are not leakage when each participant adds distinct functionality. Don't flag: an interface known to caller and implementer, a dispatcher and the handlers it selects, several implementations of one interface, or a decorator and the object it wraps. Leakage is a hidden decision duplicated across modules, not a deliberately shared contract.
+Shared signatures are not leakage when each participant adds distinct functionality. Don't flag: an interface known to caller and implementer, a dispatcher and the handlers it selects, several implementations of one interface, or a decorator and the object it wraps. Leakage is a hidden decision duplicated across modules.
 
 ### 3. Pull complexity downward
 
@@ -68,7 +68,7 @@ Two kinds of inheritance, two very different cost profiles.
 
 **Implementation inheritance** — a parent supplies method bodies that subclasses can use or override. This creates a hidden two-way coupling. Subclass authors must read the parent to know what they inherited; parent authors must check every subclass before changing instance variables or non-final methods. Instance variables visible to both sides are textbook information leakage across modules. Class hierarchies built heavily on implementation inheritance tend to be the hardest parts of a codebase to change.
 
-Default to composition. A "shared logging behavior" or "shared validation behavior" is a helper object the class holds, not a base class it extends. When you must inherit (a framework demands it, you truly override one method on a stable parent), keep the surface narrow: prefer `final`/sealed parents with one or two override points, and separate parent-managed state from subclass-managed state — don't let both sides write the same fields.
+Default to composition. A "shared logging behavior" or "shared validation behavior" is a helper object the class holds. When you must inherit (a framework demands it, you truly override one method on a stable parent), keep the surface narrow: prefer `final`/sealed parents with one or two override points, and separate parent-managed state from subclass-managed state — don't let both sides write the same fields.
 
 This check applies hardest in Java, Kotlin, C#, Swift, and Python OOP-heavy code. It applies less to Go (no inheritance; composition is the default) and to Rust (traits are interface inheritance). For TypeScript and JS, the same rule holds: extending a class to inherit behavior is the costly form; mixins, hooks, and helper objects are usually better.
 
@@ -88,7 +88,7 @@ Special-purpose conditions that exist for one caller don't belong inside a gener
 
 Weigh what the caller must manage to use the module (parameters, preconditions, ordering, error cases) against what it handles internally and invisibly. Strong asymmetry toward internal means deep; rough parity means shallow.
 
-Sharper test: write the module's interface comment. If it has to be long or describe internals to be complete, the module is shallow. The fix is a better decomposition, never more caller-facing documentation.
+Sharper test: write the module's interface comment. If it has to be long or describe internals to be complete, the module is shallow. The fix is a better decomposition. More caller-facing documentation only hides the shallowness.
 
 Exception: some small utilities are unavoidably shallow. Acceptable. Don't inflate a trivial helper into artificial depth.
 
@@ -103,7 +103,7 @@ When placing code in an existing module, inspect where the surrounding code alre
 ## Red flags
 
 - **Information leakage**: one hidden decision reflected in several modules.
-- **Temporal decomposition**: structure follows execution order, not knowledge.
+- **Temporal decomposition**: structure follows execution order; one body of knowledge ends up scattered across stages.
 - **Special-general mixture**: caller-specific conditions inside a general mechanism.
 - **Shallow module**: interface nearly as complex as the implementation.
 - **Pass-through method**: forwards arguments, adds no functionality.
@@ -113,7 +113,7 @@ When placing code in an existing module, inspect where the surrounding code alre
 - **Classitis / over-subdivision**: many shallow modules whose interfaces sum to more complexity than they remove (frontend: over-componentization).
 - **Deep implementation-inheritance hierarchy**: subclasses you can't read without reading the parent, parents you can't change without checking the subclasses. Two-way coupling masquerading as reuse.
 - **Getters and setters as the public surface**: a class whose interface is mostly `getFoo`/`setFoo` is exposing its instance variables with extra syntax. The interface and the implementation are the same shape — definitionally shallow. Replace with methods that express intent (`reserve()`, `markPaid()`) and keep state private.
-- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy applied because patterns are good, not because the problem has the shape the pattern solves. Patterns earn their place by removing complexity, not by being applied.
+- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy applied for its own sake instead of because the problem has the shape it solves. Patterns earn their place by removing complexity.
 
 ## References
 

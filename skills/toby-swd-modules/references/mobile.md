@@ -144,12 +144,12 @@ await FeedCache.clear();
 Keys, versions, JSON schemas, and migration concerns live inside each module.
 Screens call `FeedCache.load()` and don't know what key was used. Logout asks
 each owning module to clear its data and the question "what should be cleared
-on logout" becomes a deliberate policy, not an accident of which screens
-remembered to use `multiRemove`.
+on logout" becomes a deliberate policy. Today it's an accident of which screens
+remembered to call `multiRemove`.
 
 ---
 
-## Example 3 — Native bridge as a deep module, not a thin pass-through
+## Example 3 — Native bridge as a deep module
 
 A team adds barcode scanning. Initial wrapper around a native module:
 
@@ -230,7 +230,7 @@ small caller-facing interface.
 
 ---
 
-## Example 4 — Per-screen network state instead of a repository
+## Example 4 — Per-screen network state
 
 A symptom of scattered data access:
 
@@ -286,9 +286,9 @@ doesn't. The wrong move is to keep `fetch` calls scattered through screens.
 ## Platform notes
 
 - **iOS/Swift, Android/Kotlin**: the same checks apply. Auth state in a
-  shared store, not threaded through `Intent` extras or `UINavigationController`
-  segues. Native modules wrap the platform's protocol; ViewControllers and
-  Activities are thin and stateful only about their own UI.
+  shared store. Threading it through `Intent` extras or `UINavigationController`
+  segues repeats the same defect. Native modules wrap the platform's protocol;
+  ViewControllers and Activities are thin and stateful only about their own UI.
 - **Flutter/Dart**: provider/riverpod plays the role of context here.
   `InheritedWidget` directly is the low-level primitive most apps shouldn't use
   except through one of those wrappers.

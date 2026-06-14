@@ -120,7 +120,7 @@ navigating screen's state and the staleness model. The deep-link case has
 to be specially described because the contract was designed for the
 in-app-navigation path.
 
-Failure named: route params carry runtime state instead of identity.
+Failure named: route params carry runtime state when they should carry only identity.
 
 Candidate B:
 
@@ -180,7 +180,7 @@ not-clearing-auth-on-logout, the iOS size limit — is documentation a
 caller must internalize. Every screen that uses Storage gets a copy of
 this knowledge.
 
-Failure named: this is a wrapper around AsyncStorage, not a module. The
+Failure named: this is a wrapper around AsyncStorage dressed as a module. The
 domain knowledge (what's stored, what shape, what versions exist) belongs
 inside.
 
@@ -217,7 +217,7 @@ owns the secure-storage detail (`Session.save` writes to Keychain/Keystore,
 not AsyncStorage). The screens that use these modules don't know any of
 that.
 
-Logout becomes a deliberate composition rather than a clear-everything:
+Logout becomes a deliberate composition, naming each store to drop:
 
 ```ts
 await Session.clear();
@@ -226,7 +226,7 @@ await FeedCache.clear();
 ```
 
 What to clear on logout is a decision the orchestrating code now makes
-once, in one place — not a side effect of `Storage.clear()` that could
+once, in one place. With `Storage.clear()` it was a side effect that could
 include or exclude auth depending on whether some caller remembered to
 multiRemove.
 
@@ -308,8 +308,8 @@ Three sentences. Two improvements at the contract level:
   to render in the wrong state; a button that checks `permissions.canRefund`
   before calling `actions.refund` is one if-statement away from a bug.
 
-This second move — encoding "allowed" as presence rather than as a parallel
-boolean — is the kind of contract redesign the comment test reveals,
+This second move — encoding "allowed" as presence of the action, so a parallel
+boolean never exists — is the kind of contract redesign the comment test reveals,
 because writing "permissions may be undefined for an instant" is the
 signal that the shape is wrong.
 

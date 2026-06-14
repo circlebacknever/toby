@@ -20,7 +20,7 @@ Load this file when building a chart, plot, or data visualization for an Toby Ar
 
 ## Chart palette — positional order
 
-Assign by series index, not by what the series represents.
+Assign by series index.
 
 | Series index | Token | Hex |
 |---|---|---|

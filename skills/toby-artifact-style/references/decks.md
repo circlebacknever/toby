@@ -95,7 +95,7 @@ Vary the opening structure across decks. Pick one.
 
 **Title → big fact.** Title slide, then a single high-contrast slide stating the central numerical fact, measurement, or result. Works for evidence-led decks where the conclusion is the anchor.
 
-**No title slide.** Start directly with the first claim. Use a section eyebrow and the logo primitive in the footer rather than a dedicated opening slide. Works for short reference cards (≤ 6 slides) or when the deck is one section of a longer session.
+**No title slide.** Start directly with the first claim. Use a section eyebrow and the logo primitive in the footer; skip the dedicated opening slide. Works for short reference cards (≤ 6 slides) or when the deck is one section of a longer session.
 
 ---
 
@@ -216,7 +216,7 @@ Example claim line: `Bound orbits are ellipses. The rest is detail.`
 
 Each deck gets a per-artifact logo: a hairline geometric primitive + one short lowercase Inter-600 word naming the topic + a single red dot as the only color.
 
-**Pick the shape for the structure of the subject, not just its name.** Examples:
+**Pick the shape for the structure of the subject.** Examples:
 - Network topology, graph, mesh → crosshair or grid lattice
 - Recursive or nested structure → concentric squares or nested brackets
 - Wave, signal, antenna, oscillation → arc or sinusoidal rail
@@ -248,9 +248,9 @@ The concept governs the interaction type. Identify what the learner needs to fal
 
 **Direct manipulation.** The learner drags, rotates, or repositions an element in a diagram. Use for spatial or geometric concepts: moving a threshold line to see false-positive/negative tradeoff, rotating a beam to show angle vs gain, repositioning a node to show path length change. Requires more implementation but produces the strongest intuition for spatial concepts.
 
-**Input → computed output.** The learner types a value; the slide computes and displays a result. Use for formulas where plugging in numbers is the lesson: Friis equation, Shannon capacity, Nyquist rate. Show the formula, the inputs, and the computed output updating live. Validate input range; show a boundary error rather than breaking.
+**Input → computed output.** The learner types a value; the slide computes and displays a result. Use for formulas where plugging in numbers is the lesson: Friis equation, Shannon capacity, Nyquist rate. Show the formula, the inputs, and the computed output updating live. Validate input range; show a boundary error when the value falls outside it.
 
-**Clickable taxonomy.** Clicking a term or node expands its definition or sub-structure inline. Use for hierarchical reference material: protocol layers, taxonomy trees, component breakdowns. The learner explores at their own depth rather than being walked through every branch.
+**Clickable taxonomy.** Clicking a term or node expands its definition or sub-structure inline. Use for hierarchical reference material: protocol layers, taxonomy trees, component breakdowns. The learner explores at their own depth.
 
 **Comparative panels.** Two side-by-side panels update from a shared control. Use when the lesson is a trade-off or comparison that must be perceived simultaneously: two algorithms on the same data, two antenna configurations in the same environment.
 

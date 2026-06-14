@@ -41,7 +41,7 @@ accumulates a grab-bag of helpers because adding one is easier than designing a
 real boundary. After two years no one knows which controllers depend on which
 base behavior, and changing `BaseController` requires reading thirty files.
 
-Fix with composition. The "base" is not one class; it is several focused
+Fix with composition. The "base" is several focused
 collaborators each controller injects:
 
 ```java
@@ -66,12 +66,12 @@ public class OrderController {
 `AuthzGuard` is one module owning authorization decisions; `ResponseBuilder`
 owns response shape. Each is deep behind a small interface. `OrderController`
 holds them, doesn't inherit from them. The fields are now narrow and named for
-what they do, instead of a `currentUser` reachable from anywhere.
+what they do. The old `currentUser` was reachable from anywhere.
 
 Logging access, which `BaseController` did via a helper, moves to a Spring
 interceptor or AOP advice — the cross-cutting concern lives in one place where
-the dispatcher can apply it, not as a method every handler must remember to
-call.
+the dispatcher applies it. The old form made every handler remember to call
+it.
 
 ---
 
@@ -122,7 +122,7 @@ public class Order {
 Fields stay private. `markPaid` and `cancel` are the legal transitions —
 callers can't drift the state into invalid combinations. Where a value
 truly needs to be exposed (`amount()`), it's a method that names what the
-caller wants to know, not a `getAmount` whose meaning is "the bytes of the
+caller wants to know. A `getAmount` would mean only "the bytes of the
 field." The class is now deep: a few intent methods, substantial invariant
 enforcement behind them.
 
@@ -158,8 +158,9 @@ func (s *userServiceImpl) GetUser(...) ... { ... }
 Two problems. First, the interface is colocated with the implementation, so
 every consumer drags in the whole `users` package and the whole interface even
 when they only need one method. Second, the interface enumerates every method
-the implementation exposes — it's a mirror of the struct, not an abstraction.
-That's a shallow interface; it has no asymmetry between cost and benefit.
+the implementation exposes — every method appears, so the interface only
+mirrors the struct. That's a shallow interface; it has no asymmetry between
+cost and benefit.
 
 Idiomatic Go: each consumer declares the narrow interface it actually needs,
 right where it uses it. The implementation in `users` is a concrete struct with
@@ -214,7 +215,7 @@ Adding the next concern means another middleware that reads `req.user`,
 request" is whatever the union of all those fields adds up to, and no module
 owns the contract.
 
-Re-slice by knowledge, not order. The bodies of these middlewares belong to
+Re-slice by knowledge. The bodies of these middlewares belong to
 distinct subjects: authentication is one body of knowledge, authorization is
 another, multitenancy is a third, audit is a fourth. Make each a module with
 its own boundary:
@@ -240,10 +241,9 @@ async getOrder(@Req() req: Request) {
 ```
 
 The handler now invokes three named operations, each owning its knowledge.
-`req.user` is gone — `session` is a value with a real type, not a field on a
-shared mutable bag. Audit, rate-limit, and tenant context become explicit
-dependencies of operations that actually need them, not blind passes over
-every request.
+`req.user` is gone — `session` is a value with a real type. Audit,
+rate-limit, and tenant context become explicit dependencies of the operations
+that need them.
 
 Cross-cutting interceptors (logging, metrics) can still exist; they're the
 narrow category Nest interceptors and Express middleware actually fit. The

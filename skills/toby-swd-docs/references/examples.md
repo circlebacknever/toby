@@ -102,9 +102,10 @@ Full signatures and behavior are in the interface comments in `gateway.py`.
   attempt will return the original failure, not a retry.
 ```
 
-Note: the README references the interface comments in `gateway.py` rather than
-duplicating them. Implementation details — why idempotency is required, how the
-ledger works — live in AGENTS.md, not here.
+Note: the README references the interface comments in `gateway.py` and lets the
+single copy there stay authoritative. Implementation details — why idempotency
+is required, how the ledger works — live in AGENTS.md. The README stays on what a
+caller needs.
 
 ---
 
@@ -147,7 +148,7 @@ payment to the payments service and address validation to the address package.
 
 ## Example 4 — Frontend: checkout feature README.md
 
-This module's README.md is minimal because it's an internal feature, not a shared library. A README.md here only exists because the context shape is non-obvious to developers onboarding to this part of the codebase.
+This module's README.md is minimal because it serves developers already inside the codebase, with none of the orientation a shared library owes outside callers. A README.md here only exists because the context shape is non-obvious to developers onboarding to this part of the codebase.
 
 ```markdown
 # Checkout Feature
