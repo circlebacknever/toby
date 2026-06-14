@@ -49,18 +49,20 @@ When complexity is unavoidable and related to a module's job, the module absorbs
 
 Prefer computing a value internally over exporting a configuration parameter or throwing to the caller. Before exposing a parameter, ask whether the caller can choose a better value than the module can.
 
-Guardrail: only pull down complexity that is related to the module's function, simplifies callers, and simplifies the interface. Pulling unrelated complexity down is leakage with a new hat. Pulling everything down is a god module.
+Guardrail: only pull down complexity that is related to the module's function, simplifies callers, and simplifies the interface. Pulling unrelated complexity down is leakage with a new hat. Pulling everything down is a god module. When a boundary is also a serialization or process boundary, crossing it costs a round trip and a serialize/deserialize at runtime, on top of the cognitive cost; prefer one coarse call over many fine-grained ones across that boundary.
 
 ### 4. Different layer, different abstraction
 
 Adjacent layers should present different abstractions. Similar abstractions across adjacent layers usually surfaces as:
 
 - **Pass-through method**: does almost nothing but forward arguments to another method with a near-identical signature. Fix by exposing the lower module to callers, redistributing responsibility so the call disappears, or merging the two.
-- **Pass-through variable**: a value threaded through a chain of methods that don't use it (frontend: prop drilling; mobile: param threading across navigation stacks). Fix with a shared object between the endpoints, or a context, kept small and preferably immutable.
+- **Pass-through variable**: a value threaded through a chain of methods that don't use it (frontend: prop drilling; mobile: param threading across navigation stacks; across a message boundary: a field relayed through an intermediate hop that doesn't read it). Fix with a shared object between the endpoints, or a context, kept small and preferably immutable.
 
 A decorator that adds little is a shallow pass-through in disguise. Before adding one, ask whether the behavior belongs in the underlying module.
 
 ### 5. Prefer composition over implementation inheritance
+
+The underlying defect is two-way coupling: any mechanism where a shared-behavior provider and its consumers can each silently break the other. Implementation inheritance is the common form; default methods on an interface or trait, or a generic module that makes hidden assumptions about its argument, can reproduce it. A language without implementation inheritance reads this as the general two-way-coupling caution.
 
 Two kinds of inheritance, two very different cost profiles.
 
@@ -112,7 +114,7 @@ When placing code in an existing module, inspect where the surrounding code alre
 - **Repetition**: nontrivial code repeated; factor it to one place.
 - **Classitis / over-subdivision**: many shallow modules whose interfaces sum to more complexity than they remove (frontend: over-componentization).
 - **Deep implementation-inheritance hierarchy**: subclasses you can't read without reading the parent, parents you can't change without checking the subclasses. Two-way coupling masquerading as reuse.
-- **Getters and setters as the public surface**: a class whose interface is mostly `getFoo`/`setFoo` is exposing its instance variables with extra syntax. The interface and the implementation are the same shape — definitionally shallow. Replace with methods that express intent (`reserve()`, `markPaid()`) and keep state private.
+- **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax — the same shape as the implementation, definitionally shallow. Replace with operations that name intent (`reserve`, `markPaid`) and enforce invariants; keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it owned by another module — there the data is the contract, and depth lives in the module that owns the behavior.
 - **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy applied for its own sake instead of because the problem has the shape it solves. Patterns earn their place by removing complexity.
 
 ## References

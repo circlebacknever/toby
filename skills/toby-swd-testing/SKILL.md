@@ -45,6 +45,7 @@ An assertion should fail when the behavior under test changes. It should not fai
 
 Useful patterns:
 - Assert on the specific value or field that proves the behavior happened.
+- When the output is inexact by nature, assert it falls within a stated, justified tolerance of the expected value; exact-equality assertions flake or lie on such outputs.
 - Use object subset matching when only a few fields matter.
 - Reserve full-object equality and snapshot matching for cases where the entire structure is the contract — config files, public response schemas, serialization formats.
 
@@ -54,11 +55,11 @@ Before accepting a snapshot update, read the diff and confirm every change is in
 
 ## How much to test
 
-Cover the contract's distinct observable outcomes — the success path, each documented failure mode, and the boundary conditions — then stop. One behavioral concept per test; multiple asserts are fine when they prove one behavior.
+Cover the contract's distinct observable outcomes — the success path, each documented failure mode, and the boundary conditions — then stop. One behavioral concept per test; multiple asserts are fine when they prove one behavior. A behavioral outcome can be pinned by example (one named scenario) or by property (an invariant that holds over a range of generated inputs). Prefer whichever states the contract more directly.
 
 ## Each test stands alone
 
-No shared mutable state between tests, no ordering dependencies, deterministic (control time, randomness, and IO), and self-validating (it asserts; it does not print for a human to read). A test whose result depends on what ran before it is already broken.
+No shared mutable state between tests, no ordering dependencies, deterministic (control time and IO, and pin randomness to a recorded seed so the run reproduces), and self-validating (it asserts; it does not print for a human to read). A test whose result depends on what ran before it is already broken. When the system itself must reproduce the same outputs across runs or machines, that determinism is part of the contract under test; when a result depends on a library or platform version, record it so a later mismatch is visible.
 
 ## Test-first, with judgment
 
@@ -84,6 +85,8 @@ Default to the highest-fidelity dependency that is fast and deterministic.
 1. **Real implementation** when it's fast enough and stays in-process. Real domain objects, in-memory databases, real validators.
 2. **Fake** when the real thing is slow, external, or hard to set up — a hand-written stand-in with realistic behavior. Faster than the real thing, more faithful than a mock.
 3. **Mock** only at system boundaries: external APIs, payment, email, time, randomness, file systems, and specific failure modes that are hard to trigger otherwise.
+
+When the real dependency lives across a process, sandbox, or hardware boundary you can't run in-process, that boundary is the system boundary: fake the channel or simulate the environment, and test each side against the contract; mocking the other side's internals couples the test to its structure.
 
 Mocking internal collaborators couples tests to call sequences and current structure. The test passes today, a refactor breaks fifteen tests tomorrow, the team starts deleting tests to keep CI green. Avoid the chain.
 

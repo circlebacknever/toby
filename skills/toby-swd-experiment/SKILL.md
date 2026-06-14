@@ -79,6 +79,7 @@ When the user chooses a behavior, retire the experiment:
 - Fold the chosen behavior into the normal project path.
 - Remove temp names, flags, debug routes, scratch files, and notes that no longer serve the final behavior.
 - Keep only artifacts that now belong to the product, module, docs, or tests.
+- When exploratory work becomes durable code, promotion means making the inputs, seeds, and versions the exploratory surface left implicit explicit, so the result reproduces outside the original session.
 
 If the experiment changed production code, review the diff before the finish phase ends.
 
@@ -95,6 +96,8 @@ After the behavior settles, use toby-swd-testing to decide what durable tests sh
 Use toby-swd-environment before commands, ports, processes, browsers, broad checks, dependency installs, migrations, generated files, cache clearing, or destructive work.
 
 During a user-led loop, automated checks that add latency need approval. The user is part of the instrument panel; leave the controls where the user put them.
+
+Reversibility here means software reversibility. When the experiment drives something physical, costly, or externally observable, a reverted change does not undo what already happened; run the candidate first in the cheapest faithful proxy available, and treat acting on the real system as a state change that needs approval.
 
 ## Failure Modes
 

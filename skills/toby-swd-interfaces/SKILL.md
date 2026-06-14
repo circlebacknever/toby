@@ -10,11 +10,11 @@ description: >-
 
 # Toby SWD Interfaces
 
-The interface is everything a caller must know to use a module correctly: the signature plus the informal contract (behavior, side effects, ordering constraints, errors) that only comments can carry. The interface is the cost the module imposes on the rest of the system; the implementation is the benefit. You want that cost much smaller than that benefit — a simple interface over substantial functionality.
+The interface is everything a caller must know to use a module correctly: the signature plus the informal contract (behavior, side effects, ordering constraints, errors) that only comments can carry. The interface is the cost the module imposes on the rest of the system; the implementation is the benefit. You want that cost much smaller than that benefit — a simple interface over substantial functionality. When the boundary is a message channel rather than an in-process call, the "signature" is the message contract: the request and response payload shapes, what survives serialization, and the delivery guarantees.
 
 Interface-first design exists to find that interface before implementation locks in a bad one, and to use the interface itself as the earliest possible signal that the design is wrong. A comment you can't write short and internals-free is the cheapest bug report you will ever get. It shows the abstraction is broken while it's still only text.
 
-This applies identically across the stack: a class's public methods, a function's signature, a service's endpoints, a React component's props, a hook's return shape, a repository's query methods, a cache's get-or-load surface — all are interfaces, and everything below applies to each.
+This applies identically across the stack: a class's public methods, a function's signature, a service's endpoints, a React component's props, a hook's return shape, a repository's query methods, a cache's get-or-load surface, a message contract across a process or sandbox boundary — all are interfaces, and everything below applies to each.
 
 ## Bias toward somewhat general-purpose
 
@@ -57,7 +57,7 @@ For consequential or exported interfaces, write the interface comment before the
 
 This bar is checkable by reading. A vague bar collapses into taste; this one doesn't.
 
-The comment test applies to parameter objects too. A short entry-point comment that stays short only because a query or command object absorbs the complexity is not a pass — run the same test on that object's contract.
+The comment test applies to parameter objects too. A short entry-point comment that stays short only because a query or command object absorbs the complexity is not a pass — run the same test on that object's contract. When the contract crosses a serialization boundary, what must survive that crossing — no functions, no live references, no cycles — is part of the contract the comment carries.
 
 **For consequential interfaces, write the comment before the body.** The comment is a design tool — the cheapest way to find out the abstraction is wrong. Writing the body first traps you in the structure of whatever you wrote; writing the comment first lets you reject a bad shape while it's still text.
 
@@ -88,7 +88,7 @@ Apply the same test whenever you later change a public interface, before touchin
 
 ### 7. Guardrail: deep, but expose what callers actually need
 
-Hiding complexity is the goal, with a hard limit: information the caller truly needs must stay in the interface. Tunable performance config, errors the caller must handle, durability or visibility guarantees, ordering the caller depends on — hiding these to make the interface look smaller is its own defect and produces modules that can't be used correctly. Where a special case can be removed by redesigning semantics so it does not arise, redesign it away and leave it out of the interface.
+Hiding complexity is the goal, with a hard limit: information the caller truly needs must stay in the interface. Tunable performance config, errors the caller must handle, durability or visibility guarantees, ordering the caller depends on — hiding these to make the interface look smaller is its own defect and produces modules that can't be used correctly. Where a special case can be removed by redesigning semantics so it does not arise, redesign it away and leave it out of the interface. An interface that accepts input from outside the program — a request, a message, a deserialized payload — is a trust boundary: validating that input belongs to the module that owns the contract. The boundary owns the check.
 
 ### 8. Then implement
 
@@ -107,7 +107,7 @@ Before changing an existing callable surface, inspect current callers and the be
 - **Pass-through method**: an entry point that only forwards to another with a near-identical signature.
 - **Implementation in the interface comment**: the comment describes internals.
 - **Hard to describe**: a complete comment for the entry point has to be long.
-- **Getters and setters as the public surface**: a class whose interface is mostly `getFoo`/`setFoo` has an interface the same shape as its implementation — definitionally shallow. Replace with methods that name intent (`reserve()`, `markPaid()`) and enforce invariants; keep fields private.
+- **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax — the same shape as the implementation, definitionally shallow. Replace with operations that name intent (`reserve`, `markPaid`) and enforce invariants; keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it owned by another module — there the data is the contract, and depth lives in the module that owns the behavior.
 - **One method per caller-shape**: a finder/handler/query method per combination of conditions, growing without bound. Compress with a value object or query parameter that lets one method cover the cluster.
 - **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy interface adopted on the belief that patterns are good, while the problem lacks the shape the pattern solves.
 

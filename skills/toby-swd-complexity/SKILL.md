@@ -18,31 +18,35 @@ The unifying move is simple: reduce the number of places that must carry the ext
 
 Every special case a caller must branch on is complexity. Treat creating one as a design smell before a performance one, and fold it into the general case so no caller has to know it exists.
 
-## Error and exception design
+Shared mutable state and ordering between concurrent contexts is complexity like any other: concentrate the discipline for touching it in one place, so locks, checks, and assumptions don't scatter across call sites.
 
-The cost of an exception is the handling code it forces on every caller, propagating through every stack level it crosses. Work down this ladder; stop at the first rung that applies.
+## Error design
+
+The cost of an error signal — a thrown exception, an error return, a status code, a `Result` or `Option` — is the handling it forces on every caller between the failure and the code that can act on it: a catch at each level it propagates through, or a value every caller must check or thread upward. Work down this ladder; stop at the first rung that applies.
 
 1. **Define the error out of existence.** Before writing any handling, ask whether the operation's semantics can be redefined so the condition is no longer an error. "Delete this variable, fail if absent" becomes "ensure this variable no longer exists." "Throw if an index is out of range" becomes "return the overlap, empty if none." The error case disappears, the API gets simpler, the module gets deeper. Redefining the semantics is right only when the condition is genuinely a non-event; if a reported success would mask a real bug, the error stays.
 
 2. **Mask it at the lowest level.** If a low-level module can fully handle the condition without the caller ever knowing, handle it there. Masking works best in a widely-used library method, where it removes the most handlers. Transient errors are the canonical case: a network blip, a database deadlock, a rate-limit response — if a bounded retry inside the module turns them into success, the caller never had a failure to handle.
 
-3. **Aggregate.** If it must surface, let it propagate several levels to one handler that addresses the general case — the single handler at the top of a request loop. One handler at the top replaces a handler at every call site.
+3. **Aggregate.** If it must surface, let it propagate several levels to one handler that addresses the general case — the single handler at the top of a request loop. One handler at the top replaces a handler at every call site. When that handler replies to an untrusted caller, the surfaced error carries the category the caller needs and nothing about internals — no stack traces, internal identifiers, or query text. Log the detail; return the category.
 
-4. **Just crash.** For errors no caller can act on — out of memory, unrecoverable I/O, an internal invariant violated (which means a bug) — print diagnostics and abort, ideally behind one checked wrapper so call sites don't each repeat the check. This is a legitimate complexity reduction; the abort is the correct handling for an error nobody can act on. "Hard to handle" is not a reason to crash.
+4. **Stop in the safest reachable state.** For errors no caller can act on — resource exhaustion, unrecoverable I/O, a violated internal invariant (which means a bug) — record what diagnostics you can and bring the unit to its safest available stopping point, behind one checked wrapper so call sites don't each repeat the check. What "safest" means belongs to the environment: a pure computation aborts; a process driving something physical, costly, or external reaches a defined safe stop before it dies; a supervised, isolated unit stops and is restarted to a known-good state; a long-running loop contains the fault to the smallest unit and keeps running. The stop is the correct handling for an error nobody can act on; "hard to handle" is not a reason to reach for it.
 
-**Guardrail**: eliminating, masking, or crashing is correct only when the information is not needed outside the module. A module that swallows every network error so callers can't tell a message was lost hasn't reduced complexity; it's made reliable use impossible. Decide what information matters. Hide what callers do not need; surface what they do.
+Some failures can't be defined away, masked, or aggregated, and stopping would make things worse. When the operation must continue in a reduced or safer mode, the handling is a deliberately designed degraded path the system was built to expect; an undesigned degraded path is the barely-tested error branch the hard rules warn about.
 
-**Hard rules**: don't throw for conditions a well-designed API would not produce. If you can't decide what to do, the caller probably can't either — throwing just relocates the problem and adds cost. Treat handler code that can't be tested reliably with extra skepticism. A large share of production failures come from bugs in barely-exercised error paths.
+**Guardrail**: eliminating, masking, or crashing is correct only when the information is not needed outside the module. A module that swallows every network error so callers can't tell a message was lost hasn't reduced complexity; it's made reliable use impossible. Decide what information matters. Hide what callers do not need; surface what they do. A security or authorization outcome — auth denied, a validation rejection, a permission failure — is never an error to define away or mask into success; surface it as a real result the caller acts on.
+
+**Hard rules**: don't signal an error for conditions a well-designed API would not produce. If you can't decide what to do, the caller probably can't either — throwing just relocates the problem and adds cost. Treat handler code that can't be tested reliably with extra skepticism. A large share of production failures come from bugs in barely-exercised error paths.
 
 ## Performance design
 
 Tight code tends to be fast: defined-away special cases need no checks, deep modules cross fewer layers. The first performance move is good design. Beyond that, performance work has three layers.
 
-**Always, at design time — know what is expensive.** Develop a feel for the operations that cost orders of magnitude: network round trips, disk I/O, dynamic allocation, cache misses. When a naturally efficient option is no more complex than a slow one, take it — reach for a hash table when ordering isn't needed, allocate one block where many would do. This costs nothing and prevents the death-by-a-thousand-cuts case where ignoring performance entirely yields a system 5–10x slow with no single fix available.
+**Always, at design time — know what is expensive.** Develop a feel for the operations that cost orders of magnitude: network round trips, disk I/O, dynamic allocation, cache misses. When a naturally efficient option is no more complex than a slow one, take it — reach for a hash table when ordering isn't needed, allocate one block where many would do. This costs nothing and prevents the death-by-a-thousand-cuts case where ignoring performance entirely yields a system 5–10x slow with no single fix available. Some costs show up only in aggregate: an operation cheap once becomes a budget-breaker in a tight repeated loop, and allocation that accumulates forces later reclamation. In a steady-state loop, prefer reusing memory over allocating fresh, and prefer skipping or deferring work over blocking the loop to retry.
 
-**Gate complexity on evidence.** If efficiency requires added complexity that is small and hidden behind the interface, it may be worth it (it's still incremental — be wary). If it is large or complicates an interface, start simple and optimize only if a problem appears. Exception: when there is clear upfront evidence performance will matter for a specific path, implement the fast approach immediately.
+**Gate complexity on evidence.** If efficiency requires added complexity that is small and hidden behind the interface, it may be worth it (it's still incremental — be wary). If it is large or complicates an interface, start simple and optimize only if a problem appears. Exception: when a path has a stated budget it must meet to be correct — a latency or memory limit, a frame deadline, a no-allocation policy, a known hot path — treat that budget as a design input and build to it from the start. For such a path the binding number is the worst case under load; the average can hide a blown limit.
 
-**When something is actually slow — measure, then redesign the critical path.** Never optimize on intuition; programmer intuition about what is slow is unreliable regardless of experience. Record a baseline, change one thing, re-measure. A change with no measurable effect gets reverted unless it also simplified the design. Look for a fundamental fix first: a cache, a better algorithm or data structure. Code-level critical-path redesign is the last resort.
+**When something is actually slow — measure, then redesign the critical path.** Never optimize on intuition; programmer intuition about what is slow is unreliable regardless of experience. This rule targets guessing which line is the bottleneck. Writing in the idiom whose cost class is already known — allocation-free, naturally typed — is ordinary design and stays welcome. Record a baseline, change one thing, re-measure. A change with no measurable effect gets reverted unless it also simplified the design. Look for a fundamental fix first: a cache, a better algorithm or data structure. Code-level critical-path redesign is the last resort.
 
 When it is needed: describe the smallest code that must run in the common case, ignoring the current structure, and rebuild toward that — one test at the top detects all special cases, the common path then runs with no further branching, and special-case code sits off the path structured for simplicity, since it no longer runs on the hot path and gains nothing from being fast.
 
@@ -56,10 +60,10 @@ In existing code, inspect the current error, validation, retry, cache, batching,
 
 ## Red flags
 
-- An exception thrown for a condition the API could define away.
+- An error signaled for a condition the API could define away.
 - The same error handled at many call sites when one handler would do.
 - An error eliminated or masked that callers actually needed.
-- Elaborate recovery for a rare unrecoverable error that should just abort.
+- Elaborate recovery for a rare unrecoverable error that should stop in its safest state.
 - A transient error handled at the caller when an internal retry would erase it.
 - An optimization with no measured improvement left in the code.
 - Performance changes made without a baseline.

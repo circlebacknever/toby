@@ -25,7 +25,7 @@ Generic names (`data`, `value`, `result`, `status`, `flag`, `count`) are a smell
 
 Use names consistently: one name for one purpose, never that name for a second purpose, and the purpose narrow enough that every variable with the name behaves the same. When you need several of the same kind, keep the common root and add a distinguishing prefix (`srcBlock`, `dstBlock`). Boolean names read as predicates (`cursorVisible`, `isReady`, `hasChildren`). Every word must add information: drop redundant type or class-name words (`fileObject` → `file`), no Hungarian notation.
 
-**Hard-to-name red flag**: if no precise, intuitive, not-too-long name emerges after real effort, the thing being named probably has an unclear or mixed purpose. That is a design signal — split or rethink it, don't settle for a vague name.
+**Hard-to-name red flag**: if no precise, intuitive, not-too-long name emerges after real effort, the thing being named probably has an unclear or mixed purpose. That is a design signal — split or rethink it, don't settle for a vague name. The signal is about the operation as a whole: a single dense expression that computes one nameable result is one abstraction even when its internal steps have no good individual names.
 
 ## Comments
 
@@ -41,6 +41,8 @@ Comment at a different level than the code. A comment pitched at the code's own 
 Delete comments whose content is already obvious from the adjacent code, including comments that just restate the name. Document each decision once, in the most obvious place. Cross-reference a called method from its call site. Re-explaining it there gives you two copies that drift apart. For a design decision that spans modules, put it in one discoverable central place and point to it from the affected sites.
 
 Leave these uncommented: operations the code already shows (`i++ // increment i`), restatements of the name, commented-out code, change history (git holds that), and anything the type already proves.
+
+Logs and diagnostics are a surface too: keep secrets, credentials, tokens, and personal data out of them, and out of source. Naming a field sensitive in a comment is worth more than the value in a log line.
 
 ## Consistency
 
