@@ -73,9 +73,9 @@ The interface comment now:
 > with the server.
 
 Four sentences. No positions. The discriminator removes the "what does null
-mean here" question from every caller. This is the same point the testing skill
-makes about narrow assertions — a discriminated union expresses the contract
-in the type system; the caller no longer needs to remember invariants.
+mean here" question from every caller. A discriminated union expresses the
+contract in the type system, so the caller no longer needs to remember
+invariants.
 
 Solid and Svelte versions use the same shape (signals or stores wrapping the
 discriminator).
@@ -292,7 +292,7 @@ function useCombobox<T>(opts: {
   rootProps: HTMLAttributes<HTMLDivElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement>;
   listProps: HTMLAttributes<HTMLUListElement>;
-  itemProps(index: number): LIAttributes;
+  itemProps(index: number): LiHTMLAttributes<HTMLLIElement>;
 
   // observable state for rendering
   isOpen: boolean;

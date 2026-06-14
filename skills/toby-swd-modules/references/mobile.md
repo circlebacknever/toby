@@ -199,16 +199,20 @@ export function useBarcodeScanner(opts: { onCode: (c: string) => void }) {
 
   useEffect(() => {
     let cancelled = false;
+    let teardown = () => {};
     (async () => {
       const granted = await ensurePermission();           // owns iOS/Android nuance
       if (cancelled) return;
       if (!granted) { setState('denied'); return; }
       const sub = subscribe(opts.onCode);
       await startNative({ camera: 'rear' });
+      teardown = () => { sub.remove(); stopNative(); };
+      if (cancelled) { teardown(); return; }              // unmounted mid-start
       setState('scanning');
-      return () => { sub.remove(); stopNative(); };
     })();
-    return () => { cancelled = true; };
+    // Cleanup lives on the effect. A teardown returned from the async function
+    // resolves the promise instead; React never runs it, and the camera leaks.
+    return () => { cancelled = true; teardown(); };
   }, []);
 
   return { state };

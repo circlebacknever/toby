@@ -69,6 +69,11 @@ gets retried and the second attempt succeeds. The error ladder rung 2
 (mask at lowest level) absorbs the transient cases. The screen only sees
 real failures (after 3 retries, still failing).
 
+The loop is safe here because `get` is idempotent — repeating it changes
+nothing. A mutating `post` can't reuse it as-is: a retry after a lost
+response can submit the same write twice, so a write needs an idempotency
+key the server dedupes on before the same retry logic applies.
+
 For sustained offline state, surface it once globally via the platform's
 connectivity API:
 
@@ -200,10 +205,12 @@ are rendered. Memory stays bounded. This is the design-time naturally-
 efficient choice from the SKILL — same complexity as ScrollView, much
 better performance. Take it always for lists that might grow.
 
-When to escalate to `FlashList`: measured cell-recycling problems with
-`FlatList` on long lists with heterogeneous cell heights, or when the
-specific perf characteristics warrant it. Don't reach for FlashList on
-day one; FlatList covers 95% of cases.
+When to escalate to `FlashList`: large or image-heavy lists where measured
+`FlatList` scrolling drops frames. FlashList v2 is a New-Architecture-only
+rewrite that sizes cells automatically — the v1 chore of estimating item
+heights is gone — so on a New-Architecture app it's a reasonable default for
+big lists. `FlatList` still ships in the box with no extra dependency and
+handles small-to-medium lists.
 
 When to stay with `ScrollView`: known-small, known-bounded lists with
 heterogeneous content where virtualization breaks layout (e.g., a
@@ -212,16 +219,18 @@ virtualization here adds complexity for zero perf benefit.
 
 Performance pitfalls to know without measuring:
 
-- **No `keyExtractor`** or unstable keys → FlatList re-renders rows
-  unnecessarily. Use a stable id; the array index changes as the list
-  reorders and breaks recycling.
+- **Unstable keys** (the array index as key) → on reorder, insert, or
+  delete, the wrong row gets recycled and component state attaches to the
+  wrong item. Use a stable id. FlatList falls back to the index only when no
+  `keyExtractor` and no `item.key`/`item.id` is present.
 - **`renderItem` defined inline** as a new function each render → child
   rows re-render. Define it outside the component or memoize it.
 - **Images without `width`/`height`** in styles → layout thrash. Always
   size images explicitly.
-- **`scrollEventThrottle` left at default** (which on iOS is 0, meaning
-  no events!) → animations driven by scroll position appear broken.
-  Set it to `16` for 60fps.
+- **`scrollEventThrottle` left at default** on iOS sends roughly one event
+  per scroll gesture, so animations driven by scroll position barely update.
+  Set it to `16` for ~60fps. For scroll-linked animation, `Animated.event`
+  with `useNativeDriver` skips the JS-thread round trip entirely.
 
 These are known patterns where the naturally-efficient version is no more
 complex than the slow version, so they sit outside the speculative-
@@ -237,9 +246,10 @@ A profile screen with 50 avatars, each a 4MB camera-roll image:
 <Image source={{ uri: user.profilePictureUrl }} style={styles.avatar} />
 ```
 
-The phone fetches 50 × 4MB = 200MB of pixel data, decodes each to fit a
-40×40 thumbnail. The decoded form is several times larger than the JPEG
-on disk. Two screens in, the app crashes with an OOM.
+The phone fetches 50 × 4MB = 200MB over the wire, then decodes each JPEG to
+a full bitmap to draw a 40×40 thumbnail — and a 4MB JPEG expands to tens of
+MB of RGBA once decoded. The decoded bitmaps are what exhaust memory. Two
+screens in, the app crashes with an OOM.
 
 The team's instinct: lazy-load. Useful. The deeper move: don't fetch the
 4MB version when you need a 40px thumbnail.
@@ -258,8 +268,9 @@ resize service. The avatar is now 4KB, not 4MB. The phone's memory
 pressure drops by orders of magnitude.
 
 For lists of images that scroll past the viewport: pair with FlatList's
-virtualization and image caching (`react-native-fast-image` or expo-image)
-so off-screen images are unloaded.
+virtualization and an image-caching library — expo-image (the default in
+Expo projects) or react-native-fast-image (bare RN) — so off-screen images
+are unloaded.
 
 For the very large user-uploaded image case (display a full-screen
 photo): load progressively. Show the thumbnail first, swap in the full
@@ -324,7 +335,7 @@ total work.
 |---|---|
 | Per-screen network error handling | Retry transient at API layer; offline banner global |
 | Native module throws string codes | Typed result discriminator; wrapper classifies |
-| ScrollView with many children | FlatList by default; FlashList for measured cell-recycling needs |
+| ScrollView with many children | FlatList for small lists; FlashList v2 for large or image-heavy ones |
 | 4MB images for 40px avatars | Thumbnails at the right resolution; lazy where possible |
 | Loop of bridge calls (N+1 over the bridge) | Batched native API; one crossing |
 | Foreground/background transitions losing state | AppState listener; restore on resume |

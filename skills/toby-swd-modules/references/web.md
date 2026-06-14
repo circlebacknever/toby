@@ -85,11 +85,12 @@ function ProductPage(props: { id: string }) {
 ```
 
 ```svelte
-<!-- Svelte with @tanstack/svelte-query -->
+<!-- Svelte 5 with @tanstack/svelte-query -->
 <script lang="ts">
   import { createQuery } from '@tanstack/svelte-query';
-  export let id: string;
-  $: query = createQuery({ queryKey: ['product', id], queryFn: () => api.products.get(id) });
+  let { id }: { id: string } = $props();
+  // options as a thunk so the query tracks id; v6 makes the thunk mandatory
+  const query = createQuery(() => ({ queryKey: ['product', id], queryFn: () => api.products.get(id) }));
 </script>
 
 {#if $query.isLoading}
@@ -297,6 +298,15 @@ export const Cart = {
 };
 ```
 
+One reactivity caveat the three handle differently: `total` is a derived
+value. Solid tracks it on read — `Cart.total()` in JSX re-runs when `items`
+or `coupon` changes — and Svelte's `derived` store does the same. Zustand
+doesn't track derived reads: a component reaches the live value through a
+selector that calls it, `useCart((s) => s.total())`, so the subscription
+recomputes on change. Selecting the bare method (`s.total`) or calling
+`useCart.getState().total()` outside a selector doesn't subscribe, and the
+value goes stale.
+
 Each slice is now a deep module: the interface (`add`, `remove`, `total`,
 `applyCoupon`) expresses intent; the state shape and the invariants live
 inside. Components call `Cart.add(item)`. The grab-bag form made them reach
@@ -387,10 +397,10 @@ function createCombobox<T>(opts: { items: () => T[]; getId: (t: T) => string }) 
 ```
 
 ```svelte
-<!-- Svelte — a class or factory returning runes + actions -->
+<!-- Svelte 5 — a factory returning runes + actions -->
 <script lang="ts">
   import { createCombobox } from '$lib/combobox';
-  export let products: Product[];
+  let { products }: { products: Product[] } = $props();
   const cb = createCombobox({ items: () => products, getId: (p) => p.id });
 </script>
 

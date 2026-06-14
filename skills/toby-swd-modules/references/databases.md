@@ -108,8 +108,7 @@ public record UserQuery(
     Optional<UUID> orgId,
     Optional<Boolean> active,
     Optional<Instant> createdAfter,
-    Optional<Set<Role>> roles,
-    Optional<Integer> limit
+    Optional<Set<Role>> roles
 ) { ... }
 ```
 

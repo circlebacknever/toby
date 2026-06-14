@@ -146,6 +146,14 @@ is safe." A transaction that calls `sendEmail` and then writes to the DB
 will send the email twice when the retry succeeds. Move side effects
 outside the retried block.
 
+Second guardrail: do the reads inside `fn`. A deadlock or serialization
+failure rolls the transaction back, so the snapshot the body computed against
+is gone. If `fn` closes over rows read before `WithRetry`
+and writes values derived from them, each retry re-applies a stale
+computation against data that has since moved — a lost update that commits
+cleanly. Read the rows, compute, and write inside `fn`, so every attempt
+starts from what the database currently holds.
+
 ---
 
 ## Example 3 — Bulk operations: one round trip vs N
@@ -316,6 +324,48 @@ above) or an unexpected slow query.
 
 ---
 
+## Example 6 — Concurrency control: where the conflict gets caught
+
+Two transactions read an inventory row, both see one unit left, both sell it.
+Example 2 retries a conflict once the database raises one; this is the prior
+question — how the row is guarded so the conflict is detected at all. Two
+strategies, each keeping the discipline in one place.
+
+**Optimistic — a version column.** The row carries a `version`; the update
+asserts it hasn't moved since the read:
+
+```sql
+UPDATE inventory SET qty = qty - 1, version = version + 1
+WHERE id = $1 AND version = $2;
+-- 0 rows updated → another writer won; reload and decide
+```
+
+The check rides in the WHERE clause, so every writer enforces it identically.
+No lock is held and nobody waits, which is cheap when conflicts are rare. The
+caller handles the 0-row case (reload, maybe retry).
+
+**Pessimistic — lock the row.** Take the row's write lock for the rest of the
+transaction:
+
+```sql
+SELECT qty FROM inventory WHERE id = $1 FOR UPDATE;  -- concurrent writers block here
+-- decide, then UPDATE; the lock releases at commit
+```
+
+Correct under heavy contention where optimistic retries would thrash, paid
+for by holding a lock — so the transaction stays short and touches rows in a
+consistent order, or it trades the lost-update race for a deadlock.
+
+Isolation level is the backstop under both. `READ COMMITTED`, the common
+default, permits the read-then-write race above, which is why one of the two
+guards is needed. `SERIALIZABLE` makes the database detect the interleaving
+and abort one transaction — the strictest model, paid for with more aborts to
+retry (back to Example 2). Pick one strategy per contended resource and hold
+to it; mixing optimistic and pessimistic access to the same row reopens the
+race each was meant to close.
+
+---
+
 ## Cheat sheet — database complexity
 
 | Symptom | Move |
@@ -325,4 +375,5 @@ above) or an unexpected slow query.
 | Loop of single-row INSERTs/UPDATEs | Batch operation; one statement |
 | Slow query in production | EXPLAIN first; usually a missing index or bad query plan |
 | Connection pool exhausted | Short scoped transactions; pool_timeout to fail fast |
+| Lost update under concurrent writes | Version column (optimistic) or `SELECT … FOR UPDATE` (pessimistic); one per resource |
 | Index added "just in case" | Don't; index for measured query patterns only |

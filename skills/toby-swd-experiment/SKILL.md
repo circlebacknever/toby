@@ -89,7 +89,7 @@ If the selected behavior becomes durable inside a meaningful module, check wheth
 
 During discovery, user feedback and manual observation may be the validation source. Automated tests, browser automation, screenshots, and broad checks wait unless the user asks for them or they are required to run the experiment surface.
 
-After the behavior settles, use toby-swd-testing to decide what durable tests should protect the contract. Write tests for the selected behavior. Discarded candidates can stay in the experiment notes.
+After the behavior settles, decide what durable tests should protect the contract and write them for the selected behavior. Discarded candidates can stay in the experiment notes.
 
 ## Environment Boundary
 

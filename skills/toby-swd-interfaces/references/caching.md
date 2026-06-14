@@ -267,7 +267,11 @@ interface CacheStrict {
 ```
 
 Same comment-test discipline applies — whichever choice you make, name
-it in the contract.
+it in the contract. Stale-while-revalidate is a third documented choice:
+it serves a bounded-age value while a background load refreshes it, so the
+"never stale" line above flips, and the staleness window becomes part of the
+contract exactly like the fall-through rule. The freshness guarantee is a
+decision the comment states; a cache has it only when the contract says so.
 
 ---
 

@@ -59,10 +59,11 @@ The redesign: a query object on the wire, the implementation owns the
 defaults and the validation, and the contract gets short.
 
 ```http
-GET /api/users?filter=<base64-or-json>&page_token=...&page_size=50
+GET /api/users?filter=<url-encoded JSON>&page_token=...&page_size=50
 ```
 
-Where `filter` is a structured value:
+Where `filter` is a single structured value, with one documented encoding
+(URL-encoded JSON):
 
 ```json
 {
@@ -93,8 +94,18 @@ input and one pagination control.
 
 Guardrail: did anything get hidden that callers truly need? The
 performance limit on deep pagination is truly caller-facing — opaque
-tokens convey it implicitly (the token stops being valid past a
-limit) and the response can return a clear error code when that happens.
+tokens convey it implicitly (the token stops being valid past a limit), and
+the response returns a named status the caller can branch on when that
+happens (a `400`/`410`-style "page token expired, restart paging"), so an
+expired token isn't mistaken for a transient error.
+
+One wire caveat: a query string has a practical length ceiling — proxies and
+servers cap the URL around a few KB. A small filter fits; a large or deeply
+nested one doesn't, and encoding it as base64 only delays the wall. When the
+criteria object outgrows the URL, the same object moves to a
+`POST /api/users/search` body — identical contract, different transport.
+That gives up GET's caching and idempotent-by-method semantics, so keep the
+GET form while the filter stays small.
 
 ---
 
@@ -139,6 +150,7 @@ the caller currently orchestrates:
 ```java
 public sealed interface OrderResult {
     record Placed(Order order) implements OrderResult {}
+    // details: caller-safe text bound to reason, never internal diagnostics
     record Failed(OrderFailureReason reason, String details) implements OrderResult {}
 }
 
@@ -153,7 +165,8 @@ public class OrderService {
 }
 
 public record PlaceOrderCommand(UUID userId, UUID cartId, UUID paymentMethodId,
-                                 ShippingOption shipping, boolean dryRun) {}
+                                 ShippingOption shipping, String idempotencyKey,
+                                 boolean dryRun) {}
 
 public enum OrderFailureReason {
     CART_INVALID, PAYMENT_METHOD_INVALID, SHIPPING_UNAVAILABLE,
@@ -170,14 +183,20 @@ implementation's job (saga, outbox, or two-phase). If atomicity truly
 cannot be guaranteed, the contract changes to expose it (returns include
 an in-progress status), but it doesn't expose the implementation strategy.
 
+The `idempotencyKey` is part of that contract too: a retry carrying the key
+it used the first time returns the original result and never places a second
+order. A mutation is safe to retry only when the request carries a key the
+server dedupes on, or the operation is naturally idempotent; the key is what
+lets a caller re-send a `placeOrder` that timed out without risking a double
+charge.
+
 ---
 
 ## Example 3 — Go service interface declared at the consumer
 
-Continuing the pattern from `toby-swd-modules` backend-apis Example 3, the
-question for toby-swd-interfaces is what shape the consumer-side interface
-takes. The temptation is to define a "convenient" interface with
-everything the consumer might want.
+When one service consumes another, the question is what shape the
+consumer-side interface takes. The temptation is to define a "convenient"
+interface with everything the consumer might want.
 
 ```go
 // pkg/orders/interfaces.go
@@ -298,14 +317,23 @@ Comments, one per RPC:
 > DeactivateUser — Marks the user inactive and revokes all sessions.
 > Reversible by ActivateUser.
 >
-> AssignUserRole — Sets the user's role. New permissions are visible
-> immediately to subsequent requests.
+> AssignUserRole — Sets the user's role. Permission re-evaluation across the
+> user's resources is async, so the new role may not be in effect for the
+> next request; that side effect is named in the operation's purpose.
 
 Each comment is one to two sentences. Each RPC has one effect that the
 caller can reason about. The proto3 presence problem disappears because
 no field is "set or unset" — every field on every message is required to
 the operation. The side effects move from "buried in prose" to "named in
 the operation's purpose."
+
+On a published service, splitting `UpdateUser` into four RPCs is a
+wire-breaking change — existing clients call an RPC that no longer exists.
+The new RPCs ship alongside the old one, which stays and is marked
+`deprecated` until callers migrate, and proto field numbers are never reused.
+Greenfield designs adopt the split directly. This is the brownfield rule the
+skill states: a surface other teams build on doesn't get broken without a
+migration path.
 
 For high-cardinality update endpoints (admin tools that legitimately edit
 many fields), keep one `UpdateUser` operation with a field_mask, document

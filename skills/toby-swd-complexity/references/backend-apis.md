@@ -36,8 +36,9 @@ The HTTP status codes already carry a category signal — use it:
 |---|---|---|
 | 2xx | Success | Return body |
 | 4xx (except 408, 429) | Client error — caller's fault | Surface; no retry |
-| 408, 429 | Transient — retry-after applies | Retry with backoff (honor `Retry-After` header) |
-| 5xx (except 501) | Transient — server issue | Retry with backoff |
+| 408 | Transient — request never completed | Retry on a fresh connection |
+| 429 | Throttled — caller is over a limit | Back off; honor `Retry-After` (delta-seconds or an HTTP date) |
+| 5xx (except 501) | Transient — server issue | Retry with backoff, only when the request is safe to repeat |
 | 501 | Permanent — not implemented | Surface; no retry |
 
 A wrapper that applies the categorization:
@@ -46,26 +47,43 @@ A wrapper that applies the categorization:
 async function callApi<T>(path: string, opts?: RequestOpts): Promise<T> {
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const res = await fetch(path, { ...opts, signal: timeoutSignal(10_000) });
-    if (res.ok) return res.json();
+    try {
+      const res = await fetch(path, { ...opts, signal: timeoutSignal(10_000) });
+      if (res.ok) return res.json();
 
-    if (isTransient(res.status) && attempt < maxAttempts) {
-      const wait = retryAfter(res) ?? backoff(attempt);
-      await sleep(wait);
-      continue;
+      if (isTransient(res.status) && attempt < maxAttempts) {
+        await sleep(retryAfter(res) ?? backoff(attempt));
+        continue;
+      }
+      throw new HttpError(res.status, await res.text(), { permanent: !isTransient(res.status) });
+    } catch (e) {
+      // a network failure or the 10s timeout rejects fetch — it never returns a status,
+      // so the transient handling above never sees it. Catch it here and retry the same way.
+      if (isNetworkOrTimeout(e) && attempt < maxAttempts) {
+        await sleep(backoff(attempt));
+        continue;
+      }
+      throw e;
     }
-
-    throw new HttpError(res.status, await res.text(), { permanent: !isTransient(res.status) });
   }
   throw new Error('unreachable');
 }
 ```
 
 What this absorbs (rung 2, mask at lowest level): transient 5xx, 408, 429,
-network blips. What it surfaces: 4xx (caller did something wrong) and
-sustained 5xx (real outage). The thrown `HttpError` carries a `permanent`
-flag so callers don't re-retry; the flag is set in one place, which spares
-every call site from re-deriving the categorization.
+network blips, and the timeout abort. What it surfaces: 4xx (caller did
+something wrong) and sustained 5xx (real outage). The thrown `HttpError`
+carries a `permanent` flag so callers don't re-retry; the flag is set in one
+place, which spares every call site from re-deriving the categorization.
+
+Automatic retry is safe only when repeating the request is safe — an
+idempotent method (GET, PUT, DELETE) or a request carrying an idempotency key
+the server dedupes on. Retrying a non-idempotent POST after a 5xx or a timeout
+can create the resource twice, because the first attempt may have committed
+before the response was lost. Scope the wrapper to safe methods, or require
+the key. And `res.text()` rides along for logging at the boundary; a handler
+replying to an external caller maps it to a category and a safe message first,
+since a downstream body can carry stack traces or query text (rung 3).
 
 Callers handle the typed errors at one place — usually a response
 interceptor that catches `permanent: false` (sustained outage → user-facing
@@ -80,11 +98,11 @@ gRPC defines explicit retryability via status codes:
 
 | Code | Retry? |
 |---|---|
-| `UNAVAILABLE` | Yes |
-| `DEADLINE_EXCEEDED` | Maybe (with new deadline) |
-| `RESOURCE_EXHAUSTED` | With backoff |
-| `ABORTED` (transaction abort) | Yes |
-| `INTERNAL` | Sometimes (server-defined) |
+| `UNAVAILABLE` | Yes, with backoff |
+| `DEADLINE_EXCEEDED` | Only with a fresh, larger deadline |
+| `RESOURCE_EXHAUSTED` | Only when the server signals throttling, with backoff |
+| `ABORTED` (transaction conflict) | Retry the whole transaction with backoff, after re-reading state |
+| `INTERNAL` | No — signals a broken invariant, so a bare retry hides a bug |
 | `INVALID_ARGUMENT`, `NOT_FOUND`, `PERMISSION_DENIED`, etc. | No — caller error |
 
 A Go server-to-server client:
@@ -123,11 +141,12 @@ propagation, double-retries on `ABORTED`. The ladder collapses into one
 helper, masking the transient cases. Permanent errors bubble up where the
 caller can act.
 
-Deadline propagation matters: `ctx` carries a deadline; if the deadline
-is near or past, don't retry. `retryGRPC` reads the deadline from `ctx`
-and exits when there isn't enough time for another attempt. This is the
-kind of complexity that lives in the helper, which is what keeps it out of
-50 call sites.
+Deadline propagation matters: `ctx` carries a deadline, and `sleepCtx`
+returns early if it expires during backoff, so the loop stops retrying once
+the deadline is gone; it won't sleep past it. To also skip an attempt that
+can't finish in time, compare `ctx`'s remaining time against the next backoff
+before the call. This is the kind of complexity that lives in the
+helper, which is what keeps it out of 50 call sites.
 
 ---
 
@@ -257,26 +276,77 @@ batched insert.
 
 ```ts
 app.post('/api/orders/import', async (req, res) => {
-  const created = await ordersService.createBulk(req.body.orders);
-  res.json(created);
+  const result = await ordersService.createBulk(req.body.orders);
+  res.json(result);
 });
 
 // in OrdersService
-async createBulk(orders: NewOrder[]): Promise<Order[]> {
-  return await this.repo.insertMany(orders);   // one transaction, one round-trip
+async createBulk(orders: NewOrder[]): Promise<ImportOutcome[]> {
+  // one transaction, one round-trip; each input maps to a typed outcome
+  return await this.repo.insertMany(orders);
 }
 ```
 
 One round trip. The cost is bounded. The complexity gain: `insertMany`
-in the repository owns the bulk semantics — what happens if some inserts
-violate constraints (all-or-nothing transaction, or per-row reporting),
-how big a batch is too big (chunk the input above some threshold), what
-returns to the caller (typed results per input).
+in the repository owns the bulk semantics — how big a batch is too big
+(chunk the input above some threshold), and what a partial failure looks
+like to the caller. The return type decides that contract: a typed outcome
+per input (created, or rejected with a reason) lets the caller act on a
+partial success; an all-or-nothing variant rejects the whole batch and names
+the row that broke it. A flat array of successes can express neither.
 
 This is the same shape as the mobile bridge example — N+1 over a network.
 The cure is bulk APIs at the boundary that crosses the network. Within
 the application, the row-by-row code can stay (it's clearer), but at the
 network boundary, batch.
+
+---
+
+## Example 6 — Shared mutable state behind one owner
+
+An in-memory rate limiter several handlers consult. The tactical version
+exposes the state and trusts every caller to guard it:
+
+```go
+type RateLimiter struct {
+    Mu     sync.Mutex
+    Counts map[string]int
+}
+
+// at every call site:
+rl.Mu.Lock()
+rl.Counts[userID]++
+over := rl.Counts[userID] > limit
+rl.Mu.Unlock()
+```
+
+The locking discipline lives at the call sites. One handler forgets to lock
+and reads a torn value; another holds the lock across a network call and
+stalls everyone; a third takes this lock and a second one in the opposite
+order and deadlocks. Every new call site is another chance to get one wrong.
+
+Concentrate the discipline inside the owner:
+
+```go
+type RateLimiter struct {
+    mu     sync.Mutex                 // unexported; only methods touch it
+    counts map[string]int
+    limit  int
+}
+
+func (rl *RateLimiter) Allow(userID string) bool {
+    rl.mu.Lock()
+    defer rl.mu.Unlock()
+    rl.counts[userID]++
+    return rl.counts[userID] <= rl.limit
+}
+```
+
+Callers write `rl.Allow(userID)` and know nothing about the lock. The
+critical section is one short block — no network call inside it, one
+structure, one lock — so there's no ordering left to get wrong. Shared
+mutable state is complexity like any other: it costs least when one module
+owns it and the rules for touching it live in one place.
 
 ---
 
@@ -290,3 +360,4 @@ network boundary, batch.
 | Circuit breaker because "we should" | Add only when measured thread-pile-up is hurting users |
 | Loop of API calls (N+1 over the network) | Bulk endpoint; one round trip |
 | Slow non-critical dependency on critical path | Move it off the critical path; render-then-fill |
+| `mutex` locked at every call site | Put the state and its lock in one type; expose methods and keep the lock hidden |

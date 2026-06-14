@@ -56,10 +56,10 @@ type AuthResult =
   | { ok: true; signature?: string }
   | { ok: false; reason: 'user_cancelled' | 'failed' | 'locked' };
 
-export const Biometrics = {
+interface Biometrics {
   status(): Promise<BiometricsState>;
   prompt(opts: { reason: string; payload?: string }): Promise<AuthResult>;
-};
+}
 ```
 
 Comment:
@@ -156,12 +156,12 @@ contract a route should have.
 A common pre-encapsulation interface:
 
 ```ts
-export const Storage = {
+interface Storage {
   get(key: string): Promise<string | null>;
   set(key: string, value: string): Promise<void>;
   delete(key: string): Promise<void>;
   clear(): Promise<void>;
-};
+}
 ```
 
 Comment, fully honest:
@@ -171,8 +171,10 @@ Comment, fully honest:
 > 'feed:cache:v2'). When changing the shape of stored data, bump the key's
 > version suffix (':v1' to ':v2') so old clients don't read corrupted data.
 > clear() removes everything including auth tokens; use deleteSpecific keys
-> on logout instead. The set() method does not validate value size; iOS
-> AsyncStorage has a per-key 2MB limit beyond which writes silently fail.
+> on logout instead. The set() method does not validate value size; on
+> Android a value over ~2MB throws on read (the SQLite CursorWindow limit)
+> and the database has a configurable total cap. iOS has no comparable
+> per-key limit.
 
 Six sentences. The "interface" is `get/set/delete/clear`, but the
 operational contract — JSON serialization, key namespacing, versioning,
@@ -188,31 +190,31 @@ Redesign as typed accessors per domain:
 
 ```ts
 // storage/userPrefs.ts
-export const UserPrefs = {
+interface UserPrefs {
   hasSeenOnboarding(): Promise<boolean>;
   markOnboardingSeen(): Promise<void>;
   themePreference(): Promise<'light' | 'dark' | 'system'>;
   setThemePreference(v: 'light' | 'dark' | 'system'): Promise<void>;
-};
+}
 
 // storage/feedCache.ts
-export const FeedCache = {
+interface FeedCache {
   load(): Promise<FeedItem[] | null>;
   save(items: FeedItem[]): Promise<void>;
   clear(): Promise<void>;
-};
+}
 
 // storage/session.ts
-export const Session = {
+interface Session {
   tokens(): Promise<Tokens | null>;
   save(t: Tokens): Promise<void>;
   clear(): Promise<void>;
-};
+}
 ```
 
 Each module's interface comment is now two or three sentences. `UserPrefs`
 owns its key schema and migration; `FeedCache` owns its versioning and the
-2MB limit (it batches writes or drops oldest items if needed); `Session`
+Android size limits (it batches writes or drops oldest items if needed); `Session`
 owns the secure-storage detail (`Session.save` writes to Keychain/Keystore,
 not AsyncStorage). The screens that use these modules don't know any of
 that.

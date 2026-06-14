@@ -119,7 +119,7 @@ function OrderPage({ id }: { id: string }) {
   switch (q.status) {
     case 'loading':   return <Spinner />;
     case 'not_found': return <OrderNotFound />;
-    case 'loaded':    return <OrderView order={q.order} />;
+    case 'success':   return <OrderView order={q.order} />;
     // network/auth/unexpected errors never reach here:
     //  - network: retried inside the API client
     //  - auth: handled globally by the response interceptor
@@ -131,6 +131,12 @@ function OrderPage({ id }: { id: string }) {
 The page handles only the cases that are truly its concern. The other
 three handler buckets disappear from this file and from every other page
 that used the same pattern.
+
+`useOrder` returns a discriminated query result — a `status` plus the data
+for that state — and this page renders only the states it owns. The `error`
+and `stale` arms are absent by design: the error cases collapse into the
+rungs above — the client's retry, the interceptor, the boundary — and never
+reach the component. Same shape, fewer arms because the handling moved.
 
 ---
 
@@ -164,15 +170,18 @@ that are stable).
 
 The rule the team actually wants:
 
-- **Default: no memoization.** Components re-render. That's their job.
-  React 19 (and Solid/Svelte) handle this case better than humans guess.
+- **Default: no memoization.** Components re-render. That's their job. The
+  React Compiler (v1.0, opt-in) memoizes at build time, so where it runs the
+  hand-written `useMemo`/`useCallback` is redundant; plain React 19 without
+  the compiler re-renders as it always has. Solid and Svelte sidestep the
+  question — fine-grained reactivity updates only what changed.
 - **`useMemo`** is for expensive computations whose dependencies are stable
   enough that the memo will actually hit. "Expensive" means measurable —
   parsing a large blob, computing a derived structure over many items.
 - **`useCallback`** is for callbacks passed to memoized children that
-  compare by referential equality, or to dependency arrays of other hooks.
-  Not for callbacks that get passed to native DOM event handlers — those
-  don't care.
+  compare by referential equality, or to the dependency arrays of other
+  hooks. A callback used only as a JSX DOM event prop (`onClick`) doesn't
+  need it.
 - **Object-prop memoization** is for stabilizing references passed to
   memoized children. Almost never useful when the consumer isn't itself
   memoized.

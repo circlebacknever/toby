@@ -77,9 +77,8 @@ to coordinate.
 
 ## Example 2 — Query object interface design
 
-The "single find method covering every filter" pattern from `toby-swd-modules`
-databases.md needs an interface that doesn't trade the finder-explosion
-for a different problem.
+A single find method that covers every filter needs an interface that
+doesn't trade the finder-explosion for a different problem.
 
 Candidate A — too thin:
 
@@ -154,6 +153,12 @@ Comment for `find`:
 Three sentences. `UserQuery` has its own comment describing each filter,
 but it's a value object — its contract is "what each field means" and a
 reader who needs `orgId` only reads that one comment.
+
+The pagination here is worth a note. Offset/limit pagination drifts when rows
+are inserted or deleted mid-iteration — a page can repeat a row or skip one.
+The opaque `pageToken` encodes a stable cursor, so paging stays correct under
+concurrent writes. That's the trade: a token and a page size cost a bit more
+surface than a bare row limit, and buy correctness under concurrent load.
 
 The default constructor and the builder methods make the common case easy:
 `users.find(new UserQuery().withOrgId(org).withActive(true))`. The
@@ -289,14 +294,17 @@ Redesigning the *interface to migrations* — the general shape, beyond this one
 
 ```python
 class Migration:
-    """A migration is a tuple of (schema change, data backfill, dual-read
-    window, dual-write window). Each step is reversible and idempotent.
-    Migrations run in deployment order; the application understands every
-    intermediate schema."""
+    """A migration has three parts: a schema change, an idempotent data
+    backfill, and a reverse schema step. Migrations run in deployment order,
+    and the application must understand every intermediate schema. backfill
+    is safe to re-run; schema_down is reverse-only and may be destructive —
+    dropping a column added on the way up loses whatever was written to it.
+    A zero-downtime cutover needs more: a dual-write, dual-read window held
+    across two deploys, which is a larger interface this one doesn't express."""
 
     def schema_up(self): ...
     def backfill(self): ...     # idempotent
-    def schema_down(self): ...
+    def schema_down(self): ...  # reverse-only; may lose data
 ```
 
 This is heavier than what most teams need on day one — most teams ship

@@ -1,9 +1,8 @@
 # Worked Examples — Caching as Complexity
 
-`toby-swd-modules` and `toby-swd-interfaces` both have caching content. They cover
-*where* the cache should live and *what its contract should be*. This file
-covers the question those don't: *should you add a cache at all*, and if
-so, *how much complexity have you bought*?
+This file covers one question about caching: *should you add a cache at all*,
+and if so, *how much complexity have you bought*? Where a cache should live
+and what its contract should be are separate questions handled elsewhere.
 
 A cache is performance complexity. The SKILL's rule applies: gate
 complexity on evidence. A cache earns its place by measurement. The
