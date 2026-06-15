@@ -1,6 +1,6 @@
 ---
 name: toby-artifact-style
-description: Apply Toby's artifact design system to HTML or React artifacts, SVG or HTML widgets, slide decks, diagrams, charts, dashboards, learning aids, reference cards, mockups, and artifact copy. Use when a produced visual artifact should follow Toby's colors, type, density, evidence-first layout, component patterns, and copy constraints.
+description: Apply Toby's artifact design system whenever a visual artifact is being produced — an HTML or React page or widget, an SVG or HTML widget, a diagram, image, graphic, chart, dashboard, slide deck, mockup, printable reference card, or the copy inside one. Trigger when the user asks for a visual, including a visual to teach or explain something — draw it, show it, make a diagram, build a chart, sketch a graphic. Do not trigger for a plain text answer or explanation in chat where no visual was asked for; that prose belongs to toby-explain or toby-learning.
 ---
 
 # Toby Artifact Style
@@ -30,9 +30,9 @@ If a panel uses none of these, ask whether it earns its place.
 5. **Density over whitespace.** Slides and dashboards run dense. Multiple KV pairs, stat grids, sparkline-in-table cells, evidence rows. The reader is treated as a serious professional reviewing evidence; they don't need a hero illustration.
 6. **Three-tone progression for narrative blocks.** When a panel walks through reasoning, tint the rows: setup (info teal) → working (watch amber) → conclusion (stable green). The Worked Example component does this; other reasoning panels can borrow the pattern.
 
-## Teaching content can become a deck
+## Teaching decks — only when asked
 
-For substantial lessons, walkthroughs, lectures, or reference modules, prefer a Toby Artifact Style HTML deck artifact (paginated, prev/next, React `.jsx`) when the user asks for a produced artifact or the material is too dense for chat. For quick explanations, answer in chat and apply artifact copy rules only where artifact copy is being written.
+Build a Toby Artifact Style HTML deck (paginated, prev/next, React `.jsx`) only when the user has asked for a produced artifact, deck, or slides. A lesson, walkthrough, or explanation in conversation stays in chat — toby-explain and toby-learning own that, and they answer in prose. Once a deck has been asked for, apply artifact copy rules to its copy.
 
 What goes where:
 - **Deck (artifact):** glossary, mechanism explanations, tables, diagrams, derivations, examples, summary.
