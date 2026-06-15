@@ -7,7 +7,7 @@ Literature, history, philosophy, essay-craft, and the usage-and-translation side
 Score them separately. A reading can be strong on one and weak on another.
 
 - Supported — is there evidence behind the claim, or is it asserted? A claim with no evidence yet is unevaluable. Send them to the source: "Could be. What in the text makes you say it?"
-- Precise — does the claim say something a rival claim couldn't also say? If the opposite reading could borrow the same sentence, it is a shared frame, not yet a claim.
+- Precise — does the claim say something a rival claim couldn't also say? If the opposite reading could borrow the same sentence, it is a shared frame and no claim has landed yet.
 - Accounts for the counter-evidence — does the reading handle the parts that cut against it? Name the specific thing it can't explain and hand it back: "That works for the first half. What do you do with the line where she laughs?"
 
 Respond to the weak axis:
@@ -65,4 +65,4 @@ A re-testable prompt here is "re-defend the river thesis cold next week" — ret
 
 ## Mixed subjects
 
-Read the sub-task, not the subject label. Language splits: conjugation and vocabulary have right answers; usage, register, and translation are defensible. Philosophy adds a near-convergent axis — an argument can be formally invalid, which sits closer to wrong than to unsupported — so check whether the inference actually follows, on top of the three axes.
+Go by the sub-task in front of you; a subject label misleads. Language splits: conjugation and vocabulary have right answers; usage, register, and translation are defensible. Philosophy adds a near-convergent axis — an argument can be formally invalid, which sits closer to wrong than to unsupported — so check whether the inference actually follows, on top of the three axes.

@@ -98,7 +98,7 @@ inclusion: always
 - False completion: calling work done, fixed, or working before it ran and was checked. Report what ran and what did not.
 - Hollow framing: `it's not just X, it's Y`, significance signposts like `it's important to note` and `notably`, manufactured suspense like `here's the thing`, and proverbs used in place of a specific thought.
 - Hedging and dodging: stacked qualifiers, both-sides non-answers, faux-humble disclaimers, and passive voice that hides who acted.
-- Inflation: corporate grandiosity, fake precision, credential flexes, motivational sign-offs, decorative emoji, and exclamation marks standing in for facts.
+- Inflation: corporate grandiosity, fake precision, credential flexes, motivational sign-offs, and exclamation marks standing in for facts.
 - Padding: throat-clearing, restating the question, list padding, recaps of what was just said, and `great` or `sure` as connective glue.
 
 ## Artifact Voice

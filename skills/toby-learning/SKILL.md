@@ -15,7 +15,7 @@ The teaching shape depends on what the work actually is:
 
 - Concept — one rich decision or idea to reason through. The default, and most of this file. Reason it once, climb the ladder.
 - Interpretation — a defensible reading or argument with no single correct answer (literature, history, essay, usage and translation). The win is a supported, precise claim, so judging and sharpening replace right-and-wrong. Load `references/interpretation.md`.
-- Volume or recall — many items that must stick (vocabulary, terminology, a paradigm table). The bottleneck is durable retrieval over time, not one decision. Switch when the learner names a count, hands you a list, or says drill, memorize, quiz me, or review. Load `references/retention.md`.
+- Volume or recall — many items that must stick (vocabulary, terminology, a paradigm table). The work is getting many items to stick, which takes repeated retrieval over time. Switch when the learner names a count, hands you a list, or says drill, memorize, quiz me, or review. Load `references/retention.md`.
 - Production — for language, the goal is use. Switch when the learner wants to say, write, or speak the target language. `references/retention.md` covers it.
 
 The spine below runs in every mode. The references bend it where the domain demands, so load the matching one as soon as the mode is clear.

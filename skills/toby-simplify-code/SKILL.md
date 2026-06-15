@@ -5,44 +5,81 @@ description: Use when the user asks to simplify, tidy, tighten, refactor, de-dup
 
 # Toby Simplify Code
 
-Use this skill to make changed code easier to read while preserving behavior. If behavior must change, switch to feature or bug-fix work.
+Make changed code simpler to read and keep behavior identical. A lateral rewrite that only swaps one style for another is churn. The skill exists to prevent churn, so a diff shipped to look productive is the failure.
 
-## Rules
+## Disposition
 
-- Preserve behavior.
-- Prefer local style over generic taste.
-- Work on recently modified code by default. Broaden scope only when the user asks or touched code depends on nearby cleanup.
-- Keep the diff small. Whole-file formatting is separate work.
-- Preserve tests. If a test looks wrong, classify the behavior it protects first.
-- Stay at readability. Restructuring modules or redesigning interfaces is feature-dev's job (toby-swd-strategy, toby-swd-modules). If a cleanup isn't small, local, and behavior-preserving, leave it and note it as a follow-up.
+- Precision over recall. A missed cleanup costs less than a churning diff or a silent behavior change. When unsure, leave it.
+- The win is countable or it isn't a win. Before you touch anything, say which number goes down: lines, branches, state variables, duplicated blocks, or named traps removed. "Clearer," "tidier," "more idiomatic" count nothing down; they're how a lateral rewrite disguises itself.
+- Prove behavior is preserved, then change. The burden sits on the edit; the default is to leave the code alone.
+- Returning the diff unchanged is a valid result. "Nothing worth simplifying" is a complete answer; say it plainly, and don't ship a rewrite to have something to show.
 
-## Simplification Targets
+## What to look for
 
-Look for:
+**Over-built code where simple does the same job.**
 
-- Repeated setup or branches that can be named once.
-- Parameter juggling that leaks a lower-level mechanism into callers.
-- Long conditionals where early returns or named predicates expose intent.
-- Shallow wrappers that only rename another call.
-- Comments that narrate obvious code. (toby-swd-clarity)
-- Clever one-liners, nested ternaries, or dense chains that make debugging worse.
-- Names that expose history while hiding purpose. (toby-swd-clarity)
+- Repeated setup or branches that can be named once — two or more real occurrences, where naming them once removes lines.
+- A long conditional where an early return or a named predicate shows intent.
+- A clever one-liner, nested ternary, or dense chain that packs several branches or side effects into one expression and makes debugging worse.
+- A shallow wrapper with a single caller that only renames another call and adds no type, name, or boundary value.
+- A parameter that leaks a lower-level mechanism into callers.
+- A comment that narrates what the code plainly says; a name that records history while hiding purpose.
 
-Keep:
+**Code that ignores a pattern this repo already uses.**
+
+- The change re-solves something the repo solves elsewhere — a helper, util, base class, hook, decorator, error type, config accessor. Search the repo for the operation before calling the code novel. Swap to the existing pattern only when two or more independent call sites already use it. A definition plus its one use is not a pattern; if you have to squint to call two blocks the same, they aren't.
+
+**Code that fights the language's idioms.**
+
+- Hand-rolled control flow the language has a construct for: a manual index loop where an iterator or comprehension fits, a manual null check where there's optional chaining or null-coalescing, manual accumulation where a fold fits, concatenation where interpolation fits, a manual close where there's a context manager or defer.
+
+**Code that hand-rolls what a library already in this repo provides.**
+
+- Reach for a library only when it replaces a reimplementation in a hazard-prone class: timezones, unicode, retry and backoff, deep clone or equality, schema validation. Outside those, a few lines of plain stdlib stay — saving a line or two isn't worth an import. The library must already be a direct dependency; confirm it in the manifest. Adding a dependency is out of scope — note it as a follow-up.
+
+## Not a simplification
+
+Reordering for taste, a rename that doesn't fix a misleading name, swapping one construct for another of equal length and clarity, splitting or merging expressions with no debugging gain, formatting a tool owns. None of these clear the countable-win bar — leave them.
+
+## Idiom or local style
+
+1. When the repo has a settled convention for this exact construct, visible in two or more sibling files, it wins, even over the textbook idiom.
+2. With no local convention, follow the language idiom.
+3. An idiom that appears nowhere else in the repo stays out of a cleanup pass — that's a style migration, noted as a follow-up.
+4. Leave code that's already idiomatic or conventional. Rewriting it into another idiom is churn.
+
+## Behavior drifts quietly
+
+A change ships one of two ways: a test covers the touched path and passes, or the change is mechanical and you show why the edge can't fire.
+
+Mechanical means a pure rename, a dead-code deletion, or a swap where the edge for its class is provably unreachable — and you quote why ("can't be null — typed string, no | null"). Anything where the edge could fire is edge-crossing: it needs a covering test, or you leave it and note the edge that needs one. Assumed equivalence doesn't ship.
+
+The edge per class:
+
+- Idiom swap — null, undefined, and empty handling match; iteration order holds; short-circuit and laziness hold; the same exception type is thrown.
+- Library substitution — error type and shape, ordering and stability, locale and timezone, and precision all match. A change in performance class (linear to quadratic, sync to async) is a behavior change; leave it.
+- Repo-pattern reuse — the helper's defaults match the inline code: timeouts, retries, logging, caching, what it throws. A helper that also logs is not equivalent to code that didn't.
+- Early return or predicate extraction — the same side effects run before the return, and the extracted predicate has none of its own.
+
+## Keep
 
 - Helpful domain boundaries.
-- Explicit error handling. (toby-swd-complexity)
-- Slightly longer code that makes state changes visible.
-- Tests that describe behavior through public interfaces. (toby-swd-testing)
+- Explicit, visible error handling. Collapsing distinct error paths or hiding a failure path is a behavior change.
+- Slightly longer code that makes a state change visible.
+- A test that asserts behavior through the public interface. Don't rewrite a test to make a cleanup pass.
+
+## Out of scope
+
+Moving code between modules, changing a signature, or altering a public return shape is behavior-changing work. If a cleanup isn't small, local, and behavior-preserving, leave it and note it as a follow-up. If you spot a real bug or a security issue while cleaning up, don't fix it here — that's a behavior change. Flag it only when you can state the input that triggers it and why no guard catches it; a vague "this might be buggy" is noise. Then recommend a review pass.
 
 ## Process
 
-1. Inspect the diff and nearby patterns.
-2. Identify candidate simplifications and discard any that risk behavior drift.
-3. Make one coherent cleanup pass.
-4. Run the narrowest relevant verification.
-5. Re-read the diff and check that the caller now reads closer to intent.
+1. Inspect the diff and the patterns nearby and across the repo.
+2. Pick candidates, discard any that risk behavior drift.
+3. Make one cleanup pass; stop when the next change doesn't clear the countable-win bar.
+4. Verify per the behavior-drift rules above.
+5. Re-read the diff and confirm the caller now reads closer to intent.
 
-## Final Response
+## Final response
 
-State what got simpler and what verification ran. If behavior could not be proven, say what remains unknown.
+Lead with what got simpler, ordered by how much reading effort each change saves, and the number each one drove down. For every change, state in one clause the edge you checked and how you know it held — the covering test, or why the edge can't fire. If behavior couldn't be proven preserved, say what remains unknown.
