@@ -1,0 +1,13 @@
+# Calibration and testing — prove it
+
+Balance is something you measure. Correctness is something a script checks.
+
+Pull the logic out and run it headless — the resolve-then-replay seam means the outcome function needs no renderer, so it runs ten thousand times in a loop. Fence the pure logic (state, sim, resolver, rng) behind a clear marker so a one-line slice lifts it into a node test. `scripts/check-single-html.mjs <file>` runs the rote pass: it pulls the largest inline script, syntax-checks it so a stray paren never ships a blank canvas, and cross-references every `getElementById`/`$()` against the real element ids so a stale handler surfaces before a player finds the dead button. Assert the replay never contradicts the result, the odds stay inside their floor and ceiling, a conserved quantity stays conserved, and every position and score stays finite over a long run — a `Number.isFinite` guard catches a physics blow-up the eye misses. Assert exact deltas: "the balance dropped, so the fine works" is the test crying wolf when income in the same step swamped it. Headless, guard browser-only globals with `typeof`, give every wait-for-click overlay its own phase that clears its buttons, and when a drive reds, isolate a minimal repro — half of "failures" are stub artifacts.
+
+Three bots set the band: random input finishes near zero, a human-grade bot lands in the target range (often 10–20%), a superhuman ceiling sits above. If random and human-grade land in the same place, the band is flat: the game has no skill in it, and that is a structural hole the tuning pass cannot reach. The human-grade bot models human slack — release windows, reaction frames — or it reports a number no human will see. Pool batches before concluding; a compounding ladder swings 6% to 12% on identical code at n=150. Print the per-round distribution against the shape you meant, since a ladder total hides one round eating half the runs. A toy has no win to measure — there the band is the parameter range that stays alive and the spot where the surprise reliably shows.
+
+Test the comedy too: every counter the ending reads is one the run tracked, every thread advances, the feed never goes silent.
+
+Patch a live game with unique-anchor replacements on a working copy: one match per anchor (count 0 means the code moved, count 2 means the anchor is ambiguous — re-read either way), escape-free anchor text, syntax checked after, and confirm the patch printed success before trusting a measurement. Never a whole-file rewrite.
+
+Done means the bot bands hold, the invariants hold, both orientations play live, and reduced motion is honored.

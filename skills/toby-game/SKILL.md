@@ -1,0 +1,57 @@
+---
+name: toby-game
+description: "Collaborate to build a single-file HTML simulation game or toy in Toby's style: a real system with its shortcuts named out loud, deadpan comedy where there is a target, a paper-and-ink look across canvas, 3D, or DOM, and an ending that reads the run back when the game has one. Trigger only when the creator explicitly invokes this skill by name or with the /toby-game slash command. Do not trigger on general requests to make a game, a sim, a toy, a visualizer, or a simulation, and do not trigger when a game is only mentioned in passing. Genre, theme, and tone are the creator's to pick each run; the example games show the range the style already covers."
+---
+
+# Toby Game
+
+You bring the idea; this skill brings the taste — a real system underneath, jokes wired to the mechanics, a paper-and-ink look, a run that goes somewhere. One self-contained HTML file. Genre, theme, and tone are yours each time.
+
+## What this prevents
+
+It exists to kill the notes you would otherwise give twice:
+
+- "make it funnier" → the wider in-world register — `comedy-and-narrative.md`
+- "the jokes repeat" → serialize, escalate, draw without replacement — `comedy-and-narrative.md`
+- "there's no story, it doesn't flow" → a run is an arc that plants and pays off — `comedy-and-narrative.md`
+- "the feed flashes, a line every frame" → fire on a real change, paced — `comedy-and-narrative.md`
+- "feels random, feels unfair" → agency over dice, surface the gamble — `gameplay.md`
+- "it solved itself instantly, the answer is trivial" → the win is earned through structure — `gameplay.md`
+- "the physics looks wrong, the hit doesn't match the screen" → collide on what's drawn, real motion — `gameplay.md`
+- "the sim blows up or drifts after a while" → integrate so it cannot detonate, assert finite — `architecture.md`
+- "it doesn't feel like a game" → the world ticks and answers at once — `gameplay.md`
+- "the instructions are too long" → one verb in one line — `gameplay.md`
+- "it breaks on mobile" → live controls relocate, never hide — `cross-device.md`
+- "it looks generic" → paper, ink, one red, one light, always breathing — `visual-identity.md`
+
+## Opening move
+
+Do not ask "what genre?" Ask two things. What system are we modeling, and what is the one surprising thing it should do when it runs? And is there a target — an institution, a ceremony, a process — and who is the underdog caught in it? A premise can have no target and be a pure toy; do not staple a bureaucracy onto one that refuses it. When there is a target, name the specific mechanism and steal its real texture before writing a single joke.
+
+## The dials
+
+Place the game on a few axes, propose one combination with a reason, then let the creator turn any of them.
+
+- **fidelity** — real model through openly vibes-based
+- **narrative density** — silent toy through full press corps
+- **tone** — warm through bleak to the dread register
+- **player relationship** — observer, funder, or twitch actor
+- **session shape** — endless toy through bounded run with a graded ending
+- **render** — 2D canvas, 3D, or DOM
+
+## The build
+
+Loop first: the sim ticks, something changes, the player interferes, it matters — placeholder art, before anything else — and confirm the one surprising thing actually shows. Then layer by reference, and calibrate with bots. End each pass with a short status and the next dial to turn.
+
+## References
+
+- `architecture.md` — the one-file skeleton and the engineering spine
+- `gameplay.md` — how it feels to play
+- `comedy-and-narrative.md` — the voice and the story
+- `visual-identity.md` — the look
+- `cross-device.md` — live on desktop and phone
+- `calibration-and-testing.md` — prove it
+
+## The games behind it
+
+flux (a particle field), nbody (an orbit sandbox), gridlock (a traffic sim), denial-of-service (a DOM card-swipe satire), spot-kicks (a penalty duel), raccoon-syndicate (a heist idle). Touchstones that show the range; they are not bundled with the skill. The job is the next one in that range, wherever you point.

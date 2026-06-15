@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Game"
+  short_description: "Build a single-file HTML sim or game"
+  default_prompt: "Use $toby-game to build a single-file HTML simulation, toy, or game in Toby's style."
