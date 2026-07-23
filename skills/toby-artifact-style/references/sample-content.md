@@ -120,4 +120,4 @@ Standard caveats that fit Toby Artifact's "caveat next to the claim" rule:
 
 ## When to deviate from mission-ops
 
-When the artifact's actual subject is from another domain, use that domain's real vocabulary. Mission-ops is the default for fake or placeholder content, not a mandatory frame for every artifact. A deck on DNS doesn't need to be reframed as mission ops; a placeholder dashboard with no real subject does benefit from it.
+When the artifact's actual subject is from another domain, use that domain's real vocabulary. Mission-ops is the default for fake or placeholder content; artifacts with a real subject use that subject's own vocabulary. A deck on DNS doesn't need to be reframed as mission ops; a placeholder dashboard with no real subject does benefit from it.

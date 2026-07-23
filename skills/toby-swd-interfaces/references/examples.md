@@ -19,7 +19,7 @@ class RateLimiter:
     def consume(self, bucket, n) -> bool: ...
 ```
 
-Write the interface comment truthfully and it gets long: the caller must fetch a
+Write the interface comment in full and it gets long: the caller must fetch a
 bucket, refill it with the current time, check tokens, then consume — and must
 do these in that order or it breaks. The comment has to describe the bucket
 mechanism to be usable. That is the test failing on three counts at once: long,
@@ -78,8 +78,7 @@ three real call sites are three named intents:
 
 Callers make one decision (which intent), down from eight. Theme is read from context
 inside the core, so it stops being leaked through props. The core is deep; the
-presets are honest thin wrappers; each encodes a real distinct intent instead
-of forwarding.
+presets are thin wrappers; each encodes a real, distinct intent.
 
 ---
 

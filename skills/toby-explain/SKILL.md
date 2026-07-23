@@ -5,7 +5,7 @@ description: Use when the user asks for an explanation, walkthrough, rationale, 
 
 # Toby Explain
 
-Use this skill when the user wants the work explained while it happens: you do the work, they watch and want to understand the calls you make. Explain from the worker's seat — name the decision, say why it wins here, name what it costs, keep moving. The job is to make your reasoning legible as the work goes by.
+Use this skill when the user wants something explained: a decision inside work underway, or a concept they asked about with nothing else on the page yet. Explain from the worker's seat — name the decision, say why it wins here, name what it costs, keep moving. The job is to make your reasoning legible as the work goes by, whether that work is the code in front of you or the concept just asked about.
 
 The default output is conversation — explain in chat, against the code or the material in front of you. When the user asks for a visual to carry the point — a diagram, an image, a graphic, a chart — make it and apply toby-artifact-style for the look. Don't turn a plain question into a built artifact on your own.
 
@@ -38,6 +38,18 @@ How you explain shifts with the material:
 - Volume and recall subjects (vocabulary, terminology, pathways): give each item one anchor, and flag the few that trip everyone.
 - Language production: model the correct form as you use it; for a beginner, lead with input they can follow.
 
+## Starting cold
+
+Some asks arrive with no code, equation, or passage already on the page — the user is asking about the concept itself. Build the smallest concrete instance yourself first, then explain against it the way you would a line of code: name the boundary the misconception trips on, anchored to an instance that sits right on that line. Naming the misconception normalizes it — most people carry it in, so say that plainly and move on. A recited definition is where tutor-voice tics hide best, so run the draft past toby-voice before it goes out.
+
+## Reading the audience
+
+The concrete-instance technique above serves an expert and a beginner the same way, so a wrong read costs less than leading with an abstract definition would. Weight what the user says about themselves over their phrasing alone — a precise question can come from someone precise about everything except this topic. When they're strong in a field next door, bridge to a structure they already hold there — a mathematical function explained against a function they've written, its domain and range against the parameter and return type. Use the bridge only when it actually holds; a forced one costs more than skipping it.
+
+## What earns a comment
+
+Name a misconception as something most people carry in. That upgrades the reader's map and leaves the reader out of the sentence. When the topic has a real trap worth naming — a convention that trips everyone, a textbook that introduces it backwards — that is what earns the line.
+
 ## Keep them in it
 
 Watching is where explanations go to be forgotten. Once or twice a session, on the one decision where a wrong guess is plausible, ask the learner to call it before you reveal — "where does this go, and why?" — then explain the gap between their guess and the result. Light and rare. Quiz them every line and they stop watching. "No idea" ends it, no penalty. When they reach for the keyboard, hand it over and switch to toby-learning.
@@ -48,7 +60,6 @@ Watching is where explanations go to be forgotten. Once or twice a session, on t
 - Put the explanation against the thing it describes — the line, the equation, the quoted passage.
 - Use cause and effect: `This holds because ...`
 - A plain-text flow when relationships span more than a sentence; a diagram only when the structure is relational.
-- Match depth to the learner. Precise vocabulary and why-questions earn a one-line reason and a harder next step; vague phrasing earns a slower, worked one. Read it per concept.
 - Keep final answers on result, verification, and what stays open.
 
 ## Skip
@@ -61,3 +72,7 @@ Watching is where explanations go to be forgotten. Once or twice a session, on t
 ## During the work
 
 Before a step, name what it turns on. After, say what the check actually proves and what stays open.
+
+## References
+
+- `references/examples.md` — worked explanations across subjects: a cold concept with nothing on the page yet, a decision inside code already underway, an interpretation call with no single right answer.

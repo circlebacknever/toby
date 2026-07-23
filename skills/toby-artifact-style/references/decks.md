@@ -18,10 +18,10 @@ If unsure, build the HTML deck.
 Run these before writing any slide.
 
 1. **What is the deck doing?** Teaching a mechanism, summarizing evidence, building a reference, walking a process? The answer determines density and opening structure.
-2. **Composition mode.** Pick one from SKILL.md. Not the one used last time.
+2. **Composition mode.** Pick one from SKILL.md, different from the one used last time.
 3. **Ink allocation.** Decide which slides use ink before you start. Section dividers, summaries, glossaries, formula slides, decision slides earn ink. Most slides are paper. Ink-forward decks (majority dark) are valid when the deck asserts more than explains — decide deliberately.
 4. **Opening pattern.** Pick from the options below. Not every deck starts with title → glossary.
-5. **Interactivity plan.** Walk the slides conceptually. For each one, ask whether a parameter governs the concept. If yes, pick an interaction type from the catalog below — not always a slider.
+5. **Interactivity plan.** Walk the slides conceptually. For each one, ask whether a parameter governs the concept. If yes, pick an interaction type from the catalog below; sliders are one option among many.
 
 ---
 
@@ -87,7 +87,7 @@ Vary the opening structure across decks. Pick one.
 
 **Title slide → cover/index (default for reference decks).** Sparse title with the toby mark + giant topic, followed by a dense TOC grid. Works for multi-section reference decks.
 
-**Title → glossary.** Title slide with logo primitive, then a glossary slide defining the key terms before the mechanism. Works for concept-heavy topics where undefined terms would block comprehension.
+**Title → glossary.** Title slide with logo primitive, then a glossary slide defining the terms before the mechanism. Works for concept-heavy topics where undefined terms would block comprehension.
 
 **Title → problem statement.** Title slide, then an ink slide stating the problem or question the deck answers. Works for analysis, diagnosis, or decision-support decks.
 
@@ -223,7 +223,7 @@ Each deck gets a per-artifact logo: a hairline geometric primitive + one short l
 - Decision tree, branching process → Y-fork or tree branches
 - Time series, pipeline, queue → horizontal rail with tick marks
 - Probability, distribution, uncertainty → bell outline or spread cone
-- Rotation, orbit, cycle → partial orbit arc (not a full circle — too generic)
+- Rotation, orbit, cycle → partial orbit arc; a closed circle reads as generic decoration.
 - Matrix, table, grid data → small grid of squares, 3×3
 
 Lazy defaults to refuse: orbit for everything, plain triangle, plain square. If you cannot name why the shape fits the subject's structure, pick a different shape.

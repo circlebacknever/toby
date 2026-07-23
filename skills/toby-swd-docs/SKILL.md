@@ -32,7 +32,7 @@ Many thin AGENTS.md files reproduce the over-subdivision problem — they rot, t
 ### Required contents, in order
 
 1. **What this module is and the problem it solves.** One or two sentences: what it does and why it exists. Skip how it works. Everything below lands easier once the reader holds this model.
-2. **Key files and the responsibility each owns.** A short annotated list of only the files a new agent must understand to work here. State the responsibility each file owns. The implementation behind it belongs in the code.
+2. **Files to know and the responsibility each owns.** A short annotated list of only the files a new agent must understand to work here. State the responsibility each file owns. The implementation behind it belongs in the code.
 3. **Non-obvious design constraints.** Business, product, regulatory, or external constraints that force non-obvious decisions. When the code looks awkward because an outside requirement made it so, the reason lives here. Code and comments track the mechanics; the outside reason that forced them lives in this file.
 4. **Cross-module decisions.** Any design decision that touches several modules and can't be encapsulated in one of them is recorded here once. Affected sites get a one-line pointer comment (`// see "Event ordering" in AGENTS.md`). A copy of the explanation at each site drifts out of sync and gives no signal that it has.
 5. **Extension rules and invariants.** Where new files belong, conventions that must hold, patterns to match, which upstream or downstream modules a change here affects. Keep it to rules and pointers.
@@ -47,13 +47,13 @@ Reference interface comments and let them carry the behavior. Link external spec
 
 ### Maintenance
 
-Update AGENTS.md whenever a structural change makes it wrong: responsibility moves, a key file's job changes, a cross-module dependency is added or removed, a constraint changes. A stale authoritative file actively misleads. If you can't keep a section accurate at its current detail level, make it shorter and more abstract. Detailed text that no longer holds misleads every reader who trusts it.
+Update AGENTS.md whenever a structural change makes it wrong: responsibility moves, a file's job changes, a cross-module dependency is added or removed, a constraint changes. A stale authoritative file actively misleads. If you can't keep a section accurate at its current detail level, make it shorter and more abstract. Detailed text that no longer holds misleads every reader who trusts it.
 
 ### AGENTS.md red flags
 
 - AGENTS.md in a trivial or leaf folder — over-subdivision; push it up.
 - The file describes implementation mechanics — it will rot; raise the level.
-- A cross-module reason copied into code instead of pointed to — duplication.
+- A cross-module reason duplicated into code at each site — duplication.
 - A structural change shipped without updating an AGENTS.md it invalidated.
 - Behavior documented here that belongs in an interface or field comment.
 
@@ -76,7 +76,7 @@ Don't create one for a leaf utility, an internal helper, or anything not meant t
 
 1. **What this is.** One or two sentences: what problem it solves and who it's for.
 2. **How to use it.** The minimal working example. Show the common case first. Don't bury it under environment setup.
-3. **Key concepts.** The abstractions a caller operates with to use this correctly. Implementation details stay out.
+3. **Concepts a caller needs.** The abstractions a caller operates with to use this correctly. Implementation details stay out.
 4. **Public API reference** (if not self-evident from the code). Only the public surface. Link to generated docs and let the single source stay current when possible.
 5. **Known constraints or gotchas.** Things that will bite a user who doesn't know them: ordering requirements, required environment, edge cases the API doesn't protect against.
 
@@ -99,7 +99,7 @@ Update when the public API changes, when a new constraint is added, or when a us
 |------------------------|---------------------------------------------|------------------------------------------------|
 | **Audience**           | Agents writing code here                    | Humans using or maintaining the module         |
 | **Job**                | Mental model, rationale, cross-module decisions | How to think about and use the module      |
-| **Level**              | Structure, constraints, invariants          | Public API, key concepts, gotchas              |
+| **Level**              | Structure, constraints, invariants          | Public API, concepts, gotchas                  |
 | **When to create**     | Every meaningful module                     | Only when humans need orientation              |
 | **Maintenance trigger**| Any structural change                       | Any public API change                          |
 

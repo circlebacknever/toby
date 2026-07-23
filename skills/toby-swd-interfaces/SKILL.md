@@ -10,7 +10,7 @@ description: >-
 
 # Toby SWD Interfaces
 
-The interface is everything a caller must know to use a module correctly: the signature plus the informal contract (behavior, side effects, ordering constraints, errors) that only comments can carry. The interface is the cost the module imposes on the rest of the system; the implementation is the benefit. You want that cost much smaller than that benefit — a simple interface over substantial functionality. When the boundary is a message channel rather than an in-process call, the "signature" is the message contract: the request and response payload shapes, what survives serialization, and the delivery guarantees.
+The interface is everything a caller must know to use a module correctly: the signature plus the informal contract (behavior, side effects, ordering constraints, errors) that only comments can carry. The interface is the cost the module imposes on the rest of the system; the implementation is the benefit. You want that cost much smaller than that benefit — a simple interface over substantial functionality. For a message-channel boundary, the "signature" is the message contract: the request and response payload shapes, what survives serialization, and the delivery guarantees.
 
 Interface-first design exists to find that interface before implementation locks in a bad one, and to use the interface itself as the earliest possible signal that the design is wrong. A comment you can't write short and internals-free is the cheapest bug report you will ever get. It shows the abstraction is broken while it's still only text.
 

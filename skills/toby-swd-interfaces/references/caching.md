@@ -249,9 +249,9 @@ interface Cache {
 }
 ```
 
-Three sentences. Cache failure semantics — fall through, don't throw —
-are part of the contract, so callers don't write defensive code, and
-the cache layer commits to handling its own outages. This is the kind of
+Three sentences. Cache failure semantics fall through silently as part
+of the contract, so callers don't write defensive code, and the cache
+layer commits to handling its own outages. This is the kind of
 caller-facing information the guardrail (step 7 of the procedure)
 explicitly preserves: graceful degradation in the face of cache outage
 is what `getOrLoad` promises, and that promise has to be visible.

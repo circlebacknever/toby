@@ -6,7 +6,7 @@ description: >-
   dependencies, runs migrations, updates snapshots, or otherwise changes state
   outside the immediate edit. Covers command classification, port discipline,
   long-running processes, repo-guidance commands, and what to ask before doing.
-  The agent is a guest in a real environment with real state — not a sandbox.
+  The agent is a guest in a real environment with real state. Nothing is disposable.
 ---
 
 # Toby SWD Environment
@@ -31,7 +31,7 @@ Seven classes. The class determines whether to run, run narrowly, or ask first.
 
 **Runtime-affecting.** Starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers. Ask first, always. A `pnpm dev` restart looks identical to a kill — and if the user had unsaved state in a browser tab connected to it, that state is gone.
 
-**Destructive.** Deleting files, dropping data, force-pushing, hard reset, killing processes, clearing caches, deleting volumes, anything that starts with `rm -rf`. Ask first, always. Name exactly what will be deleted in the request — `delete the .next/ build cache`, not `tidy build artifacts`.
+**Destructive.** Deleting files, dropping data, force-pushing, hard reset, killing processes, clearing caches, deleting volumes, anything that starts with `rm -rf`. Ask first, always. Name exactly what will be deleted in the request, e.g. `delete the .next/ build cache`.
 
 **Repo-guidance-driven.** Scripts the repo itself recommends: `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, the giant validation script in `package.json`. Summarize what the command does, explain why the repo recommends it, and ask — unless it's narrow and cheap. For a heavy command, offer a narrower alternative: one focused test file, the package's test suite, a type-check on the affected package.
 

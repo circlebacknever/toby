@@ -37,9 +37,9 @@ def get_product_listing(category: str) -> list[Product]:
 Two checks fail at once. Information leakage: the cache key schema
 (`"product:..."`), the TTL (600 seconds), the serialization format, and the
 invalidation rules are duplicated wherever they're touched. The different-layer
-check: the service is supposed to be about products,
-not about Redis, but half the code is Redis bookkeeping. When the team
-introduces a second category-listing endpoint, the new author either
+check: the service should hold product logic; half the code here is Redis
+bookkeeping. When the team introduces a second category-listing endpoint, the
+new author either
 duplicates the cache machinery or — much worse — forgets to invalidate, and
 stale listings appear in production.
 

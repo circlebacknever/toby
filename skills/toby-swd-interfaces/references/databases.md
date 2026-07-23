@@ -154,8 +154,8 @@ Three sentences. `UserQuery` has its own comment describing each filter,
 but it's a value object — its contract is "what each field means" and a
 reader who needs `orgId` only reads that one comment.
 
-The pagination here is worth a note. Offset/limit pagination drifts when rows
-are inserted or deleted mid-iteration — a page can repeat a row or skip one.
+Offset/limit pagination drifts when rows are inserted or deleted
+mid-iteration — a page can repeat a row or skip one.
 The opaque `pageToken` encodes a stable cursor, so paging stays correct under
 concurrent writes. That's the trade: a token and a page size cost a bit more
 surface than a bare row limit, and buy correctness under concurrent load.
@@ -275,7 +275,7 @@ def downgrade():
 ```
 
 The interface comment isn't usually written because Alembic scripts are
-"obvious." But truthfully:
+"obvious." It isn't:
 
 > Adds a phone_number column to the users table on upgrade; drops it on
 > downgrade. Note: any existing User domain objects after upgrade will
@@ -286,7 +286,7 @@ The interface comment isn't usually written because Alembic scripts are
 > data and is non-destructive only if no phone_number values were
 > written during the rolled-back window.
 
-The migration looks simple; its contract isn't. The thing that's leaked
+The migration's contract is more complex than the script suggests. The thing that's leaked
 is the difference between "schema migration" and "data migration" — the
 script does the former and offers no story for the latter.
 
@@ -308,11 +308,10 @@ class Migration:
 ```
 
 This is heavier than what most teams need on day one — most teams ship
-`upgrade()` / `downgrade()` and live with it. The point is that when the
-comment test exposes the real interface (schema, data, code coordination
-across deploys), the team can decide whether to invest in the deeper
-abstraction or accept the limits of the shallow one. The choice is now
-informed.
+`upgrade()` / `downgrade()` and live with it. When the comment test exposes
+the real interface (schema, data, code coordination across deploys), the
+team can decide whether to invest in the deeper abstraction or accept the
+limits of the shallow one. The choice is now informed.
 
 ---
 

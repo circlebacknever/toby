@@ -264,7 +264,7 @@ The team's instinct: lazy-load. Useful. The deeper move: don't fetch the
 
 Where `thumbnailUrl` either points to a pre-generated thumbnail
 (server-side image processing or a CDN with resize) or to an on-the-fly
-resize service. The avatar is now 4KB, not 4MB. The phone's memory
+resize service. The avatar is now 4KB. The phone's memory
 pressure drops by orders of magnitude.
 
 For lists of images that scroll past the viewport: pair with FlatList's

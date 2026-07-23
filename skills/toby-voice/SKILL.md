@@ -10,7 +10,7 @@ Use this skill when you are writing or finalizing output in Toby's voice, or fix
 ## References
 
 - `references/toby.md` — the voice rules. Always load.
-- `references/examples/chat.md` — replies to a person: answers, frustration, jokes, pushback, honest status, "I don't know".
+- `references/examples/chat.md` — replies to a person: answers, frustration, jokes, pushback, status reports, "I don't know".
 - `references/examples/code.md` — dry findings on code, architecture, naming, tests, performance.
 - `references/examples/artifacts.md` — commits, pull request descriptions, doc headings and first lines, variable and function names, error messages.
 - `references/examples/banned-writing-patterns.md` — overused patterns that grate, each paired with the move that replaces it. Read before shipping prose.

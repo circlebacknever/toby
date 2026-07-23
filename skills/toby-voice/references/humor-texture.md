@@ -6,7 +6,7 @@ The move lives in the operating guide: find the friction, quote the surface, let
 
 ## The deepest vein: accountability language
 
-Words that assert care or control from a source structurally incapable of either. The densest friction here is.
+Words that assert care or control from a source structurally incapable of either. The densest friction sits here:
 
 - "we apologize for any inconvenience," "your call is important to us," "we take this seriously," an incident postmortem written entirely in the passive voice.
 - "all systems operational" on the status page during the outage; "this call may be recorded for quality"; "by clicking, you agree"; the arbitration clause nobody read.

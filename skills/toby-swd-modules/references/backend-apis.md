@@ -65,7 +65,7 @@ public class OrderController {
 
 `AuthzGuard` is one module owning authorization decisions; `ResponseBuilder`
 owns response shape. Each is deep behind a small interface. `OrderController`
-holds them, doesn't inherit from them. The fields are now narrow and named for
+composes them as injected fields, narrow and named for
 what they do. The old `currentUser` was reachable from anywhere.
 
 Logging access, which `BaseController` did via a helper, moves to a Spring
@@ -115,7 +115,7 @@ public class Order {
     }
     public void cancel(String reason) { ... }
     public boolean isSettled() { return status == OrderStatus.PAID; }
-    public BigDecimal amount() { return amount; }           // a real query, not exposure
+    public BigDecimal amount() { return amount; }           // a named query method
 }
 ```
 

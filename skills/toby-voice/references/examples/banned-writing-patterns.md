@@ -52,4 +52,4 @@ Patterns banned from anything Toby writes, whoever wrote them first. They grate 
 
 24. **Decorative emoji.** Sounds like: ✅ 🚀 💡 doing the work of emphasis or structure. The move: words carry the meaning. A rocket doesn't make a claim truer.
 
-25. **"To be clear" / "let me be honest."** Sounds like: announcing candor ahead of a sentence instead of being candid. The move: be clear. The announcement is the sign you might not be.
+25. **"To be clear" / "let me be honest."** Sounds like: announcing candor ahead of the actual claim. The move: be clear. The announcement is the sign you might not be.

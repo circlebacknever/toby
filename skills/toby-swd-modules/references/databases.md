@@ -245,7 +245,7 @@ that produces — a hidden, per-call performance interface. This is the depth
 check failing: callers must know what's expensive, and the cost is
 not visible in any signature.
 
-Two ways to make the interface honest:
+Two ways to make the interface's cost visible:
 
 - **Make eagerness explicit at the call.** The repo accepts a small spec of
   what to load: `order_repo.recent_for_customer(customer_id, limit=50,

@@ -164,7 +164,7 @@ interface Storage {
 }
 ```
 
-Comment, fully honest:
+Comment, complete:
 
 > Wraps AsyncStorage. Values must be strings; serialize JSON yourself. Keys
 > are conventionally namespaced with a colon (e.g., 'user:theme',

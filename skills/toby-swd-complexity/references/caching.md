@@ -59,7 +59,7 @@ a measurable predicted improvement and a baseline to compare against.
 
 ## Example 2 — The complexity a cache actually adds
 
-A cache layer brings real and recurring costs. List them truthfully before
+A cache layer brings real and recurring costs. List them in full before
 deciding:
 
 - **Invalidation.** Every mutation that affects a cached value must

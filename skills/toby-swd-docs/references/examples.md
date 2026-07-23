@@ -15,7 +15,7 @@ Scope decision: `services/payments/` is a meaningful module that owns a real bod
 Turns an authorized cart into a settled charge and a ledger entry. Owns the
 money path; nothing else in the system is allowed to move funds.
 
-## Key files
+## Files
 - gateway.py — the Gateway interface and its provider implementations. Owns
   "how we talk to an external processor."
 - ledger.py — append-only double-entry ledger. Owns "what we believe we are
@@ -31,16 +31,16 @@ money path; nothing else in the system is allowed to move funds.
   token at the edge and only the token reaches this module.
 
 ## Cross-module decisions
-- "Settlement ordering": the ledger is the source of truth, not the processor
-  webhook; webhooks are advisory and may arrive out of order. Billing and
-  analytics consume the ledger, never the webhook. Affected sites carry
+- "Settlement ordering": the ledger is the source of truth; the processor
+  webhook is advisory and may arrive out of order. Billing and
+  analytics consume the ledger. Affected sites carry
   `// see "Settlement ordering" in AGENTS.md`.
 
 ## Extension rules
-- A new processor is a new Gateway implementation plus a config entry — never
-  a branch in existing gateway code.
+- A new processor is a new Gateway implementation plus a config entry.
+  Existing gateway code stays untouched.
 - The ledger is append-only. Corrections are compensating entries. Code that
-  mutates a posted entry is a bug, not a feature.
+  mutates a posted entry is a bug.
 ```
 
 Note what is absent: no function signatures, no algorithm descriptions. Those live in interface comments in `gateway.py`. This file would survive a full rewrite of the internals unchanged.
@@ -74,16 +74,16 @@ if result.settled:
     # proceed
 ```
 
-## Key concepts
+## Concepts
 
-- **Token, not PAN**: card data is exchanged for a token at the edge before it
+- **Token**: card data is exchanged for a token at the edge before it
   reaches this service. Raw card numbers are never handled here.
 - **Idempotency key**: the same (order_id, attempt) combination will return the
   same result even if the call is retried. Always supply one; the service will
   reject requests without it.
 - **Ledger as source of truth**: the ledger reflects settled charges; webhooks
-  from the processor are advisory and arrive out of order. Query the ledger,
-  not the webhook state, for settlement status.
+  from the processor are advisory and arrive out of order. Query the ledger
+  for settlement status.
 
 ## Public API
 
@@ -95,11 +95,11 @@ Full signatures and behavior are in the interface comments in `gateway.py`.
 
 ## Known gotchas
 
-- Refunds require a `charge_id` from a settled (not just authorized) charge.
-  Attempting to refund an authorization that was never captured raises
+- Refunds require a `charge_id` from a settled charge. Authorization alone
+  does not produce one. Attempting to refund an authorization that was never captured raises
   `ChargeNotSettledError`.
 - The idempotency key must be unique per attempt. Reusing a key from a failed
-  attempt will return the original failure, not a retry.
+  attempt will return the original failure.
 ```
 
 Note: the README references the interface comments in `gateway.py` and lets the
@@ -120,7 +120,7 @@ Scope decision: `features/checkout/` is a feature module — one AGENTS.md at it
 The multi-step checkout flow. Owns flow state and the order of steps; delegates
 payment to the payments service and address validation to the address package.
 
-## Key files
+## Files
 - machine.ts — the step state machine. Owns "what step the user is on and what
   transitions are legal."
 - CheckoutProvider.tsx — supplies flow state via context. Owns the shared
@@ -133,15 +133,16 @@ payment to the payments service and address validation to the address package.
   UI could render without it.
 
 ## Cross-module decisions
-- "Checkout context shape": steps read flow state only from CheckoutProvider,
-  never by prop-drilling from the page. The shape is defined and commented at
+- "Checkout context shape": steps read flow state only from CheckoutProvider.
+  Nothing in this feature reads it via props drilled from the page. The shape
+  is defined and commented at
   CheckoutProvider; this is the central note. Step files carry
   `// see "Checkout context shape" in AGENTS.md`.
 
 ## Extension rules
-- A new step is a component in steps/ plus a transition in machine.ts. Adding
-  flow logic inside a step component is the thing not to do.
-- Shared step state goes on the context, not into a new prop threaded through.
+- A new step is a component in steps/ plus a transition in machine.ts. Flow
+  logic stays in machine.ts.
+- Shared step state goes on the context.
 ```
 
 ---
@@ -158,7 +159,7 @@ The multi-step checkout flow: cart → address → payment → review → confir
 ## How it works
 
 Wrap the checkout entry point with `<CheckoutProvider>`. Step components
-consume flow state from context — they do not accept flow props directly.
+consume flow state from context. They take no flow props.
 
 ```tsx
 import { CheckoutProvider, CheckoutFlow } from 'features/checkout'
@@ -172,17 +173,17 @@ export function CheckoutPage() {
 }
 ```
 
-## Key concept: step isolation
+## Concept: step isolation
 
 Each step component renders its own content and fires transitions via
 `useCheckoutMachine()`. Steps do not know about each other. Adding a new step
-means a new component in `steps/` and a new transition in `machine.ts` — not
-changes to existing steps.
+means a new component in `steps/` and a new transition in `machine.ts`.
+Existing steps stay unchanged.
 
 ## Known constraints
 
 - Tax display is blocked until address validation completes. This is a legal
-  requirement, not a rendering limitation. Don't try to work around it.
+  requirement. Don't try to work around it.
 - Flow state lives in `CheckoutProvider`. Do not lift it to a parent or store
   it externally — the machine enforces valid transitions and bypassing it
   produces inconsistent UI state.

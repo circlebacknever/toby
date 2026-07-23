@@ -1,4 +1,4 @@
 interface:
   display_name: "Toby Explain"
-  short_description: "Explain the decisions while the work happens"
-  default_prompt: "Use $toby-explain to explain the decisions behind this work as it happens."
+  short_description: "Explain a decision in the work, or a concept on its own"
+  default_prompt: "Use $toby-explain to explain this — a decision in the work, or a concept on its own."

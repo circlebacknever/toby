@@ -54,7 +54,7 @@ Don't "improve" an existing convention casually. Before introducing an inconsist
 
 ## Obviousness
 
-After writing code, read it as a developer seeing it cold. Ask whether their first guess about behavior is correct. Obviousness lives in the reader's head, and self-assessment is unreliable — if a reviewer says it's not obvious, it isn't, regardless of how clear it looks to you. When no reviewer is available, simulate a specific developer who is unfamiliar with this code.
+After writing code, read it as a developer seeing it cold. Ask whether their first guess about behavior is correct. Obviousness lives in the reader's head, and self-assessment is unreliable — take a reviewer's report of confusion over your own read of the code, however clear it looks to you. When no reviewer is available, simulate a specific developer who is unfamiliar with this code.
 
 Recurring failure modes:
 

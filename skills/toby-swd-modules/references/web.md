@@ -389,7 +389,7 @@ function ProductCombobox({ products }: { products: Product[] }) {
 ```
 
 ```tsx
-// Solid — same idea, signals instead of state
+// Solid — same idea, built on signals
 function createCombobox<T>(opts: { items: () => T[]; getId: (t: T) => string }) {
   // returns signals for open/highlighted/filtered + accessor props
   return { /* ... */ };

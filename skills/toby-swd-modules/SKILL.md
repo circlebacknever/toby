@@ -115,7 +115,7 @@ When placing code in an existing module, inspect where the surrounding code alre
 - **Classitis / over-subdivision**: many shallow modules whose interfaces sum to more complexity than they remove (frontend: over-componentization).
 - **Deep implementation-inheritance hierarchy**: subclasses you can't read without reading the parent, parents you can't change without checking the subclasses. Two-way coupling masquerading as reuse.
 - **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax — the same shape as the implementation, definitionally shallow. Replace with operations that name intent (`reserve`, `markPaid`) and enforce invariants; keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it owned by another module — there the data is the contract, and depth lives in the module that owns the behavior.
-- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy applied for its own sake instead of because the problem has the shape it solves. Patterns earn their place by removing complexity.
+- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy applied for its own sake, when the problem doesn't actually have the shape the pattern solves. Patterns earn their place by removing complexity.
 
 ## References
 

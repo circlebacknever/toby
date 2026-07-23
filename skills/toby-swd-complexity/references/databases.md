@@ -136,8 +136,8 @@ err := WithRetry(ctx, db, func(tx *gorm.DB) error {
 ```
 
 One retry policy, one place that knows what's transient, jittered backoff
-so retries don't synchronize. Callers see the deadlocks they actually need
-to surface (after 5 attempts, still failing) and not the routine ones.
+so retries don't synchronize. Callers only see deadlocks that persist
+through 5 attempts; routine ones stay absorbed.
 
 Guardrail: the transaction body must be idempotent or fully transactional
 with no side effects outside the database (no email sends, no API calls
@@ -249,8 +249,7 @@ WHERE status = 'open';
 
 What not to do: add an index per column "just in case." Indexes have
 write cost (every insert/update updates every relevant index) and storage
-cost. The right count is "the few that serve your real query patterns,"
-not "all of them."
+cost. The right count is the few that serve your real query patterns.
 
 Measurement validates: `EXPLAIN ANALYZE` your hot queries before shipping.
 The plan tells you whether the optimizer is using the index you expected.

@@ -30,8 +30,8 @@ elsewhere. The "deleted" concept has leaked into name formatting.
 
 ```python
 def display_name(user):
-    return user.display_label()      # the question "what do we call this user?"
-                                     # belongs to the user, not the formatter
+    return user.display_label()      # the user owns the answer to
+                                     # "what do we call this user?"
 ```
 
 ```python
@@ -88,7 +88,7 @@ So take the tactical path deliberately and label it:
 ```python
 def process(self, payment):
     # TACTICAL: hardcoded gateway switch for ACME only, shipped under the
-    # 4/12 deadline. Clean design = a Gateway interface + config selection;
+    # 4/12 deadline. Sound design = a Gateway interface + config selection;
     # do this before adding a third gateway or it compounds. Tracked: JIRA-1234.
     if payment.customer_id == ACME:
         return self._charge_via_stripe(payment)
@@ -98,7 +98,7 @@ def process(self, payment):
 You took the shortcut. What separates this from pure tactical programming is that
 the shortcut is now visible, bounded, and carries a stated exit, so it reads as a
 labeled loan the next person can see and pay down.
-The strategic move under a deadline is a truthful IOU with a stated exit.
+The strategic move under a deadline is an IOU with a stated exit.
 
 ---
 

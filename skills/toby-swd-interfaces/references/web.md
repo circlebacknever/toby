@@ -3,8 +3,8 @@
 Interfaces in web SPAs are mostly invisible at compile time and brutal at
 runtime. A hook's return shape, a component's prop contract, and a store
 slice's method surface are read by every consumer; getting them wrong costs
-the same as a bad backend API, just distributed across the team rather than
-across organizations.
+the same as a bad backend API. A public API's blast radius crosses company
+lines; this one stays inside your own team.
 
 These examples walk the comment test on the shapes you'll touch most.
 
@@ -23,7 +23,7 @@ function useProduct(id: string): [Product | null, Error | null, boolean, () => P
 const [product, error, loading, refetch, mutate] = useProduct(id);
 ```
 
-The interface comment, written truthfully:
+The interface comment, in full:
 
 > Returns a 5-tuple. Position 0 is the loaded product, or null when loading
 > or after a failed fetch. Position 1 is the last error, or null. Position 2
@@ -37,8 +37,8 @@ The interface comment, written truthfully:
 That comment is six sentences. It describes the data structure (positions
 0-4). It describes ordering (which is non-null when). It is hard to read and
 impossible to use correctly from the destructuring site, because the names
-`product`, `error`, `loading`, `refetch`, `mutate` are not part of the
-contract — they are the caller's choice. Two callers will read the positions
+`product`, `error`, `loading`, `refetch`, `mutate` are the caller's choice,
+invisible to the contract. Two callers will read the positions
 differently.
 
 Failure named: the contract leaks positional layout the caller must memorize,

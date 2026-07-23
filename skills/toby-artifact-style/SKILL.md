@@ -5,11 +5,11 @@ description: Apply Toby's artifact design system whenever a visual artifact is b
 
 # Toby Artifact Style
 
-Every artifact you produce under this system either looks like it was made for this exact content, or it looks like AI output. Two outcomes. Pick the first one.
+Every artifact you produce under this system looks like it was made for this exact content. That is the bar, every session.
 
 Toby Artifact Style is a constraint set. Tokens, copy constraints, and visual rules are tight. Structural choices stay wide: dense reference card, spacious single claim, ink-heavy authority piece, paper-first reading surface, animated process, static evidence panel, three-slide lesson, or twenty-slide reference deck. Make those choices per artifact.
 
-The failure mode for any design system is convergence — every artifact starting to look like every other artifact. When you feel yourself reaching for the same layout you built last time, stop and pick a different one. The constraints don't mandate sameness. They mandate quality. Within them, vary everything.
+The failure mode for any design system is convergence — every artifact starting to look like every other artifact. When you feel yourself reaching for the same layout you built last time, stop and pick a different one. The constraints protect quality; structure stays free to vary. Within them, vary everything.
 
 ## Three principles
 
@@ -27,7 +27,7 @@ If a panel uses none of these, ask whether it earns its place.
 2. **Categorical section accents.** When a page has multiple sections, give each its own color from the chart palette. The accent shows up as the section number, the bottom-rule strip under the heading, and small cell-id pills.
 3. **Mono values, sans labels.** Every number, ID, timestamp, or coordinate is JetBrains Mono with tabular numerals. Every label and description is Inter. The two typefaces alternating is part of the visual signature.
 4. **Hairline rules and small radii.** 1px hairlines do almost all the dividing. Cards stay at 12px radius; only outer containing frames get 18px.
-5. **Density over whitespace.** Slides and dashboards run dense. Multiple KV pairs, stat grids, sparkline-in-table cells, evidence rows. The reader is treated as a serious professional reviewing evidence; they don't need a hero illustration.
+5. **Density over whitespace.** Slides and dashboards run dense. Multiple KV pairs, stat grids, sparkline-in-table cells, evidence rows. The reader is treated as a serious professional reviewing evidence — density itself carries the authority.
 6. **Three-tone progression for narrative blocks.** When a panel walks through reasoning, tint the rows: setup (info teal) → working (watch amber) → conclusion (stable green). The Worked Example component does this; other reasoning panels can borrow the pattern.
 
 ## Teaching decks — only when asked
@@ -38,7 +38,7 @@ What goes where:
 - **Deck (artifact):** glossary, mechanism explanations, tables, diagrams, derivations, examples, summary.
 - **Chat:** a short framing line, the comprehension check question, and any branch options.
 
-Slide count grows with the material, but keep the deck to the smallest count that preserves the concept. If the material genuinely wants 18 slides, build 18.
+Slide count grows with the material, but keep the deck to the smallest count that preserves the concept. If the material wants 18 slides, build 18.
 
 See `references/decks.md` for deck patterns.
 
@@ -69,7 +69,7 @@ Pick one per artifact. Vary across sessions. The mode is a structural commitment
 
 **Spacious argument.** One concept per section. Generous white space. Each panel or slide earns its own breathing room. Reading pace is deliberate. Use when the concept is singular and deep — a derivation, a worked example, an analysis. Ink appears only at summary or decision points.
 
-**Ink-anchored.** Paper is the default surface, but ink panels punctuate the flow — section dividers, quoted measurements, key decisions. The artifact reads as paper-first but the ink anchors give it authority at specific moments. Works well for reference decks with multiple sections.
+**Ink-anchored.** Paper is the default surface, but ink panels punctuate the flow — section dividers, quoted measurements, named decisions. The artifact reads as paper-first but the ink anchors give it authority at specific moments. Works well for reference decks with multiple sections.
 
 **Ink-forward.** Majority ink surfaces, paper used only for relief or sharp contrast. The artifact asserts more than it explains. Use for summary dashboards, executive snapshots, decision panels, final-state reference cards. Paper panels should feel like interruptions — a table that needs to be read, a diagram that needs white space.
 

@@ -1,10 +1,9 @@
 # Worked Examples — Backend APIs (Java, Go, TypeScript)
 
 Distributed systems have one defining property: things fail. The complexity
-question is not "how to prevent failures" but "where in the system does
-each kind of failure get absorbed, and at what cost." The error ladder
-applies directly; performance design at the network layer is mostly about
-keeping the failure modes bounded.
+question is where in the system each kind of failure gets absorbed, and at
+what cost. The error ladder applies directly; performance design at the
+network layer is mostly about keeping the failure modes bounded.
 
 ---
 
@@ -160,8 +159,8 @@ async function getRecommendations(userId: string): Promise<Recommendation[]> {
 }
 ```
 
-No timeout. The downstream service is slow today, taking 30 seconds
-instead of its usual 50ms. This service's threads/event-loop hang on
+No timeout. The downstream service is slow today: 30 seconds, against a
+usual 50ms. This service's threads/event-loop hang on
 those calls. The user's page-load takes 30 seconds. Cascading failure:
 this service now appears slow to *its* callers, which back up, which
 ... and so on.
