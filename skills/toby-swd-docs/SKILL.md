@@ -77,7 +77,7 @@ Don't create one for a leaf utility, an internal helper, or anything not meant t
 1. **What this is.** One or two sentences: what problem it solves and who it's for.
 2. **How to use it.** The minimal working example. Show the common case first. Don't bury it under environment setup.
 3. **Concepts a caller needs.** The abstractions a caller operates with to use this correctly. Implementation details stay out.
-4. **Public API reference** (if not self-evident from the code). Only the public surface. Link to generated docs and let the single source stay current when possible.
+4. **Public API reference** (if not self-evident from the code). Only the public surface. Link to generated docs and let the single source stay current when possible. If the interface itself splits common calls from advanced or rarely used ones, mirror that split here. Don't flatten a tiered API into one list.
 5. **Known constraints or gotchas.** Things that will bite a user who doesn't know them: ordering requirements, required environment, edge cases the API doesn't protect against.
 
 ### What README.md is not

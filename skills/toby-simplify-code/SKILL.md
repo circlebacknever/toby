@@ -24,6 +24,11 @@ Make changed code simpler to read and keep behavior identical. A lateral rewrite
 - A shallow wrapper with a single caller that only renames another call and adds no type, name, or boundary value.
 - A parameter that leaks a lower-level mechanism into callers.
 - A comment that narrates what the code plainly says; a name that records history while hiding purpose.
+- A try/catch, guard, or branch defending against a condition that can't occur, the kind toby-swd-complexity's error ladder already defines out of existence — removing it is one fewer branch or catch block.
+
+**A design smell from references/smells.md.**
+
+- A match against the file's "Fix here" half is a countable win like any other in this section — fix it in the same pass.
 
 **Code that ignores a pattern this repo already uses.**
 
@@ -64,13 +69,13 @@ The edge per class:
 ## Keep
 
 - Helpful domain boundaries.
-- Explicit, visible error handling. Collapsing distinct error paths or hiding a failure path is a behavior change.
+- Explicit, visible error handling for a failure that can actually happen. Collapsing distinct error paths or hiding a failure path is a behavior change.
 - Slightly longer code that makes a state change visible.
 - A test that asserts behavior through the public interface. Don't rewrite a test to make a cleanup pass.
 
 ## Out of scope
 
-Moving code between modules, changing a signature, or altering a public return shape is behavior-changing work. If a cleanup isn't small, local, and behavior-preserving, leave it and note it as a follow-up. If you spot a real bug or a security issue while cleaning up, don't fix it here — that's a behavior change. Flag it only when you can state the input that triggers it and why no guard catches it; a vague "this might be buggy" is noise. Then recommend a review pass.
+Moving code between modules, changing a signature, or altering a public return shape is behavior-changing work. If a cleanup isn't small, local, and behavior-preserving, leave it. When it matches the "Flag, don't fix" half of references/smells.md, or a red flag in toby-swd-modules, toby-swd-interfaces, or toby-swd-complexity, name the smell and the skill that owns it. Otherwise, note it as a follow-up. If you spot a real bug or a security issue while cleaning up, don't fix it here — that's a behavior change. Flag it only when you can state the input that triggers it and why no guard catches it; a vague "this might be buggy" is noise. Then recommend a review pass.
 
 ## Process
 
@@ -82,4 +87,4 @@ Moving code between modules, changing a signature, or altering a public return s
 
 ## Final response
 
-Lead with what got simpler, ordered by how much reading effort each change saves, and the number each one drove down. For every change, state in one clause the edge you checked and how you know it held — the covering test, or why the edge can't fire. If behavior couldn't be proven preserved, say what remains unknown.
+Lead with what got simpler, ordered by how much reading effort each change saves, and the number each one drove down. For every change, state in one clause the edge you checked and how you know it held — the covering test, or why the edge can't fire. If behavior couldn't be proven preserved, say what remains unknown. A structural smell spotted but left alone gets one line naming the smell and the skill that owns it, kept apart from what changed.

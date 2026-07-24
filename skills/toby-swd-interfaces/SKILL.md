@@ -88,7 +88,7 @@ Apply the same test whenever you later change a public interface, before touchin
 
 ### 7. Guardrail: deep, but expose what callers actually need
 
-Hiding complexity is the goal, with a hard limit: information the caller truly needs must stay in the interface. Tunable performance config, errors the caller must handle, durability or visibility guarantees, ordering the caller depends on — hiding these to make the interface look smaller is its own defect and produces modules that can't be used correctly. Where a special case can be removed by redesigning semantics so it does not arise, redesign it away and leave it out of the interface. An interface that accepts input from outside the program — a request, a message, a deserialized payload — is a trust boundary: validating that input belongs to the module that owns the contract. The boundary owns the check.
+Hiding complexity is the goal, with a hard limit: information the caller truly needs must stay in the interface. Tunable performance config, errors the caller must handle, durability or visibility guarantees, ordering the caller depends on — hiding these to make the interface look smaller is its own defect and produces modules that can't be used correctly. This is progressive disclosure applied to a signature: the common case stays on the primary surface, required and simple, and advanced or rarely needed config moves to a separate, explicitly optional surface — an options object with sane defaults. A caller doing the ordinary thing reads only the first two or three parameters to use it correctly. Where a special case can be removed by redesigning semantics so it does not arise, redesign it away and leave it out of the interface. An interface that accepts input from outside the program — a request, a message, a deserialized payload — is a trust boundary: validating that input belongs to the module that owns the contract. The boundary owns the check.
 
 ### 8. Then implement
 
@@ -96,9 +96,11 @@ Only now write the bodies. If implementation reveals the abstraction was wrong �
 
 ## Brownfield Work
 
-Before changing an existing callable surface, inspect current callers and the behavior they rely on. If a cleaner interface would reduce caller burden, offer a migration path so call sites move over without silent breakage. Keep compatibility when the current surface is public, exported, persisted, or used across a service boundary unless the user approves the break. When the change creates or clarifies a public contract in a meaningful module, offer an AGENTS.md update if none exists nearby.
+Before changing an existing callable surface, list its callers in the repo and the behavior each relies on, then mark every one updated or deliberately out of scope before calling the change done. If a cleaner interface would reduce caller burden, offer a migration path so call sites move over without silent breakage. Keep compatibility when the current surface is public, exported, persisted, or used across a service boundary unless the user approves the break. When the change creates or clarifies a public contract in a meaningful module, offer an AGENTS.md update if none exists nearby.
 
 ## Red flags
+
+Run this list against the finished interface before calling it done. A match against any item calls for a redesign now, while it is still cheap to change.
 
 - **Shallow module**: interface nearly as complex as the implementation.
 - **Overexposure**: callers must understand rarely-used features to use common ones.

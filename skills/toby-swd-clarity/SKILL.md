@@ -75,6 +75,8 @@ For existing code, first learn the local vocabulary and comment style. Improve u
 
 ## Red flags
 
+Before calling a clarity pass done, check the code you touched against every red flag below.
+
 - **Vague name**: broad enough to refer to many things.
 - **Hard to pick a name**: signals unclear or mixed purpose.
 - **Name reused for two purposes**: the classic source of silent bugs.

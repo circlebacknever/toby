@@ -309,6 +309,8 @@ def check_voice_compliance(errors: list[str]) -> None:
         REPO_ROOT / "skills" / "toby-feature-dev" / "SKILL.md",
         REPO_ROOT / "skills" / "toby-learning" / "SKILL.md",
         REPO_ROOT / "skills" / "toby-simplify-code" / "SKILL.md",
+        REPO_ROOT / "skills" / "toby-code-review" / "references" / "smells.md",
+        REPO_ROOT / "skills" / "toby-simplify-code" / "references" / "smells.md",
     ]
     banned_re = [
         re.compile(rf"(?<![A-Za-z]){re.escape(word)}(?![A-Za-z])", re.I)

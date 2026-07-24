@@ -100,7 +100,7 @@ happens (a `400`/`410`-style "page token expired, restart paging"), so an
 expired token isn't mistaken for a transient error.
 
 One wire caveat: a query string has a practical length ceiling — proxies and
-servers cap the URL around a few KB. A small filter fits; a large or deeply
+servers cap the URL around a few KB. A small filter fits; a large or heavily
 nested one doesn't, and encoding it as base64 only delays the wall. When the
 criteria object outgrows the URL, the same object moves to a
 `POST /api/users/search` body — identical contract, different transport.

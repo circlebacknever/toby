@@ -60,6 +60,8 @@ In existing code, inspect the current error, validation, retry, cache, batching,
 
 ## Red flags
 
+Before finishing, check the change against every red flag below and fix anything that applies.
+
 - An error signaled for a condition the API could define away.
 - The same error handled at many call sites when one handler would do.
 - An error eliminated or masked that callers actually needed.

@@ -81,6 +81,8 @@ If none of those apply, a plain conclusion is enough. No restatement of what was
 
 ## Red flags
 
+Before finishing, check what you did against every red flag below.
+
 - **Killed a process to free a port.** The user's dev server is now gone.
 - **Restarted a server to reset state.** Whatever was in there is also gone.
 - **Ran `npm install` to fix a missing module.** Could be a typo, the wrong directory, or a lockfile mismatch. Inspect first.

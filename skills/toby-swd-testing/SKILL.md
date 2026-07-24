@@ -111,6 +111,8 @@ In an existing codebase, inspect the tests that already cover the touched behavi
 
 ## Red flags
 
+Before calling test coverage done, check it against every red flag below.
+
 - **Test fails on a correct refactor.** Coupled to internals.
 - **Test name describes a call.** "calls X with Y" names a mock log. The reader still can't tell what the system is supposed to do.
 - **Snapshot blob.** Large auto-updated string nobody reviews on change.

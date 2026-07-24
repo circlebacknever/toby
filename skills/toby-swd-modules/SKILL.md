@@ -104,6 +104,8 @@ When placing code in an existing module, inspect where the surrounding code alre
 
 ## Red flags
 
+Run this list against the diff before calling a boundary decision done.
+
 - **Information leakage**: one hidden decision reflected in several modules.
 - **Temporal decomposition**: structure follows execution order; one body of knowledge ends up scattered across stages.
 - **Special-general mixture**: caller-specific conditions inside a general mechanism.
