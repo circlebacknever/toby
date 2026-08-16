@@ -1,6 +1,6 @@
 # Worked Examples — Backend APIs (Java/Kotlin, Go, TypeScript)
 
-The interface is everything callers must know — and on a backend that
+The interface is everything callers must know. On a backend that
 includes the wire contract (REST, gRPC), the service-layer methods, and
 the value objects in between. The comment test applies to each.
 
@@ -87,20 +87,20 @@ Comment:
 Four sentences. Definitions of "active" and validation specifics move to
 the filter object's schema (versioned, documented separately from this
 endpoint). The pagination contract is opaque tokens, which lets the
-server change its internal offset strategy without telling clients —
+server change its internal offset strategy without telling clients, so
 performance defenses become invisible to callers. The endpoint is now
 shaped like its contract: "list users by criteria" with one criteria
 input and one pagination control.
 
-Guardrail: did anything get hidden that callers truly need? The
-performance limit on deep pagination is truly caller-facing — opaque
-tokens convey it implicitly (the token stops being valid past a limit), and
-the response returns a named status the caller can branch on when that
+Guardrail: did anything get hidden that callers need? The
+performance limit on deep pagination is caller-facing. Opaque
+tokens convey it implicitly, because the token stops being valid past a limit.
+The response returns a named status the caller can branch on when that
 happens (a `400`/`410`-style "page token expired, restart paging"), so an
 expired token isn't mistaken for a transient error.
 
-One wire caveat: a query string has a practical length ceiling — proxies and
-servers cap the URL around a few KB. A small filter fits; a large or heavily
+One wire caveat: a query string has a practical length ceiling, because proxies
+and servers cap the URL around a few KB. A small filter fits. A large or heavily
 nested one doesn't, and encoding it as base64 only delays the wall. When the
 criteria object outgrows the URL, the same object moves to a
 `POST /api/users/search` body — identical contract, different transport.
@@ -175,18 +175,18 @@ public enum OrderFailureReason {
 ```
 
 Comment passes: four sentences, no ordering, no exception names, no
-escape hatches in the surface. The `skipTaxValidation` flag is gone —
-that policy is a property of the org, computed inside the service from
+escape hatches in the surface. The `skipTaxValidation` flag is gone,
+because that policy is a property of the org, computed inside the service from
 `userId`. The "partial failure of payment capture" reality is hidden
-behind the atomic guarantee in the comment; achieving atomicity is the
-implementation's job (saga, outbox, or two-phase). If atomicity truly
+behind the atomic guarantee in the comment. Achieving atomicity is the
+implementation's job (saga, outbox, or two-phase). If atomicity
 cannot be guaranteed, the contract changes to expose it (returns include
 an in-progress status), but it doesn't expose the implementation strategy.
 
-The `idempotencyKey` is part of that contract too: a retry carrying the key
+The `idempotencyKey` is part of that contract too. A retry carrying the key
 it used the first time returns the original result and never places a second
 order. A mutation is safe to retry only when the request carries a key the
-server dedupes on, or the operation is naturally idempotent; the key is what
+server dedupes on, or the operation is naturally idempotent. The key is what
 lets a caller re-send a `placeOrder` that timed out without risking a double
 charge.
 
@@ -323,24 +323,24 @@ Comments, one per RPC:
 
 Each comment is one to two sentences. Each RPC has one effect that the
 caller can reason about. The proto3 presence problem disappears because
-no field is "set or unset" — every field on every message is required to
+no field is "set or unset". Every field on every message is required to
 the operation. The side effects move from "buried in prose" to "named in
 the operation's purpose."
 
 On a published service, splitting `UpdateUser` into four RPCs is a
-wire-breaking change — existing clients call an RPC that no longer exists.
+wire-breaking change, because existing clients call an RPC that no longer exists.
 The new RPCs ship alongside the old one, which stays and is marked
 `deprecated` until callers migrate, and proto field numbers are never reused.
 Greenfield designs adopt the split directly. This is the brownfield rule the
-skill states: a surface other teams build on doesn't get broken without a
+skill states. A surface other teams build on doesn't get broken without a
 migration path.
 
 For high-cardinality update endpoints (admin tools that legitimately edit
 many fields), keep one `UpdateUser` operation with a field_mask, document
-the field_mask requirement once, and accept the trade — but understand
-that the comment is necessarily longer because the operation is truly
+the field_mask requirement once, and accept the trade. The comment is
+necessarily longer there, because the operation is truly
 "set whichever subset of these fields the caller asked for." The intent
-form is the default; the bulk form is the exception.
+form is the default, and the bulk form is the exception.
 
 ---
 

@@ -18,12 +18,12 @@ A common conversation:
 
 The first question — slow how? — usually doesn't get an answer. The
 fastest path from "slow" to "added Redis" involves no measurement, no
-baseline, and no idea whether the cache will actually help.
+baseline, and no idea whether the cache will help.
 
 The discipline before adding any cache:
 
 1. **Measure the current latency.** Median, P95, P99 for the hot path.
-   "Slow" is a feeling; numbers are a baseline.
+   "Slow" is a feeling, and numbers are a baseline.
 2. **Find where the time goes.** Is it a database query? A downstream
    API call? CPU work in serialization? A 5x improvement in the wrong
    layer is no improvement.
@@ -32,7 +32,7 @@ The discipline before adding any cache:
    too narrow) saves nothing and costs added latency on the miss path.
 4. **Estimate the staleness tolerance.** Some data must be fresh
    (account balances). Some can be minutes stale (product catalog).
-   The TTL is a product decision; set it from the staleness budget.
+   The TTL is a product decision, so set it from the staleness budget.
 
 After this, the cache is either plainly right (slow database query,
 high hit ratio, tolerant of seconds-to-minutes staleness) or plainly
@@ -57,7 +57,7 @@ a measurable predicted improvement and a baseline to compare against.
 
 ---
 
-## Example 2 — The complexity a cache actually adds
+## Example 2 — The complexity a cache adds
 
 A cache layer brings real and recurring costs. List them in full before
 deciding:
@@ -88,7 +88,7 @@ operational reality. The question "is the P99 latency improvement worth
 this?" should weigh both columns.
 
 When the answer is yes, ship the cache. When the answer is no but the
-endpoint is truly too slow, the work is somewhere else: optimize
+endpoint is too slow, the work is somewhere else: optimize
 the query, add an index, denormalize, fix the N+1. Those moves usually
 have smaller operational footprint than introducing a cache.
 
@@ -112,7 +112,7 @@ concurrent requests all miss, all call `load()`, all hit Postgres.
 Postgres now handles 1000 connections for what should be a single query.
 The hot path goes from cached-fast to slower than uncached.
 
-This is a performance problem; the results stay correct — eventually
+This is a performance problem, and the results stay correct. Eventually
 the load succeeds, the cache repopulates, things stabilize. During
 the herd, though, the system is far slower than the uncached version, because
 each load contends with 999 others.
@@ -155,12 +155,12 @@ unless you have hundreds of processes.
 **Cross-process locking.** Add a short-lived distributed lock (Redis
 `SET NX EX`) around the load. Other processes wait briefly and read
 from cache when the lock holder finishes. Only worth the complexity when
-in-process single-flight isn't enough — you have many processes and the
-load is so expensive that even one-per-process is too many.
+in-process single-flight isn't enough, meaning you have many processes and
+the load is so expensive that even one-per-process is too many.
 
 **Stale-while-revalidate.** Continue serving the stale value to most
 callers while a single load refreshes the cache in the background. The
-hot path stays fast even during the refresh; users see slightly-old
+hot path stays fast even during the refresh, and users see slightly-old
 data for a short window. The complexity is real (a background refresh
 worker, a "is this stale?" check). Worth it when staleness budget allows
 and load latency is significant.
@@ -205,8 +205,8 @@ is a one-line edit at a named location. New caches in the codebase ask
 "which staleness category does this fit?" The guessing question — "what
 number should I put here?" — stops coming up.
 
-For data that truly shouldn't be cached (every read must be fresh),
-don't cache it. A 1-second TTL is a bug magnet — it caches just long
+For data that shouldn't be cached (every read must be fresh),
+don't cache it. A 1-second TTL is a bug magnet. It caches just long
 enough to produce occasional stale reads under load while delivering
 almost no hit-rate benefit.
 
@@ -251,7 +251,7 @@ The right move depends on the actual goal:
 - If the issue was "we want to reduce database load," a cache might
   help — but with a longer TTL (and a willingness to serve up-to-1-hour
   stale profiles) to push hit rate up. The cache earns its complexity
-  by actually hitting.
+  by hitting.
 - If the issue was perceived and never measured, no cache at all.
 
 Caches earn their complexity by *hitting often enough to
@@ -271,6 +271,6 @@ complexity.
 | How do I know it's working? | Hit rate, miss rate, miss-path latency, all as metrics |
 | When to remove a cache? | Hit rate stays low; the work it was protecting is no longer slow |
 
-The cache decision is a complexity decision. Every cache you don't add
-is a system that's simpler to operate, easier to test, and clearer to
-reason about. Caches earn their place by measured improvement.
+The cache decision is a complexity decision. Skip the cache where it isn't
+earned, and the system stays simpler to operate, easier to test, and clearer
+to reason about. Add a cache only on measured improvement.

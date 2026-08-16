@@ -41,9 +41,9 @@ Aggregate: let the exception propagate to the single dispatch loop at the top,
 which catches it once and produces the 400. One handler replaces dozens.
 
 Separately, the same server calls `malloc`-equivalent allocation deep in request
-parsing. Out-of-memory is rare and there is nothing useful to do — checking it
+parsing. Out-of-memory is rare and there is nothing useful to do, so checking it
 at every allocation is pure complexity. This is the just-crash case: one checked
-allocation wrapper that aborts with a diagnostic. Note the boundary: a corrupt
+allocation wrapper that aborts with a diagnostic. A corrupt
 request body is expected and per-request, so it rides the aggregation path to
 the 400, well clear of the crash path.
 
@@ -53,13 +53,13 @@ the 400, well clear of the crash path.
 
 A list view re-fetches the full dataset on every keystroke of a filter box, and
 each row component re-derives a sorted copy of the list. No single line is
-"slow"; together the view is sluggish.
+"slow". Together the view is sluggish.
 
-The design-time move, made before any measurement: typing into a filter is
+The design-time move lands before any measurement. Typing into a filter is
 a known-expensive trigger if it crosses the network, so debounce the fetch and
-filter client-side when the set is small — both are as simple as the slow
+filter client-side when the set is small. Both are as simple as the slow
 version and cost no extra complexity. The per-row re-sort is redundant work on a
-known-hot path; lift the sorted derivation to the parent so it runs once. These
+known-hot path. Lift the sorted derivation to the parent so it runs once. These
 are naturally-efficient simple choices, the everyday layer that lands before any
 profiler session.
 
@@ -78,10 +78,10 @@ try { return await api.getOrders(); }
 catch { return []; }   // caller cannot distinguish "no orders" from "failed"
 ```
 
-This masks information the caller truly needs: an empty list and a failed
-request look identical, so the UI cannot show a retry state and silently lies to
+This masks information the caller needs, because an empty list and a failed
+request look identical. The UI cannot show a retry state and silently lies to
 the user. Masking is correct only when the information is not needed outside the
-module; here it is needed. Surface it as part of the contract instead — a result
+module. Here it is needed. Surface it as part of the contract instead — a result
 that distinguishes loaded-empty from failed — even though that adds to the
-hook's interface. The interface cost is the point: callers need this, so it must
+hook's interface. The interface cost is the point. Callers need this, so it must
 be exposed.

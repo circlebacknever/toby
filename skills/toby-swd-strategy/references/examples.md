@@ -1,9 +1,9 @@
 # Worked Examples: The Same Task, Tactical vs Strategic
 
-Each example shows the tactical version (smallest change that works), why it
-quietly hurts, and the strategic version (the structure the code would have had
-if designed with the change in mind). The code is illustrative; the reasoning
-transfers.
+Each example shows the tactical version, the smallest change that works, and
+why it quietly hurts. The strategic version follows: the structure the code
+would have had if designed with the change in mind. The code is illustrative,
+and the reasoning transfers.
 
 ---
 
@@ -54,20 +54,21 @@ simpler while the work moved to where it belongs.
 Task: add retry logic to an HTTP client call.
 
 **Tactical:** wrap the call site in a `for` loop with a `sleep`. It works. Three
-weeks later a second call site needs retries and the loop is copy-pasted with a
-slightly different backoff, and now there are two retry policies that drift.
+weeks later a second call site needs retries, and the loop is copy-pasted with a
+slightly different backoff. Now there are two retry policies that drift.
 
 **Strategic — sketch two approaches first:**
 
 - *A: retry decorator on each call site.* Interface: callers add `@retry(...)`.
   Hides the loop but every call site still chooses and can mis-choose policy.
 - *B: a retrying transport the client is constructed with.* Interface: callers
-  call the client normally; retry is a property of the client, configured once.
+  call the client normally, and retry is a property of the client, configured
+  once.
 
 B has the simpler caller-side interface and absorbs the "there will be more call
-sites" variant for free, so pick B even though its insides (wrapping the
+sites" variant for free. Pick B even though its insides (wrapping the
 transport, classifying retryable errors) are more work than a loop. That extra
-work is the investment; it is paid once and every current and future call site
+work is the investment. It is paid once, and every current and future call site
 collects the return.
 
 ---
@@ -78,10 +79,10 @@ Existing `PaymentProcessor` hardcodes one gateway. Task, due tomorrow: support a
 second gateway for one specific customer.
 
 Apply the test: *what would this look like if designed with two gateways in
-mind?* Answer: a `Gateway` interface with two implementations and selection by
-config. That is the right design and it is also several hours you do not have
-before the deadline — this is a legitimate quick-fix situation (hard external
-deadline, accepted cost).
+mind?* That design is a `Gateway` interface with two implementations and
+selection by config. It is the right design, and it is also several hours you
+do not have before the deadline. This is a legitimate quick-fix situation (hard
+external deadline, accepted cost).
 
 So take the tactical path deliberately and label it:
 
@@ -95,10 +96,10 @@ def process(self, payment):
     return self._charge_via_legacy(payment)
 ```
 
-You took the shortcut. What separates this from pure tactical programming is that
-the shortcut is now visible, bounded, and carries a stated exit, so it reads as a
-labeled loan the next person can see and pay down.
-The strategic move under a deadline is an IOU with a stated exit.
+You took the shortcut. What separates this from pure tactical programming is
+that the shortcut is now visible, bounded, and carries a stated exit. It reads
+as a labeled loan the next person can see and pay down. Under a deadline, write
+the IOU and state the exit.
 
 ---
 
@@ -106,7 +107,7 @@ The strategic move under a deadline is an IOU with a stated exit.
 
 - The target is roughly 10–20% more effort than the tactical path, spent
   continuously through the change. Save it up into a separate "cleanup phase"
-  and it never happens; spend it all at once on a redesign and you have left the
+  and it never happens. Spend it all at once on a redesign and you have left the
   band entirely.
 - Proactive spend: trying a second design, choosing names well, writing the
   interface comment first so the abstraction is stable before the code.

@@ -3,7 +3,7 @@
 The web stack has its own complexity patterns. Errors arrive from three
 sources at once (network, render, user input) and performance pressure
 arrives from a fourth (re-renders, large lists, memoization decisions).
-The ladders apply; the framework idioms shape the move.
+The ladders apply, and the framework idioms shape the move.
 
 ---
 
@@ -21,7 +21,7 @@ A common reflex when adding error boundaries to a React app:
 A single boundary around the entire app catches everything. The fallback
 renders an "Application Error" screen. Every render error, anywhere,
 unmounts the whole tree. The user loses their form data, their scroll
-position, their open dialog. This is aggregation at the wrong level — the
+position, their open dialog. This is aggregation at the wrong level. The
 boundary aggregates more than it should because no smaller boundary was
 designed.
 
@@ -128,13 +128,13 @@ function OrderPage({ id }: { id: string }) {
 }
 ```
 
-The page handles only the cases that are truly its concern. The other
+The page handles only the cases that are its concern. The other
 three handler buckets disappear from this file and from every other page
 that used the same pattern.
 
 `useOrder` returns a discriminated query result — a `status` plus the data
 for that state — and this page renders only the states it owns. The `error`
-and `stale` arms are absent by design: the error cases collapse into the
+and `stale` arms are absent by design. The error cases collapse into the
 rungs above — the client's retry, the interceptor, the boundary — and never
 reach the component. Same shape, fewer arms because the handling moved.
 
@@ -155,28 +155,28 @@ function ProductCard({ product, onSelect }: { product: Product; onSelect: (p: Pr
 }
 ```
 
-The author's mental model: `useMemo` prevents the re-render. The actual
-behavior: every `useMemo` adds a closure allocation, a comparison of
+The author's mental model: `useMemo` prevents the re-render. In actual
+behavior, every `useMemo` adds a closure allocation, a comparison of
 dependencies, and a tiny bit of work on every render. For values that are
 cheap to compute, the memoization itself costs more than what it saves.
-Density of `useMemo` doesn't track render frequency — it tracks the
+Density of `useMemo` doesn't track render frequency. It tracks the
 author's anxiety.
 
 This is speculative performance complexity added without measurement. It
-also hides the design problems it pretends to solve: if a component
+also hides the design problems it pretends to solve. When a component
 re-renders too often, the right fix is usually higher up the tree (a stable
 parent reference, a context that doesn't change every render, list keys
 that are stable).
 
-The rule the team actually wants:
+The rule the team wants:
 
 - **Default: no memoization.** Components re-render. That's their job. The
   React Compiler (v1.0, opt-in) memoizes at build time, so where it runs the
-  hand-written `useMemo`/`useCallback` is redundant; plain React 19 without
+  hand-written `useMemo`/`useCallback` is redundant. Plain React 19 without
   the compiler re-renders as it always has. Solid and Svelte sidestep the
-  question — fine-grained reactivity updates only what changed.
+  question, because fine-grained reactivity updates only what changed.
 - **`useMemo`** is for expensive computations whose dependencies are stable
-  enough that the memo will actually hit. "Expensive" means measurable —
+  enough that the memo will hit. "Expensive" means measurable —
   parsing a large blob, computing a derived structure over many items.
 - **`useCallback`** is for callbacks passed to memoized children that
   compare by referential equality, or to the dependency arrays of other
@@ -199,11 +199,11 @@ function ProductList({ products, filter }: { products: Product[]; filter: string
 One `useMemo`, on the one expensive computation. Everything else
 re-evaluates and nobody notices.
 
-In Solid, this whole class of problem largely disappears — `createSignal`
-and `createMemo` are fine-grained, so unnecessary memoization is unusual
-even at scale. In Svelte 5 with `$derived`, the equivalent is automatic.
-The React lesson is: the framework's default is already the right answer
-for most components; resist the urge to add a layer.
+In Solid, this whole class of problem largely disappears, because
+`createSignal` and `createMemo` are fine-grained and unnecessary
+memoization is unusual even at scale. In Svelte 5 with `$derived`, the
+equivalent is automatic. In React, the framework's default is already the
+right answer for most components, so resist the urge to add a layer.
 
 ---
 
@@ -217,8 +217,8 @@ Each is a small component. The browser handles this without breaking a
 sweat. No virtualization library needed.
 
 The team renders 2000 items. Things get slower on low-end devices but the
-P95 is still acceptable. Probably no virtualization yet — measure the
-specific bottleneck. The item count is rarely the cause; the usual culprit
+P95 is still acceptable. Probably no virtualization yet, so measure the
+specific bottleneck. The item count is rarely the cause. The usual culprit
 is a single expensive per-row computation, or a giant image being rendered
 without sizing constraints.
 
@@ -250,7 +250,7 @@ Adding virtualization to a 100-item list because "lists should be
 virtualized" is exactly the speculative-complexity anti-pattern. The
 library adds a real cost: scroll-position bugs, focus management, sticky
 items become harder, snapshot tests get noisy, you lose ctrl-F to find
-text in the list. Each cost is real; pay it when it's earned.
+text in the list. Each cost is real, so pay it when it's earned.
 
 Same call applies for Solid (`solid-virtual`) and Svelte (`svelte-virtual`
 or framework-specific patterns).
@@ -288,7 +288,7 @@ the result. That helps. But the design-time move is cheaper *and* better:
   comparison reuses it. (500 string lowercases * keystrokes * keystrokes...)
 - Sort once when orders are loaded, so every render reads the sorted list.
 - Debounce the filter input. Users don't see results between keystrokes
-  anyway; running the filter at 60fps when they're typing is wasted work.
+  anyway, so running the filter at 60fps when they're typing is wasted work.
 
 ```tsx
 function Dashboard() {
@@ -308,14 +308,14 @@ function Dashboard() {
 }
 ```
 
-The `useMemo` is now real — the filter is the only expensive thing left.
+The `useMemo` is now real, because the filter is the only expensive thing left.
 The pre-sort and pre-lowercase happen once at load and every render reads
 the result. The debounce eliminates work the user can't perceive. Three design-time moves,
 each almost free, and the slow render disappears without any memoization
 heroics.
 
-This is the same point as `examples.md` Example 3: design-time moves are
-the cheap layer and they prevent the death-by-a-thousand-cuts case. The
+This is the same point as `examples.md` Example 3. Design-time moves are
+the cheap layer, and they prevent the death-by-a-thousand-cuts case. The
 profiler session is for after.
 
 ---

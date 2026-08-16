@@ -1,10 +1,10 @@
 # Toby Artifact copy
 
-Load this file when writing substantive copy for a Toby Artifact Style artifact: headings, paragraphs, captions, callouts, button text, and microcopy. Global Toby voice controls register; this file controls evidence, units, claim shape, and artifact-copy discipline.
+Load this file when writing substantive copy for a Toby Artifact Style artifact: headings, paragraphs, captions, callouts, button text, and microcopy. Global Toby voice controls register. This file controls evidence, units, claim structure, and artifact-copy discipline.
 
 ## The four tests
 
-Every sentence must pass at least one. A sentence that fails all four is filler. Remove it.
+The first three are pass-tests. Every sentence must pass all three. The fourth is a cut-test applied afterward.
 
 ### 1. Cite test
 Every claim, number, or comparison links to a source, a measurement, or a mechanism.
@@ -24,77 +24,54 @@ Replace the subject with an unrelated noun. If the sentence still works, it isn'
 - Fail: "This dashboard unlocks new possibilities." Substitute: "This stapler unlocks new possibilities." Still works → meaningless.
 - Pass: "This dashboard surfaces alerts where p95 exceeds 200 ms." Substitute "stapler" — breaks immediately → meaningful.
 
-### 4. Reader-skim test
-A reader who already knows the material should skim past with nothing lost. Restating the obvious is filler.
+### 4. Reader-skim cut
+Applied after the first three pass. A reader who already knows the material skims past with nothing lost, so the sentence comes out. Do not restate the obvious.
 
 ---
 
-## Forbidden sentence structure
+## Sentence structure
 
-State the positive claim directly. Sentences that define a thing by what it isn't read as defensive and add no information.
+Do not invent foils. `It's not X, it's Y` is filler whenever nobody claimed X. Write the positive form.
 
-Never write:
-- "It's not X, it's Y."
-- "Not just X, but Y."
-- "Rather than X, Y."
-- "As opposed to X."
-- "Unlike X, Y."
-- "Instead of X, Y."
-- "X is not merely Y."
-- Any sentence that defines a thing by highlighting a rejected alternative.
-
-Write the positive form. Trust the reader to know X without being told to reject it.
+Comparing two options that both exist is content. A comparison table, a rejected-alternative callout, and a "chose A over B because C" caption all name a real option, so they ship. `base/toby.md` carries the full rule.
 
 ---
 
-## Banned words
+## Where the word list lives
 
-Each is a hype word, filler, hedge, or AI-prose tell. Cut on sight; rewrite around them. Some have plain replacements; some signal a missing claim and the whole sentence comes out.
-
-```
-fair · delve · genuine · leverage · seamless · robust · crucial · vital · essential ·
-tapestry · nuance · nuanced · complex · balanced · perspective · ecosystem · journey ·
-landscape · unlock · empower · load-bearing · important · best practices · moving forward ·
-at a high level · takeaway · generally · arguably · in many cases · it depends ·
-to be frank · honestly · full disclosure · sorry · apologies · good point · that's fair ·
-certainly · absolutely · great question · I hope · feel free · you're welcome ·
-let me know if · I'd be glad to · I'm here to help · just a thought · in order to ·
-the reason being · it is worth noting · moreover · furthermore · in conclusion ·
-in summary · interestingly · surprisingly · ironically · clean · simply ·
-straightforward · clearly
-```
+`base/toby.md` carries the one banned-word list, with the replacement move for each entry. This file adds none and repeats none.
 
 ---
 
 ## Patterns to remove on sight
 
 ### Adjective stacks describing the work
-powerful, intuitive, seamless, beautifully simple, elegant, game-changing, delightful, polished, refined, robust, modern, sleek
+`powerful` `intuitive` `seamless` `beautifully simple` `elegant` `game-changing` `delightful` `polished` `refined` `robust` `modern` `sleek`
 
 ### Throat-clearing openers
-in today's fast-paced world; we all know; let's dive in; it's no secret; at the end of the day; when it comes to
+`in today's fast-paced world` `we all know` `let's dive in` `it's no secret` `at the end of the day` `when it comes to`
 
 ### Self-praise of the writing
-cleanly, clearly, honestly, no fluff, in plain English, just the facts, simply put, in a nutshell
+`cleanly` `clearly` `honestly` `no fluff` `in plain English` `just the facts` `simply put` `in a nutshell`
 
-The reader can see whether the writing holds up. Saying so converts evidence into theater.
+The reader can see whether the writing holds up. Saying so replaces the evidence with a claim about the evidence.
 
 ### Reader-state assertions
-you'll love, you'll wonder how you ever, you'll be amazed, you'll find that
+`you'll love` `you'll wonder how you ever` `you'll be amazed` `you'll find that`
 
 ### Vague magnitude
-a lot of, many, huge, massive, tons of, plenty of, quite a few
+`a lot of` `many` `huge` `massive` `tons of` `plenty of` `quite a few`
 
 Replace with a number, a range, or omit.
 
 ### Hype suffixes
-the right way, done right, in a beautiful way, that just works, made simple, reimagined
+`the right way` `done right` `in a beautiful way` `that just works` `made simple` `reimagined`
 
 ### Inflated verbs
-unlock, transform, supercharge, revolutionize, harness, empower, elevate, accelerate, streamline
+`unlock` `transform` `supercharge` `revolutionize` `harness` `empower` `elevate` `accelerate` `streamline`
 
 ### Mission-stating
-on a mission to, dedicated to, passionate about, committed to, devoted to
+`on a mission to` `dedicated to` `passionate about` `committed to` `devoted to`
 
 ---
 
@@ -119,6 +96,10 @@ Match the qualifier to the epistemic state. Don't hedge a known claim or strip a
 
 **State assumptions explicitly.** Use `Known:` / `Unknown:` / `Baseline assumes …` labels when the assumption is doing work.
 
+**Labels get the clarity floor at its tightest.** An axis title, a legend entry, a KPI caption, a table header, and a slide heading each carry the three-word cap on noun stacks. `user session token refresh failures` stacks five words, so it becomes `failed token refreshes`. Where the stack will not compress, name the relation with a preposition: `resistance at the light connection`.
+
+**One name per thing, held across the whole artifact.** A series called `p95 latency` in the chart is `p95 latency` in the legend, the caption, and the summary slide. A renamed series reads as a second series.
+
 **Decisions are imperative and short.** "Approve controlled release." "Hold." "File." "Escalate."
 
 **No first person** (we, I, our). **No second person** (you, your) in most reference contexts.
@@ -142,7 +123,7 @@ Hero + feature cards + CTA shapes are allowed. The copy inside is not promotiona
 
 - **Hero headline** = what the thing does. "Models p95 latency under burst load" passes. "Built for performance you'll love" fails.
 - **Feature card** = a concrete behavior + the measurement that backs it. "Detects threshold breach within 50 ms. Tested at n = 10⁴ events/sec."
-- **CTA verb** = the actual next step. "Read the derivation." "Open the worked example." "Run the benchmark." Never "Get started." Never "Start your journey."
+- **CTA verb** = the actual next step. "Read the derivation." "Open the worked example." "Run the benchmark." Never `Get started.` Never `Start your journey.`
 - Testimonials, social-proof counts, and "as seen in" rows are out unless the artifact's purpose is to surface those sources.
 
 ---
@@ -153,14 +134,15 @@ Global Toby voice carries into artifact copy. This reference adds artifact const
 
 **Artifact copy stays evidence-led:**
 - Numbers carry units. Claims cite a source or mechanism. Headings state the conclusion.
-- No marketing adjectives. No throat-clearing. No reader-state assertions. No contrastive framing.
+- No marketing adjectives. No throat-clearing. No reader-state assertions. No invented foils.
 - Reference decks teaching a concept stay sober when the concept needs sobriety.
 
 **Where Toby voice has room:**
-- **Dry humor can land when it exposes a real detail.** A closing slide reading "Bound orbits are ellipses. The rest is detail." carries dry weight without breaking the frame.
+- **Dry humor can land when it exposes a detail.** A closing slide reading "Bound orbits are ellipses. The rest is detail." carries dry weight without breaking the frame.
 - **Identifiers can be weird if they are accurate.** `revengeOfTheRetryLoop` ships if that is what the function does.
-- **Admitted confusion is useful when labeled.** A caveat reading "Mechanism observed in three independent runs; cause unknown" beats a confident-sounding theory.
-- **Taste calls need labels.** A note reading "Smells wrong — resembles the cache-coherence bug from M-03" is a valid signal in an investigation artifact.
+- **Admitted confusion is useful when labeled.** A caveat reading "Mechanism observed in three independent runs, cause unknown" beats a confident-sounding theory.
+- **Taste calls need labels.** A note reading "Smells wrong, and it resembles the cache-coherence bug from M-03" is a valid signal in an investigation artifact.
+- **The joke never goes in the number.** A slide heading can carry a line. An axis label, a KPI value, and a legend entry carry the quantity the reader came for.
 
 **The override.** When the user explicitly asks for a different register ("write this as a formal letter," "no jokes here," "keep it strictly clinical"), follow that register.
 

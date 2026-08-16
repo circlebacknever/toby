@@ -11,10 +11,10 @@ def trim(text, start, end):
     ...
 ```
 
-The name and signature cannot answer the questions a caller actually has: is
+The name and signature cannot answer the questions a caller has: is
 `end` inclusive? what happens if `start > end`? are these byte offsets or
 character indices? Self-documenting-code reasoning would stop here because the
-names look fine. They are fine; the missing information has no place in code, so
+names look fine. They are fine. The missing information has no place in code, so
 it goes in the interface comment:
 
 ```python
@@ -33,14 +33,14 @@ precision (lower-level) function of comments, the half most often skipped.
 
 A file-system module uses `block` for both a physical disk block and a logical
 block within a file. The names look "reasonably close," so nobody questions
-them, and a logical block number is eventually used where a physical one was
+them. A logical block number is eventually used where a physical one was
 required — silent data corruption that took months to find.
 
 Consistency rule: one name, one purpose. Rename to `fileBlock` and `diskBlock`
 so the two cannot be confused at a glance, and better still give them distinct
 types so they cannot be interchanged at all. The clarity fix here is also a
-correctness fix. That pairing shows up again and again: a name that can be
-confused is a value that can be confused.
+correctness fix. Treat a name that can be confused as a value that can be
+confused.
 
 ---
 
@@ -54,7 +54,7 @@ useEffect(() => {
 
 A reader scanning the component linearly never sees what triggers
 `reconcileCart` or why those three dependencies. Event-driven invocation is
-exactly the book's hidden-control-flow case; React effects are its modern form.
+exactly the book's hidden-control-flow case, and React effects are its modern form.
 Document at the point of surprise:
 
 ```tsx
@@ -94,7 +94,7 @@ return result;
 ```
 
 The `error is never set on 404` and `null while loading or failed` facts cannot
-live in the types; without the field comments a caller cannot use this
+live in the types. Without the field comments a caller cannot use this
 correctly, and no amount of good naming supplies them.
 
 ---
@@ -103,8 +103,8 @@ correctly, and no amount of good naming supplies them.
 
 The codebase names handlers `handleSubmit`, `handleChange`, `handleRowClick`.
 A new component is added with `onSaveClicked` and `submitHandler`. Each is
-defensible in isolation; together they break the pattern that lets a reader
+defensible in isolation. Together they break the pattern that lets a reader
 predict the next handler's name. Inspect the file, see the established
 `handleX` form, and match it. Introducing a "better" handler-naming scheme is
 worth it only with significant new information and a commit that converts every
-existing handler — otherwise the half-and-half state is worse than either.
+existing handler. Otherwise the half-and-half state is worse than either.

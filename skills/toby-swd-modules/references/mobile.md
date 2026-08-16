@@ -37,7 +37,7 @@ function Tabs({ user, navigation }) {
 Same defect as web prop drilling (the different-layer check) — pass-through variable — with
 extra hazards specific to navigation:
 
-- React Navigation params are serialized; passing a complex `user` object
+- React Navigation params are serialized, so passing a complex `user` object
   through them silently breaks deep links and state restoration.
 - Screens that don't use `user` still take it, because nested screens below
   them do.
@@ -73,8 +73,8 @@ const { user } = useAuth();
 
 Routes carry only what identifies the destination (an `orderId`, a `tab`).
 Identity is a separate concern owned by one module. The intermediate screens
-lose the prop entirely; deep linking works because routes are now serializable
-without object juggling.
+lose the prop entirely, and deep linking works because routes are now
+serializable without object juggling.
 
 Guardrail: don't pile the context with everything. Auth is one well-defined
 body of knowledge; theme is another; feature flags a third. A `RootContext`
@@ -280,10 +280,10 @@ const { data, loading, error, refresh } = useFeed();   // a hook over FeedRepo
 header, base URL, retry policy, and offline cache live inside `FeedRepo`. The
 two screens shrink to rendering code.
 
-For larger apps this is what React Query / SWR / RTK Query are designed for —
-they provide the deep module so you don't have to build it from scratch. Use
-them when the surface justifies it; build the lightweight repository when it
-doesn't. The wrong move is to keep `fetch` calls scattered through screens.
+For larger apps this is what React Query / SWR / RTK Query are designed for.
+They provide the deep module so you don't have to build it from scratch. Use
+them when the surface justifies it, and build the lightweight repository when
+it doesn't. The wrong move is to keep `fetch` calls scattered through screens.
 
 ---
 
@@ -291,12 +291,12 @@ doesn't. The wrong move is to keep `fetch` calls scattered through screens.
 
 - **iOS/Swift, Android/Kotlin**: the same checks apply. Auth state in a
   shared store. Threading it through `Intent` extras or `UINavigationController`
-  segues repeats the same defect. Native modules wrap the platform's protocol;
+  segues repeats the same defect. Native modules wrap the platform's protocol.
   ViewControllers and Activities are thin and stateful only about their own UI.
 - **Flutter/Dart**: provider/riverpod plays the role of context here.
   `InheritedWidget` directly is the low-level primitive most apps shouldn't use
   except through one of those wrappers.
 - **Implementation inheritance in mobile native code** (extending
   `UIViewController`, `Activity`, `Fragment`): same caution as the composition-over-inheritance check. The
-  framework demands one or two override points; resist building a deep family
-  tree on top of those for "shared behavior."
+  framework demands one or two override points, so resist building a deep
+  family tree on top of those for "shared behavior."

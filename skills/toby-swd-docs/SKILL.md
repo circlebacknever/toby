@@ -13,7 +13,7 @@ description: >-
 
 A module carries two categories of information that can't live in the code itself. The code says *what*. These files say *why*, *who this is for*, and *how to think about it*.
 
-Two artifacts. Different audiences. Different jobs. Don't conflate them.
+Don't conflate the two artifacts. They have different audiences and different jobs.
 
 ---
 
@@ -25,25 +25,25 @@ An agent without an AGENTS.md is operating blind. It doesn't know what it doesn'
 
 ### Scope — one per meaningful module
 
-Create an AGENTS.md at the root of a module, package, or feature that owns a real body of knowledge: a service, a bounded domain package, a frontend feature, a design-system package, a store module. Don't create one for a leaf folder, a single-file utility directory, or a folder that exists for file organization alone.
+Create an AGENTS.md at the root of a module, package, or feature that owns a real body of knowledge. Examples: a service, a bounded domain package, a frontend feature, a design-system package, a store module. Don't create one for a leaf folder, a single-file utility directory, or a folder that exists for file organization alone.
 
-Many thin AGENTS.md files reproduce the over-subdivision problem — they rot, they drift, and they train readers to ignore them. When in doubt, push the documentation up to the nearest meaningful module root.
+Many thin AGENTS.md files reproduce the over-subdivision problem, because they rot, they drift, and they train readers to ignore them. When in doubt, push the documentation up to the nearest meaningful module root.
 
 ### Required contents, in order
 
 1. **What this module is and the problem it solves.** One or two sentences: what it does and why it exists. Skip how it works. Everything below lands easier once the reader holds this model.
 2. **Files to know and the responsibility each owns.** A short annotated list of only the files a new agent must understand to work here. State the responsibility each file owns. The implementation behind it belongs in the code.
-3. **Non-obvious design constraints.** Business, product, regulatory, or external constraints that force non-obvious decisions. When the code looks awkward because an outside requirement made it so, the reason lives here. Code and comments track the mechanics; the outside reason that forced them lives in this file.
+3. **Non-obvious design constraints.** Business, product, regulatory, or external constraints that force non-obvious decisions. When the code looks awkward because an outside requirement made it so, the reason lives here. Code and comments track the mechanics, while the outside reason that forced them lives in this file.
 4. **Cross-module decisions.** Any design decision that touches several modules and can't be encapsulated in one of them is recorded here once. Affected sites get a one-line pointer comment (`// see "Event ordering" in AGENTS.md`). A copy of the explanation at each site drifts out of sync and gives no signal that it has.
 5. **Extension rules and invariants.** Where new files belong, conventions that must hold, patterns to match, which upstream or downstream modules a change here affects. Keep it to rules and pointers.
 
 ### Stay abstract on purpose
 
-Describe purpose, rationale, constraints, and structure. Keep implementation mechanics out. Abstract documentation survives code changes; detail that tracks the code belongs in code comments, where it's next to the thing it describes and gets updated when that code changes. The further this content sits from the code, the longer it stays accurate.
+Describe purpose, rationale, constraints, and structure. Keep implementation mechanics out. Abstract documentation survives code changes. Detail that tracks the code belongs in code comments, where it's next to the thing it describes and gets updated when that code changes. The further this content sits from the code, the longer it stays accurate.
 
 ### No duplication
 
-Reference interface comments and let them carry the behavior. Link external specs and let them stay authoritative. State each cross-module decision once here and point to it from affected code. Duplicated documentation is as dangerous as duplicated logic, and worse than absent documentation — copies drift with no signal to the reader that what they're reading is stale.
+Reference interface comments and let them carry the behavior. Link external specs and let them stay authoritative. State each cross-module decision once here and point to it from affected code. Duplicated documentation is as dangerous as duplicated logic, and worse than absent documentation. Copies drift with no signal to the reader that what they're reading is stale.
 
 ### Maintenance
 
@@ -52,7 +52,7 @@ Update AGENTS.md whenever a structural change makes it wrong: responsibility mov
 ### AGENTS.md red flags
 
 - AGENTS.md in a trivial or leaf folder — over-subdivision; push it up.
-- The file describes implementation mechanics — it will rot; raise the level.
+- The file describes implementation mechanics, so it will rot. Raise the level.
 - A cross-module reason duplicated into code at each site — duplication.
 - A structural change shipped without updating an AGENTS.md it invalidated.
 - Behavior documented here that belongs in an interface or field comment.
@@ -84,8 +84,8 @@ Don't create one for a leaf utility, an internal helper, or anything not meant t
 
 - A tutorial on internals. Those belong in AGENTS.md or code comments.
 - A changelog or version history.
-- A repetition of interface comments. Link to them; don't copy.
-- A place for implementation rationale — that is AGENTS.md's job.
+- A repetition of interface comments. Link to them. Don't copy.
+- A place for implementation rationale, which is AGENTS.md's job.
 
 ### README.md maintenance
 
@@ -105,6 +105,6 @@ Update when the public API changes, when a new constraint is added, or when a us
 
 ## Brownfield Work
 
-When work touches an existing meaningful module, check whether the nearest module root already has an AGENTS.md. If it does not, offer to create one with only the facts learned from the current change. If responsibility moves, a public API changes, or a cross-module rule appears, update the nearest AGENTS.md when it is in scope; otherwise offer that update as the next local step. Keep the offer small and concrete, tied to the module you just inspected.
+When work touches an existing meaningful module, check whether the nearest module root already has an AGENTS.md. If it does not, offer to create one with only the facts learned from the current change. If responsibility moves, a public API changes, or a cross-module rule appears, update the nearest AGENTS.md when it is in scope. Otherwise offer that update as the next local step. Keep the offer small and concrete, tied to the module you just inspected.
 
 See `references/examples.md` for backend and frontend examples of both files.

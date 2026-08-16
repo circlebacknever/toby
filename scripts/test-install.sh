@@ -1,73 +1,168 @@
 #!/usr/bin/env bash
-# Install the whole package into a throwaway HOME and check every target landed.
-# Touches only a temp dir, which it removes on exit. Proves the package installs
+# Install the whole package into a throwaway HOME and check what landed is right.
+# Touches only temp dirs, which it removes on exit. Proves the package installs
 # on a fresh machine without trusting prose.
+#
+# Counting files only proves something arrived. These checks compare content, so
+# a truncated copy or a stale instruction block fails here instead of on a user's
+# machine.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-EXPECTED_PER_TOOL=17
-TMP_HOME="$(mktemp -d "${TMPDIR:-/tmp}/toby-install-test.XXXXXX")"
-trap 'rm -rf "$TMP_HOME"' EXIT
 
-HOME="$TMP_HOME" CODEX_HOME="$TMP_HOME/.codex" \
-  "$ROOT/scripts/install.sh" --tool all --force >/dev/null
+# One table, read by every check below. A new tool goes here and nowhere else.
+# Fields: label | skills dir | instruction file. Both paths are relative to HOME.
+TOOLS="
+codex|.codex/skills|.codex/AGENTS.md
+claude|.claude/skills|.claude/CLAUDE.md
+copilot|.copilot/skills|.copilot/copilot-instructions.md
+kiro|.kiro/skills|.kiro/steering/toby-instructions.md
+"
+
+tool_rows() { printf '%s\n' "$TOOLS" | grep -v '^[[:space:]]*$'; }
+
+EXPECTED_PER_TOOL="$(find "$ROOT/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')"
+TOOL_COUNT="$(tool_rows | wc -l | tr -d ' ')"
+EXPECTED_TOTAL=$(( EXPECTED_PER_TOOL * TOOL_COUNT ))
+
+TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/toby-install-test.XXXXXX")"
+trap 'rm -rf "$TMP_ROOT"' EXIT
 
 fail=0
 
-check_count() {
-  local label="$1" dir="$2"
-  local count=0
-  if [[ -d "$dir" ]]; then
-    count="$(find "$dir" -name SKILL.md | wc -l | tr -d ' ')"
-  fi
+pass() { printf 'ok   %-9s %s\n' "$1" "$2"; }
+flunk() { printf 'FAIL %-9s %s\n' "$1" "$2"; fail=1; }
+
+install_into() {
+  local home="$1"
+  shift
+  mkdir -p "$home"
+  HOME="$home" CODEX_HOME="$home/.codex" "$ROOT/scripts/install.sh" "$@"
+}
+
+# The instruction block as base/toby.md defines it, which is what every
+# installed instruction file must carry verbatim.
+base_block() { cat "$ROOT/base/toby.md"; }
+
+installed_block() {
+  python3 - "$1" <<'PY'
+import re, sys
+from pathlib import Path
+text = Path(sys.argv[1]).read_text()
+match = re.search(
+    r"<!-- BEGIN TOBY INSTRUCTIONS -->\n?(.*?)\n?<!-- END TOBY INSTRUCTIONS -->", text, re.S
+)
+if not match:
+    raise SystemExit(1)
+print(match.group(1).strip())
+PY
+}
+
+# --- 1. fresh install ---------------------------------------------------------
+
+FRESH="$TMP_ROOT/fresh"
+install_into "$FRESH" --tool all --force >/dev/null
+
+while IFS='|' read -r label skills_rel instr_rel; do
+  dir="$FRESH/$skills_rel"
+  instr="$FRESH/$instr_rel"
+
+  count=0
+  [[ -d "$dir" ]] && count="$(find "$dir" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')"
   if [[ "$count" -ne "$EXPECTED_PER_TOOL" ]]; then
-    printf 'FAIL %-8s %s SKILL.md files (want %s) in %s\n' "$label" "$count" "$EXPECTED_PER_TOOL" "$dir"
-    fail=1
+    flunk "$label" "$count skills installed, want $EXPECTED_PER_TOOL"
   else
-    printf 'ok   %-8s %s skills\n' "$label" "$count"
-  fi
-}
-
-check_file() {
-  local label="$1" path="$2"
-  if [[ ! -f "$path" ]]; then
-    printf 'FAIL %-8s missing instruction file %s\n' "$label" "$path"
-    fail=1
-    return
+    pass "$label" "$count skills"
   fi
 
-  if grep -q '<!-- BEGIN TOBY INSTRUCTIONS -->' "$path"; then
-    printf 'ok   %-8s instruction marker present\n' "$label"
+  # Every installed skill must be byte-identical to the repo copy.
+  if [[ -d "$dir" ]] && diff -r "$ROOT/skills" "$dir" >/dev/null 2>&1; then
+    pass "$label" "skill contents match the repo"
   else
-    printf 'FAIL %-8s instruction marker missing in %s\n' "$label" "$path"
-    fail=1
+    flunk "$label" "installed skills differ from $ROOT/skills"
   fi
-}
 
-check_count codex   "$TMP_HOME/.codex/skills"
-check_count claude  "$TMP_HOME/.claude/skills"
-check_count copilot "$TMP_HOME/.copilot/skills"
-check_count kiro    "$TMP_HOME/.kiro/skills"
+  if [[ ! -f "$instr" ]]; then
+    flunk "$label" "missing instruction file $instr_rel"
+  elif ! grep -q '<!-- BEGIN TOBY INSTRUCTIONS -->' "$instr"; then
+    flunk "$label" "instruction marker missing in $instr_rel"
+  elif ! diff <(installed_block "$instr") <(base_block) >/dev/null 2>&1; then
+    flunk "$label" "instruction block in $instr_rel is out of sync with base/toby.md"
+  else
+    pass "$label" "instruction block matches base/toby.md"
+  fi
 
-check_file codex   "$TMP_HOME/.codex/AGENTS.md"
-check_file claude  "$TMP_HOME/.claude/CLAUDE.md"
-check_file copilot "$TMP_HOME/.copilot/copilot-instructions.md"
-check_file kiro    "$TMP_HOME/.kiro/steering/toby-instructions.md"
+done < <(tool_rows)
 
-kiro_steering="$TMP_HOME/.kiro/steering/toby-instructions.md"
+kiro_steering="$FRESH/.kiro/steering/toby-instructions.md"
 if [[ -f "$kiro_steering" ]] && grep -q '^inclusion: always$' "$kiro_steering"; then
-  printf 'ok   kiro     steering uses inclusion: always\n'
+  pass kiro "steering uses inclusion: always"
 else
-  printf 'FAIL kiro     steering missing inclusion: always\n'
-  fail=1
+  flunk kiro "steering missing inclusion: always"
 fi
 
-total="$(find "$TMP_HOME" -path '*/skills/toby-*/SKILL.md' | wc -l | tr -d ' ')"
-if [[ "$total" -ne 68 ]]; then
-  printf 'FAIL total    %s SKILL.md files across all tools (want 68)\n' "$total"
-  fail=1
+total="$(find "$FRESH" -path '*/skills/toby-*/SKILL.md' | wc -l | tr -d ' ')"
+if [[ "$total" -ne "$EXPECTED_TOTAL" ]]; then
+  flunk total "$total skill files across all tools, want $EXPECTED_TOTAL"
 else
-  printf 'ok   total    68 skill files across four tools\n'
+  pass total "$EXPECTED_TOTAL skill files across $TOOL_COUNT tools"
+fi
+
+# --- 2. re-install without --force must refuse -------------------------------
+# README promises an existing toby-* stays put unless forced. Untested, that
+# promise is the one that quietly overwrites someone's work.
+
+if install_into "$FRESH" --tool claude >/dev/null 2>&1; then
+  flunk safety "re-install without --force overwrote existing skills"
+else
+  pass safety "re-install without --force refuses"
+fi
+
+# --- 3. surrounding text in an instruction file survives ----------------------
+
+MERGE="$TMP_ROOT/merge"
+mkdir -p "$MERGE/.claude"
+cat >"$MERGE/.claude/CLAUDE.md" <<'EOF'
+# My own notes
+
+Keep this line.
+
+<!-- BEGIN TOBY INSTRUCTIONS -->
+stale content that must be replaced
+<!-- END TOBY INSTRUCTIONS -->
+
+Keep this trailing line too.
+EOF
+
+install_into "$MERGE" --tool claude --force >/dev/null
+
+merged="$MERGE/.claude/CLAUDE.md"
+if grep -q 'Keep this line.' "$merged" && grep -q 'Keep this trailing line too.' "$merged"; then
+  pass merge "text around the marker block survives"
+else
+  flunk merge "install destroyed text outside the marker block"
+fi
+
+if grep -q 'stale content that must be replaced' "$merged"; then
+  flunk merge "stale block content was left in place"
+elif diff <(installed_block "$merged") <(base_block) >/dev/null 2>&1; then
+  pass merge "marker block updated to base/toby.md"
+else
+  flunk merge "marker block does not match base/toby.md"
+fi
+
+# --- 4. a file with no marker block is not touched without --force ------------
+
+NOMARK="$TMP_ROOT/nomark"
+mkdir -p "$NOMARK/.claude"
+printf 'user content, no toby marker\n' >"$NOMARK/.claude/CLAUDE.md"
+
+if install_into "$NOMARK" --tool claude >/dev/null 2>&1; then
+  flunk safety "install appended to an unmarked file without --force"
+elif [[ "$(cat "$NOMARK/.claude/CLAUDE.md")" == "user content, no toby marker" ]]; then
+  pass safety "unmarked instruction file left untouched"
+else
+  flunk safety "unmarked instruction file was modified"
 fi
 
 if [[ "$fail" -ne 0 ]]; then

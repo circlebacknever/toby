@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// check-single-html.mjs — the rote pass on a one-file game. it does not judge taste; it catches the
+// check-single-html.mjs — the rote pass on a one-file game. it does not judge taste. it catches the
 // three bugs that ship a dead screen and waste a playtest: a syntax error, a handler wired to an id
 // that never existed, and a stray external <script> that breaks the open-by-double-click promise.
 //

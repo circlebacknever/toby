@@ -29,7 +29,7 @@ Multiplied across thirty services and fifty endpoints, this pattern leaks:
 - Lazy-loading rules (every caller knows to touch `line_items` before commit).
 - Query construction syntax (every caller writes SQLAlchemy filters).
 - Detachment semantics (returned `Order` is bound to a session that just
-  closed; using it later blows up).
+  closed, and using it later blows up).
 
 When the team moves from SQLAlchemy to SQLModel, or splits writes off to a
 separate DB, every service is touched.
@@ -64,7 +64,7 @@ replica is the repository's choice. Domain `Order` is a plain class. The old one
 was a session-bound proxy that explodes if you touch it after commit.
 
 This is the canonical example of pulling complexity downward at the
-data layer. The repository is more callers than authors; let it absorb the
+data layer. The repository is more callers than authors, so let it absorb the
 hard part.
 
 ---
@@ -88,9 +88,9 @@ public interface UserRepository {
 
 Separate general from special, remove special cases. Each new
 caller's filter combination becomes a new method. The interface grows
-unbounded; two finders that differ in argument order do almost the same query;
-some are unused but no one will delete them. And the meaning of
-"active" is encoded in every caller — the day "active" gets redefined (excludes
+unbounded. Two finders that differ in argument order do almost the same query,
+and some are unused but no one will delete them. The meaning of
+"active" is encoded in every caller. The day "active" gets redefined (excludes
 suspended? excludes pending verification?) is the day every site needs review.
 
 A general-purpose interface compresses the cluster:
@@ -113,15 +113,15 @@ public record UserQuery(
 ```
 
 One general method covers every existing finder and the next ten that haven't
-been requested. The "active" definition stops being encoded at call sites:
-either `active` is a real database column with a clear definition, or the
-repository computes it from other fields — either way, it's one decision in
+been requested. The "active" definition stops being encoded at call sites.
+Either `active` is a real database column with a clear definition, or the
+repository computes it from other fields. Either way, it's one decision in
 one place.
 
 The questions to check before doing this (the somewhat-general-purpose
 framing): does the query object's interface make the common case easy?
 (`UserRepository.find(new UserQuery(orgId=org))` should be simple to write.)
-Does it avoid becoming a god interface? (`UserQuery` is for users — don't
+Does it avoid becoming a god interface? (`UserQuery` is for users, so don't
 extend it to orders.) Both pass.
 
 ---
@@ -201,9 +201,9 @@ const order = await db.transaction(async (tx) => {
 ```
 
 Every method along the chain takes a `tx` argument it doesn't use directly
-except to pass to the next call. This is a pass-through variable (the different-layer check),
-and it is an unusually costly one — adding the next repository method means
-adding `tx` to every call site that ever touches it.
+except to pass to the next call. This is a pass-through variable (the
+different-layer check), and it is an unusually costly one. Adding the next
+repository method means adding `tx` to every call site that ever touches it.
 
 Two fixes depending on where the responsibility belongs:
 
@@ -222,7 +222,7 @@ async function placeOrder(input: NewOrder): Promise<Order> {
 ```
 
 If the *controller* owns transaction scoping (less common), the service still
-shouldn't accept `tx`; it should be transparent. Either way, `tx` does not
+shouldn't accept `tx`. It should be transparent. Either way, `tx` does not
 appear in the signatures of `placeOrder` or repository methods.
 
 ---
@@ -242,7 +242,7 @@ for o in orders:
 The "interface" of `Order` looks like a normal object. The actual contract
 includes which relations the ORM happens to lazy-load and how many queries
 that produces — a hidden, per-call performance interface. This is the depth
-check failing: callers must know what's expensive, and the cost is
+check failing. Callers must know what's expensive, and the cost is
 not visible in any signature.
 
 Two ways to make the interface's cost visible:
@@ -250,12 +250,12 @@ Two ways to make the interface's cost visible:
 - **Make eagerness explicit at the call.** The repo accepts a small spec of
   what to load: `order_repo.recent_for_customer(customer_id, limit=50,
   include=[Order.shipping_address, Order.line_items, LineItem.product])`. The
-  hidden N+1 is now an explicit join; callers that don't ask don't get the
+  hidden N+1 is now an explicit join, and callers that don't ask don't get the
   cost.
 - **Return a purpose-built shape.** If the use case is "list orders with
   product names," the repo provides
-  `order_repo.list_for_display(customer_id)` returning a flat dataclass that
-  contains exactly the fields needed, produced by one query. Callers cannot
+  `order_repo.list_for_display(customer_id)`. It returns a flat dataclass with
+  exactly the fields needed, produced by one query. Callers cannot
   trigger N+1 by reading the wrong field because the field is just a column
   on the result.
 
@@ -267,12 +267,13 @@ precondition documented nowhere.
 
 ## Cross-cutting notes
 
-- **Migration knowledge** belongs in one module. A column rename touched in
-  twelve services because each constructs raw SQL or hardcodes a column alias
-  is the same leakage pattern as Example 3.
+- **Migration knowledge** belongs in one module. A column rename gets touched in
+  twelve services when each constructs raw SQL or hardcodes a column alias.
+  That is the same leakage pattern as Example 3.
 - **Caching the repository** is properly Example 1 from `caching.md`. The
   service never owns it. The repository is the natural home for read-through
   caching because it already owns the data-access contract.
 - **Read models versus write models** become natural splits when one query
   shape is wildly different from the entity shape (reporting, dashboards).
-  That's a deliberate split per the split/merge check; most apps don't need it.
+  That's a deliberate split per the split/merge check, and most apps don't need
+  it.

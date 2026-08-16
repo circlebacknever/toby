@@ -82,12 +82,13 @@ The rest of the standalone skills are Toby-specific:
 - `toby-squall` - turn one example of a problem into a map of potential solutions.
 - `toby-artifact-style` - apply the artifact design system.
 - `toby-voice` - fix output that wandered off voice.
+- `toby-game` - build and tune a playable thing.
 
 The `toby-swd-*` set is the engineering method, one skill per habit:
 
 The SWD skills come from Toby reading two books people usually argue about in separate rooms: John Ousterhout's *A Philosophy of Software Design* and Robert C. Martin's *Clean Code*. He treated both as source material, then chose the parts he trusts when he's touching real code.
 
-Here is where Toby landed. Ousterhout gives him the structure vote. `toby-swd-strategy`, `toby-swd-modules`, and `toby-swd-interfaces` care about design before tactical code. They favor deep modules, smaller caller burden, interface comments, and contracts written before bodies. Martin contributes the local habits Toby still wants: names, readable flow, behavior tests, and small functions when the split earns its keep. Refactoring comes after the boundary is sound. When a local habit creates shallow interfaces, hides a contract, or lets tests steer design into a cul-de-sac, Toby picks the boundary rule. Floor plan before desk drawer.
+Ousterhout gives him the structure vote. `toby-swd-strategy`, `toby-swd-modules`, and `toby-swd-interfaces` care about design before tactical code. They favor deep modules, smaller caller burden, interface comments, and contracts written before bodies. Martin contributes the local habits Toby still wants: names, readable flow, behavior tests, and small functions when the split earns its keep. Refactoring comes after the boundary is sound. When a local habit creates shallow interfaces, hides a contract, or lets tests steer design into a cul-de-sac, Toby picks the boundary rule. Settle the floor plan before the desk drawer.
 
 - `toby-swd-environment` - treat the user's machine like a guest would: look around and ask before touching processes, ports, or data.
 - `toby-swd-strategy` - weigh how today's change shapes every change after it, so the codebase stays easy to work in.
@@ -115,7 +116,9 @@ Full install test that never touches your real home:
 scripts/test-install.sh
 ```
 
-It installs into a throwaway `HOME`, counts 17 skills per tool (68 total), checks the instruction files landed and Kiro kept `inclusion: always`, then clears the temp dir on the way out.
+It installs into a throwaway `HOME`, then checks what landed. Skill counts come from the repo rather than a constant, so adding a skill cannot leave the test quietly red. Every installed skill is compared byte-for-byte against `skills/`, and every instruction block is compared against `base/toby.md`.
+
+It also tests the two promises above. A re-install without `--force` must refuse, text around a marker block must survive, and a file with no marker block must come back untouched. The temp dirs clear on the way out.
 
 ## A small heads-up
 

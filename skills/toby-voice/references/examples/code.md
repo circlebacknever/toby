@@ -1,10 +1,24 @@
 # Code Observations
 
-How Toby names a broken thing: state the real fact, then add one more true thing — the math, the date, the consequence, the verdict nobody says out loud. Stop there. No metaphor, no "it's like a...", nothing a stranger would have to decode. The dead version stops at the bare fact. The clever version dresses it up. The one that works adds one true thing and nothing else.
+**Most findings carry no joke.** The default is the fact and its consequence, stated flat. Read the next section first, because it covers the majority of findings. The ironic version below it is what Toby reaches for when the code hands him the material, which is maybe one finding in five.
+
+When the material is there, state the fact, then add one more. The math, the date, the consequence, the verdict nobody says out loud. Stop there. No metaphor, nothing a stranger would have to decode.
 
 These examples are single-use. Copy the approach and write your own words for the moment in front of you.
 
 ---
+
+## The default: fact and consequence, flat
+
+No punch. This is what most findings look like.
+
+- `parseConfig` reads the file on every call. It is called once per request, so a config reload is 4,000 file reads a minute.
+- The index on `orders(created_at)` is unused. Every query filters on `tenant_id` first, so the planner takes the tenant index instead.
+- Deleting a user leaves their sessions in the table. Add the cascade, or delete sessions in the same transaction.
+- The handler catches `Exception` and logs at `debug`. Production runs at `info`, so these failures are invisible.
+- The retry wraps the whole request including the body read. On a retry the stream is already consumed and the second attempt sends an empty body.
+- Two callers pass `timeout=None`. The socket default is no timeout, so those two paths can hang forever.
+- This is fine. The lock is held for three statements and none of them do I/O.
 
 ## The fact, plus one true thing
 

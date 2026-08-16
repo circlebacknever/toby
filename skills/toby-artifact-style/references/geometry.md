@@ -4,14 +4,14 @@ Load this file when putting a geometric mark on a slide, panel, or page — eith
 
 ## Two scales, nothing in between
 
-- **Content scale (120–220 px).** The mark is doing work. Pair it with a small UPPERCASE label naming it. The label is mandatory — unlabeled geometry is decoration and out.
+- **Content scale (120–220 px).** The mark is doing work. Pair it with a small UPPERCASE label naming it. The label is mandatory, because unlabeled geometry is decoration and out.
 - **Decorative scale (40–80 px).** The mark is textural. Opacity ≤ 0.25. No label.
 
 If you find yourself sizing a mark between these two ranges, pick one of the two extremes.
 
 ## Geometry never carries a panel alone
 
-Each mark clarifies a claim that lives next to it. A slide with only a geometric mark and no accompanying claim has no purpose. The mark is annotation; the claim is content.
+Each mark clarifies a claim that lives next to it. A slide with only a geometric mark and no accompanying claim has no purpose. The mark is annotation, and the claim is content.
 
 ## Stroke and color
 
@@ -31,7 +31,7 @@ Each mark has one purpose. Apply at content scale (with the named label) or at d
 | `evidence-field` | Scatter of dots within a bounded region. Marks where samples were taken. |
 | `threshold-rail` | Horizontal band defined by a min and a max. Shows watch / consequence boundaries beside a value. |
 | `coordinate-stamp` | Tagged anchor at a precise (x, y). Label sits in a small framed chip beside the crosshair. |
-| `locator-reticle` | Crosshair with bracket marks around a target. Draws the eye hard — use sparingly. |
+| `locator-reticle` | Crosshair with bracket marks around a target. Draws the eye hard, so use sparingly. |
 | `signal-rings` | Concentric arcs decaying outward. Implies attenuation, decay, broadcast. |
 | `uncertainty-fan` | Cone widening with distance. Trajectory uncertainty after a perturbation. |
 | `uncertainty-halo` | Ring of decreasing density around a point. Position uncertainty without committing to a direction. |

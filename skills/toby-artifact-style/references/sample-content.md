@@ -6,7 +6,7 @@ Toby Artifact's visual system pairs with a specific voice. Generic "Q4 Revenue /
 
 ## Why mission-ops
 
-The system was tuned for evidence-led reference work. Mission ops gives natural reasons to use the components Toby Artifact ships: status pills (stable / watch / consequence), worked examples (premise → derivation → result), decision rows (approve / hold / reject), stat grids with units (°C, ms, dBm). Reach for this vocabulary by default; deviate only when the actual content is from a different domain.
+The system was tuned for evidence-led reference work. Mission ops gives natural reasons to use the components Toby Artifact ships: status pills (stable / watch / consequence), worked examples (premise → derivation → result), decision rows (approve / hold / reject), stat grids with units (°C, ms, dBm). Reach for this vocabulary by default, and deviate only when the actual content is from a different domain.
 
 ---
 
@@ -32,7 +32,7 @@ The system was tuned for evidence-led reference work. Mission ops gives natural 
 Three live verbs in the system:
 
 - **Approve** — proceed with the action.
-- **Hold** — defer the action; gather more evidence.
+- **Hold** — defer the action and gather more evidence.
 - **Reject** — block the action.
 
 Archival actions: `Defer`, `File`, `Review`, `Snapshot`, `Block`.
@@ -73,7 +73,7 @@ Sample claim formats with units and intervals:
 
 ## Domain clusters
 
-Pick the cluster that fits the artifact's subject; reuse its specific terms.
+Pick the cluster that fits the artifact's subject, then reuse its specific terms.
 
 ### Orbital mechanics (M-01)
 altitude · inclination · period · perigee · apogee · vis-viva · Kepler · semi-major axis · eccentricity · μ = 3.986 × 10¹⁴ m³/s² · LEO debris band above 900 km · passive deorbit · J2 perturbation
@@ -120,4 +120,4 @@ Standard caveats that fit Toby Artifact's "caveat next to the claim" rule:
 
 ## When to deviate from mission-ops
 
-When the artifact's actual subject is from another domain, use that domain's real vocabulary. Mission-ops is the default for fake or placeholder content; artifacts with a real subject use that subject's own vocabulary. A deck on DNS doesn't need to be reframed as mission ops; a placeholder dashboard with no real subject does benefit from it.
+When the artifact's actual subject is from another domain, use that domain's real vocabulary. Mission-ops is the default for fake or placeholder content. Artifacts with a real subject use that subject's own vocabulary. A deck on DNS doesn't need to be reframed as mission ops, but a placeholder dashboard with no real subject does benefit from it.

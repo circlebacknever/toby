@@ -1,10 +1,10 @@
 # Worked Examples — Web SPAs (React, Solid, Svelte)
 
-Interfaces in web SPAs are mostly invisible at compile time and brutal at
+Interfaces in web SPAs are mostly invisible at compile time and fail at
 runtime. A hook's return shape, a component's prop contract, and a store
-slice's method surface are read by every consumer; getting them wrong costs
+slice's method surface are read by every consumer. Getting them wrong costs
 the same as a bad backend API. A public API's blast radius crosses company
-lines; this one stays inside your own team.
+lines, while this one stays inside your own team.
 
 These examples walk the comment test on the shapes you'll touch most.
 
@@ -155,7 +155,7 @@ Interface comment for `DestructiveConfirmDialog`:
 > esc and overlay-click are enabled and treated as cancel.
 
 Three sentences. No prop combinations to memorize. The destructive-confirm
-intent owns the safe defaults (focus on cancel, confirm button styled red);
+intent owns the safe defaults (focus on cancel, confirm button styled red), so
 callers can't accidentally produce an unsafe variant. Common-case caller
 burden drops from eleven decisions to four.
 
@@ -165,7 +165,7 @@ the intent's invariants.
 
 This is the same design-it-twice pattern as the `UserCard` case in
 `examples.md`. The mistake to avoid is treating "named intents over a core"
-as automatic — only do it when the call sites really are three distinct
+as automatic. Only do it when the call sites are three distinct
 intents. Three sets of prop combinations that happen to recur do not qualify.
 
 ---
@@ -201,7 +201,7 @@ The comment is long because the "interface" is `setX` for each field, but
 the real operations the cart supports (add an item, apply a coupon, pick
 shipping) carry invariants the store doesn't enforce. Every caller now owns
 those invariants. The store's interface and its implementation have the
-same shape: it is the canonical shallow module.
+same shape, which makes it the canonical shallow module.
 
 Failure named: the slice exposes the state shape and leaves the operations to
 callers. Invariants live in callers.
@@ -235,7 +235,7 @@ Comment:
 > failure.
 
 Three sentences. No "callers must" anywhere. Invariants live in one place,
-where they can be tested once. The store is now deep — the interface has
+where they can be tested once. The store is now deep. The interface has
 six operations expressing intent, but the implementation owns dedup,
 validation, total computation, coupon validity, async network calls during
 `applyCoupon`, and rollback semantics.
@@ -318,9 +318,9 @@ renders against `filteredItems`. Keyboard, ARIA, open/close, filter, and
 focus management are all internal. No "callers must" — the hook owns the
 state and exposes it read-only for rendering.
 
-The depth gain is substantial: the implementation runs to a few hundred
+The depth gain is substantial. The implementation runs to a few hundred
 lines (intelligently handling Tab vs Enter, IME composition events, screen
-reader announcements, Home/End navigation, etc.), and the caller pays for
+reader announcements, Home/End navigation, and so on), and the caller pays for
 none of that complexity in their interface comment.
 
 ---
@@ -336,6 +336,6 @@ none of that complexity in their interface comment.
 | Wrap effect-based logic the same way in every component | A custom hook/composable/rune for that effect |
 | Pass children-via-props with rigid slots | `children` plus a small subcomponent API (compound components) |
 
-The pattern is consistent: when the comment has to describe what the caller
-will do with the return values, the interface is too low-level — the module
+The pattern is consistent. When the comment has to describe what the caller
+will do with the return values, the interface is too low-level. The module
 should be doing more of the work.

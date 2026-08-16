@@ -1,8 +1,8 @@
 # Worked Examples — Backend APIs (Java, Go, TypeScript)
 
-Distributed systems have one defining property: things fail. The complexity
+In distributed systems, things fail. The complexity
 question is where in the system each kind of failure gets absorbed, and at
-what cost. The error ladder applies directly; performance design at the
+what cost. The error ladder applies directly. Performance design at the
 network layer is mostly about keeping the failure modes bounded.
 
 ---
@@ -27,9 +27,9 @@ async function callApi(path: string, opts?: RequestOpts): Promise<any> {
 
 Every caller now handles every HTTP status. Callers retry on their own,
 treat 503 as a real "service is down" failure, surface 500 to the user.
-The error ladder isn't applied; everything propagates uniformly.
+The error ladder isn't applied, so everything propagates uniformly.
 
-The HTTP status codes already carry a category signal — use it:
+The HTTP status codes already carry a category signal, so use it:
 
 | Status range | Class | Handling |
 |---|---|---|
@@ -72,7 +72,7 @@ async function callApi<T>(path: string, opts?: RequestOpts): Promise<T> {
 What this absorbs (rung 2, mask at lowest level): transient 5xx, 408, 429,
 network blips, and the timeout abort. What it surfaces: 4xx (caller did
 something wrong) and sustained 5xx (real outage). The thrown `HttpError`
-carries a `permanent` flag so callers don't re-retry; the flag is set in one
+carries a `permanent` flag so callers don't re-retry. The flag is set in one
 place, which spares every call site from re-deriving the categorization.
 
 Automatic retry is safe only when repeating the request is safe — an
@@ -80,7 +80,7 @@ idempotent method (GET, PUT, DELETE) or a request carrying an idempotency key
 the server dedupes on. Retrying a non-idempotent POST after a 5xx or a timeout
 can create the resource twice, because the first attempt may have committed
 before the response was lost. Scope the wrapper to safe methods, or require
-the key. And `res.text()` rides along for logging at the boundary; a handler
+the key. And `res.text()` rides along for logging at the boundary. A handler
 replying to an external caller maps it to a category and a safe message first,
 since a downstream body can carry stack traces or query text (rung 3).
 
@@ -102,7 +102,7 @@ gRPC defines explicit retryability via status codes:
 | `RESOURCE_EXHAUSTED` | Only when the server signals throttling, with backoff |
 | `ABORTED` (transaction conflict) | Retry the whole transaction with backoff, after re-reading state |
 | `INTERNAL` | No — signals a broken invariant, so a bare retry hides a bug |
-| `INVALID_ARGUMENT`, `NOT_FOUND`, `PERMISSION_DENIED`, etc. | No — caller error |
+| `INVALID_ARGUMENT`, `NOT_FOUND`, `PERMISSION_DENIED`, and the rest | No — caller error |
 
 A Go server-to-server client:
 
@@ -134,15 +134,15 @@ func retryGRPC[T any](ctx context.Context, maxAttempts int, fn func(context.Cont
 The retryability decision lives in one place (`isRetryableGRPC`), which
 reads the gRPC status code and applies the table above.
 
-Per-call-site retry logic is where this goes wrong: each site writes its
+Per-call-site retry logic is where this goes wrong. Each site writes its
 own retry-or-not check, gets it slightly wrong, misses the deadline
 propagation, double-retries on `ABORTED`. The ladder collapses into one
 helper, masking the transient cases. Permanent errors bubble up where the
 caller can act.
 
-Deadline propagation matters: `ctx` carries a deadline, and `sleepCtx`
-returns early if it expires during backoff, so the loop stops retrying once
-the deadline is gone; it won't sleep past it. To also skip an attempt that
+Deadline propagation matters. `ctx` carries a deadline, and `sleepCtx`
+returns early if it expires during backoff. The loop stops retrying once
+the deadline is gone, and it won't sleep past it. To also skip an attempt that
 can't finish in time, compare `ctx`'s remaining time against the next backoff
 before the call. This is the kind of complexity that lives in the
 helper, which is what keeps it out of 50 call sites.
@@ -161,8 +161,8 @@ async function getRecommendations(userId: string): Promise<Recommendation[]> {
 
 No timeout. The downstream service is slow today: 30 seconds, against a
 usual 50ms. This service's threads/event-loop hang on
-those calls. The user's page-load takes 30 seconds. Cascading failure:
-this service now appears slow to *its* callers, which back up, which
+those calls. The user's page-load takes 30 seconds. The failure cascades.
+This service now appears slow to *its* callers, which back up, which
 ... and so on.
 
 Timeout choice is a performance design decision. The cheap design-time
@@ -189,11 +189,11 @@ worse than "give up after 5 seconds."
 For non-critical dependencies (the recommendations panel on a page that
 also loads the actual content), the right move is often "render the page
 without it; fetch in the background; insert when it arrives." This is a
-design move: it defines the recommendation's slowness out of the user's
+design move. It defines the recommendation's slowness out of the user's
 critical path entirely, so the timeout never even comes into play.
 
 This is the same shape as `examples.md` Example 1 ("define the error out
-of existence") applied to latency: the most reliable way to handle a slow
+of existence") applied to latency. The most reliable way to handle a slow
 dependency is to remove it from your critical path.
 
 ---
@@ -212,22 +212,22 @@ Libraries: `resilience4j` (Java), `gobreaker` (Go), `cockatiel` (TypeScript).
 When does the complexity pay for itself?
 
 **Earned**:
-- The downstream's failure mode is "slow" — calls hang and burn the full
-  timeout. A retry-and-timeout policy alone causes threads to pile up; the
+- The downstream's failure mode is "slow", so calls hang and burn the full
+  timeout. A retry-and-timeout policy alone causes threads to pile up, and the
   breaker prevents the pile-up by short-circuiting calls when the downstream
   is unhealthy.
 - The downstream is called frequently, so the breaker has signal to act
   on.
-- Backpressure has business value: serving "I can't reach recommendations
-  right now" immediately is better than holding the user's page for the
-  timeout duration.
+- Backpressure has business value, because serving "I can't reach
+  recommendations right now" immediately is better than holding the user's
+  page for the timeout duration.
 
 **Not earned**:
 - Low-traffic call (a daily cron job to a partner API). The breaker has
-  no recent-failure signal; you're paying complexity for nothing.
+  no recent-failure signal, so you're paying complexity for nothing.
 - The retry policy already handles the failure mode adequately. Adding a
   breaker on top is duplicated machinery.
-- The downstream is "fail-fast" — a quick error from an unhealthy
+- The downstream is "fail-fast", so a quick error from an unhealthy
   downstream doesn't pile up threads. A breaker prevents nothing.
 
 The mistake — adding a circuit breaker because "we should" — produces a
@@ -238,7 +238,7 @@ piece of stateful complexity that:
 - Has tuning parameters (window size, threshold, half-open timing) that
   nobody understands well enough to set correctly.
 - Hides downstream failures from operators (the breaker has tripped, so
-  calls don't appear in logs; the dashboard is misleading).
+  calls don't appear in logs and the dashboard is misleading).
 
 If you don't have *measured* evidence that a piling-up failure mode is
 hurting users today, the circuit breaker is speculative complexity.
@@ -268,7 +268,7 @@ app.post('/api/orders/import', async (req, res) => {
 500 orders means 500 sequential database round-trips. With a 2ms DB ping
 that's 1 second of network latency before any actual work. The endpoint
 takes 5 seconds. The client times out at 3. The user retries. Now there's
-contention because of the partial import. Operationally a disaster.
+contention because of the partial import.
 
 The design-time fix: a bulk path through the service down to a single
 batched insert.
@@ -286,13 +286,14 @@ async createBulk(orders: NewOrder[]): Promise<ImportOutcome[]> {
 }
 ```
 
-One round trip. The cost is bounded. The complexity gain: `insertMany`
-in the repository owns the bulk semantics — how big a batch is too big
-(chunk the input above some threshold), and what a partial failure looks
-like to the caller. The return type decides that contract: a typed outcome
-per input (created, or rejected with a reason) lets the caller act on a
-partial success; an all-or-nothing variant rejects the whole batch and names
-the row that broke it. A flat array of successes can express neither.
+One round trip. The cost is bounded. The complexity concentrates in one
+place. `insertMany` in the repository owns the bulk semantics — how big a
+batch is too big (chunk the input above some threshold), and what a partial
+failure looks like to the caller. The return type decides that contract. A
+typed outcome per input (created, or rejected with a reason) lets the caller
+act on a partial success. An all-or-nothing variant rejects the whole batch
+and names the row that broke it. A flat array of successes can express
+neither.
 
 This is the same shape as the mobile bridge example — N+1 over a network.
 The cure is bulk APIs at the boundary that crosses the network. Within
@@ -320,8 +321,8 @@ rl.Mu.Unlock()
 ```
 
 The locking discipline lives at the call sites. One handler forgets to lock
-and reads a torn value; another holds the lock across a network call and
-stalls everyone; a third takes this lock and a second one in the opposite
+and reads a torn value. Another holds the lock across a network call and
+stalls everyone. A third takes this lock and a second one in the opposite
 order and deadlocks. Every new call site is another chance to get one wrong.
 
 Concentrate the discipline inside the owner:
@@ -344,7 +345,7 @@ func (rl *RateLimiter) Allow(userID string) bool {
 Callers write `rl.Allow(userID)` and know nothing about the lock. The
 critical section is one short block — no network call inside it, one
 structure, one lock — so there's no ordering left to get wrong. Shared
-mutable state is complexity like any other: it costs least when one module
+mutable state is complexity like any other. It costs least when one module
 owns it and the rules for touching it live in one place.
 
 ---

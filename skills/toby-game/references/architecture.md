@@ -36,20 +36,20 @@ Drop `user-scalable=no` for a reading-heavy DOM game that wants pinch-zoom.
 
 Make these calls once.
 
-- **One state object.** Everything in one lowercase `G` with a single `reset()` that re-seeds and rebuilds. Keep it in module scope; a `window.*` side channel breaks headless tests.
-- **Resolve, then replay.** A pure function decides the outcome; the animation plays it back and changes nothing. The picture cannot contradict the result, and the same function tests headless.
+- **One state object.** Everything in one lowercase `G` with a single `reset()` that re-seeds and rebuilds. Keep it in module scope, because a `window.*` side channel breaks headless tests.
+- **Resolve, then replay.** A pure function decides the outcome. The animation plays it back and changes nothing. The picture cannot contradict the result, and the same function tests headless.
 - **Seed the randomness.** One seedable generator, the seed stored in the result, so a run reproduces and you can replay a bug. Keep `Math.random()` out of the resolver.
 - **Own the clock.** Clamp the frame delta so a backgrounded tab does not detonate the sim, step outcomes at a fixed rate so replays match, and give the player a speed knob. Guard the loop so one thrown error does not blank the screen.
-- **Integrate so it cannot blow up.** Sub-step a stiff force so one big push across a frame does not inject energy and fling a body off-screen; match the scheme to the system (symplectic for mutually attracting bodies, small explicit steps for a swarm of test particles); cap or soften a force near a singularity; clamp a runaway speed. A blow-up is a free win, and any search will take it before it ever learns the real thing.
-- **Name the phases.** A readable string (`deploy`, `work`, `flee`) drives sim and camera; the camera tracks the moving actor so focus does not teleport on a phase flip.
+- **Integrate so it cannot blow up.** Sub-step a stiff force so one big push across a frame does not inject energy and fling a body off-screen. Match the scheme to the system (symplectic for mutually attracting bodies, small explicit steps for a swarm of test particles). Cap or soften a force near a singularity. Clamp a runaway speed. A blow-up is a free win, and any search will take it before it ever learns the real thing.
+- **Name the phases.** A readable string (`deploy`, `work`, `flee`) drives sim and camera. The camera tracks the moving actor so focus does not teleport on a phase flip.
 - **Map input from the real camera.** Screen-to-world comes from the actual camera rig — offsets along its axes, intersect the ground — never an approximate frustum guess.
-- **Make state changes total.** Anything that should happen once nulls its own callback first; every transition resets what it depends on; retire a verb and re-grep its call sites.
-- **Own the meshes.** Build each once; dispose geometry, material, and label textures on teardown; null the slot.
-- **Go data-oriented only where it earns it.** Thousands of particles want flat typed arrays and one draw call; a few characters do not.
+- **Make state changes total.** Anything that should happen once nulls its own callback first. Every transition resets what it depends on. Retire a verb and re-grep its call sites.
+- **Own the meshes.** Build each once. Dispose geometry, material, and label textures on teardown. Null the slot.
+- **Go data-oriented only where it earns it.** Thousands of particles want flat typed arrays and one draw call. A few characters do not.
 
 ## How real to make it
 
-Match the model to the system: a real integrator for something physical, a rate or a curve for something statistical, a few rules per agent for something behavioral. The same subject moves between models by intent — a market as a backdrop number is statistical; a market whose point is the crash is behavioral, because the crash has to emerge from the agents. Pick the model that keeps the surprise alive, then say what you faked in a comment, the way the games do ("physics is vibes-based and labeled as such").
+Match the model to the system: a real integrator for something physical, a rate or a curve for something statistical, a few rules per agent for something behavioral. The same subject moves between models by intent. A market as a backdrop number is statistical. A market whose point is the crash is behavioral, because the crash has to emerge from the agents. Pick the model that keeps the surprise alive, then say what you faked in a comment, the way the games do ("physics is vibes-based and labeled as such").
 
 ## Sound, and saving
 

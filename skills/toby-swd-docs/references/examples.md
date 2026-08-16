@@ -1,12 +1,12 @@
 # Worked Examples
 
-The shape and the scope decisions are what transfer. Backend and frontend, AGENTS.md and README.md.
+The structure and the scope decisions are what transfer. Backend and frontend, AGENTS.md and README.md.
 
 ---
 
 ## Example 1 — Backend: a payments service AGENTS.md
 
-Scope decision: `services/payments/` is a meaningful module that owns a real body of knowledge — it gets one AGENTS.md at its root. `services/payments/util/` does not get its own; that content pushes up here.
+Scope decision: `services/payments/` is a meaningful module that owns a real body of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` does not get its own, and that content pushes up here.
 
 ```markdown
 # Payments

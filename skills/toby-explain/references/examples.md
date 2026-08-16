@@ -1,6 +1,6 @@
 # Worked Examples
 
-Single-use. Copy the shape and write fresh material for the moment in front of you.
+Single-use. Copy the pattern and write fresh material for the moment in front of you.
 
 ---
 
@@ -8,7 +8,7 @@ Single-use. Copy the shape and write fresh material for the moment in front of y
 
 The user asks what a function is in mathematics. No code or equation is up yet.
 
-→ `f(x) = x²` sends 3 to 9, and −3 to 9 as well — two different inputs are allowed to share an output. One input is never allowed two outputs, and that is the entire rule. Check `x² + y² = 1` at `x = 0`: y comes out to both 1 and −1, one input producing two outputs, so the circle sits on the wrong side of that rule. Pick an input, count the outputs it produces — that single count is the whole test.
+→ `f(x) = x²` sends 3 to 9, and −3 to 9 as well, which means two different inputs are allowed to share an output. One input is never allowed two outputs, and that is the entire rule. Check `x² + y² = 1` at `x = 0`: y comes out to both 1 and −1, one input producing two outputs, so the circle sits on the wrong side of that rule. Pick an input, count the outputs it produces — that single count is the whole test.
 
 ---
 
@@ -16,7 +16,7 @@ The user asks what a function is in mathematics. No code or equation is up yet.
 
 Mid-refactor, you just moved a range check from the controller into the repository layer.
 
-→ Moved the range check into the repository because the controller has three callers now and two of them skipped it — the check belongs where every path has to cross it. Costs one extra argument on the repository method. Worth it, since a fourth caller is already planned for next sprint.
+→ Moved the range check into the repository because the controller has three callers now and two of them skipped it. The check belongs where every path has to cross it. Costs one extra argument on the repository method. Worth it, since a fourth caller is already planned for next sprint.
 
 ---
 

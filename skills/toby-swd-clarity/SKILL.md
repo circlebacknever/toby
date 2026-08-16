@@ -13,25 +13,25 @@ description: >-
 
 Code is read far more than it is written. The decisions you make about names, comments, and consistency compound across every future read — every debug session, every onboarding, every agent that touches this code next. Bad clarity is one of the most durable forms of complexity because it slows everything downstream while never appearing in a diff as the problem.
 
-Correct this before you start: **"Good code is self-documenting" is false.** Only signatures can be expressed in code; the behavior, side effects, units, invariants, and reasons a reader needs live in the designer's head and have no representation in the code itself. Good names reduce the need for comments; they never remove it. Treat comments as the mechanism by which abstraction is delivered. They carry the units, invariants, and reasons that have no home in the code.
+**"Good code is self-documenting" is false.** Correct that before you start. Only signatures can be expressed in code. The behavior, side effects, units, invariants, and reasons a reader needs live in the designer's head and have no representation in the code itself. Good names reduce the need for comments, but they never remove it. Treat comments as the mechanism by which abstraction is delivered. They carry the units, invariants, and reasons that have no home in the code.
 
 ## Naming
 
-Test every name by guessability: a developer who sees this name alone, with no declaration, documentation, or surrounding code, should guess what it holds or does — and what it is not. Pick the few words that capture what matters; omit the rest. A name is an abstraction.
+Test every name by guessability. A developer who sees this name alone, with no declaration, documentation, or surrounding code, should guess what it holds or does — and what it is not. Pick the few words that capture what matters, and omit the rest. Treat the name as an abstraction.
 
-Scale specificity to scope. A variable whose entire span of use fits in a few visible lines can be terse (a loop index `i`). A variable across a large span, a field, an argument, or anything exported needs a precise name. Over-specific is also a defect — an argument named `selection` for a method that works on any range misleads.
+Scale specificity to scope. A variable whose entire span of use fits in a few visible lines can be terse (a loop index `i`). A variable across a large span, a field, an argument, or anything exported needs a precise name. Over-specific is also a defect. An argument named `selection` for a method that works on any range misleads.
 
 Generic names (`data`, `value`, `result`, `status`, `flag`, `count`) are a smell when the scope is non-trivial. Acceptable only when the meaning is visible at a glance.
 
 Use names consistently: one name for one purpose, never that name for a second purpose, and the purpose narrow enough that every variable with the name behaves the same. When you need several of the same kind, keep the common root and add a distinguishing prefix (`srcBlock`, `dstBlock`). Boolean names read as predicates (`cursorVisible`, `isReady`, `hasChildren`). Every word must add information: drop redundant type or class-name words (`fileObject` → `file`), no Hungarian notation.
 
-**Hard-to-name red flag**: if no precise, intuitive, not-too-long name emerges after real effort, the thing being named probably has an unclear or mixed purpose. That is a design signal — split or rethink it, don't settle for a vague name. The signal is about the operation as a whole: a single dense expression that computes one nameable result is one abstraction even when its internal steps have no good individual names.
+**Hard-to-name red flag**: if no precise, intuitive, not-too-long name emerges after real effort, the thing being named probably has an unclear or mixed purpose. That is a design signal, so split or rethink it. Do not settle for a vague name. The signal is about the operation as a whole. A single dense expression that computes one nameable result is one abstraction, even when its internal steps have no good individual names.
 
 ## Comments
 
 Comments come in four kinds, each with its own home: interface (what a caller needs, with no internals), data-structure member (what a non-trivial field holds — units, null meaning, bounds, ownership), implementation intuition (why a non-obvious block does what it does), and cross-module (a decision spanning modules, stated once in a discoverable place and pointed to). Keep implementation detail out of the interface.
 
-An **interface comment** describes behavior, arguments, return value, side effects, exceptions, and caller preconditions — the abstraction. If it has to describe internals to be complete, the module is shallow; that is a redesign signal. Reach for the design, since better wording won't fix a leaky abstraction. Write interface comments before the implementation; they are a design tool.
+An **interface comment** describes behavior, arguments, return value, side effects, exceptions, and caller preconditions — the abstraction. If it has to describe internals to be complete, the module is shallow, and that is a redesign signal. Reach for the design, since better wording won't fix a leaky abstraction. Write interface comments before the implementation, because they are a design tool.
 
 Comment at a different level than the code. A comment pitched at the code's own level just restates it and rots in place:
 
@@ -42,19 +42,19 @@ Delete comments whose content is already obvious from the adjacent code, includi
 
 Leave these uncommented: operations the code already shows (`i++ // increment i`), restatements of the name, commented-out code, change history (git holds that), and anything the type already proves.
 
-Logs and diagnostics are a surface too: keep secrets, credentials, tokens, and personal data out of them, and out of source. Naming a field sensitive in a comment is worth more than the value in a log line.
+Logs and diagnostics are a surface too. Keep secrets, credentials, tokens, and personal data out of them, and out of source. Naming a field sensitive in a comment is worth more than the value in a log line.
 
 ## Consistency
 
 Similar things done the same way; dissimilar things done differently — both halves carry weight. Before introducing any convention (naming, structure, error handling, style, test layout), inspect the local file and project and mimic what's already there. Reuse exact names already established for a concept.
 
-Factor code together only when the instances share the same knowledge, so a change to one should change all. Blocks that look alike but answer to different reasons are separate decisions that happen to share text; merging them couples things that should move apart, and the next change tears them back out.
+Factor code together only when the instances share the same knowledge, so a change to one should change all. Blocks that look alike but answer to different reasons are separate decisions that happen to share text. Merging them couples things that should move apart, and the next change tears them back out.
 
-Don't "improve" an existing convention casually. Before introducing an inconsistency, both must be true: you have significant new information that wasn't available when the convention was set, and the new approach is enough better to justify converting every existing use. If you change it, leave no instance of the old convention behind. Half-adopted conventions are worse than either option alone — they destroy a reader's ability to draw safe conclusions from a familiar-looking pattern.
+Don't "improve" an existing convention casually. Before introducing an inconsistency, both must be true: you have significant new information that wasn't available when the convention was set, and the new approach is enough better to justify converting every existing use. If you change it, leave no instance of the old convention behind. Half-adopted conventions are worse than either option alone, because they destroy a reader's ability to draw safe conclusions from a familiar-looking pattern.
 
 ## Obviousness
 
-After writing code, read it as a developer seeing it cold. Ask whether their first guess about behavior is correct. Obviousness lives in the reader's head, and self-assessment is unreliable — take a reviewer's report of confusion over your own read of the code, however clear it looks to you. When no reviewer is available, simulate a specific developer who is unfamiliar with this code.
+After writing code, read it as a developer seeing it cold. Ask whether their first guess about behavior is correct. Obviousness lives in the reader's head, and self-assessment is unreliable. Take a reviewer's report of confusion over your own read of the code, however clear it looks to you. When no reviewer is available, simulate a specific developer who is unfamiliar with this code.
 
 Recurring failure modes:
 

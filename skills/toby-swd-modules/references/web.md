@@ -2,7 +2,7 @@
 
 The web SPA stack has its own pattern vocabulary: hooks (React), composables
 and signals (Solid, Vue), runes and stores (Svelte). The framework names
-differ; the module principles don't. These examples show the same checks
+differ, but the module principles don't. These examples show the same checks
 applied across the three with the idiom of each.
 
 The existing `examples.md` covers two foundational web cases (prop drilling
@@ -133,8 +133,8 @@ export default withWindowSize(withCurrentUser(withTheme(MyComponent)));
 ```
 
 This is implementation-inheritance leakage in non-class clothing. `withWindowSize` and `MyComponent` are
-in a parent-child relationship where the wrapper invisibly injects props,
-overrides nothing visible, and yet `MyComponent` cannot be understood without
+in a parent-child relationship where the wrapper invisibly injects props and
+overrides nothing visible. Yet `MyComponent` cannot be understood without
 reading the wrapper. Three wrappers deep ("wrapper hell") and the component's
 real interface is unknowable from its file.
 
@@ -199,7 +199,7 @@ function MyComponent() {
 
 The shared behavior is a function the component calls and composes. No
 hidden injection, no wrapper chain. If a component needs three shared
-behaviors, it calls three functions — they appear at the top of the
+behaviors, it calls three functions. They appear at the top of the
 component's body where a reader naturally meets them, in the order they
 were called. This is composition, exactly the pattern the composition-over-inheritance check recommends.
 
@@ -213,7 +213,7 @@ an HOC, package it as a hook/composable/rune function and call it.
 ## Example 3 — Store slice as a deep module
 
 A pattern in growing apps: state starts in a component, gets lifted to a
-parent, then to a context, then to a global store — but the store grows by
+parent, then to a context, then to a global store, but the store grows by
 accretion, becoming a grab-bag.
 
 ```tsx
@@ -237,10 +237,10 @@ const useStore = create((set) => ({
 
 This is classitis at the store level. Auth, theme, cart, coupons, and
 notifications share nothing except a tendency to live globally. Selectors
-get longer and longer, all components subscribe to the same store, every
-mutation can in principle touch anything, and the "interface" of the store
+get longer and longer, all components subscribe to the same store, and every
+mutation can in principle touch anything. The "interface" of the store
 is the entire state shape exposed by getter and the entire set of mutations
-exposed by name — the interface is the whole state shape, which makes the store
+exposed by name. An interface that is the whole state shape makes the store
 as shallow as a module gets.
 
 Re-slice by knowledge (the decompose-by-knowledge check). Each slice owns one body of state and the
@@ -301,19 +301,19 @@ export const Cart = {
 One reactivity caveat the three handle differently: `total` is a derived
 value. Solid tracks it on read — `Cart.total()` in JSX re-runs when `items`
 or `coupon` changes — and Svelte's `derived` store does the same. Zustand
-doesn't track derived reads: a component reaches the live value through a
+doesn't track derived reads. A component reaches the live value through a
 selector that calls it, `useCart((s) => s.total())`, so the subscription
 recomputes on change. Selecting the bare method (`s.total`) or calling
 `useCart.getState().total()` outside a selector doesn't subscribe, and the
 value goes stale.
 
-Each slice is now a deep module: the interface (`add`, `remove`, `total`,
-`applyCoupon`) expresses intent; the state shape and the invariants live
+Each slice is now a deep module. The interface (`add`, `remove`, `total`,
+`applyCoupon`) expresses intent, and the state shape and the invariants live
 inside. Components call `Cart.add(item)`. The grab-bag form made them reach
 into `useStore.setState((s) => ({ cart: [...s.cart, item] }))`. The "what
 counts as a duplicate" rule
 lives once, in `add`. Adding the next state concern (a `wishlist`)
-creates a new slice; it does not extend the same monolith.
+creates a new slice. It does not extend the same monolith.
 
 Guardrail: don't shatter into so many slices that every component imports
 six. Slice by real knowledge boundary (auth, cart, theme). One slice per field
@@ -416,15 +416,15 @@ function createCombobox<T>(opts: { items: () => T[]; getId: (t: T) => string }) 
 </div>
 ```
 
-The behavior is one deep module (the hook / composable / factory); the
+The behavior is one deep module (the hook / composable / factory), and the
 presentation is whatever the consumer writes. Each `ProductCombobox`,
 `UserCombobox`, `TagCombobox` is a few lines of presentational code that
 composes the behavior. The mega-prop form crammed 20 props into one black box
 that tries to be every combobox.
 
 This pattern is what Radix, Headless UI, and Melt UI productize. Adopting
-one of those libraries is usually cheaper than writing your own; the
-principle to take away is *why* they're structured that way — behavior
+one of those libraries is usually cheaper than writing your own. The
+principle is *why* they're structured that way. Behavior
 and presentation are different bodies of knowledge, and a single component
 that ships both ends up with a wide and shallow interface.
 
@@ -443,6 +443,6 @@ that ships both ends up with a wide and shallow interface.
 | Server state | TanStack Query, SWR | TanStack Solid Query | TanStack Svelte Query |
 | Form state | React Hook Form, TanStack Form | Solid forms / TanStack Form | Svelte forms / TanStack Form |
 
-The principles are the same in every column: the deep module is the
-function/hook/composable/rune; components call it; shared knowledge lives
-inside it; the rest of the framework is reactive plumbing.
+The principles are the same in every column. The deep module is the
+function/hook/composable/rune, components call it, shared knowledge lives
+inside it, and the rest of the framework is reactive plumbing.

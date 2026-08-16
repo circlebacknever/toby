@@ -40,7 +40,7 @@ The interface comment, complete:
 > BiometryNotEnrolled, and BiometryLockoutPermanent separately.
 
 Twelve sentences. Describes ordering ("Call X first, then Y"). Describes
-platform-specific protocol. The "interface" is really seven separate APIs
+platform-specific protocol. The "interface" is seven separate APIs
 the caller must compose, with platform quirks layered on top. Failure
 named.
 
@@ -70,12 +70,12 @@ Comment:
 > payload is supplied, the result includes a signature bound to a
 > per-device key (created lazily on first use).
 
-Four sentences. iOS/Android differences are gone from the caller's view —
-they collapsed into status's discriminator. Key lifecycle, Info.plist
+Four sentences. iOS/Android differences are gone from the caller's view,
+because they collapsed into status's discriminator. Key lifecycle, Info.plist
 errors, and lockout handling all live inside. Common callers just call
 `prompt({ reason: 'Confirm payment' })` and switch on the result.
 
-Guardrail check: did anything truly caller-facing get hidden? The
+Guardrail check: did anything caller-facing get hidden? The
 caller still needs to know that a payload signature is per-device (so
 sending the signature to the server is meaningful only if the server
 trusts that device). One sentence covers it. The fingerprint sensor's
@@ -213,11 +213,11 @@ interface Session {
 ```
 
 Each module's interface comment is now two or three sentences. `UserPrefs`
-owns its key schema and migration; `FeedCache` owns its versioning and the
-Android size limits (it batches writes or drops oldest items if needed); `Session`
-owns the secure-storage detail (`Session.save` writes to Keychain/Keystore,
-not AsyncStorage). The screens that use these modules don't know any of
-that.
+owns its key schema and migration. `FeedCache` owns its versioning and the
+Android size limits (it batches writes or drops oldest items if needed).
+`Session` owns the secure-storage detail (`Session.save` writes to
+Keychain/Keystore, not AsyncStorage). The screens that use these modules
+don't know any of that.
 
 Logout becomes a deliberate composition, naming each store to drop:
 
@@ -307,12 +307,12 @@ Three sentences. Two improvements at the contract level:
 - The discriminator eliminates the "what does undefined mean" problem.
 - Permissions move from "boolean per action" to "presence of the action in
   the actions object." A button that exists when permitted is impossible
-  to render in the wrong state; a button that checks `permissions.canRefund`
+  to render in the wrong state. A button that checks `permissions.canRefund`
   before calling `actions.refund` is one if-statement away from a bug.
 
-This second move — encoding "allowed" as presence of the action, so a parallel
-boolean never exists — is the kind of contract redesign the comment test reveals,
-because writing "permissions may be undefined for an instant" is the
+This second move encodes "allowed" as presence of the action, so a parallel
+boolean never exists. It is the kind of contract redesign the comment test
+reveals, because writing "permissions may be undefined for an instant" is the
 signal that the shape is wrong.
 
 ---
@@ -323,8 +323,8 @@ signal that the shape is wrong.
   `Fragment` accepting twelve init parameters has the same shape as the
   RN screen passing a `user` object through route params. Identity in,
   state through composition.
-- **Flutter**: route params are arguments; the same identity-in/data-via-providers
-  principle applies. Riverpod/Provider play the context role.
+- **Flutter**: route params are arguments, and the same
+  identity-in/data-via-providers principle applies. Riverpod/Provider play the context role.
 - **Native modules**: the bridge interface should hide the platform's
   protocol the way Example 1 does, regardless of which side you're writing
   on. A Swift `BiometricsBridge` that exposes `isAvailable`, `createKeys`,

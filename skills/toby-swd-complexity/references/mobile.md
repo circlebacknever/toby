@@ -64,13 +64,13 @@ function isTransient(e: unknown): boolean {
 }
 ```
 
-Now a real-world momentary network drop never reaches the screen — it
-gets retried and the second attempt succeeds. The error ladder rung 2
+Now a real-world momentary network drop never reaches the screen, because
+it gets retried and the second attempt succeeds. The error ladder rung 2
 (mask at lowest level) absorbs the transient cases. The screen only sees
 real failures (after 3 retries, still failing).
 
-The loop is safe here because `get` is idempotent — repeating it changes
-nothing. A mutating `post` can't reuse it as-is: a retry after a lost
+The loop is safe here because `get` is idempotent, so repeating it changes
+nothing. A mutating `post` can't reuse it as-is. A retry after a lost
 response can submit the same write twice, so a write needs an idempotency
 key the server dedupes on before the same retry logic applies.
 
@@ -200,20 +200,20 @@ or `FlashList` (Shopify's higher-performance alternative):
 />
 ```
 
-`FlatList` virtualizes — only the visible items and a small overdraw zone
+`FlatList` virtualizes, so only the visible items and a small overdraw zone
 are rendered. Memory stays bounded. This is the design-time naturally-
 efficient choice from the SKILL — same complexity as ScrollView, much
 better performance. Take it always for lists that might grow.
 
 When to escalate to `FlashList`: large or image-heavy lists where measured
 `FlatList` scrolling drops frames. FlashList v2 is a New-Architecture-only
-rewrite that sizes cells automatically — the v1 chore of estimating item
-heights is gone — so on a New-Architecture app it's a reasonable default for
+rewrite that sizes cells automatically, and the v1 chore of estimating item
+heights is gone. On a New-Architecture app it's a reasonable default for
 big lists. `FlatList` still ships in the box with no extra dependency and
 handles small-to-medium lists.
 
 When to stay with `ScrollView`: known-small, known-bounded lists with
-heterogeneous content where virtualization breaks layout (e.g., a
+heterogeneous content where virtualization breaks layout (for example, a
 settings screen with 8 sections, each a different shape). The
 virtualization here adds complexity for zero perf benefit.
 
@@ -247,7 +247,7 @@ A profile screen with 50 avatars, each a 4MB camera-roll image:
 ```
 
 The phone fetches 50 × 4MB = 200MB over the wire, then decodes each JPEG to
-a full bitmap to draw a 40×40 thumbnail — and a 4MB JPEG expands to tens of
+a full bitmap to draw a 40×40 thumbnail. A 4MB JPEG expands to tens of
 MB of RGBA once decoded. The decoded bitmaps are what exhaust memory. Two
 screens in, the app crashes with an OOM.
 
@@ -277,7 +277,7 @@ photo): load progressively. Show the thumbnail first, swap in the full
 resolution when it's ready. The user sees something immediately and
 doesn't wait staring at a blank screen.
 
-This is the same point as `examples.md` Example 3 — death by thousand
+This is the same point as `examples.md` Example 3. Death by thousand
 cuts is the failure mode. Each image is "just an image." Together, with
 no resizing strategy, they OOM the device.
 
@@ -320,11 +320,11 @@ goes from ~2 seconds to ~50ms.
 
 If the native module doesn't already offer a batched call, write one.
 Native bridges are not usually the place where someone wrote the API
-thinking about JS performance — the JS side often needs to ask for it.
+thinking about JS performance, so the JS side often needs to ask for it.
 
-For New Architecture / Fabric / TurboModules, the bridge is faster but
-the same principle holds: fewer crossings is fewer crossings. Synchronous
-TurboModule calls help for the per-call cost; batching helps for the
+For New Architecture / Fabric / TurboModules, the bridge is faster, but
+the same principle holds, so cut the number of crossings. Synchronous
+TurboModule calls help for the per-call cost, and batching helps for the
 total work.
 
 ---

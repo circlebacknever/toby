@@ -5,11 +5,11 @@ description: Apply Toby's artifact design system whenever a visual artifact is b
 
 # Toby Artifact Style
 
-Every artifact you produce under this system looks like it was made for this exact content. That is the bar, every session.
+Make every artifact under this system look like it was made for this exact content. That is the bar, every session.
 
 Toby Artifact Style is a constraint set. Tokens, copy constraints, and visual rules are tight. Structural choices stay wide: dense reference card, spacious single claim, ink-heavy authority piece, paper-first reading surface, animated process, static evidence panel, three-slide lesson, or twenty-slide reference deck. Make those choices per artifact.
 
-The failure mode for any design system is convergence — every artifact starting to look like every other artifact. When you feel yourself reaching for the same layout you built last time, stop and pick a different one. The constraints protect quality; structure stays free to vary. Within them, vary everything.
+The failure mode for any design system is convergence — every artifact starting to look like every other artifact. When you feel yourself reaching for the same layout you built last time, stop and pick a different one. The constraints protect quality, and structure stays free to vary. Within them, vary everything.
 
 ## Three principles
 
@@ -17,22 +17,22 @@ The failure mode for any design system is convergence — every artifact startin
 
 **Dark means judgment.** `--toby-ink` (`#1a1c1f`) for decision surfaces, evidence panels, summaries, section dividers. When something uses ink, the artifact has stopped to make a point. Reserve it for moments that earn the weight. An artifact that uses ink everywhere has made nothing authoritative.
 
-**Red is consequence.** `--toby-accent` (`#c44e3f`) for risk, breach, finality, threshold violation. Never a brand accent. Never plain emphasis. Its scarcity is what makes it land.
+**Red is consequence.** `--toby-accent` (`#c44e3f`) for risk, breach, finality, threshold violation. Never a brand accent. Never plain emphasis. Keep it rare, because a red that shows up often stops landing.
 
 ## Six visual moves that make Toby Artifact Style coherent
 
 If a panel uses none of these, ask whether it earns its place.
 
-1. **Tinted state families.** When a panel expresses a state (info / stable / watch / consequence / unknown), give it the three-step palette: pale background, mid-saturation border, dark saturated text. The whole panel reads as one mood. See "Callout philosophy" below — this is the foundational pattern.
+1. **Tinted state families.** When a panel expresses a state (info / stable / watch / consequence / unknown), give it the three-step palette: pale background, mid-saturation border, dark saturated text. The whole panel reads as one mood. See "Callout philosophy" below. This is the foundational pattern.
 2. **Categorical section accents.** When a page has multiple sections, give each its own color from the chart palette. The accent shows up as the section number, the bottom-rule strip under the heading, and small cell-id pills.
 3. **Mono values, sans labels.** Every number, ID, timestamp, or coordinate is JetBrains Mono with tabular numerals. Every label and description is Inter. The two typefaces alternating is part of the visual signature.
-4. **Hairline rules and small radii.** 1px hairlines do almost all the dividing. Cards stay at 12px radius; only outer containing frames get 18px.
-5. **Density over whitespace.** Slides and dashboards run dense. Multiple KV pairs, stat grids, sparkline-in-table cells, evidence rows. The reader is treated as a serious professional reviewing evidence — density itself carries the authority.
-6. **Three-tone progression for narrative blocks.** When a panel walks through reasoning, tint the rows: setup (info teal) → working (watch amber) → conclusion (stable green). The Worked Example component does this; other reasoning panels can borrow the pattern.
+4. **Hairline rules and small radii.** 1px hairlines do almost all the dividing. Cards stay at 12px radius, and only outer containing frames get 18px.
+5. **Density over whitespace.** Slides and dashboards run dense. Multiple KV pairs, stat grids, sparkline-in-table cells, evidence rows. Treat the reader as a serious professional reviewing evidence. Density itself carries the authority.
+6. **Three-tone progression for narrative blocks.** When a panel walks through reasoning, tint the rows: setup (info teal) → working (watch amber) → conclusion (stable green). The Worked Example component does this, and other reasoning panels can borrow the pattern.
 
 ## Teaching decks — only when asked
 
-Build a Toby Artifact Style HTML deck (paginated, prev/next, React `.jsx`) only when the user has asked for a produced artifact, deck, or slides. A lesson, walkthrough, or explanation in conversation stays in chat — toby-explain and toby-learning own that, and they answer in prose. Once a deck has been asked for, apply artifact copy rules to its copy.
+Build a Toby Artifact Style HTML deck (paginated, prev/next, React `.jsx`) only when the user has asked for a produced artifact, deck, or slides. A lesson, walkthrough, or explanation in conversation stays in chat, because toby-explain and toby-learning own that and they answer in prose. Once a deck has been asked for, apply artifact copy rules to its copy.
 
 What goes where:
 - **Deck (artifact):** glossary, mechanism explanations, tables, diagrams, derivations, examples, summary.
@@ -59,7 +59,7 @@ Run this checklist before writing any code or markup.
 2. **Composition mode.** Pick one from below. Not the one you used last time.
 3. **Ink allocation.** Decide before you start which panels or slides use ink and which use paper. Don't let it happen by accident.
 4. **Logo primitive.** Name the shape. It should hint at the structure of the subject.
-5. **For decks:** identify which slides earn interactivity before writing any slide. The concept governs the interaction type — see `references/decks.md`.
+5. **For decks:** identify which slides earn interactivity before writing any slide. The concept governs the interaction type. See `references/decks.md`.
 
 ## Composition modes
 
@@ -156,8 +156,8 @@ Pattern for a state-tinted panel: background = `*-soft`, border = `*-tint`, left
 
 - No gradients. No rainbow scales. No glow. No colored shadows.
 - No red as brand accent. Use ink weight, hairline, or position for emphasis.
-- Chart palette is positional — use in fixed order, by series index. Also drives section accents on long pages.
-- **No left-accent-colored cards** as a general decoration (a known AI-slop tell). Exception: alerts/toasts use a single 4px coloured left strip from the callout family — that strip is the documented pattern.
+- Chart palette is positional, so use in fixed order, by series index. Also drives section accents on long pages.
+- **No left-accent-colored cards** as a general decoration (a known AI-slop tell). Exception: alerts/toasts use a single 4px coloured left strip from the callout family, and that strip is the documented pattern.
 
 ## Typography
 
@@ -248,7 +248,7 @@ Prefer named tokens. Pick the closest, never a one-off.
 - **Hover (dark):** bg lifts to `--ink-hover` (`#4a4e57`). Text unchanged.
 - **Active / press:** bg steps DARKER (`--surface-pressed` / `--ink-pressed` / `--accent-pressed`), border stays. No scale shrink. The control does NOT move.
 - **Focus:** 2px outside ring in `--toby-info` (teal), 2px offset. **Never red.**
-- **Selected / current in lists/trees/menus:** `--toby-paper-2` background + a 3px `--toby-info` inset on the left. Paper-3 against paper-3 is INVISIBLE — never use it as a selection state.
+- **Selected / current in lists/trees/menus:** `--toby-paper-2` background + a 3px `--toby-info` inset on the left. Paper-3 against paper-3 is INVISIBLE, so never use it as a selection state.
 
 Hover and base must differ by ≥ 3:1 contrast (WCAG 1.4.11).
 
@@ -260,7 +260,7 @@ Hover and base must differ by ≥ 3:1 contrast (WCAG 1.4.11).
 
 ## Iconography
 
-- Use Lucide where available. Inline SVG is acceptable for static artifacts; use the app's icon library for coded frontends when one exists. Icons are 16–20px, 1.5px stroke, square caps, monochromatic `currentColor`.
+- Use Lucide where available. Inline SVG is acceptable for static artifacts. Use the app's icon library for coded frontends when one exists. Icons are 16–20px, 1.5px stroke, square caps, monochromatic `currentColor`.
 - Heroicons-outline, Tabler, and Phosphor-regular are acceptable fallback families. Material Icons and Carbon are too dense — forbidden.
 - About 12 glyphs system-wide. If you're reaching for a 13th, a text label would do the job.
 - Forbidden: emoji, unicode dingbats. Allowed unicode: `→` for handoffs, `·` as metadata separator, `±` for uncertainty.
@@ -298,7 +298,7 @@ Every sentence, panel, or slide must do one of these. If it does none, remove it
 
 ### Visualizer SVG diagrams
 - Call `visualize:read_me` first, then override its CSS variables with Toby Artifact tokens before generating output.
-- Visualizer requires transparent background — set paper color on a top-level `<rect>` if a paper field is wanted.
+- Visualizer requires transparent background, so set paper color on a top-level `<rect>` if a paper field is wanted.
 - Use the Toby Artifact chart palette in positional order for any series.
 
 ### Visualizer HTML widgets
@@ -313,22 +313,15 @@ Every sentence, panel, or slide must do one of these. If it does none, remove it
 
 ## Copy rules
 
-Every sentence in artifact copy must pass at least one of: **cite**, **negation**, **substitution**, **reader-skim**. Sentences that fail all four are filler. Remove them.
+Every sentence in artifact copy must pass **cite**, **negation**, and **substitution**, then survive the **reader-skim** cut. `references/copy.md` carries all four.
 
-Copy cuts:
-- Marketing adjectives (powerful, intuitive, seamless, elegant, game-changing, delightful).
-- Throat-clearing openers (in today's fast-paced world, we all know, let's dive in).
-- Self-praise of the writing (cleanly, clearly, honestly, in plain English, just the facts).
-- Vague magnitude (a lot of, many, huge, massive) — replace with a number, range, or omit.
-- Inflated verbs (unlock, transform, supercharge, revolutionize, harness, empower).
-- Mission-stating (on a mission to, dedicated to, passionate about).
-- First and second person (we, I, our, you) in most reference contexts.
-- Emoji. Exclamation points.
-- Numbers without units. A bare number is a defect.
-
-**No contrastive framing.** State the positive claim directly.
+Banned words live in `base/toby.md`. This skill adds none.
 
 **Headings carry the claim.** Body explains or qualifies. Caveats sit next to the claim, never in a footnote.
+
+**Numbers carry units.** A bare number is a defect.
+
+Labels are where the clarity floor binds hardest. An axis title, a legend entry, a KPI caption, and a slide heading each get the three-word cap on noun stacks. Each also gets one name per thing, held identical across every chart in the artifact.
 
 Global Toby voice controls register. This skill controls artifact structure, visual tokens, density, copy tests, and component patterns.
 

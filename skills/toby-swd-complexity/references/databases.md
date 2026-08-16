@@ -25,8 +25,8 @@ for addresses, 50 queries for line items, 250 queries for products. 351
 queries to render a list. P99 latency is bad even though no single query
 is "slow."
 
-This is the death-by-a-thousand-cuts case from the SKILL — no profiler will
-show one expensive call. The fundamental fix is at the design level.
+This is the death-by-a-thousand-cuts case from the SKILL, because no profiler
+will show one expensive call. The fundamental fix is at the design level.
 
 Three ways out, in roughly increasing complexity:
 
@@ -49,7 +49,7 @@ orders = (
 One query for orders + addresses (joinedload), one query for all
 line_items (selectinload by order ids), one query for all products
 (selectinload by product ids). 351 queries → 3. Same code shape as
-before; the eager-load hint is the only change.
+before, and the eager-load hint is the only change.
 
 **Purpose-built read model.** If the list view always needs the same
 shape, build a query that returns it directly:
@@ -65,14 +65,14 @@ The repository returns `list[OrderDisplay]` — a flat dataclass with
 exactly the fields the list view needs. Callers can't trigger N+1 because
 the fields aren't relations.
 
-**CQRS-style read store** (most complex; reserve for measured need). Keep
+**CQRS-style read store** (most complex, so reserve it for measured need). Keep
 a separate denormalized table updated on writes, queried directly. Useful
 at scale when even the joined query is too slow. Almost never the right
 first move.
 
 The design-time choice — eager-load hints, purpose-built read models —
 costs no more complexity than the slow version. The default of "let the
-ORM lazy-load whatever I touch" is what produces the N+1; explicit
+ORM lazy-load whatever I touch" is what produces the N+1. Explicit
 eager-loading is the naturally-efficient simple choice.
 
 ---
@@ -80,7 +80,7 @@ eager-loading is the naturally-efficient simple choice.
 ## Example 2 — Transaction retry: mask deadlocks at the wrapper
 
 Concurrent updates in any RDBMS will produce occasional deadlocks. The
-database aborts one transaction; the application is expected to retry.
+database aborts one transaction, and the application is expected to retry.
 
 Tactical code:
 
@@ -137,7 +137,7 @@ err := WithRetry(ctx, db, func(tx *gorm.DB) error {
 
 One retry policy, one place that knows what's transient, jittered backoff
 so retries don't synchronize. Callers only see deadlocks that persist
-through 5 attempts; routine ones stay absorbed.
+through 5 attempts, and routine ones stay absorbed.
 
 Guardrail: the transaction body must be idempotent or fully transactional
 with no side effects outside the database (no email sends, no API calls
@@ -151,7 +151,7 @@ failure rolls the transaction back, so the snapshot the body computed against
 is gone. If `fn` closes over rows read before `WithRetry`
 and writes values derived from them, each retry re-applies a stale
 computation against data that has since moved — a lost update that commits
-cleanly. Read the rows, compute, and write inside `fn`, so every attempt
+without error. Read the rows, compute, and write inside `fn`, so every attempt
 starts from what the database currently holds.
 
 ---
@@ -179,7 +179,7 @@ db.execute(
 ```
 
 One statement, one round trip, milliseconds. The bulk version is no more
-complex than the loop version; in most languages and ORMs it's actually
+complex than the loop version, and in most languages and ORMs it's
 shorter.
 
 For inserts:
@@ -234,9 +234,9 @@ CREATE INDEX idx_line_items_order_id ON line_items (order_id);
 **Index the columns in your common WHERE/ORDER BY pairs.** A query like
 `WHERE customer_id = ? AND status = 'open' ORDER BY created_at DESC` is
 best served by `(customer_id, status, created_at DESC)`. The column
-order matters; the index supports `(customer_id)` queries, `(customer_id,
-status)` queries, and `(customer_id, status, created_at)` queries, but
-not bare `(status)` queries.
+order matters, because the index supports `(customer_id)` queries,
+`(customer_id, status)` queries, and `(customer_id, status, created_at)`
+queries, but not bare `(status)` queries.
 
 **Partial indexes for sparse conditions.** If "open orders" are 5% of
 the orders table but most queries are about open orders, a partial index
@@ -281,7 +281,7 @@ The implicit transaction held by `session` lives for the entire request.
 If the request takes 500ms because of N+1 queries and a slow renderer,
 that connection is held for 500ms. Under high load, the connection pool
 exhausts. Every request now waits for a free connection. The system
-appears to deadlock; new requests get rejected.
+appears to deadlock, and new requests get rejected.
 
 Two design-time choices that prevent this:
 
@@ -301,7 +301,7 @@ def handler():
 ```
 
 **A bounded pool with timeouts.** Configure the pool to fail fast when
-exhausted; queuing forever hides the exhaustion as a hang:
+exhausted, because queuing forever hides the exhaustion as a hang:
 
 ```python
 engine = create_engine(
@@ -312,13 +312,13 @@ engine = create_engine(
 )
 ```
 
-A request that can't get a connection in 2 seconds fails — caller sees
+A request that can't get a connection in 2 seconds fails, and the caller sees
 "service unavailable," which is recoverable. The unbounded version waits
 forever in the pool queue, which appears as a hang.
 
-These are the design-time moves. The measurement-driven move comes later
-— if a specific endpoint holds connections too long even after scoping,
-profile what it's actually doing. Usually it's lazy-loading (Example 1
+These are the design-time moves. The measurement-driven move comes later.
+If a specific endpoint holds connections too long even after scoping,
+profile what it is doing. Usually it's lazy-loading (Example 1
 above) or an unexpected slow query.
 
 ---
@@ -326,11 +326,11 @@ above) or an unexpected slow query.
 ## Example 6 — Concurrency control: where the conflict gets caught
 
 Two transactions read an inventory row, both see one unit left, both sell it.
-Example 2 retries a conflict once the database raises one; this is the prior
+Example 2 retries a conflict once the database raises one. This is the prior
 question — how the row is guarded so the conflict is detected at all. Two
 strategies, each keeping the discipline in one place.
 
-**Optimistic — a version column.** The row carries a `version`; the update
+**Optimistic — a version column.** The row carries a `version`, and the update
 asserts it hasn't moved since the read:
 
 ```sql
@@ -352,7 +352,7 @@ SELECT qty FROM inventory WHERE id = $1 FOR UPDATE;  -- concurrent writers block
 ```
 
 Correct under heavy contention where optimistic retries would thrash, paid
-for by holding a lock — so the transaction stays short and touches rows in a
+for by holding a lock, so the transaction stays short and touches rows in a
 consistent order, or it trades the lost-update race for a deadlock.
 
 Isolation level is the backstop under both. `READ COMMITTED`, the common
@@ -360,7 +360,7 @@ default, permits the read-then-write race above, which is why one of the two
 guards is needed. `SERIALIZABLE` makes the database detect the interleaving
 and abort one transaction — the strictest model, paid for with more aborts to
 retry (back to Example 2). Pick one strategy per contended resource and hold
-to it; mixing optimistic and pessimistic access to the same row reopens the
+to it. Mixing optimistic and pessimistic access to the same row reopens the
 race each was meant to close.
 
 ---

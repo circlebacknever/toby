@@ -151,18 +151,18 @@ Comment for `find`:
 > token if there are more results.
 
 Three sentences. `UserQuery` has its own comment describing each filter,
-but it's a value object — its contract is "what each field means" and a
+but it's a value object. Its contract is "what each field means", and a
 reader who needs `orgId` only reads that one comment.
 
 Offset/limit pagination drifts when rows are inserted or deleted
-mid-iteration — a page can repeat a row or skip one.
+mid-iteration, so a page can repeat a row or skip one.
 The opaque `pageToken` encodes a stable cursor, so paging stays correct under
-concurrent writes. That's the trade: a token and a page size cost a bit more
+concurrent writes. That's the trade. A token and a page size cost a bit more
 surface than a bare row limit, and buy correctness under concurrent load.
 
 The default constructor and the builder methods make the common case easy:
 `users.find(new UserQuery().withOrgId(org).withActive(true))`. The
-somewhat-general-purpose framing applies: this covers today's known queries
+somewhat-general-purpose framing applies. This covers today's known queries
 and a reasonable surface of near-future ones, without becoming a god
 interface for arbitrary searches.
 
@@ -252,7 +252,7 @@ One sentence. The `UnitOfWork.run` contract handles the transactional
 guarantee separately.
 
 Guardrail: did anything needed get hidden? Yes — sometimes the caller
-needs to know whether they are inside a transaction (e.g., to avoid
+needs to know whether they are inside a transaction (for example, to avoid
 firing an out-of-process event that would commit independently). For that
 case, expose `UnitOfWork.isActive()` as a one-method check and keep the `tx`
 parameter off every method.
@@ -287,7 +287,7 @@ The interface comment isn't usually written because Alembic scripts are
 > written during the rolled-back window.
 
 The migration's contract is more complex than the script suggests. The thing that's leaked
-is the difference between "schema migration" and "data migration" — the
+is the difference between "schema migration" and "data migration". The
 script does the former and offers no story for the latter.
 
 Redesigning the *interface to migrations* — the general shape, beyond this one migration — helps:
@@ -307,7 +307,7 @@ class Migration:
     def schema_down(self): ...  # reverse-only; may lose data
 ```
 
-This is heavier than what most teams need on day one — most teams ship
+This is heavier than what most teams need on day one. Most teams ship
 `upgrade()` / `downgrade()` and live with it. When the comment test exposes
 the real interface (schema, data, code coordination across deploys), the
 team can decide whether to invest in the deeper abstraction or accept the

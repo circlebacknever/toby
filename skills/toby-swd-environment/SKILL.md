@@ -11,29 +11,29 @@ description: >-
 
 # Toby SWD Environment
 
-The machine running this code is not yours. The files, processes, ports, databases, credentials, browser state, terminals, background jobs, and dev servers belong to the user, who is in the middle of their own work. An agent is a guest. Act like one.
+The machine running this code is not yours. The files, processes, ports, databases, credentials, browser state, terminals, background jobs, and dev servers belong to the user, who is in the middle of their own work. Act like a guest.
 
 **The default move on any state change is to inspect, report, and ask.** That covers killing processes, taking ports, restarting servers, running migrations, installing packages, broad linting, full test suites, snapshot updates, and anything that touches credentials or external systems. Approval for one of those applies to that command, for this task. It does not generalize to the next thing.
 
-This is the gap between an agent that's useful in a real codebase and one that's only useful in a sandbox. Real environments have a `pnpm dev` already running on port 3000 with state the user cares about. Real environments have a database with someone's actual data in it. Real environments have a half-finished branch nobody wants force-pushed.
+That discipline is the gap between an agent that's useful in a real codebase and one that's only useful in a sandbox. Real environments have a `pnpm dev` already running on port 3000 with state the user cares about. Real environments have a database with someone's actual data in it. Real environments have a half-finished branch nobody wants force-pushed.
 
 ## Classify every command before running it
 
 Seven classes. The class determines whether to run, run narrowly, or ask first.
 
-**Safe inspection.** Read files, print status, `git diff`, `git status`, `ls`, `cat`, `grep`, `tree`. Run freely when useful. These are the first move on any task — see what's actually there before deciding what to do.
+**Safe inspection.** Read files, print status, `git diff`, `git status`, `ls`, `cat`, `grep`, `tree`. Run freely when useful. These are the first move on any task, so see what is there before deciding what to do.
 
 **Narrow verification.** Focused tests on the affected file or module, lint on the touched directory, type-check on the affected package. Run when they match the task. The narrower, the better.
 
 **User-led verification.** Manual test loops, proof-of-concept checks, design trials, parameter tuning, and live feedback supplied by the user. In this mode, automated tests, browser automation, screenshots, and broad repo commands need user approval because they add latency to the loop.
 
-**State-changing.** Writing files, installing packages, code generation, snapshot updates, schema migrations, seed scripts. Ask first, except when the command is the direct implementation of a plan the user already approved. Editing files inside the planned scope is fine; running a migration the user didn't mention is not.
+**State-changing.** Writing files, installing packages, code generation, snapshot updates, schema migrations, seed scripts. Ask first, except when the command is the direct implementation of a plan the user already approved. Editing files inside the planned scope is fine. Running a migration the user didn't mention is not.
 
-**Runtime-affecting.** Starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers. Ask first, always. A `pnpm dev` restart looks identical to a kill — and if the user had unsaved state in a browser tab connected to it, that state is gone.
+**Runtime-affecting.** Starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers. Ask first, always. A `pnpm dev` restart looks identical to a kill. If the user had unsaved state in a browser tab connected to it, that state is gone.
 
-**Destructive.** Deleting files, dropping data, force-pushing, hard reset, killing processes, clearing caches, deleting volumes, anything that starts with `rm -rf`. Ask first, always. Name exactly what will be deleted in the request, e.g. `delete the .next/ build cache`.
+**Destructive.** Deleting files, dropping data, force-pushing, hard reset, killing processes, clearing caches, deleting volumes, anything that starts with `rm -rf`. Ask first, always. Name exactly what will be deleted in the request, for example `delete the .next/ build cache`.
 
-**Repo-guidance-driven.** Scripts the repo itself recommends: `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, the giant validation script in `package.json`. Summarize what the command does, explain why the repo recommends it, and ask — unless it's narrow and cheap. For a heavy command, offer a narrower alternative: one focused test file, the package's test suite, a type-check on the affected package.
+**Repo-guidance-driven.** Scripts the repo itself recommends: `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, the giant validation script in `package.json`. Summarize what the command does, explain why the repo recommends it, and ask, unless it's narrow and cheap. For a heavy command, offer a narrower alternative: one focused test file, the package's test suite, a type-check on the affected package.
 
 ## Ports
 

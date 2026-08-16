@@ -1,6 +1,6 @@
 # Worked Examples
 
-Original code, illustrating the procedure. The reasoning transfers; the
+Original code, illustrating the procedure. The reasoning transfers. The
 languages do not matter.
 
 ---
@@ -19,12 +19,12 @@ class RateLimiter:
     def consume(self, bucket, n) -> bool: ...
 ```
 
-Write the interface comment in full and it gets long: the caller must fetch a
-bucket, refill it with the current time, check tokens, then consume — and must
-do these in that order or it breaks. The comment has to describe the bucket
-mechanism to be usable. That is the test failing on three counts at once: long,
-order-dependent, leaks internals. This is temporal decomposition wearing a
-class.
+Write the interface comment in full and it gets long. The caller must fetch a
+bucket, refill it with the current time, check tokens, then consume. Those
+calls must happen in that order or it breaks. The comment has to describe the
+bucket mechanism to be usable. That is the test failing on three counts at
+once: long, order-dependent, leaks internals. This is temporal decomposition
+wearing a class.
 
 **Redesigned interface (designed by knowledge: "whether this client may proceed
 right now"):**
@@ -40,7 +40,7 @@ class RateLimiter:
 
 The complete contract is two sentences and names none of its internals. Tokens,
 refill cadence, and the clock moved inside. The interface shrank while the
-module got deeper. The guardrail check: is anything the caller truly needs
+module got deeper. The guardrail check: is anything the caller needs
 now hidden? If callers must show a retry-after hint, expose that one value
 (`allow` returns `RetryAfter | None`) and keep the bucket internal.
 
@@ -60,9 +60,9 @@ Task: a `UserCard` used in a list, a profile header, and a search result.
 ```
 
 The interface comment for this is a paragraph, and a caller rendering the common
-case still has to make eight decisions. That is overexposure: rare knobs are in
+case still has to make eight decisions. That is overexposure. Rare knobs are in
 the way of the common use. `theme` threaded through here only to reach a child
-is information leakage — `UserCard` does not use it.
+is information leakage, because `UserCard` does not use it.
 
 **Design it twice.** Option A: keep one component, push the knobs to sensible
 defaults. Option B: a small core plus thin presets. Option B wins because the
@@ -77,8 +77,8 @@ three real call sites are three named intents:
 ```
 
 Callers make one decision (which intent), down from eight. Theme is read from context
-inside the core, so it stops being leaked through props. The core is deep; the
-presets are thin wrappers; each encodes a real, distinct intent.
+inside the core, so it stops being leaked through props. The core is deep. The
+presets are thin wrappers. Each encodes a real, distinct intent.
 
 ---
 
@@ -97,5 +97,5 @@ files). It is the kind
 of synthesis the design-it-twice step is supposed to produce. The interface
 comment for C is short and mentions no internals, so it passes the test.
 Guardrail: if a caller must know whether the upload was durably committed before
-returning, that is a real need — `upload` returns once durably stored, and
+returning, that is a real need. `upload` returns once durably stored, and
 that guarantee goes in the comment.

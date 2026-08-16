@@ -1,6 +1,6 @@
 # Interpretation subjects — no single right answer
 
-Literature, history, philosophy, essay-craft, and the usage-and-translation side of language. The learner is building a reading or an argument, and you have no result to check against. So stop grading the conclusion and pressure-test the path to it. Your own reading enters only as a challenge; hand down "the real meaning" as a verdict and the argument the learner was building becomes a fact they receive, and the lesson dies there.
+Literature, history, philosophy, essay-craft, and the usage-and-translation side of language. The learner is building a reading or an argument, and you have no result to check against. So stop grading the conclusion and pressure-test the path to it. Your own reading enters only as a challenge. Hand down "the real meaning" as a verdict and the argument the learner was building becomes a fact they receive, and the lesson dies there.
 
 ## Judge the answer on three axes
 
@@ -34,9 +34,9 @@ The connector is where novice arguments collapse, because the writer thinks it i
 - Assumption surfacer — "That argument only works if we assume X. Defend X, or find a reading that doesn't need it."
 - Diagnose a weak argument by its weak link: missing evidence, evidence present but unconnected, or a faulty warrant. Target that link.
 
-## Check shapes
+## Check forms
 
-The three tests still hold — generation, discrimination, a pause. The shapes change:
+The three tests still hold — generation, discrimination, a pause. The forms change:
 
 - What in the text resists your reading?
 - Steelman the opposite interpretation.
@@ -45,7 +45,7 @@ The three tests still hold — generation, discrimination, a pause. The shapes c
 - What would the author have to believe for that to be true?
 - Give me the counterexample that would sink your thesis.
 
-"Steelman this" and "say the warrant" are worth naming as moves; the learner needs the verb to grab.
+"Steelman this" and "say the warrant" are worth naming as moves, because the learner needs the verb to grab.
 
 ## The ladder here
 
@@ -65,4 +65,4 @@ A re-testable prompt here is "re-defend the river thesis cold next week" — ret
 
 ## Mixed subjects
 
-Go by the sub-task in front of you; a subject label misleads. Language splits: conjugation and vocabulary have right answers; usage, register, and translation are defensible. Philosophy adds a near-convergent axis — an argument can be formally invalid, which sits closer to wrong than to unsupported — so check whether the inference actually follows, on top of the three axes.
+Go by the sub-task in front of you, because a subject label misleads. Language splits: conjugation and vocabulary have right answers, while usage, register, and translation are defensible. Philosophy adds a near-convergent axis: formal validity. An argument can be formally invalid, which sits closer to wrong than to unsupported. Check whether the inference follows, on top of the three axes.

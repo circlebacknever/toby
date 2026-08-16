@@ -19,15 +19,15 @@ Run these before writing any slide.
 
 1. **What is the deck doing?** Teaching a mechanism, summarizing evidence, building a reference, walking a process? The answer determines density and opening structure.
 2. **Composition mode.** Pick one from SKILL.md, different from the one used last time.
-3. **Ink allocation.** Decide which slides use ink before you start. Section dividers, summaries, glossaries, formula slides, decision slides earn ink. Most slides are paper. Ink-forward decks (majority dark) are valid when the deck asserts more than explains — decide deliberately.
+3. **Ink allocation.** Decide which slides use ink before you start. Section dividers, summaries, glossaries, formula slides, decision slides earn ink. Most slides are paper. Ink-forward decks (majority dark) are valid when the deck asserts more than explains, so decide deliberately.
 4. **Opening pattern.** Pick from the options below. Not every deck starts with title → glossary.
-5. **Interactivity plan.** Walk the slides conceptually. For each one, ask whether a parameter governs the concept. If yes, pick an interaction type from the catalog below; sliders are one option among many.
+5. **Interactivity plan.** Walk the slides conceptually. For each one, ask whether a parameter governs the concept. If yes, pick an interaction type from the catalog below. Sliders are one option among many.
 
 ---
 
 ## Deck structure — title and end bookends
 
-Every Toby Artifact deck opens with a **title slide** and closes with an **end slide**. Both are sparse, intentionally — they bracket the dense reference content. Between them: cover/index, then content, then references.
+Every Toby Artifact deck opens with a **title slide** and closes with an **end slide**. Both are deliberately sparse, because they bracket the dense reference content. Between them: cover/index, then content, then references.
 
 ```
 01  Title           (paper, sparse, mark + giant topic)
@@ -74,7 +74,7 @@ XX / NN · R-XX.X · LABEL
 ```
 
 - `XX / NN` — current slide of total (1-indexed, zero-padded to 2 digits).
-- `R-XX.X` — reference deck identifier (e.g. `R-04.2`).
+- `R-XX.X` — reference deck identifier, for example `R-04.2`.
 - `LABEL` — short uppercase section name (`TITLE`, `INDEX`, `GLOSSARY`, `KEPLER`, `WORKED`, `APPLY`, `FIN`).
 
 On ink slides, color the footer text with `--text-on-dark-muted` (`#a8a39a`).
@@ -95,13 +95,13 @@ Vary the opening structure across decks. Pick one.
 
 **Title → big fact.** Title slide, then a single high-contrast slide stating the central numerical fact, measurement, or result. Works for evidence-led decks where the conclusion is the anchor.
 
-**No title slide.** Start directly with the first claim. Use a section eyebrow and the logo primitive in the footer; skip the dedicated opening slide. Works for short reference cards (≤ 6 slides) or when the deck is one section of a longer session.
+**No title slide.** Start directly with the first claim. Use a section eyebrow and the logo primitive in the footer, and skip the dedicated opening slide. Works for short reference cards (≤ 6 slides) or when the deck is one section of a longer session.
 
 ---
 
 ## Title slide pattern — sparse, paper-toned
 
-The opening identity slide. Big topic, the toby wordmark + mark, a quiet decorative orbit lattice. No TOC here — the cover/index slide handles that.
+The opening identity slide. Big topic, the toby wordmark + mark, a quiet decorative orbit lattice. No TOC here, because the cover/index slide handles that.
 
 ```html
 <section data-screen-label="01 Title">
@@ -175,7 +175,7 @@ Dense table-of-contents. 4-column grid of cards, each card naming a section.
 
 ## Content slide patterns
 
-These all sit between the cover and the end slide. Compose freely — bring the component vocabulary onto slides.
+These all sit between the cover and the end slide. Compose freely, and bring the component vocabulary onto slides.
 
 | Slide type | Pattern |
 |---|---|
@@ -202,7 +202,7 @@ Recipe:
 - **Ink-toned.** Background `#1a1c1f`.
 - **Toby Artifact mark + wordmark** in the top-left, using `--text-on-dark` for the strokes (red dot stays accent red).
 - **One centred claim** in 64–80px Inter 500. The most fundamental fact the deck just taught — the sentence that, if remembered alone, still does work. Period at the end.
-- **Small eyebrow** above the claim in `--toby-accent` (one of the few places consequence red is allowed without indicating risk — it marks the deck closing).
+- **Small eyebrow** above the claim in `--toby-accent` (one of the few places consequence red is allowed without indicating risk, because it marks the deck closing).
 - **One-paragraph context** beneath in 16–17px, color `--text-on-dark-muted`. Cites the source / historical anchor for the claim.
 - **Faint geometric backdrop** behind the claim at opacity ≤ 0.12.
 - **Bottom mono stripe** with two captions: source line on the left, "begin again at § 02" pointer on the right.
@@ -236,25 +236,25 @@ See `references/geometry.md` for the 20 named geometric marks and their purposes
 
 The concept governs the interaction type. Identify what the learner needs to falsify or explore, then pick the mechanism. Sliders are one option among many.
 
-**When to make a slide interactive:** the concept has a parameter that governs a visual outcome, a trade-off between two effects, or a process the learner should be able to step through. If moving a control would let the learner falsify an intuition — build it. Decorative motion fails the test.
+**When to make a slide interactive:** the concept has a parameter that governs a visual outcome, a trade-off between two effects, or a process the learner should be able to step through. If moving a control would let the learner falsify an intuition, build it. Decorative motion fails the test.
 
 ### Interaction types
 
-**Slider (continuous parameter).** A scalar value governs a visual or numerical outcome. Use when the relationship between input and output is the lesson: gain vs noise figure, sample size vs confidence interval, learning rate vs convergence. Skip when the parameter is categorical or when the interesting thing isn't the gradient — use a toggle or step-through.
+**Slider (continuous parameter).** A scalar value governs a visual or numerical outcome. Use when the relationship between input and output is the lesson: gain vs noise figure, sample size vs confidence interval, learning rate vs convergence. Skip when the parameter is categorical or when the interesting thing isn't the gradient, and use a toggle or step-through instead.
 
-**Step-through / stepper.** A button advances a process one step at a time. Use for algorithms (sort traversal, packet routing, hash collision resolution), protocols (handshake sequence, state machine transitions), or any process where the sequence is the lesson. Each step updates the diagram and adds an annotation. Don't animate automatically — let the learner control the pace.
+**Step-through / stepper.** A button advances a process one step at a time. Use for algorithms (sort traversal, packet routing, hash collision resolution), protocols (handshake sequence, state machine transitions), or any process where the sequence is the lesson. Each step updates the diagram and adds an annotation. Don't animate automatically. Let the learner control the pace.
 
 **Toggle / mode switch.** A binary or small-N switch changes the view. Use when the concept has two distinct states or representations that benefit from direct comparison: time domain vs frequency domain, serial vs parallel execution, raw data vs normalized data. The learner sees the difference by switching.
 
 **Direct manipulation.** The learner drags, rotates, or repositions an element in a diagram. Use for spatial or geometric concepts: moving a threshold line to see false-positive/negative tradeoff, rotating a beam to show angle vs gain, repositioning a node to show path length change. Requires more implementation but produces the strongest intuition for spatial concepts.
 
-**Input → computed output.** The learner types a value; the slide computes and displays a result. Use for formulas where plugging in numbers is the lesson: Friis equation, Shannon capacity, Nyquist rate. Show the formula, the inputs, and the computed output updating live. Validate input range; show a boundary error when the value falls outside it.
+**Input → computed output.** The learner types a value, and the slide computes and displays a result. Use for formulas where plugging in numbers is the lesson: Friis equation, Shannon capacity, Nyquist rate. Show the formula, the inputs, and the computed output updating live. Validate input range, and show a boundary error when the value falls outside it.
 
 **Clickable taxonomy.** Clicking a term or node expands its definition or sub-structure inline. Use for hierarchical reference material: protocol layers, taxonomy trees, component breakdowns. The learner explores at their own depth.
 
 **Comparative panels.** Two side-by-side panels update from a shared control. Use when the lesson is a trade-off or comparison that must be perceived simultaneously: two algorithms on the same data, two antenna configurations in the same environment.
 
-**Simulation with run/pause.** The learner presses Run to advance a simulation in real time, and Pause to inspect state. Use for queue dynamics, signal propagation, population models, or any system with emergent behavior over time. Include a Reset. Keep the simulation loop under ~60 fps; honor `prefers-reduced-motion` with a static snapshot mode.
+**Simulation with run/pause.** The learner presses Run to advance a simulation in real time, and Pause to inspect state. Use for queue dynamics, signal propagation, population models, or any system with emergent behavior over time. Include a Reset. Keep the simulation loop under ~60 fps, and honor `prefers-reduced-motion` with a static snapshot mode.
 
 ---
 
@@ -293,7 +293,7 @@ export default function Deck() {
 - Slide aspect ratio: 16:9, enforced via CSS `aspect-ratio: 16/9`.
 - Slide width fills the artifact viewport.
 - Padding inside slide: `clamp(20px, 4vw, 64px)` outer; `1rem` inside cards.
-- Font sizes scale with viewport — use `clamp()` for display sizes.
+- Font sizes scale with viewport, so use `clamp()` for display sizes.
 
 ### Typography
 Load Inter and JetBrains Mono via `@import` from `cdn.jsdelivr.net`:
@@ -354,7 +354,7 @@ const T = {
 
 Every slide has, in order:
 
-1. **Eyebrow** — UPPERCASE +0.12em, 11px, muted, section name and slide id (e.g. `05 / 17 · NUMEROLOGY`).
+1. **Eyebrow** — UPPERCASE +0.12em, 11px, muted, section name and slide id, for example `05 / 17 · NUMEROLOGY`.
 2. **Title** — claim-led, sentence case, Inter 600. Sized via `clamp(24px, 3vw, 38px)`.
 3. **Body** — paragraphs, tables, cards, diagrams, interactive controls.
 4. **(Optional) Caption** — meta or caveat, mono 12px, muted, pinned bottom.

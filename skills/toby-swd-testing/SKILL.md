@@ -11,9 +11,9 @@ description: >-
 
 # Toby SWD Testing
 
-A test suite exists for three jobs: pin down what the system does so callers can rely on it, catch regressions when something changes, and make refactoring safe enough that the team will actually do it. A suite that does these jobs is the cheapest insurance in software. A suite that locks in implementation details does worse than nothing — it slows every change, lies about coverage, and trains the team to ignore failures.
+A test suite exists for three jobs: pin down what the system does so callers can rely on it, catch regressions when something changes, and make refactoring safe enough that the team will do it. Do those three jobs. A suite that locks in implementation details does worse than nothing, because it slows every change, lies about coverage, and trains the team to ignore failures.
 
-**A good test describes behavior at the public interface.** Inputs go in, outputs come out, observable side effects show up where callers would notice them. Internal call order, private method signatures, the order helpers fire, and intermediate data shapes are invisible from outside the module and should be invisible to the test. A test that survives a correct refactor is doing its job. A test that fails because you renamed a helper while preserving behavior is just diff detection with extra steps.
+**Describe behavior at the public interface.** Inputs go in, outputs come out, observable side effects show up where callers would notice them. Internal call order, private method signatures, the order helpers fire, and intermediate data shapes are invisible from outside the module and should be invisible to the test. Write tests that survive a correct refactor. A test that fails because you renamed a helper while preserving behavior is detecting the diff and nothing else.
 
 ## Name tests by behavior
 
@@ -29,15 +29,15 @@ Avoid:
 - `sets internalOpenIndex to 1`
 - `returns object with status field`
 
-If you can't name the behavior, you don't know what you're testing. That's a design signal — usually the abstraction boundary you're testing through is wrong, or the behavior under test is tangled with something else.
+If you can't name the behavior, you don't know what you're testing. That is a design signal. Usually the abstraction boundary you're testing through is wrong, or the behavior under test is tangled with something else.
 
 ## Test through public interfaces
 
 Tests at the boundary survive refactors. Tests that reach into internals do not.
 
-Concretely: don't import private modules to test them. Don't assert on private state. Don't verify that helper X was called before helper Y unless that call sequence is the observable contract — which is rare. Mock external dependencies at the system boundary. Internal collaborators stay real — mocking them couples the test to current structure.
+Concretely: don't import private modules to test them. Don't assert on private state. Don't verify that helper X was called before helper Y unless that call sequence is the observable contract — which is rare. Mock external dependencies at the system boundary. Internal collaborators stay real, because mocking them couples the test to current structure.
 
-When a behavior is hard to test through the public interface, the abstraction is usually too coarse. The fix is to extract a smaller module with a real interface, then test through it. Reaching into internals to "make it testable" is the failure mode toby-swd-modules exists to prevent.
+When a behavior is hard to test through the public interface, the abstraction is usually too coarse. The fix is to extract a smaller module with a real interface, then test through it. Do not reach into internals to "make it testable". That failure is what toby-swd-modules exists to prevent.
 
 ## Narrow assertions
 
@@ -45,7 +45,7 @@ An assertion should fail when the behavior under test changes. It should not fai
 
 Useful patterns:
 - Assert on the specific value or field that proves the behavior happened.
-- When the output is inexact by nature, assert it falls within a stated, justified tolerance of the expected value; exact-equality assertions flake or lie on such outputs.
+- When the output is inexact by nature, assert it falls within a stated, justified tolerance of the expected value. Exact-equality assertions flake or lie on such outputs.
 - Use object subset matching when only a few fields matter.
 - Reserve full-object equality and snapshot matching for cases where the entire structure is the contract — config files, public response schemas, serialization formats.
 
@@ -59,7 +59,7 @@ Cover the contract's distinct observable outcomes — the success path, each doc
 
 ## Each test stands alone
 
-No shared mutable state between tests, no ordering dependencies, deterministic (control time and IO, and pin randomness to a recorded seed so the run reproduces), and self-validating (it asserts; it does not print for a human to read). A test whose result depends on what ran before it is already broken. When the system itself must reproduce the same outputs across runs or machines, that determinism is part of the contract under test; when a result depends on a library or platform version, record it so a later mismatch is visible.
+No shared mutable state between tests, no ordering dependencies, deterministic, and self-validating. Deterministic means controlling time and IO, and pinning randomness to a recorded seed so the run reproduces. Self-validating means the test asserts, and does not print for a human to read. A test whose result depends on what ran before it is already broken. When the system itself must reproduce the same outputs across runs or machines, that determinism is part of the contract under test. When a result depends on a library or platform version, record it so a later mismatch is visible.
 
 ## Test-first, with judgment
 
@@ -68,7 +68,7 @@ Write the test before the implementation when the behavior is well-defined. Two 
 1. **Bug fixes with defined durable behavior.** Reproduce the bug in a failing test before touching production code. This proves the test catches the bug, proves the fix works, and leaves a regression guard behind. A bug fix without a regression test is incomplete work and the bug can return without notice.
 2. **New behavior with a settled contract.** Once the design pass identifies the abstraction and its interface, test-first pins down the contract and drives the implementation toward it.
 
-Skip test-first when the design is still being worked out. Letting the next failing test drive the next bit of implementation is how you end up with a feature-shaped pile of code and no real abstraction — TDD as a substitute for design. Do the design pass first (see toby-swd-strategy and toby-swd-modules), then write tests against the interface you settled on.
+Skip test-first when the design is still being worked out. Letting the next failing test drive the next bit of implementation is TDD as a substitute for design. You end up with a feature-shaped pile of code and no real abstraction. Do the design pass first (see toby-swd-strategy and toby-swd-modules), then write tests against the interface you settled on.
 
 Also skip test-first when no relevant test harness exists, the change is documentation-only, the edit is pure formatting or metadata, or the only useful verification would require unsafe external state. Say which case applies and how you verified instead.
 
@@ -86,7 +86,7 @@ Default to the highest-fidelity dependency that is fast and deterministic.
 2. **Fake** when the real thing is slow, external, or hard to set up — a hand-written stand-in with realistic behavior. Faster than the real thing, more faithful than a mock.
 3. **Mock** only at system boundaries: external APIs, payment, email, time, randomness, file systems, and specific failure modes that are hard to trigger otherwise.
 
-When the real dependency lives across a process, sandbox, or hardware boundary you can't run in-process, that boundary is the system boundary: fake the channel or simulate the environment, and test each side against the contract; mocking the other side's internals couples the test to its structure.
+When the real dependency lives across a process, sandbox, or hardware boundary you can't run in-process, that boundary is the system boundary. Fake the channel or simulate the environment, and test each side against the contract. Mocking the other side's internals couples the test to its structure.
 
 Mocking internal collaborators couples tests to call sequences and current structure. The test passes today, a refactor breaks fifteen tests tomorrow, the team starts deleting tests to keep CI green. Avoid the chain.
 
@@ -101,7 +101,7 @@ Classify the failing test before changing it. Four buckets:
 3. **Behavior is obsolete.** Remove the test and explain why in the commit message.
 4. **Bad test** — coupled to internals, asserts on incidental data, or doesn't test what its name claims. Rewrite it to protect the same useful behavior through a better interface.
 
-A test you can't classify is a test you don't understand. Read it until you do. Mass-updating snapshots, deleting cases that "break a lot," or replacing strong assertions with weaker ones to land a PR is how a suite turns into theater.
+Read a test you can't classify until you understand it. Mass-updating snapshots, deleting cases that "break a lot," or replacing strong assertions with weaker ones to land a PR leaves a suite that passes and protects nothing.
 
 When you do delete or weaken a test deliberately, report the test name, the behavior it protected, why that behavior is obsolete or wrong, and what coverage replaces it. No silent removals.
 
@@ -116,7 +116,7 @@ Before calling test coverage done, check it against every red flag below.
 - **Test fails on a correct refactor.** Coupled to internals.
 - **Test name describes a call.** "calls X with Y" names a mock log. The reader still can't tell what the system is supposed to do.
 - **Snapshot blob.** Large auto-updated string nobody reviews on change.
-- **Flaky test.** Passes on retry, fails at random. It is a broken test; fix the nondeterminism, never loop it until it goes green.
+- **Flaky test.** Passes on retry, fails at random. It is a broken test, so fix the nondeterminism and never loop it until it goes green.
 - **Mock of an internal collaborator.** Verifies the call sequence, which says nothing about what the system produces.
 - **Coverage-driven test.** Written to hit a line. It protects no behavior and reads like the implementation with the word "expect" sprinkled in.
 - **Hard-to-name test.** The abstraction under test is wrong or mixed.

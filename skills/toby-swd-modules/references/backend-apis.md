@@ -33,10 +33,10 @@ public class OrderController extends BaseController {
 }
 ```
 
-What's wrong: applies the composition-over-inheritance check. `BaseController` and every `*Controller` share a
-two-way coupling. A new field added to the base is visible everywhere; a base
-method's behavior is overridable from any subclass; `currentUser` and
-`lastValidation` are instance variables that both sides mutate. The base class
+The composition-over-inheritance check applies here. `BaseController` and every
+`*Controller` share a two-way coupling. A new field added to the base is visible
+everywhere. A base method's behavior is overridable from any subclass, and
+`currentUser` and `lastValidation` are instance variables that both sides mutate. The base class
 accumulates a grab-bag of helpers because adding one is easier than designing a
 real boundary. After two years no one knows which controllers depend on which
 base behavior, and changing `BaseController` requires reading thirty files.
@@ -63,13 +63,13 @@ public class OrderController {
 }
 ```
 
-`AuthzGuard` is one module owning authorization decisions; `ResponseBuilder`
+`AuthzGuard` is one module owning authorization decisions, and `ResponseBuilder`
 owns response shape. Each is deep behind a small interface. `OrderController`
 composes them as injected fields, narrow and named for
 what they do. The old `currentUser` was reachable from anywhere.
 
 Logging access, which `BaseController` did via a helper, moves to a Spring
-interceptor or AOP advice — the cross-cutting concern lives in one place where
+interceptor or AOP advice. The cross-cutting concern lives in one place where
 the dispatcher applies it. The old form made every handler remember to call
 it.
 
@@ -119,14 +119,14 @@ public class Order {
 }
 ```
 
-Fields stay private. `markPaid` and `cancel` are the legal transitions —
+Fields stay private. `markPaid` and `cancel` are the legal transitions, so
 callers can't drift the state into invalid combinations. Where a value
-truly needs to be exposed (`amount()`), it's a method that names what the
+must be exposed (`amount()`), it's a method that names what the
 caller wants to know. A `getAmount` would mean only "the bytes of the
 field." The class is now deep: a few intent methods, substantial invariant
 enforcement behind them.
 
-This is the same point as the depth check: `getX/setX` makes the
+This is the same point as the depth check. `getX/setX` makes the
 interface and the implementation the same shape. That's the definition of a
 shallow module.
 
@@ -155,16 +155,16 @@ func (s *userServiceImpl) GetUser(...) ... { ... }
 // ...
 ```
 
-Two problems. First, the interface is colocated with the implementation, so
-every consumer drags in the whole `users` package and the whole interface even
+Two problems. First, the interface is colocated with the implementation. Every
+consumer drags in the whole `users` package and the whole interface even
 when they only need one method. Second, the interface enumerates every method
-the implementation exposes — every method appears, so the interface only
-mirrors the struct. That's a shallow interface; it has no asymmetry between
-cost and benefit.
+the implementation exposes. Every method appears, so the interface only
+mirrors the struct. That's a shallow interface, because it has no asymmetry
+between cost and benefit.
 
-Idiomatic Go: each consumer declares the narrow interface it actually needs,
-right where it uses it. The implementation in `users` is a concrete struct with
-public methods; no one declares it implements anything explicitly.
+Idiomatic Go: each consumer declares the narrow interface it needs and nothing
+more, right where it uses it. The implementation in `users` is a concrete struct
+with public methods, and no one declares it implements anything explicitly.
 
 ```go
 // pkg/orders/checkout.go
@@ -180,12 +180,12 @@ func Checkout(u userLookup, orderID string) error { ... }
 The `orders` package depends on a one-method interface it defined for its own
 purposes. Tests inject a fake implementing only that method. When `users` adds
 methods, `orders` is unaffected because it never asked for them. Depth comes
-from the cost-to-benefit asymmetry: the consumer pays for one method's worth
+from the cost-to-benefit asymmetry. The consumer pays for one method's worth
 of interface and gets whatever the implementation does behind it.
 
-This is the same principle as the depth check in a different syntax: the interface
-should be much smaller than the implementation. Go's convention makes it
-mechanical to enforce.
+This is the same principle as the depth check in a different syntax. The
+interface should be much smaller than the implementation. Go's convention makes
+it mechanical to enforce.
 
 ---
 
@@ -206,8 +206,8 @@ app.use(audit());                    // reads everything written above
 This is temporal decomposition (the decompose-by-knowledge check). The reason there are seven
 middlewares is "first do this, then that, then the next thing." The thing
 being passed between them is `req`, a giant bag that each step reads from and
-writes to. Every middleware knows about fields the previous ones produced —
-information about who the user is, what their permissions are, which tenant
+writes to. Every middleware knows about fields the previous ones produced.
+Information about who the user is, what their permissions are, and which tenant
 they belong to is leaked across all seven modules.
 
 Adding the next concern means another middleware that reads `req.user`,
@@ -241,12 +241,12 @@ async getOrder(@Req() req: Request) {
 ```
 
 The handler now invokes three named operations, each owning its knowledge.
-`req.user` is gone — `session` is a value with a real type. Audit,
+`req.user` is gone, and `session` is a value with a real type. Audit,
 rate-limit, and tenant context become explicit dependencies of the operations
 that need them.
 
-Cross-cutting interceptors (logging, metrics) can still exist; they're the
-narrow category Nest interceptors and Express middleware actually fit. The
+Cross-cutting interceptors (logging, metrics) can still exist, and they're the
+narrow category Nest interceptors and Express middleware fit. The
 seven-middleware pipeline collapses to two or three when each represents a
 real cross-cut and the rest move into named modules.
 
@@ -261,4 +261,4 @@ real cross-cut and the rest move into named modules.
 | Cross-cutting concern | AOP advice or `HandlerInterceptor` | Wrapping middleware at the router | Nest interceptors/guards |
 | Wide interface near implementation | One narrow interface per consumer | One narrow interface per consumer (idiomatic) | One narrow interface per consumer |
 
-The principles are the same; the idiom is what changes.
+The principles are the same, and the idiom is what changes.

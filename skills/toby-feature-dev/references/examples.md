@@ -1,6 +1,6 @@
 # Worked cuts
 
-Four feature shapes, cut into slices, all four in one invented repo: orders, a members screen, a billing module, a search path. The behavior record at the bottom is what these four left behind, which is why it holds two of them and one retirement. Each shape shows the criteria in full, the slice order and its name, the wiring line that proves the slice is reachable, and where a stop earns its place. The paths are invented; the shape is what survived contact with a real repo.
+Four feature shapes, cut into slices, all four in one invented repo: orders, a members screen, a billing module, a search path. The behavior record at the bottom is what these four left behind, which is why it holds two of them and one retirement. Each shape shows the criteria in full, the slice order and its name, the wiring line that proves the slice is reachable, and where a stop earns its place. The paths are invented. The shape is what survived contact with a real repo.
 
 Every criterion below carries all three lines, because a criterion missing one is the thing the skill tells you to drop.
 
@@ -10,14 +10,14 @@ Request: "let people cancel an order from the account page."
 
 1. Observable — a POST to `/orders/:id/cancel` on an order the caller owns returns the order with status `cancelled`. Source — user: "cancel an order". Check — `test_cancel_returns_cancelled_order`, unmet if the status stays `open`.
 2. Observable — cancelling an order already shipped returns 409 and leaves the order untouched. Source — user: "no cancelling once it's out the door", backed by `api/orders.ts:88`, the shipped-state guard refunds already run. Check — `test_cancel_rejects_shipped`, unmet if the order changes.
-3. Observable — cancelling someone else's order returns 404. Source — `api/orders.ts:31`, the ownership check every other order route runs; the request is silent on this. Check — `test_cancel_scopes_to_owner`, unmet on any 2xx.
+3. Observable — cancelling someone else's order returns 404. Source — `api/orders.ts:31`, the ownership check every other order route runs. The request is silent on this. Check — `test_cancel_scopes_to_owner`, unmet on any 2xx.
 4. Stays working — the order list still returns shipped and open orders unchanged. Source — the existing contract. Check — the `orders_list` suite, unmet on any changed row.
 
 Slices: one, `an open order can be cancelled from the account page`. All four criteria arrive at the same seam, an HTTP request to the orders API.
 
 Wiring: `api/routes.ts:142` — `router.post('/orders/:id/cancel', cancelOrder)`. Without that line the handler is a well-tested function nothing can reach.
 
-Stops: criteria only, one line, keep moving. No strategic trigger — the route is new, the boundary isn't, and `api/orders.ts` is the sibling at path:line. No plan file for a one-slice tactical change.
+Stops: criteria only, one line, keep moving. No strategic trigger, because the route is new, the boundary isn't, and `api/orders.ts` is the sibling at path:line. No plan file for a one-slice tactical change.
 
 Record: criteria 1 and 2 quote a person, so both get entries. Criterion 3 cites a repo fact, so it gets none.
 
@@ -30,19 +30,19 @@ Request: "users should be able to invite a teammate and see the invite pending."
 3. Observable — opening a used or expired link shows an expired state and creates no account. Source — user, on the follow-up about resent links: "once I resend, the first link should be scrap". Check — `test_expired_link_creates_no_account`, unmet if an account exists after.
 4. Stays working — the members list still renders for an org with no pending invites. Source — the existing contract. Check — `members_list` suite.
 
-Slices: two, named for what each one lets someone do — `invite shows up as pending`, then `the invite email opens the accept screen`. Criteria 1 and 4 land at the members screen; 2 and 3 land at the mail and the accept route. Different seams, different slices.
+Slices: two, named for what each one lets someone do — `invite shows up as pending`, then `the invite email opens the accept screen`. Criteria 1 and 4 land at the members screen, and 2 and 3 land at the mail and the accept route. Different seams, different slices.
 
 Wiring: slice one at `screens/Members.tsx:210` — `<InviteForm onSubmit={createInvite} />`. Slice two at `jobs/index.ts:17`, the `invite.created` subscription.
 
-Stops: criteria, then a plan file, since this spans two slices. Slice one ends on a boundary carrying a real question — the pending row shows the address, and whether it also shows the inviter and the expiry decides the second slice's shape. Stop there. Had it raised nothing, three lines and keep moving.
+Stops: criteria, then a plan file, since this spans two slices. Slice one ends on a boundary carrying a real question. The pending row shows the address, and whether it also shows the inviter and the expiry decides the second slice's shape. Stop there. Had it raised nothing, three lines and keep moving.
 
-Slice one depends on slice two to be worth anything: an invite that creates a row and mails nobody is half-built behavior a user can reach. So `invites.form` defaults off, slice one is observed with it on, and the flag flips for real when slice two's send lands. Slice two's last checkbox deletes it. A staging flag still set after its slice ships is a config option nobody decided to add.
+Slice one depends on slice two to be worth anything. An invite that creates a row and mails nobody is half-built behavior a user can reach. So `invites.form` defaults off, slice one is observed with it on, and the flag flips for real when slice two's send lands. Slice two's last checkbox deletes it. A staging flag still set after its slice ships is a config option nobody decided to add.
 
 ## 3. Greenfield — a subsystem with no sibling
 
 Request: "we need usage metering so we can bill by seat next quarter."
 
-The same subsystem asked for differently — "a quick PoC of the metering dashboard so I can see if the layout works" — never reaches this section. That is experiment mode: hand it to toby-swd-experiment, say in one line what would move it to durable, and write no criteria, no slices, no record. What follows is what arrives after the user has seen a layout they like and asks for the real one. The layout survives; the code under it does not.
+The same subsystem asked for differently — "a quick PoC of the metering dashboard so I can see if the layout works" — never reaches this section. That is experiment mode. Hand it to toby-swd-experiment, say in one line what would move it to durable, and write no criteria, no slices, no record. What follows is what arrives after the user has seen a layout they like and asks for the real one. The layout survives. The code under it does not.
 
 Nothing nearby resembles this: no metering module, no counter storage, no billing surface. Greenfield, so the design pass runs through toby-swd-strategy before any code, and a plan file is written whatever the slice count.
 
@@ -52,11 +52,11 @@ Nothing nearby resembles this: no metering module, no counter storage, no billin
 
 Greenfield's extra work, before the second file exists:
 
-- Nearest conventions the repo already has: `billing/` for money-adjacent modules and the `jobs/` daily aggregate shape used by `jobs/revenue_rollup.ts`. Extend those two; don't invent a third layout.
+- Nearest conventions the repo already has: `billing/` for money-adjacent modules and the `jobs/` daily aggregate shape used by `jobs/revenue_rollup.ts`. Extend those two. Don't invent a third layout.
 - Boundary written once, per toby-swd-modules and toby-swd-interfaces: the module exposes `seatCountForDay(workspace, date)` and owns the storage shape behind it. Callers never touch rows.
 - The naming call goes to the user. `seat`, `member`, and `active user` mean the same thing today and one of them is about to appear on an invoice.
 
-Slices: two — `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it, and the CLI is what keeps slice one from being a layer cut nobody can open.
+Slices: two — `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI is what keeps slice one from being a layer cut nobody can open.
 
 Stops: criteria, then the design pass, then the plan. Both a persisted shape and money are strategic triggers, so the design lines are owed before the plan can name a file.
 
@@ -72,11 +72,11 @@ Slices: one, `search matches a full SKU`. The baseline run matters more than usu
 
 Wiring: none new. The change sits inside a reached path, so the fourth slice condition is met by the existing call site at `search/query.ts:60`, cited.
 
-Stops: criteria only. Criterion 3 came out of the ambiguity pass — "match on SKU as well" holds a second reading where SKU matches outrank names. One edit undoes it, so it ships marked `assumed`: reading taken is name-first, reading dropped is SKU-first, and what changes if they wanted the other is the ordering clause in `rankResults`.
+Stops: criteria only. Criterion 3 came out of the ambiguity pass. The phrase "match on SKU as well" holds a second reading where SKU matches outrank names. One edit undoes it, so it ships marked `assumed`: reading taken is name-first, reading dropped is SKU-first, and what changes if they wanted the other is the ordering clause in `rankResults`.
 
 # A plan an operator can approve
 
-Slice one of the invite flow. Format is AGENTS.md's; the detail in each step is what makes it reviewable.
+Slice one of the invite flow. Format is AGENTS.md's. The detail in each step is what makes it reviewable.
 
 ```markdown
 # Toby's plan for team invites

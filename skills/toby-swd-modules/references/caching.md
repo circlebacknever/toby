@@ -37,11 +37,10 @@ def get_product_listing(category: str) -> list[Product]:
 Two checks fail at once. Information leakage: the cache key schema
 (`"product:..."`), the TTL (600 seconds), the serialization format, and the
 invalidation rules are duplicated wherever they're touched. The different-layer
-check: the service should hold product logic; half the code here is Redis
+check: the service should hold product logic, and half the code here is Redis
 bookkeeping. When the team introduces a second category-listing endpoint, the
-new author either
-duplicates the cache machinery or — much worse — forgets to invalidate, and
-stale listings appear in production.
+new author either duplicates the cache machinery or, much worse, forgets to
+invalidate. Stale listings then appear in production.
 
 Treat the cache as a layer below the repository:
 
@@ -65,7 +64,7 @@ a thin caching decorator around an underlying `ProductsStore` it composes).
 Adding a new derived listing means adding a method and an entry to
 `_evict_for`; never editing fifteen services.
 
-This is the canonical place to pull complexity down: the cache
+This is the canonical place to pull complexity down. The cache
 serves many callers, and the right author for the hard parts is the module
 that already owns the data.
 
@@ -111,15 +110,15 @@ const products: ProductsStore = new CachedProductsStore(
 `CachedProductsStore` earns its place as a real module. It owns:
 cache-key construction, TTL policy, eviction rules, and load-through semantics
 behind `getOrLoad`. The interface (`ProductsStore`) is identical to the
-underlying store — that is correct here, because this is the decorator case
-called out in the different-layer check as legitimate. Each implementation adds distinct
-functionality: the cache version adds memoization and invalidation that
+underlying store. That is correct here, because this is the decorator case
+called out in the different-layer check as legitimate. Each implementation adds
+distinct functionality. The cache version adds memoization and invalidation that
 callers cannot see and do not manage.
 
 If `CachedProductsStore` ever shrinks to forwarding without adding behavior
 (no TTL choices, no eviction logic, no stampede protection — just a `get` and
-`set`), it has degraded into a pass-through wrapper and should be deleted in
-favor of using `cache` directly inside `PostgresProductsStore`.
+`set`), it has degraded into a pass-through wrapper. Delete it and use `cache`
+directly inside `PostgresProductsStore`.
 
 ---
 
@@ -205,7 +204,7 @@ func (s *EventsService) Record(ev Event) error {
 }
 ```
 
-The list looks like a precondition that every writer must remember. It is —
+The list looks like a precondition that every writer must remember. It is one,
 and the same list will need to be replicated in every batch importer, every
 admin tool that injects events, every migration that backfills. Six caches
 deriving from one table is a deliberate design decision, and the decision is
@@ -234,8 +233,8 @@ The batch importer and the admin tool call `Insert` and get correct
 invalidation automatically.
 
 For higher-volume systems this same logic moves to an event/CDC stream and a
-worker that invalidates based on database changes. The principle is the same:
-invalidation is a decision; one module owns it; callers don't carry the
+worker that invalidates based on database changes. The principle is the same.
+Invalidation is a decision, one module owns it, and callers don't carry the
 list.
 
 ---

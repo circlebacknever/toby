@@ -35,7 +35,7 @@ Seven sentences. Three caller obligations (load-on-miss coordination,
 JSON-only values, TTL fuzziness). The interface sits at the level of "wraps
 Redis." It should own caching for this app.
 
-The deeper interface inverts the contract — the cache coordinates
+The deeper interface inverts the contract. The cache coordinates
 load-on-miss itself, so the caller never does:
 
 ```ts
@@ -55,7 +55,7 @@ interface Cache {
 
 Comment for `getOrLoad`: four sentences (the docstring above). No load-on-miss
 coordination obligation. The cache owns single-flight per process (and
-optionally a distributed lock for cross-process coordination) — the
+optionally a distributed lock for cross-process coordination), so the
 caller writes one line.
 
 `get` and `set` are gone from the interface. They are useful internally
@@ -66,7 +66,7 @@ into the load-through pattern, which is what they wanted anyway.
 Guardrail: rare cases legitimately need `set` without an associated load
 (precomputed cache warming, for example). Expose a `warm(key, value,
 ttl)` method that explicitly signals the intent. The mechanism (`set`)
-remains hidden; the operation (`warm`) is the named contract.
+remains hidden, and the operation (`warm`) is the named contract.
 
 ---
 
@@ -139,7 +139,7 @@ class CachedProductsStore implements ProductsStore {
 ```
 
 The service goes back to calling `products.find(id)` and
-`products.save(updated)`. The cache's interface has not changed; what
+`products.save(updated)`. The cache's interface has not changed. What
 changed is *who calls it*. `CachedProductsStore` is the one module that
 knows the products' caching scheme. Adding a new derived view adds an
 entry to `evictDerivedFrom`, in one place.
@@ -151,7 +151,7 @@ The data interface (`ProductsStore`) has the same comment as before:
 
 The cache interface is unchanged. The redesign was at the *composition*
 level — moving the cache from a peer of the service to a decorator of
-the store. This is a recurring pattern: when an interface's natural
+the store. This is a recurring pattern. When an interface's natural
 operation has a side effect on a peer module, the side effect probably
 belongs *inside* whichever module owns the underlying decision. The caller
 should never carry it.
@@ -212,8 +212,8 @@ One sentence. The keying convention does not appear anywhere callers can
 see.
 
 This is the same redesign pattern as `databases.md` Example 1 (ORM
-exposed vs intent methods). The shallow interface accepted a string;
-the deep interface accepts a typed identity.
+exposed vs intent methods). The shallow interface accepted a string.
+The deep interface accepts a typed identity.
 
 ---
 
@@ -230,7 +230,7 @@ async function getProduct(id: string): Promise<Product | null> {
 If `cache.getOrLoad` throws when Redis is unreachable, the caller now
 must handle "Redis is down" as a failure mode for what looks like a
 product fetch. If `cache.getOrLoad` silently falls back to calling
-`load` directly, the caller doesn't know the cache is failing — and a
+`load` directly, the caller doesn't know the cache is failing. A
 flood of cache misses hitting the database is a different kind of bad day.
 
 The choice is part of the interface. Document it:
@@ -253,7 +253,7 @@ Three sentences. Cache failure semantics fall through silently as part
 of the contract, so callers don't write defensive code, and the cache
 layer commits to handling its own outages. This is the kind of
 caller-facing information the guardrail (step 7 of the procedure)
-explicitly preserves: graceful degradation in the face of cache outage
+explicitly preserves. Graceful degradation in the face of cache outage
 is what `getOrLoad` promises, and that promise has to be visible.
 
 The alternative interface, which surfaces outages explicitly, is also
@@ -266,12 +266,12 @@ interface CacheStrict {
 }
 ```
 
-Same comment-test discipline applies — whichever choice you make, name
-it in the contract. Stale-while-revalidate is a third documented choice:
-it serves a bounded-age value while a background load refreshes it, so the
-"never stale" line above flips, and the staleness window becomes part of the
+Same comment-test discipline applies. Whichever choice you make, name
+it in the contract. Stale-while-revalidate is a third documented choice.
+It serves a bounded-age value while a background load refreshes it, so the
+"never stale" line above flips. The staleness window becomes part of the
 contract exactly like the fall-through rule. The freshness guarantee is a
-decision the comment states; a cache has it only when the contract says so.
+decision the comment states, and a cache has it only when the contract says so.
 
 ---
 
