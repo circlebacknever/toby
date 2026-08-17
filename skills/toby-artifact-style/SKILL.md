@@ -315,7 +315,7 @@ Every sentence, panel, or slide must do one of these. If it does none, remove it
 
 Every sentence in artifact copy must pass **cite**, **negation**, and **substitution**, then survive the **reader-skim** cut. `references/copy.md` carries all four.
 
-Banned words live in `base/toby.md`. This skill adds none.
+Banned words live in the operating guide, already loaded. This skill adds none.
 
 **Headings carry the claim.** Body explains or qualifies. Caveats sit next to the claim, never in a footnote.
 

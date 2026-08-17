@@ -25,6 +25,21 @@ OLD_REFERENCES = [
 
 REVIEW_TOOL_NAMES = re.compile(r"\b(Codex|Claude|Kiro|Copilot)\b")
 
+# The repo path for the operating guide. Nothing installs under this name, so a
+# skill that cites it sends the reader to a file that is not there.
+#
+# The other half of this bug is a skill calling the guide `AGENTS.md`, and that
+# one is not checked here. `AGENTS.md` is also what toby-swd-docs calls the
+# module doc in the user's own repo, so the same string is right in one skill
+# and wrong in another, and only the sentence around it tells them apart.
+OPERATING_GUIDE_PATHS = [
+    re.compile(r"base/toby\.md"),
+]
+
+# Kept byte-identical to base/toby.md by sync.sh, so it is scanned as the guide
+# rather than as a skill file.
+VOICE_REFERENCE_COPY = REPO_ROOT / "skills" / "toby-voice" / "references" / "toby.md"
+
 # Ceiling every current CLI target accepts (agentskills/Kiro allow up to 1024;
 # Claude Code allows more). Stay under this and the skill loads everywhere.
 DESCRIPTION_MAX = 1024
@@ -257,6 +272,29 @@ def check_review_skill(errors: list[str]) -> None:
         errors.append(f"tool-specific review wording {match.group(0)!r}: {review}:{line_for_offset(text, match.start())}")
 
 
+def check_operating_guide_refs(errors: list[str]) -> None:
+    """A skill may not name the operating guide by any file path.
+
+    Skills install standalone. The guide installs as a marked block inside
+    whichever file the host tool already reads, so `base/toby.md` is a repo
+    path that exists nowhere after install, and `AGENTS.md's ask-list` is only
+    the right filename on one of the four targets. Say "the operating guide";
+    it is always loaded, so no path is needed to reach it. Plain `AGENTS.md`
+    stays legal because toby-swd-docs means the user's own module doc by it.
+    """
+    for path in text_files(REPO_ROOT / "skills"):
+        if path == VOICE_REFERENCE_COPY:
+            continue
+        text = path.read_text(errors="ignore")
+        rel = path.relative_to(REPO_ROOT)
+        for pattern in OPERATING_GUIDE_PATHS:
+            for match in pattern.finditer(text):
+                errors.append(
+                    f"operating guide named by path {match.group(0)!r}, "
+                    f"write \"the operating guide\": {rel}:{line_for_offset(text, match.start())}"
+                )
+
+
 # These files quote the rules in order to state them, so scanning them for the
 # words they define would fail by design.
 VOICE_SCAN_EXEMPT = {
@@ -439,6 +477,7 @@ def main() -> int:
     check_instruction_sync(errors)
     check_stale_references(errors)
     check_review_skill(errors)
+    check_operating_guide_refs(errors)
     check_voice_compliance(errors, warnings)
     check_single_source(errors)
     check_ste_conformance(warnings)

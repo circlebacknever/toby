@@ -67,6 +67,8 @@ Block already there? Only the block changes. No block? The installer waits for `
 
 The operating guide owns safety, work loop, skill routing, verification posture, and voice. Skills own task method. Toby keeps the boundary visible, since mixed guidance turns into paperwork with hinges.
 
+A skill points at the guide by calling it "the operating guide" and never by a filename. `base/toby.md` is a path in this repo and nowhere else after install, and the installed name is `CLAUDE.md` on one tool, `AGENTS.md` on another, `copilot-instructions.md` on a third. The guide loads on every turn, so the name is all a skill needs. The validator fails on `base/toby.md` inside `skills/`. It does not police the `AGENTS.md` spelling, because `toby-swd-docs` uses that filename for the module doc in the user's own repo.
+
 ## Skills
 
 The first five workflow skills are adapted from Anthropic skills. Toby kept the workflow shape, rewrote the instructions, and packaged them as `toby-*` names:

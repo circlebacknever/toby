@@ -33,13 +33,13 @@ Applied after the first three pass. A reader who already knows the material skim
 
 Do not invent foils. `It's not X, it's Y` is filler whenever nobody claimed X. Write the positive form.
 
-Comparing two options that both exist is content. A comparison table, a rejected-alternative callout, and a "chose A over B because C" caption all name a real option, so they ship. `base/toby.md` carries the full rule.
+Comparing two options that both exist is content. A comparison table, a rejected-alternative callout, and a "chose A over B because C" caption all name a real option, so they ship. The operating guide carries the full rule.
 
 ---
 
 ## Where the word list lives
 
-`base/toby.md` carries the one banned-word list, with the replacement move for each entry. This file adds none and repeats none.
+The operating guide carries the one banned-word list, with the replacement move for each entry. It is always loaded, so the list is already in context. This file adds none and repeats none.
 
 ---
 

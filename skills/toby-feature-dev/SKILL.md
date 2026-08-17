@@ -26,12 +26,12 @@ Mode. Discovery. Criteria. Slices. Stop 1. Design. Plan. Stop 2. Build the slice
 
 Two modes, and picking wrong is expensive in both directions. A throwaway spike carrying acceptance criteria is paperwork. A payments integration built as a throwaway spike is a payments integration built as a throwaway spike.
 
-- **Experiment**, on AGENTS.md's experiment triggers — spike, proof of concept, throwaway, compare options, tune it while I watch. Hand the loop to toby-swd-experiment and stand down: no criteria, no slices, no record, no stops beyond that skill's own. Say in one line that this is experiment mode and what would move it to durable.
+- **Experiment**, on the operating guide's experiment triggers — spike, proof of concept, throwaway, compare options, tune it while I watch. Hand the loop to toby-swd-experiment and stand down: no criteria, no slices, no record, no stops beyond that skill's own. Say in one line that this is experiment mode and what would move it to durable.
 - **Durable implementation**, everything else, which is the rest of this file.
 
 When the user picks a behavior at the end of an experiment, come back here and write the criteria from what they picked. The spike proves behavior and decides no structure. toby-swd-experiment's finish phase deletes the throwaway surface, and what survives gets the greenfield or brownfield read on its own merits. Durable work that stalls on a value no amount of reading can settle drops into toby-swd-experiment for that one question, then returns with the answer.
 
-Every durable feature loads toby-swd-strategy: a full design pass before any code on strategic or greenfield work, its brownfield read and reactive-investment pass on tactical work. AGENTS.md's standing routes fire here on their own conditions and this file never narrows them. The skills that fired name the active-skills line.
+Every durable feature loads toby-swd-strategy: a full design pass before any code on strategic or greenfield work, its brownfield read and reactive-investment pass on tactical work. The operating guide's standing routes fire here on their own conditions and this file never narrows them. The skills that fired name the active-skills line.
 
 ## Discover before designing
 
@@ -87,7 +87,7 @@ Cutting by layer is the classic wrong cut. "The data layer" fails the bar twice:
 
 ## Checkpoints
 
-Three stops, on the running order above. The machine-safety stops in AGENTS.md and toby-swd-environment stay in force alongside them.
+Three stops, on the running order above. The machine-safety stops in the operating guide and toby-swd-environment stay in force alongside them.
 
 1. **The criteria, before the first edit.** Show the list under the heading `What done means for [task]`, then the slice cut by name. Tactical work with one slice gets one line and keeps moving. Any strategic trigger, wait. Where checkpoint 2 also fires, say so here, since the yes at this stop is what asks for the plan.
 2. **The plan, after the design pass and before the first edit on strategic or multi-slice work.** Written file, reviewed and approved before execution. See below.
@@ -97,12 +97,12 @@ Strategic triggers: a new module or boundary; a public API, event, or persisted 
 
 ## The plan document
 
-AGENTS.md owns the format — `Toby's plan for [task]`, task groups, checkboxes, a verification block ending each group. This file owns when the plan gets written and what a step carries for someone to approve it. Do not agree a plan in scrollback, because nobody can check it off.
+The operating guide owns the format — `Toby's plan for [task]`, task groups, checkboxes, a verification block ending each group. This file owns when the plan gets written and what a step carries for someone to approve it. Do not agree a plan in scrollback, because nobody can check it off.
 
-- **Written when** the user asks, which includes the yes at checkpoint 1 on strategic or multi-slice work. AGENTS.md writes plans on an explicit ask, and naming the plan at that stop is what gets one. One-slice tactical work keeps the criteria list in chat. A plan file for a four-line change is the ceremony this file spends the rest of its length avoiding.
+- **Written when** the user asks, which includes the yes at checkpoint 1 on strategic or multi-slice work. The operating guide writes plans on an explicit ask, and naming the plan at that stop is what gets one. One-slice tactical work keeps the criteria list in chat. A plan file for a four-line change is the ceremony this file spends the rest of its length avoiding.
 - **Where** the repo already keeps plans. With nowhere obvious, propose a path and get a yes, the same gate the behavior record gets.
 - **Opens with** the mode, the one-line problem, the criteria in their pre-code wording, and what's out of scope, then one task group per slice in the order they ship, each carrying its slice's name and ending in its verification block. An operator approving a plan is approving the boundary as much as the work.
-- **Anything on** AGENTS.md's or toby-swd-environment's ask-list — migration, install, seed, snapshot, deletion, process or port — appears as its own step with the exact command.
+- **Anything on** the operating guide's or toby-swd-environment's ask-list — migration, install, seed, snapshot, deletion, process or port — appears as its own step with the exact command.
 - **The plan is the execution record.** Check items off as they land, and when execution diverges from an approved step, edit the plan and say what moved before continuing.
 - **A step an operator can approve** names four things: the file it touches at path and whether it's created, edited, or deleted; what changes there, concretely enough to disagree with; the criterion it serves, by its wording; and what proves it, with the result that would mean it failed. `references/examples.md` carries a task group written at that detail.
 

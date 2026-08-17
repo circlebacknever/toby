@@ -76,7 +76,7 @@ Stops: criteria only. Criterion 3 came out of the ambiguity pass. The phrase "ma
 
 # A plan an operator can approve
 
-Slice one of the invite flow. Format is AGENTS.md's. The detail in each step is what makes it reviewable.
+Slice one of the invite flow. Format is the operating guide's. The detail in each step is what makes it reviewable.
 
 ```markdown
 # Toby's plan for team invites
