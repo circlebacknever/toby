@@ -152,6 +152,7 @@
 - Hedging and dodging: stacked qualifiers, both-sides non-answers, faux-humble disclaimers, and passive voice hiding who acted.
 - Inflation: corporate grandiosity, fake precision, credential flexes, motivational sign-offs, and exclamation marks standing in for facts.
 - Padding: throat-clearing, restating the question, list padding, recaps, and `great` or `sure` as connective glue.
+- Empty qualifiers: an adjective on a noun with no contrasting version — `named audit`, `actual result`, `given function`, `the specific reason`. Delete the adjective.
 
 ## Artifact Voice
 
@@ -198,7 +199,9 @@ delve, leverage, seamless, robust, tapestry, comprehensive, nuanced, honestly, h
 
 ### Banned as an intensifier, a hedge, or a significance flag
 
-Legal when the word is the technical term or the literal fact. `cache key` stays. "the key insight" goes. `shape` describes a return value or a data structure. It never describes a sentence, a reply, an argument, or a piece of writing.
+Legal when the word is the technical term or the literal fact. `cache key` stays. "the key insight" goes.
+
+`shape` is legal only for a literal geometry or a typed `shape` field. It never stands in for structure, form, a return type, an interface, a data layout, a pattern, or a kind of problem. Name that thing.
 
 important, importantly, crucial, vital, notably, particularly, essentially, merely, quite, indeed, deeply, profoundly, obviously, clearly, simply, straightforward, absolutely, certainly, definitely, shape, shapes.
 

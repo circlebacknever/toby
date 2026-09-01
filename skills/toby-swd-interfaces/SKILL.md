@@ -29,6 +29,8 @@ Four questions, asked early:
 
 The mistake in the other direction is speculative generality — parameters or extension points for futures that never arrive. "Somewhat" is the operative word. Cover today's needs and one or two near-future variants you can name. Stop there.
 
+The interface-segregation principle is the floor here: no caller should depend on parts of the surface it does not use. A consumer that needs one method gets an interface with one method. `references/backend-apis.md` shows the consumer-side form.
+
 Each parameter forces every caller to answer a question. Before adding one, check whether the module can compute or decide the value itself. A default lowers the burden and keeps the coupling, because the caller still reads the default to know the behavior. Prefer a computed value or a narrower operation over a configurable one.
 
 ## The procedure
@@ -90,6 +92,8 @@ Apply the same test whenever you later change a public interface, before touchin
 
 Hiding complexity is the goal, with one hard limit. Information the caller needs must stay in the interface. Tunable performance config, errors the caller must handle, durability or visibility guarantees, ordering the caller depends on — hiding these to make the interface look smaller is its own defect and produces modules that can't be used correctly. This is progressive disclosure applied to a signature. The common case stays on the primary surface, required and simple. Advanced or rarely needed config moves to a separate, explicitly optional surface — an options object with sane defaults. A caller doing the ordinary thing reads only the first two or three parameters to use it correctly. Where a special case can be removed by redesigning semantics so it does not arise, redesign it away and leave it out of the interface. An interface that accepts input from outside the program — a request, a message, a deserialized payload — is a trust boundary. The module that owns the contract validates that input. The boundary owns the check.
 
+The word "configuration" covers two things. A caller-facing parameter — a function argument, a component prop — is the kind this skill tells you to minimize. Deploy-varying config is separate: database URLs, credentials, log levels, pool sizes, timeouts that differ between environments. It belongs in one module that reads the environment, validates it at startup, and hands typed values to the rest of the code. A module that reads `process.env` for its own needs has taken a hidden dependency and leaked a decision that should live in one place. `references/runtime-config.md` has the detail.
+
 ### 8. Then implement
 
 Only now write the bodies. If implementation reveals the abstraction was wrong — a promise you can't keep cleanly, a parameter you didn't need — change the interface and its comment. Don't let the implementation quietly widen the contract.
@@ -118,6 +122,7 @@ Run this list against the finished interface before calling it done. A match aga
 Worked examples organized by domain. Read the file matching the code you are in:
 
 - `references/examples.md` — Foundational cases (rate limiter, UserCard, file upload).
+- `references/runtime-config.md` — where deploy config enters, validation at boot, injecting typed values, the composition root.
 - `references/web.md` — React, Solid, Svelte. Hook return shapes, component prop contracts, store slice interfaces.
 - `references/mobile.md` — React Native. Native bridge interfaces, navigation prop contracts, storage module shapes.
 - `references/backend-apis.md` — Java/Spring, Go, TypeScript backends. Service interfaces, REST/gRPC contracts.

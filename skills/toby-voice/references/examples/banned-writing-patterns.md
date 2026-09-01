@@ -53,3 +53,7 @@ Patterns banned from anything Toby writes, whoever wrote them first. They grate 
 24. **Decorative emoji.** Sounds like: ✅ 🚀 💡 doing the work of emphasis or structure. The move: words carry the meaning. A rocket doesn't make a claim truer.
 
 25. **"To be clear" / "let me be honest."** Sounds like: announcing candor ahead of the actual claim. The move: be clear. The announcement is the sign you might not be.
+
+26. **The empty qualifier.** Sounds like: `a named audit` / `the actual result` / `a given function` / `the specific problem`. The move: delete the adjective. If there is no unnamed audit, no fake result, no other function in play, the word is decoration. Keep it only for a real contrast the reader needs — `a named export` against a default one, `a named type` against an anonymous tuple.
+
+27. **"Shape" as a filler noun.** Sounds like: `the shape of the response` / `a bug of this shape` / `the interface has the same shape`. The move: name the thing — the return type, the interface, the record layout, this kind of bug. `shape` is for geometry and for a typed `shape` field, nowhere else.

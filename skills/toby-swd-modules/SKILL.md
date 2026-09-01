@@ -35,6 +35,8 @@ Apply these to any boundary decision. They are cheap, so run all of them. Reserv
 
 State the one design decision or piece of knowledge each module encapsulates. If the split is described as a sequence — "first read, then parse, then write" — that is temporal decomposition. It scatters one piece of knowledge across stages and produces shallow modules. Re-slice so each module owns a body of knowledge end to end.
 
+This check is the single-responsibility principle. "One reason to change" and "one body of knowledge" are the same test. It does not mean one function per file. A long function that is one coherent deep abstraction stays whole.
+
 Two pieces belong together when they share knowledge, or when using one almost always means using the other. They also belong together when they fall under one simple higher-level category, or when one cannot be understood without the other. The "using one means the other" relation must run both ways. A cache uses a hash table, but hash tables serve unrelated callers, so they stay apart.
 
 ### 2. Information-leakage check
@@ -66,7 +68,7 @@ The underlying defect is two-way coupling: any mechanism where a shared-behavior
 
 Interface inheritance and implementation inheritance carry very different cost profiles.
 
-**Interface inheritance** — a parent declares method signatures with no bodies, and subclasses each implement them differently. This is a tool for depth: one interface, many implementations (a `Storage` interface implemented by disk, S3, memory). Use it freely when the interface captures real shared structure.
+**Interface inheritance** — a parent declares method signatures with no bodies, and subclasses each implement them differently. This is a tool for depth: one interface, many implementations (a `Storage` interface implemented by disk, S3, memory). Use it freely when the interface captures real shared structure. It is also the open-closed mechanism for cases that own state: a new case is a new implementation, and the code that selects between them does not change.
 
 **Implementation inheritance** — a parent supplies method bodies that subclasses can use or override. This creates a hidden two-way coupling. Subclass authors must read the parent to know what they inherited. Parent authors must check every subclass before changing instance variables or non-final methods. Instance variables visible to both sides are textbook information leakage across modules. Class hierarchies built heavily on implementation inheritance tend to be the hardest parts of a codebase to change.
 
@@ -98,6 +100,24 @@ Exception: some small utilities are unavoidably shallow. Acceptable. Don't infla
 
 The checks above are cheap and apply on every edit. A full restructuring proposal is reserved for modules that are exported, have several callers, cross a service boundary, or are costly to change.
 
+## Replace the growing conditional
+
+Two forms of conditional are a design smell. The first gains a branch every time the domain gains a case. The second is the same branch decision copied across call sites. Both are a module that is not closed to modification. The next case edits shared code, or several files at once. A `switch` over a set that has been stable for a year is fine, so leave it alone.
+
+Work down this ladder and stop at the first rung that fits.
+
+1. **Remove the branch.** Can the type answer for itself, so the caller stops asking? Can the common path take the edge input with no special case? The `toby-swd-complexity` error ladder opens with this same move. It is often the whole fix.
+2. **Data-driven dispatch.** Branches that select a small behavior by a tag value become a lookup map. `Record<Kind, Handler>` makes a missing entry a compile error. No pattern name, no class.
+3. **Discriminated union with an exhaustive switch.** Branches that read different fields keep the switch. Add `default: assertNever(x)` so the compiler fails the build when a variant is added. A single dispatch point the compiler guards is fine.
+4. **Polymorphism.** When each case owns behavior, private state, or its own dependencies, give each an object behind a shared interface. This is the `Gateway` design in `toby-swd-strategy`'s examples. It earns its place when the case set is open and each case holds state the others do not.
+5. **Registry.** When new cases must be addable without editing a central file, each implementation registers itself. This fits a real extension point: a plugin surface, or config-selected adapters at boot. It is the heaviest rung.
+
+Move up a rung only when the case bodies carry weight. An enum switch over one-liners never needs an object per arm, so rung 2 is its ceiling. Rungs 4 and 5 need two conditions at once: a case set that visibly grows, and case bodies that own state or dependencies.
+
+Greenfield: build the dispatch from the start. Brownfield: a scattered conditional is a scoped refactor. Offer it with its cost and benefit, and keep it out of an unrelated change.
+
+See `references/replace-the-conditional.md` for the React, React Native, and backend forms.
+
 ## Brownfield Work
 
 When placing code in an existing module, inspect where the surrounding code already puts that knowledge. If the new work fits awkwardly, name the current ownership problem and suggest the smallest local boundary cleanup that would make the change fit. Do not turn a local placement issue into a module-tree redesign. If a touched meaningful module has no AGENTS.md, offer to create one after the boundary is understood.
@@ -118,12 +138,14 @@ Run this list against the diff before calling a boundary decision done.
 - **Deep implementation-inheritance hierarchy**: subclasses you can't read without reading the parent, parents you can't change without checking the subclasses. Two-way coupling masquerading as reuse.
 - **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax — the same shape as the implementation, definitionally shallow. Replace with operations that name intent (`reserve`, `markPaid`) and enforce invariants. Keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it owned by another module. There the data is the contract, and depth lives in the module that owns the behavior.
 - **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy applied for its own sake, when the problem does not have the shape the pattern solves. Patterns earn their place by removing complexity.
+- **Conditional that grows per domain change**: a `switch` or `if` chain that takes a new arm every time the domain gains a case, or the same branch decision copied across call sites. Convert it with the ladder in "Replace the growing conditional." A single stable dispatch point over a closed set is not this flag.
 
 ## References
 
 Worked examples organized by domain. Read the file matching the code you are in:
 
 - `references/examples.md` — Python backend and React web. The canonical starting cases.
+- `references/replace-the-conditional.md` — the five-rung ladder with a worked example per rung, then React, React Native, and backend forms.
 - `references/web.md` — React, Solid, Svelte. Hooks/composables/runes, server state, store slices, headless components.
 - `references/mobile.md` — React Native, navigation state, native modules, async storage.
 - `references/backend-apis.md` — Java/Spring, Go, TypeScript backends. Composition vs inheritance shows up most concretely here.

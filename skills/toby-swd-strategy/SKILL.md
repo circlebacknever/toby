@@ -24,6 +24,7 @@ For anything beyond a one-line change, don't implement the first idea.
 - State the change in one sentence, including the obvious near-future variants ("today it's one provider; tomorrow there will be three").
 - Sketch at least two structural approaches. They must differ in *where complexity lives* — which module owns the hard part, what the interface exposes, what callers must manage. Pick the one with the simplest caller-side interface, even if its insides are harder.
 - Check the near-future variants against your design. If a likely next change would force callers to change or add a new special case, adjust now while it's cheap.
+- If those variants are new cases picked by a tag or type, design the dispatch now. Use a lookup map when the case bodies are small, an interface with implementations when each case owns state. `toby-swd-modules` has the ladder. Greenfield builds it in; brownfield offers it as a scoped refactor.
 - Proportionality: a real one-liner doesn't need an architecture review. The design pass scales to the size of the decision.
 
 ## While writing — pull complexity to the right place

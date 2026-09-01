@@ -103,6 +103,51 @@ the IOU and state the exit.
 
 ---
 
+## Example 4 — A dispatch that will grow
+
+A function routes a notification to a channel. Today: email and SMS.
+
+**Tactical**
+
+```python
+def send(notification, user):
+    if notification.channel == "email":
+        return email_client.send(user.email, notification.body)
+    if notification.channel == "sms":
+        return sms_client.send(user.phone, notification.body)
+```
+
+It works. Then push is added, then Slack, then a webhook. Each one edits `send`,
+and three call sites have grown their own copy of the same `if` chain to decide
+whether a channel is available for a user.
+
+**Strategic**
+
+The near-future variant is stated in the first sentence: "today email and SMS."
+More channels are certain, so build the dispatch now:
+
+```python
+CHANNELS: dict[str, Channel] = {
+    "email": EmailChannel(),
+    "sms": SmsChannel(),
+}
+
+def send(notification, user):
+    channel = CHANNELS[notification.channel]
+    return channel.deliver(notification, user)
+```
+
+Each `Channel` owns its client, its address lookup, and its own answer to "is
+this available for this user." A new channel is one class and one entry. The
+call sites lose their copied checks, because `deliver` handles an unavailable
+channel internally.
+
+This is rung 4 of the ladder in `toby-swd-modules` — an interface with one
+implementation per case. The cost over the tactical version is a dict and an
+interface, paid once at design time.
+
+---
+
 ## How to calibrate the investment
 
 - The target is roughly 10–20% more effort than the tactical path, spent

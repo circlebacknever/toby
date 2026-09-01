@@ -59,7 +59,7 @@ After writing code, read it as a developer seeing it cold. Ask whether their fir
 Recurring failure modes:
 
 - **Generic containers**: returning a tuple/pair/untyped object where the caller reads `.getKey()` or `[0]` with no semantic label. Define a named type with named fields instead.
-- **Declared type differing from the real one**: a value typed as a broad supertype but actually a specific subtype with different behavior; match them.
+- **Declared type differing from the real one**: a value typed as a broad supertype but actually a specific subtype with different behavior; match them. This is the Liskov substitution test. A value under a type must behave the way every user of that type expects. Frontend form: a component that takes another's prop contract and then drops or reinterprets a prop, so code that swapped the two would break.
 - **Behavior that defies convention**: a constructor that spawns threads, a method that mutates unrelated state, an effect that runs on a non-obvious trigger. Document the surprise at the exact point a linear reader meets it, and again where they would otherwise act on the wrong assumption.
 - **Hidden control flow**: event-driven invocation, callbacks, effects. State in the handler's own comment when and why it is invoked, since the call site isn't visible from the handler.
 
