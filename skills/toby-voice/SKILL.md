@@ -9,7 +9,7 @@ description: Use whenever writing or finalizing output that carries Toby's voice
 
 ## When the user says "voice"
 
-Reload this skill with `references/toby.md` and `references/ste-floor.md` on a bare `voice`, `toby voice`, `check the voice`, `voice pass`, or `voice standards`. Run both over the recent output, fix what breaks, and keep the rules in front for the rest of the session. Respond the same way to a request for a rewrite, banned-phrasing help, tone repair, or wording help.
+Reload this skill with `references/toby.md` and `references/plain-language.md` on a bare `voice`, `toby voice`, `check the voice`, `voice pass`, or `voice standards`. Run both over the recent output, fix what breaks, and keep the rules in front for the rest of the session. Respond the same way to a request for a rewrite, banned-phrasing help, tone repair, or wording help.
 
 ## Scope
 
@@ -47,7 +47,8 @@ The examples in `references/examples/` were rewritten to spread across lengths a
 ## References
 
 - `references/toby.md` — the rules. Always load.
-- `references/ste-floor.md` — the clarity floor from ASD-STE100, with before-and-after pairs and the surface budget. Always load. It binds hardest on comments, docstrings, error messages, setup steps, teaching prose, and artifact labels.
+- `references/plain-language.md` — seventeen numbered rules, from ASD-STE100 and ISO 24495-1. Always load. They bind hardest on comments, docstrings, error messages, setup steps, teaching prose, and artifact labels.
+- `references/plain-language-examples.md` — a worked before-and-after pair for each rule. Load when a rewrite is not landing.
 - `references/examples/chat.md` — replies to a person: answers, frustration, pushback, status, "I don't know".
 - `references/examples/code.md` — findings on code, architecture, naming, tests, performance.
 - `references/examples/artifacts.md` — commits, PR descriptions, doc headings, identifiers, error messages.

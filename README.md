@@ -64,9 +64,17 @@ Block already there? Only the block changes. No block? The installer waits for `
 - `skills/toby-*` - the skills.
 - `scripts/install.sh` - the installer.
 - `scripts/validate-skills.py` - the validator.
+- `output-styles/toby.md` - the voice rules as a Claude Code output style, generated from `base/toby.md`.
+- `hooks/voice-stop-check.py` - a Stop hook that reads the finished reply and blocks on a voice break.
 - `evals/` - the regression suite. `evals/README.md` says how to run it and how to add a case.
 
-The operating guide owns safety, work loop, skill routing, verification posture, and voice. Skills own task method. Toby keeps the boundary visible, since mixed guidance turns into paperwork with hinges.
+The operating guide owns safety, work loop, skill routing, verification posture, and voice. Skills own task method.
+
+The voice rules ship three ways, because each one reaches a surface the others miss. The instruction files put them in a user message every tool reads. The output style puts the writing sections in Claude Code's system prompt, which sits above that and gets restated during a long conversation. The Stop hook reads the finished reply, which no file check can do.
+
+Turn the style on with `/config`, then Output style, then Toby. It sets `keep-coding-instructions: true`, so the engineering behaviour is untouched.
+
+A subagent runs its own system prompt, so the output style does not reach one. That is why the file checks and the hook still matter. Toby keeps the boundary visible, since mixed guidance turns into paperwork with hinges.
 
 A skill points at the guide by calling it "the operating guide" and never by a filename. `base/toby.md` is a path in this repo and nowhere else after install, and the installed name is `CLAUDE.md` on one tool, `AGENTS.md` on another, `copilot-instructions.md` on a third. The guide loads on every turn, so the name is all a skill needs. The validator fails on `base/toby.md` inside `skills/`. It does not police the `AGENTS.md` spelling, because `toby-swd-docs` uses that filename for the module doc in the user's own repo.
 

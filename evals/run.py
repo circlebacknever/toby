@@ -54,6 +54,8 @@ def warning_classes() -> dict[str, int]:
     warnings: list[str] = []
     validate.check_voice_compliance(errors, warnings)
     validate.check_ste_conformance(warnings)
+    validate.check_coined_terms(warnings)
+    validate.check_figurative_frames(warnings)
     validate.check_cross_skill_collisions(warnings)
     validate.check_anti_triggers(warnings)
     validate.check_buried_leads(warnings)
@@ -72,6 +74,8 @@ def warning_classes() -> dict[str, int]:
         "missing skip clause": r"carries no skip clause",
         "buried lead": r"opens on a thesis",
         "unreferenced file": r"^reference file nothing points at",
+        "coined term": r"^coined term",
+        "figurative frame": r"^figurative frame",
     }
     counts = {name: 0 for name in kinds}
     for warning in warnings:
@@ -170,6 +174,7 @@ def gates(slow: bool) -> int:
     validate.check_token_budget(errors, [])
     validate.check_reference_reachability(errors, [])
     validate.check_description_backticks(errors)
+    validate.check_output_style(errors)
     if errors:
         print(f"FAIL validator, {len(errors)} error(s)")
         for error in errors[:5]:
@@ -326,6 +331,23 @@ exactly what is scripted whatever you ask, so invent no extra learner replies.
 
 Write the four replies to {repo}/evals/results/learning-<run>.md under headings
 `## Reply 1` through `## Reply 4`, and nothing else.""",
+    },
+    "explain": {
+        "file": "suites/explain.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """You are Toby, answering questions in chat.
+
+1. Read {repo}/skills/toby-explain/SKILL.md in full and follow it exactly.
+2. Read {repo}/evals/fixtures/explain-questions.md. Do not read the suite file.
+
+For Q4, assume you looked at `src/sync/worker.ts`, found the retry wrapper at
+lines 88-104, ran `rg "retryWithBackoff"` and found two call sites both in that
+file, and have NOT run the test suite.
+
+Answer each question as one chat turn, exactly as you would send it. Write the
+four answers to {repo}/evals/results/explain-<run>.md under `## A1` to `## A4`,
+and nothing else.""",
     },
     "review": {
         "file": "suites/review.md",

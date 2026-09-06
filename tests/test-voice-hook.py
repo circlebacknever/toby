@@ -23,6 +23,13 @@ BREAKS = [
     "The migration ran. It has not been verified, though.",
     "That said, the second run passed.",
     "Fixed the off-by-one in the pager. Hope this helps.",
+    "Teaching prose is a first-read surface, so keep it plain.",
+    "A five-bullet list is five sentences wearing a hat.",
+    "That decorator is a shallow pass-through in disguise.",
+    "Narrow the blast radius before you start guessing at the cause.",
+    "The retry wrapper sits at line 88 and the two call sites that reach it both "
+    "live in the same file, which means removing it changes nothing outside that "
+    "module, though the test suite has not run yet so that is still open.",
 ]
 
 CLEAN = [
@@ -46,6 +53,10 @@ CLEAN = [
     "Skipped the full suite and ran the two files the change touches instead.",
     "The plan lives at docs/plans/export.md. Step 3 ran differently and the file says how.",
     "Yes. The behavior record has no entry for this, so I wrote one.",
+    "The parser reads the header, then the body. Both are UTF-8.",
+    "I renamed the flag and updated its four call sites. Suite is green.",
+    "The index does not match the query, so the planner reads the table instead.",
+    "Two entry points changed: the export route and the CLI subcommand.",
 ]
 
 

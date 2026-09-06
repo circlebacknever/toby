@@ -1,6 +1,6 @@
 # Trigger scenarios
 
-Ten prompts. Each names the skills that should load and the skills that must
+Eleven prompts. Each names the skills that should load and the skills that must
 not. A skill that fires when it should not costs 100 percent of its tokens, so
 the four probes at the end carry as much weight as the four positives.
 
@@ -140,10 +140,24 @@ Should load: nothing.
 Should not load: `toby-squall`. Its description quotes this exact phrasing as a
 case that must not fire it.
 
+### N7 — asking for a clear explanation
+> In one or two sentences, clearly and concisely: what's the actual difference
+> between a mutex and a semaphore?
+
+```
+Required: toby-explain
+Forbidden: toby-swd-clarity, toby-learning, toby-swd-complexity
+```
+
+Should load: `toby-explain`.
+Should not load: `toby-swd-clarity`. The words "clearly and concisely" describe
+the answer wanted, and that skill renames variables and writes comments. It
+fired on this phrasing before both descriptions named the boundary.
+
 ## Scoring
 
 Per scenario: one point for every should-load skill that fired, minus one for
 every should-not-load skill that fired. Eight scenarios, so the ceiling moves
 with the expected sets. The number that matters is the total of false firings
-across N1 to N6, because that is the co-load bill. N5 and N6 are the two
+across N1 to N7, because that is the co-load bill. N5 and N6 are the two
 invoke-only skills. A single firing there is a defect. The other probes cost tokens, and these two break a stated rule.

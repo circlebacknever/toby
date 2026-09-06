@@ -27,7 +27,7 @@ runs took back.
 | Gate | Catches |
 |---|---|
 | validator errors | a banned word, a broken sync, a skill naming the guide by path, a description with a skill name split across a line wrap |
-| warning counts by class | a new foil, a sentence over the ceiling, a buried lead, a missing skip clause, a cross-skill sentence collision |
+| warning counts by class | a new foil, a sentence over the ceiling, a buried lead, a missing skip clause, a cross-skill sentence collision, a coined term |
 | body tokens per skill | a body that grew more than 10 percent |
 | co-load tokens per routing group | a group that grew more than 5 percent, which is what a task actually pays |
 | lost rules | a sentence that left the repo with no reworded survivor |
@@ -68,6 +68,8 @@ the ranges overlap.
 | `voice` | banned words, foils, sentence length, clause welds in four written outputs | `scripts/score-voice.py` | 5 |
 | `review` | whether a review catches three seeded defects and reports them the way the skill specifies | a person, against `suites/review.md` | 1 |
 | `feature-dev` | whether the process a request gets matches its size | a person, against `suites/feature-dev.md` | 1 |
+| `learning` | whether a beginner gets taught in steps without a wall of text | a person, against `suites/learning.md` | 1 |
+| `explain` | whether an answer is short, backed, and leads with the answer | a person, against `suites/explain.md` | 1 |
 
 ### Recorded results
 
@@ -101,12 +103,46 @@ once. The run also said the tactical row is still heavy for a one-line copy
 change, which is why the sizing section now says to check the skip clause before
 sizing anything.
 
+`baselines/explain.json` — three runs of the same four questions. The evidence
+rule held from the first run: every claim carried a path and a line, and "safe
+to remove" came back as a guess with the missing test run named. The length rule
+took two tries. Written as prose it moved nothing, and a 42-word sentence
+survived. Written as three numbered limits with a word count in them, the
+beginner question went from 108 words and two clause welds to 59 words and none.
+
 `baselines/review.json` — the same seeded diff before and after the compliance
 pass. The old skill caught the bug and bundled the two missing tests into one
 line. The new one named each criterion as its own finding and caught a fourth
 defect, and it routed a security bug to `toby-swd-interfaces`, which owns
 nothing about it. The frame now says a bug needs no routing, so a later run
 repeating that is a regression.
+
+## The coined-term check
+
+Rule 14 of `plain-language.md` says never invent a term, and this check holds it.
+Every entry in `COINED_TERMS` was written in this repo and then flagged by a
+reader who had to stop and work out what was meant. Each one is a real English
+word, so the banned list and the sense-scoped list both pass it, and no other
+check sees it.
+
+`primitive` was tried and removed. It is a real term in graphics and in
+programming, and every hit was correct usage. Add a term only after it has
+confused a reader here.
+
+## The figurative-frame check
+
+A sentence cannot wear a hat. The check holds the guide's ban on invented
+metaphor, and it catches the commonest form that ban takes here: an abstract
+thing described as if it had a body or clothes.
+
+Every frame in `FIGURATIVE_FRAMES` was written in this repo, and the fixtures in
+`tests/test-validator-checks.py` quote four of them.
+
+The list holds frames, not subjects, so a fresh metaphor built from a frame
+nobody has used yet walks past it. A reader is the only check for that one.
+
+`moving parts` was tried and left out. It is a dead metaphor, it is in the
+dictionary, and the guide keeps established terms of art.
 
 ## The nine `shape` warnings that stay
 

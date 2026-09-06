@@ -38,8 +38,63 @@ mode = sys.argv[2]
 body = (root / "base" / "toby.md").read_text()
 body_stripped = body.strip()
 
+# The output style is generated from the writing sections of base/toby.md. It
+# sits in Claude Code's system prompt, one level above CLAUDE.md, and the tool
+# re-states it during the conversation. That is the strongest position the
+# voice rules can hold, and it is the only one that survives turn ten.
+#
+# It carries the writing sections only. The operating floor, skill routing, and
+# machine safety stay in the instruction files, which every tool already loads.
+OUTPUT_STYLE_SECTIONS = [
+    "No Performance Around the Answer",
+    "Role",
+    "Prose",
+    "Register",
+    "Reply Architecture",
+    "Register Range",
+    "Banned Writing Patterns",
+    "Writing in Files and Artifacts",
+    "Disagreement",
+    "Uncertainty",
+    "Banned Words",
+]
+
+OUTPUT_STYLE_HEADER = """---
+name: Toby
+description: Toby's voice. Plain words, the answer first, no padding, in chat and in every file.
+keep-coding-instructions: true
+---
+
+# Toby
+
+Write everything below this line in Toby's voice: chat replies, code comments,
+docstrings, commit messages, docs, diagrams, chart labels, and every generated
+artifact. No surface is exempt.
+
+Generated from base/toby.md by scripts/sync.sh. Edit base, then run it.
+
+"""
+
+
+def sections_of(text):
+    parts = re.split(r"^(## .+)$", text, flags=re.M)
+    return dict(zip((h[3:].strip() for h in parts[1::2]), parts[2::2]))
+
+
+def output_style(text: str) -> str:
+    found = sections_of(text)
+    missing = [n for n in OUTPUT_STYLE_SECTIONS if n not in found]
+    if missing:
+        sys.exit(f"  ERROR: base/toby.md has no section(s): {', '.join(missing)}")
+    out = [OUTPUT_STYLE_HEADER]
+    for name in OUTPUT_STYLE_SECTIONS:
+        out.append(f"## {name}{found[name].rstrip()}\n\n")
+    return "".join(out).rstrip() + "\n"
+
+
 # Raw copies hold the body verbatim; marker copies hold it between the markers.
 raw_targets = [root / "skills" / "toby-voice" / "references" / "toby.md"]
+generated_targets = [(root / "output-styles" / "toby.md", output_style(body))]
 marker_targets = [
     root / "AGENTS.md",
     root / "instructions" / "claude" / "CLAUDE.md",
@@ -73,6 +128,12 @@ def apply(target: Path, new_text: str) -> None:
 
 for target in raw_targets:
     apply(target, body)
+
+for target, text in generated_targets:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if not target.exists():
+        target.write_text("")
+    apply(target, text)
 
 for target in marker_targets:
     text = target.read_text()

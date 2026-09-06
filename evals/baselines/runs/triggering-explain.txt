@@ -1,0 +1,11 @@
+P1 fired: toby-swd-interfaces, toby-swd-complexity, toby-swd-testing, toby-swd-strategy
+P2 fired: toby-swd-modules, toby-swd-strategy, toby-swd-docs
+P3 fired: toby-feature-dev
+P4 fired: toby-swd-environment
+N1 fired: toby-swd-clarity
+N2 fired: toby-code-review
+N3 fired: toby-swd-experiment, toby-swd-complexity
+N4 fired: none
+N5 fired: toby-feature-dev
+N6 fired: none
+N7 fired: toby-explain

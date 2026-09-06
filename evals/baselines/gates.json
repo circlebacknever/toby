@@ -1,17 +1,17 @@
 {
   "accepted_lost_rules": [],
   "coload_tokens": {
-    "feature-change": 18175,
-    "feature-dev": 9606,
+    "feature-change": 18182,
+    "feature-dev": 9612,
     "review": 4590
   },
   "skill_tokens": {
     "toby-artifact-style": 4905,
     "toby-code-review": 2792,
-    "toby-explain": 1351,
-    "toby-feature-dev": 5364,
+    "toby-explain": 1428,
+    "toby-feature-dev": 5370,
     "toby-game": 886,
-    "toby-learning": 2728,
+    "toby-learning": 2734,
     "toby-simplify-code": 1798,
     "toby-squall": 956,
     "toby-swd-clarity": 2384,
@@ -20,19 +20,21 @@
     "toby-swd-environment": 1548,
     "toby-swd-experiment": 1186,
     "toby-swd-interfaces": 3398,
-    "toby-swd-modules": 3544,
+    "toby-swd-modules": 3551,
     "toby-swd-strategy": 1790,
     "toby-swd-testing": 2452,
-    "toby-voice": 1152
+    "toby-voice": 1179
   },
   "warning_classes": {
     "banned word": 0,
-    "buried lead": 16,
-    "cross-skill collision": 1,
+    "buried lead": 14,
+    "coined term": 0,
+    "cross-skill collision": 0,
+    "figurative frame": 0,
     "invented foil": 3,
     "latin abbreviation": 0,
-    "missing skip clause": 2,
-    "over-length sentence": 49,
+    "missing skip clause": 1,
+    "over-length sentence": 43,
     "over-long paragraph": 19,
     "sense-scoped word": 9,
     "unreferenced file": 0

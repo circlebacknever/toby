@@ -158,7 +158,7 @@ It is the heaviest rung. The registration is indirection a reader has to trace, 
 ## React and React Native forms
 
 - **Status to component.** `Record<Status, FC>` over a `switch (status)` in render. The map sits above the component or in a sibling module.
-- **Variant prop that grew.** A `<Button variant="…">` whose `variant` gains values every quarter is rung 2 wearing a prop. Move to compound components with `children`, or a map from variant to a style object.
+- **Variant prop that grew.** A `<Button variant="…">` whose `variant` gains values every quarter is rung 2, with the tag passed as a prop. Move to compound components with `children`, or a map from variant to a style object.
 - **Field type to input.** A form that renders from a schema maps `field.type` to a component. A `switch (field.type)` inside JSX is the smell.
 - **Behavior split from presentation.** A headless hook owns the state machine and each screen composes it. `references/web.md` Example 4 shows it in full.
 - **Platform branch.** `Platform.OS === "ios"` checks scattered through components are the copied-decision case. Use `Platform.select({ ios, android })` at one module boundary, or `Foo.ios.tsx` and `Foo.android.tsx` files where the bundler picks the file and no branch runs.

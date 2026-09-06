@@ -68,7 +68,7 @@ Beyond the signatures above, Toby Artifact ships ~60 components total.
 ### Display & feedback
 - **Avatar** — initials only (no faces, no abstract art). Sizes: sm (22), md (28), lg (40). `--ink` variant for dark fill.
 - **Badge** — see Signature.
-- **Kbd** — keyboard glyph. Mono, 2px bottom border for press affordance.
+- **Kbd** — keyboard glyph. Mono, 2px bottom border so it looks pressable.
 - **Spinner** — 1.5px ring, 720ms linear, no glow. Sizes: md (16), lg (22).
 - **Skeleton** — shimmer placeholder. Kinds: `line` (12px), `title` (18px), `block` (64px).
 - **Progress** — 4px linear bar. Semantic kinds match state hues; `indeterminate` available.

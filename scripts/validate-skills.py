@@ -204,6 +204,56 @@ def check_instruction_sync(errors: list[str]) -> None:
         errors.append("instructions/kiro/toby-instructions.md must use inclusion: always")
 
 
+OUTPUT_STYLE = REPO_ROOT / "output-styles" / "toby.md"
+
+# The writing sections scripts/sync.sh writes into the output style. Kept here so
+# a section dropped from sync.sh fails the build instead of going quiet.
+OUTPUT_STYLE_SECTIONS = [
+    "No Performance Around the Answer",
+    "Role",
+    "Prose",
+    "Register",
+    "Reply Architecture",
+    "Register Range",
+    "Banned Writing Patterns",
+    "Writing in Files and Artifacts",
+    "Disagreement",
+    "Uncertainty",
+    "Banned Words",
+]
+
+
+def sections_of(text: str) -> dict[str, str]:
+    """Split a guide-shaped file into {heading: body} at its `## ` headings."""
+    parts = re.split(r"^(## .+)$", text, flags=re.M)
+    return dict(zip((h[3:].strip() for h in parts[1::2]), parts[2::2]))
+
+
+def check_output_style(errors: list[str]) -> None:
+    """The output style carries guide sections verbatim, and nothing else.
+
+    It lands in Claude Code's system prompt, which is a stronger position than
+    any instruction file. A section that drifts there is a rule that applies in
+    chat and nowhere else, or the reverse.
+    """
+    if not OUTPUT_STYLE.exists():
+        errors.append("output-styles/toby.md is missing, run scripts/sync.sh")
+        return
+    style = sections_of(OUTPUT_STYLE.read_text())
+    base = sections_of(BASE_TOBY.read_text())
+    for name, body in style.items():
+        if name not in base:
+            errors.append(f"output style has a section base/toby.md lacks: {name!r}")
+        elif body.strip() != base[name].strip():
+            errors.append(f"output style section {name!r} has drifted from base/toby.md")
+    for name in OUTPUT_STYLE_SECTIONS:
+        if name not in style:
+            errors.append(f"output style is missing the {name!r} section, run scripts/sync.sh")
+    head = OUTPUT_STYLE.read_text()[:400]
+    if "keep-coding-instructions: true" not in head:
+        errors.append("output style must set keep-coding-instructions: true, or Toby stops engineering")
+
+
 def check_skills(skills_root: Path, errors: list[str]) -> None:
     if not skills_root.exists():
         errors.append(f"{skills_root} does not exist")
@@ -310,7 +360,8 @@ VOICE_SCAN_EXEMPT = {
     REPO_ROOT / "instructions" / "copilot" / "copilot-instructions.md",
     REPO_ROOT / "instructions" / "kiro" / "toby-instructions.md",
     REPO_ROOT / "skills" / "toby-voice" / "references" / "toby.md",
-    REPO_ROOT / "skills" / "toby-voice" / "references" / "ste-floor.md",
+    REPO_ROOT / "skills" / "toby-voice" / "references" / "plain-language.md",
+    REPO_ROOT / "skills" / "toby-voice" / "references" / "plain-language-examples.md",
     REPO_ROOT / "skills" / "toby-voice" / "references" / "examples" / "banned-writing-patterns.md",
 }
 
@@ -348,12 +399,14 @@ def prose_paths() -> list[Path]:
     # Repo-root markdown faces the same floor as a skill. A plan or a design note
     # that ships banned words is the same defect in a file nobody validated.
     paths.extend(sorted(REPO_ROOT.glob("*.md")))
+    paths.extend(sorted((REPO_ROOT / "output-styles").glob("*.md")))
     paths.append(REPO_ROOT / "base" / "toby.md")
     # AGENTS.md and instructions/** are generated from base/toby.md by sync.sh,
     # so scanning them would report every finding five times over.
     generated = {
         REPO_ROOT / "skills" / "toby-voice" / "references" / "toby.md",
         REPO_ROOT / "AGENTS.md",
+        REPO_ROOT / "output-styles" / "toby.md",
     }
     return [p for p in paths if p not in generated]
 
@@ -388,6 +441,90 @@ def check_voice_compliance(errors: list[str], warnings: list[str]) -> None:
         for pattern in CONTRAST_PATTERNS:
             for match in pattern.finditer(text):
                 warnings.append(f"possible invented foil {match.group(0)!r}: {rel}:{line_for_offset(text, match.start())}")
+
+
+# Words used outside their everyday meaning, every one found in this repo's own
+# prose by a reader who had to stop and work out what was meant. A coined term
+# costs the reader a guess, and no other check sees it: each of these is a real
+# English word, so the banned list and the sense-scoped list both pass it.
+#
+# `shape` and `key` are handled by the sense-scoped tier already. `primitive`
+# was tried and removed: it is a real term in graphics and in programming, and
+# every hit was correct usage.
+COINED_TERMS = {
+    "first-read": "say when the reader reads it",
+    "blast radius": "say what else the change touches",
+    "surface area": "say what callers can reach",
+    "load-bearing": "say what fails without it",
+    "north star": "say the goal",
+    "forcing function": "say what makes it happen",
+    "cognitive surface": "say what the reader has to hold",
+    "lens": "say whose view, or what it is being judged against",
+    "seam": "say where, in plain words",
+    "affordance": "say what it lets the reader do",
+    "the shape of the work": "say what the work involves",
+}
+COINED_RE = [
+    (term, re.compile(rf"(?<![A-Za-z]){re.escape(term)}(?![A-Za-z])", re.I))
+    for term in COINED_TERMS
+]
+
+
+# Figurative frames that dress an abstract thing as a physical one. Every entry
+# was written in this repo: "a performance problem dressed as an error", "rung 2
+# wearing a prop", "leakage with a new hat", "two-way coupling masquerading as
+# reuse". The guide bans invented metaphor, and nothing else here sees these,
+# because every word in them is ordinary.
+#
+# The list is frames, not subjects, so it cannot catch a fresh metaphor built
+# from a frame nobody has used yet. A reader is still the only check for that.
+# "moving parts" was tried and left out: it is a dead metaphor, in the
+# dictionary, and the guide keeps established terms of art.
+FIGURATIVE_FRAMES = [
+    "wearing a", "wears a", "dressed as", "dressed up as", "in disguise",
+    "masquerading as", "pretending to be", "with a new hat", "with a hat on",
+    "under the hood", "in a trench coat", "puts on a", "wrapped in a costume",
+]
+FIGURATIVE_RE = [
+    (frame, re.compile(rf"(?<![A-Za-z]){re.escape(frame)}(?![A-Za-z])", re.I))
+    for frame in FIGURATIVE_FRAMES
+]
+
+
+def check_figurative_frames(warnings: list[str]) -> None:
+    """Flag an abstract thing described as wearing, dressing, or disguising itself.
+
+    A sentence cannot wear a hat. The guide bans invented metaphor and this is
+    the commonest form it takes here, because the words are all ordinary and no
+    other check reads them.
+    """
+    for path in voice_scan_paths():
+        text = prose_only(path.read_text())
+        rel = path.relative_to(REPO_ROOT)
+        for frame, pattern in FIGURATIVE_RE:
+            for match in pattern.finditer(text):
+                warnings.append(
+                    f"figurative frame {match.group(0)!r}, say what the thing is: "
+                    f"{rel}:{line_for_offset(text, match.start())}"
+                )
+
+
+def check_coined_terms(warnings: list[str]) -> None:
+    """Flag a word doing a job its everyday meaning does not cover.
+
+    Rule 14 in plain-language.md. Every term here was written in this repo and
+    then flagged by a reader who could not tell what it meant. A reader who has
+    to guess is the cost, and it is invisible to every other check.
+    """
+    for path in voice_scan_paths():
+        text = prose_only(path.read_text())
+        rel = path.relative_to(REPO_ROOT)
+        for term, pattern in COINED_RE:
+            for match in pattern.finditer(text):
+                warnings.append(
+                    f"coined term {match.group(0)!r}, {COINED_TERMS[term]}: "
+                    f"{rel}:{line_for_offset(text, match.start())}"
+                )
 
 
 def check_single_source(errors: list[str]) -> None:
@@ -649,7 +786,7 @@ def check_reference_reachability(errors: list[str], warnings: list[str]) -> None
             for match in matches:
                 # A skill may cite another skill's reference, and that path is
                 # relative to the other skill. toby-learning points at
-                # toby-voice's ste-floor.md, which is correct and not a break.
+                # toby-voice's plain-language.md, which is correct and not a break.
                 lead = text[max(0, match.start() - 60) : match.start()]
                 if re.search(r"`toby-(?!" + skill_dir.name[5:] + r")[a-z-]+`", lead):
                     continue
@@ -823,11 +960,14 @@ def main() -> int:
 
     check_skills(skills_root, errors)
     check_instruction_sync(errors)
+    check_output_style(errors)
     check_stale_references(errors)
     check_review_skill(errors)
     check_operating_guide_refs(errors)
     check_voice_compliance(errors, warnings)
     check_single_source(errors)
+    check_coined_terms(warnings)
+    check_figurative_frames(warnings)
     check_ste_conformance(warnings)
     check_token_budget(errors, warnings)
     check_cross_skill_collisions(warnings)

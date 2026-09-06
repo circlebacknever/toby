@@ -24,7 +24,7 @@ bucket, refill it with the current time, check tokens, then consume. Those
 calls must happen in that order or it breaks. The comment has to describe the
 bucket mechanism to be usable. That is the test failing on three counts at
 once: long, order-dependent, leaks internals. This is temporal decomposition
-wearing a class.
+with a class around it.
 
 **Redesigned interface (designed by knowledge: "whether this client may proceed
 right now"):**

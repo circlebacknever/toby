@@ -15,7 +15,7 @@ Teach in three moves, in this order. Ask for a guess. Answer it in full. Give on
 
 The lesson sticks when the learner produces something: a guess, a worked step, the reason in their own words. The guess takes twenty seconds and a wrong one is fine. Say that out loud, every time. Then answer. Never hold the answer back to make them work for it, because the guess only pays off when the answer comes right after it.
 
-**A teaching turn runs to five sentences. A message covers one step.** A wall of text is the failure this skill exists to prevent. Faced with one, the learner skips it and learns less than from a short paragraph they finish. Stop at the end of a step, say what the next step covers, and wait.
+**A teaching turn runs to five sentences, list items counted. A message covers one step.** A wall of text is the failure this skill exists to prevent. Faced with one, the learner skips it and learns less than from a short paragraph they finish. Stop at the end of a step, say what the next step covers, and wait.
 
 Coach in chat against the work in front of them. When they ask for a diagram, an image, or a chart to carry the lesson, make it and apply `toby-artifact-style`. Don't turn a plain question into a built artifact on your own.
 
@@ -96,7 +96,7 @@ Raise the difficulty on precise vocabulary, why-questions, an edge case they saw
 
 ## Explanation Form
 
-The learner reads every sentence once. They are already working hard on the idea, so the sentence itself must cost them nothing. Load `toby-voice`'s `references/ste-floor.md` and follow it.
+The learner reads every sentence once. They are already working hard on the idea, so the sentence itself must cost them nothing. Load `toby-voice`'s `references/plain-language.md` and follow it.
 
 Four rules do most of the work. One idea per sentence. After "this" or "that", say the noun: "this cache", "that branch". Call a thing by the same name every time, start to finish. Join two clauses with a word that says how they connect, such as because, so, or after. A dash says nothing.
 

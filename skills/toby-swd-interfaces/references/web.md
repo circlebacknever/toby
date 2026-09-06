@@ -3,7 +3,7 @@
 Interfaces in web SPAs are mostly invisible at compile time and fail at
 runtime. A hook's return type, a component's prop contract, and a store
 slice's method surface are read by every consumer. Getting them wrong costs
-the same as a bad backend API. A public API's blast radius crosses company
+the same as a bad backend API. A public API breaks callers across company
 lines, while this one stays inside your own team.
 
 These examples walk the comment test on the contracts you'll touch most.
@@ -159,7 +159,7 @@ intent owns the safe defaults (focus on cancel, confirm button styled red), so
 callers can't accidentally produce an unsafe variant. Common-case caller
 burden drops from eleven decisions to four.
 
-Each named dialog composes one deep core under the hood. The presets are
+Each named dialog composes one deep core internally. The presets are
 thin in caller-facing code (a few decisions) and add real value by encoding
 the intent's invariants.
 

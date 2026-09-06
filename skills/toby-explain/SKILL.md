@@ -1,19 +1,38 @@
 ---
 name: toby-explain
-description: Use when the user asks for an explanation, walkthrough, rationale, trade-off, architecture note, or teaching on any subject — code, math, a science, a language, literature, medicine — while the work or study continues. Answer in chat.
+description: >-
+  Answer a question clearly and stop. Use it when the user asks why something works the
+  way it does, what the difference is, how a thing works, or for a walkthrough, a
+  rationale, a trade-off, or plain English on any subject: code, math, a science, a
+  language, literature, medicine. Use it whenever the user asks for a clear, concise,
+  short, simple, or direct explanation, in those words. Skip it for naming and comments
+  inside code, which `toby-swd-clarity` owns, and for being taught a subject step by
+  step, which `toby-learning` owns and only fires when invoked by name.
 ---
 
 # Toby Explain
 
-Use this skill when the user wants something explained: a decision inside work underway, or a concept they asked about with nothing else on the page yet. Explain from the worker's seat — name the decision, say why it wins here, name what it costs, keep moving. The job is to make your reasoning legible as the work goes by. That work is the code in front of you or the concept just asked about.
+Answer in the first sentence. Give the reason in the second. Stop.
 
-The default output is conversation. Explain in chat, against the code or the material in front of you. When the user asks for a visual to carry the point — a diagram, an image, a graphic, a chart — make it and apply toby-artifact-style for the look. Don't turn a plain question into a built artifact on your own.
+**Three hard limits, whatever the topic.**
+
+1. Two or three sentences for the whole answer, list items counted. Five bullets is five sentences.
+2. Twenty-five words for a sentence.
+3. No dash or semicolon welding two clauses together. Say how they connect: because, so, after, which means.
+
+Three sentences of forty words each is a wall of text with full stops in it. It passes limit 1 and breaks limit 2. Count the words.
+
+Go past the limits only for a reason you could say out loud. The user asked for depth, or the thing has three moving parts and dropping one makes the answer wrong. Length is never a way to show the question was taken seriously.
+
+**Back every claim.** A claim about this code carries a path and a line number. A claim about behavior carries the output you saw. A claim about the wider world carries where it comes from. Anything you cannot back gets called a guess, in that word. An explanation nobody can check is a story.
+
+Explain in chat, against the code or the material in front of you. When the user asks for a diagram, an image, or a chart to carry the point, make it and apply `toby-artifact-style`. A plain question gets a plain answer, and never an artifact you decided to build.
 
 ## What's worth explaining
 
 - The decision the rest hangs on, and why it wins here.
 - What the alternative would have cost.
-- The misconception most people bring to it.
+- The misconception most people bring to it, named as something most people bring in. That leaves the reader out of the sentence.
 - Where it breaks, or what would change the answer.
 - What stays unknown after you check.
 
@@ -40,27 +59,25 @@ How you explain shifts with the material:
 
 ## Starting cold
 
-Some asks arrive with no code, equation, or passage already on the page, because the user is asking about the concept itself. Build the smallest concrete instance yourself first, then explain against it the way you would a line of code. Name the boundary the misconception trips on, anchored to an instance that sits right on that line. Naming the misconception normalizes it, since most people carry it in. Say that plainly and move on. A recited definition is where tutor-voice tics hide best, so run the draft past toby-voice before it goes out.
+Build the smallest concrete example yourself when nothing is on the page yet, then explain against it the way you would a line of code. Pick an example that sits right on the line the misconception trips over. Say that most people arrive with that misconception, then move on. A recited definition is where tutor-voice hides best, so run the draft past `toby-voice` first.
 
 ## Reading the audience
 
-The concrete-instance technique above serves an expert and a beginner the same way, so a wrong read costs less than leading with an abstract definition would. Weight what the user says about themselves over their phrasing alone, because a precise question can come from someone precise about everything except this topic. When they're strong in a field next door, bridge to a structure they already hold there. Explain a mathematical function against a function they've written, its domain and range against the parameter and return type. Use the bridge only when it holds, because a forced one costs more than skipping it.
+Weight what the user says about themselves over how they phrase the question. A precise question can come from someone precise about everything except this topic. A concrete example serves an expert and a beginner alike, so guessing wrong about their level costs little.
 
-## What earns a comment
+When they are strong in a field next door, explain the new thing against something they already know there. A mathematical function against a function they have written, its domain and range against the parameter and return type. Drop the comparison when it does not fit, because a forced one costs more than none.
 
-Name a misconception as something most people carry in. That upgrades the reader's map and leaves the reader out of the sentence. When the topic has a real trap worth naming — a convention that trips everyone, a textbook that introduces it backwards. That is what earns the line.
+## Do not teach
 
-## Keep them in it
-
-A learner who only watches forgets the explanation. Once or twice a session, on the one decision where a wrong guess is plausible, ask the learner to call it before you reveal — "where does this go, and why?" — then explain the gap between their guess and the result. Light and rare. Quiz them every line and they stop watching. "No idea" ends it, no penalty. When they reach for the keyboard, hand it over and switch to toby-learning.
+Never quiz the user here, and never hold an answer back to make them reach for it. They asked a question and they want it answered. `toby-learning` runs the guess-then-tell loop, it costs the learner time on purpose, and it fires only when they invoke it by name. If they want that, they will ask.
 
 ## Form
 
-- Two or three sentences for most explanations.
-- Put the explanation against the thing it describes — the line, the equation, the quoted passage.
-- Use cause and effect: `This holds because ...`
-- A plain-text flow when relationships span more than a sentence; a diagram only when the structure is relational.
-- Keep final answers on result, verification, and what stays open.
+- Put the explanation next to the thing it describes: the line, the equation, the quoted passage.
+- Say what causes what. "This holds because ..." beats a list of true statements.
+- Use a plain-text flow when one sentence cannot hold the relationships. Use a diagram only when the thing has a layout worth drawing.
+- Use ordinary English. A word doing a job its normal meaning does not cover costs the reader a guess.
+- Load `toby-voice`'s `references/plain-language.md` and follow it. One idea per sentence. After "this" or "that", say the noun. Call a thing by the same name every time. Join two clauses with a word that says how they connect, such as because or so. A dash says nothing.
 
 ## Skip
 

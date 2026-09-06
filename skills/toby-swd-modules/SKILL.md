@@ -45,7 +45,7 @@ Put unavoidable complexity inside the module, when it is related to that module'
 
 Prefer computing a value internally over exporting a configuration parameter or throwing to the caller. Before exposing a parameter, ask whether the caller can choose a better value than the module can.
 
-Guardrail: only pull down complexity that is related to the module's function, simplifies callers, and simplifies the interface. Pulling unrelated complexity down is leakage with a new hat. Pulling everything down is a god module. When a boundary is also a serialization or process boundary, crossing it costs a round trip and a serialize/deserialize at runtime. That runtime cost sits on top of the cognitive cost. Prefer one coarse call over many fine-grained ones across that boundary.
+Guardrail: only pull down complexity that is related to the module's function, simplifies callers, and simplifies the interface. Pulling unrelated complexity down is leakage under another name. Pulling everything down is a god module. When a boundary is also a serialization or process boundary, crossing it costs a round trip and a serialize/deserialize at runtime. That runtime cost sits on top of the cognitive cost. Prefer one coarse call over many fine-grained ones across that boundary.
 
 ### 4. Different layer, different abstraction
 
@@ -54,7 +54,7 @@ Adjacent layers should present different abstractions. Similar abstractions acro
 - **Pass-through method**: does almost nothing but forward arguments to another method with a near-identical signature. Fix by exposing the lower module to callers, redistributing responsibility so the call disappears, or merging the two.
 - **Pass-through variable**: a value threaded through a chain of methods that don't use it (frontend: prop drilling; mobile: param threading across navigation stacks; across a message boundary: a field relayed through an intermediate hop that doesn't read it). Fix with a shared object between the endpoints, or a context, kept small and preferably immutable.
 
-A decorator that adds little is a shallow pass-through in disguise. Before adding one, ask whether the behavior belongs in the underlying module.
+A decorator that adds little is a shallow pass-through that looks like it adds something. Before adding one, ask whether the behavior belongs in the underlying module.
 
 ### 5. Prefer composition over implementation inheritance
 
@@ -127,7 +127,7 @@ Run this list against the diff before calling a boundary decision done.
 - **Conjoined methods**: one can't be understood without the other.
 - **Repetition**: nontrivial code repeated, so factor it to one place.
 - **Classitis / over-subdivision**: many shallow modules whose interfaces sum to more complexity than they remove (frontend: over-componentization).
-- **Deep implementation-inheritance hierarchy**: subclasses you can't read without reading the parent, parents you can't change without checking the subclasses. Two-way coupling masquerading as reuse.
+- **Deep implementation-inheritance hierarchy**: subclasses you can't read without reading the parent, parents you can't change without checking the subclasses. Two-way coupling that gets called reuse.
 - **Accessors as the public surface**: a module whose surface is mostly per-field get/set is definitionally shallow. The `toby-swd-interfaces` red flags carry the replacement and the plain-data exception.
 - **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy applied for its own sake, when the problem does not have the structure the pattern solves. Patterns earn their place by removing complexity.
 - **Conditional that grows per domain change**: a `switch` or `if` chain that takes a new arm every time the domain gains a case, or the same branch decision copied across call sites. Convert it with the ladder in "Replace the growing conditional." A single stable dispatch point over a closed set is not this flag.

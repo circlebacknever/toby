@@ -4,8 +4,10 @@ description: >-
   Make the code readable to whoever inherits it. Use it for naming,
   comments, docstrings, conventions, and control flow a reader trips on,
   inside the code being touched. It leaves already-clear surrounding code
-  alone. Skip it for module documentation files, which `toby-swd-docs` owns,
-  and for the design of a contract, which `toby-swd-interfaces` owns.
+  alone. Skip it when the user wants a clear or concise explanation in chat,
+  which `toby-explain` owns; this skill changes code and writes no prose for
+  the reader. Skip it for module documentation files, which `toby-swd-docs`
+  owns, and for the design of a contract, which `toby-swd-interfaces` owns.
 ---
 
 # Toby SWD Clarity

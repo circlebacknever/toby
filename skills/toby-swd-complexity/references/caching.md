@@ -94,7 +94,7 @@ have smaller operational footprint than introducing a cache.
 
 ---
 
-## Example 3 — Stampede: a performance problem dressed as an error
+## Example 3 — Stampede: a performance problem that arrives as an error
 
 A cache that "just works":
 

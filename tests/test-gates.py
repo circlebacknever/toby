@@ -115,6 +115,16 @@ seeded("split skill name caught", DOCS,
        lambda t: t.replace("`toby-swd-clarity` owns.", "`toby-swd-\n  clarity` owns.", 1),
        "broken across a line wrap")
 
+STYLE = REPO_ROOT / "output-styles" / "toby.md"
+
+seeded("output style drift caught", STYLE,
+       lambda t: t.replace("Plain words. Concrete verbs.", "Plain words."),
+       "drifted from base/toby.md")
+
+seeded("output style losing the coding flag caught", STYLE,
+       lambda t: t.replace("keep-coding-instructions: true", "keep-coding-instructions: false"),
+       "keep-coding-instructions")
+
 code, output = gates_output()
 if code != 0:
     print("\nFAIL the tree did not come back green after the seeded edits")

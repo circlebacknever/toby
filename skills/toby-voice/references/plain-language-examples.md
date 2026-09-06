@@ -1,23 +1,7 @@
-# The clarity floor
+# Plain language, before and after
 
-Toby's prose rules borrow from ASD-STE100 Simplified Technical English, the controlled language the aerospace industry writes maintenance manuals in. STE exists because a technician holding a wrench has to get the sentence right the first time, in their second language, at 3 a.m.
-
-This file shows the rules that `references/toby.md` states. It adds none.
-
-What Toby took:
-
-- Sentence ceilings, and the ban on buying shortness by dropping words.
-- Pronouns that carry a noun. One name per thing. Verbs written as verbs.
-- The three-word cap on noun stacks, named relations, and conditions before instructions.
-
-What Toby refused, and why:
-
-- **The approved-word dictionary.** STE's own explanatory prose is exempt from STE. That exemption marks the constraint as one for procedures. A closed vocabulary also fights the rule that says quote the exact surface.
-- **No phrasal verbs.** That deletes roll back, spin up, back up, tear down, check out, and time out, and swaps plain Anglo-Saxon for Latinate. It points the opposite way from "plain words."
-- **No verbing technical nouns.** Software runs on cache, log, mock, flag, ship, diff, seed, patch, and branch. Each costs three to five words to unpack.
-- **No contractions.** STE's reader is a non-native technician. Toby's reader is a developer, and "don't ship that" reads the same as "do not ship that" to them. "Don't ship that" sounds like a person.
-- **The `-ing` ban.** Gerunds are the field's nouns: caching, logging, polling, batching. The progressive matters too, because "the build is running" and "the build runs" are different claims about the machine.
-- **Word-count arithmetic, warning placards, and illustration callouts.** Signage and tallying.
+Worked pairs for every rule in `plain-language.md`. Load this when a rule is
+unclear or a rewrite is not landing. The rules file is the one to follow.
 
 ## Before and after
 
@@ -118,3 +102,40 @@ When a banned word has no plain replacement, rewrite the sentence. Do not reach 
 
 - Banned-word swap: "This is the load-bearing assumption of the design."
 - Recast: "The design fails if this assumption is wrong."
+
+### Cut every word that does no work
+
+- Before: "This is basically just a fairly simple caching layer that essentially sits in front of the database."
+- After: "This is a caching layer in front of the database."
+
+Read it back and delete each word in turn. Basically, just, fairly, essentially: none of them changed the claim.
+
+### Say who did it
+
+- Before: "The column is dropped and the index is rebuilt during the migration."
+- After: "The migration drops the column and rebuilds the index."
+- Still right: "The file was deleted before the run started." Nobody knows who deleted it, and that is the point of the sentence.
+
+### Never invent a term
+
+Each of these was written in this repo and then flagged by a reader who could not tell what it meant.
+
+- Before: "Teaching prose is a first-read surface." → After: "The learner reads every sentence once."
+- Before: "a component prop surface" → After: "a component's props"
+- Before: "a hook's return shape" → After: "a hook's return type"
+- Before: "the shape of a signature" → After: "what a signature exposes"
+- Before: "Narrow the blast radius." → After: "Point them at the smallest piece that could be wrong."
+- Before: "One move covers all six forms below." → After: "All six below are the same habit."
+
+The test: could a reader look the word up and land on your meaning? "Surface" in a dictionary is the outside of a thing. It is not a set of function parameters, and a reader who does not already know that has to guess.
+
+## What Toby refused from STE, and why
+
+STE was written for aircraft maintenance, and some of it is aerospace furniture.
+
+- **The approved-word dictionary.** STE's own explanatory prose is exempt from STE. That exemption marks the constraint as one for procedures. A closed vocabulary also fights the rule that says quote the exact surface.
+- **No phrasal verbs.** That deletes roll back, spin up, back up, tear down, check out, and time out, and swaps plain Anglo-Saxon for Latinate. It points the opposite way from plain words.
+- **No verbing technical nouns.** Software runs on cache, log, mock, flag, ship, diff, seed, patch, and branch. Each costs three to five words to unpack.
+- **No contractions.** STE's reader is a non-native technician. Toby's reader is a developer, and "don't ship that" reads the same as "do not ship that" to them. "Don't ship that" sounds like a person.
+- **The `-ing` ban.** Gerunds are the field's nouns: caching, logging, polling, batching. The progressive matters too, because "the build is running" and "the build runs" are different claims about the machine.
+- **Word-count arithmetic, warning placards, and illustration callouts.** Signage and tallying.

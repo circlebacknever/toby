@@ -84,6 +84,19 @@ install_skills() {
   done
 }
 
+install_output_style() {
+  # Claude Code only. The style lands in the system prompt, which is why the
+  # voice rules go here as well as in CLAUDE.md.
+  local target="$HOME/.claude/output-styles/toby.md"
+  run mkdir -p "$(dirname "$target")"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    printf '[dry-run] install Toby output style to %s\n' "$target"
+    return
+  fi
+  run cp "$ROOT/output-styles/toby.md" "$target"
+  printf 'output style installed. Turn it on with /config, then Output style, then Toby.\n'
+}
+
 install_instruction_file() {
   local source="$1"
   local target="$2"
@@ -160,6 +173,7 @@ install_codex() {
 install_claude() {
   install_skills "$HOME/.claude/skills"
   install_instruction_file "$ROOT/instructions/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md" merge
+  install_output_style
 }
 
 install_copilot() {

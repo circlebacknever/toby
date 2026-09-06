@@ -38,6 +38,25 @@ PATTERNS = [
      "relational performance — cut the closing offer"),
 ]
 
+# Words used outside their everyday meaning. Kept in step with COINED_TERMS in
+# scripts/validate-skills.py, which checks the same rule against files. This one
+# checks it against the reply, which is the only surface no file check reaches.
+COINED = [
+    "first-read", "blast radius", "surface area", "load-bearing", "north star",
+    "forcing function", "cognitive surface", "affordance", "the shape of the work",
+]
+
+# Figurative frames, kept in step with FIGURATIVE_FRAMES in validate-skills.py.
+# A sentence cannot wear a hat, and the file checks never see a reply.
+FRAMES = [
+    "wearing a", "wears a", "dressed as", "in disguise", "masquerading as",
+    "with a new hat", "under the hood", "pretending to be",
+]
+
+# The prose ceiling is 25 words. The hook fires at 40, well past it, because a
+# hook that argues about a 27-word sentence gets switched off.
+SENTENCE_LIMIT = 40
+
 # Fenced code, inline code, and quoted user text are not Toby's prose.
 FENCE_RE = re.compile(r"```.*?```", re.S)
 INLINE_RE = re.compile(r"`[^`\n]*`")
@@ -91,6 +110,23 @@ def main() -> int:
         match = pattern.search(reply)
         if match:
             hits.append(f"{match.group(0).strip()!r}: {reason}")
+
+    for frame in FRAMES:
+        match = re.search(rf"(?<![A-Za-z]){re.escape(frame)}(?![A-Za-z])", reply, re.I)
+        if match:
+            hits.append(f"{match.group(0)!r}: figurative frame, say what the thing is")
+
+    for term in COINED:
+        match = re.search(rf"(?<![A-Za-z]){re.escape(term)}(?![A-Za-z])", reply, re.I)
+        if match:
+            hits.append(f"{match.group(0)!r}: invented term, say it in everyday words")
+
+    for sentence in re.split(r"(?<=[.!?])\s+", reply):
+        words = len(sentence.split())
+        if words > SENTENCE_LIMIT:
+            hits.append(f"a {words}-word sentence: the ceiling is 25, so split it")
+            break
+
     if not hits:
         return 0
 

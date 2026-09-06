@@ -100,6 +100,42 @@ v.check_install_drift(drift)
 check("install drift check runs without touching disk", isinstance(drift, list))
 print(f"     ({len(drift)} install target(s) differ from the repo)")
 
+# --- figurative frames ------------------------------------------------------
+figurative: list[str] = []
+v.check_figurative_frames(figurative)
+check("no figurative frame in the repo", not figurative, str(figurative[:2]))
+# The line that prompted this check. A sentence cannot wear a hat.
+check("a hat is caught",
+      any(p.search("A five-bullet list is five sentences wearing a hat.") for _, p in v.FIGURATIVE_RE))
+check("a disguise is caught",
+      any(p.search("a shallow pass-through in disguise") for _, p in v.FIGURATIVE_RE))
+check("ordinary prose is not caught",
+      not any(p.search("The migration drops the column and rebuilds the index.") for _, p in v.FIGURATIVE_RE))
+# A dead metaphor in the dictionary stays, per the guide's terms-of-art rule.
+check("moving parts is left alone", "moving parts" not in v.FIGURATIVE_FRAMES)
+
+# --- output style -----------------------------------------------------------
+style_errors: list[str] = []
+v.check_output_style(style_errors)
+check("output style is in sync", not style_errors, str(style_errors[:2]))
+style_text = v.OUTPUT_STYLE.read_text()
+check("output style keeps the coding instructions", "keep-coding-instructions: true" in style_text)
+check("output style carries every writing section",
+      all(f"## {name}" in style_text for name in v.OUTPUT_STYLE_SECTIONS))
+check("output style leaves out skill routing", "## Skill Routing" not in style_text)
+check("output style leaves out environment safety", "## Environment Safety" not in style_text)
+
+# --- coined terms -----------------------------------------------------------
+coined: list[str] = []
+v.check_coined_terms(coined)
+check("no coined term in the repo", not coined, str(coined[:2]))
+check("a coined term is caught",
+      any(p.search("Teaching prose is a first-read surface.") for _, p in v.COINED_RE))
+check("an ordinary word is not caught",
+      not any(p.search("The migration drops the column.") for _, p in v.COINED_RE))
+# `primitive` was tried and removed: real term in graphics and in programming.
+check("primitive is not treated as coined", "primitive" not in v.COINED_TERMS)
+
 # --- description backticks ---------------------------------------------------
 check("split skill name caught", bool(v.SPLIT_BACKTICK_RE.search("which `toby-swd- clarity` owns")))
 check("intact skill name passes", not v.SPLIT_BACKTICK_RE.search("which `toby-swd-clarity` owns"))

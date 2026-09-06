@@ -165,6 +165,21 @@ else
   flunk safety "unmarked instruction file was modified"
 fi
 
+# The output style lands in Claude Code's system prompt, so a truncated or stale
+# copy changes how every reply reads. Compare content, not existence.
+STYLE_HOME="$TMP_ROOT/style"
+install_into "$STYLE_HOME" --tool claude >/dev/null 2>&1
+STYLE="$STYLE_HOME/.claude/output-styles/toby.md"
+if [[ ! -f "$STYLE" ]]; then
+  flunk claude "output style did not install"
+elif ! diff -q "$ROOT/output-styles/toby.md" "$STYLE" >/dev/null; then
+  flunk claude "installed output style differs from the repo"
+elif ! grep -q '^keep-coding-instructions: true$' "$STYLE"; then
+  flunk claude "installed output style would switch off the coding instructions"
+else
+  pass claude "output style matches the repo"
+fi
+
 if [[ "$fail" -ne 0 ]]; then
   printf '\nInstall smoke test failed.\n' >&2
   exit 1

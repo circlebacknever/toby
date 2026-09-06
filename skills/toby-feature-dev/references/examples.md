@@ -4,7 +4,7 @@ Four kinds of feature, cut into slices, all four in one invented repo: orders, a
 
 Every criterion below carries all three lines, because a criterion missing one is the thing the skill tells you to drop.
 
-## 1. Brownfield, one seam — new endpoint on an existing resource
+## 1. Brownfield, one entry point — new endpoint on an existing resource
 
 Request: "let people cancel an order from the account page."
 
@@ -13,7 +13,7 @@ Request: "let people cancel an order from the account page."
 3. Observable — cancelling someone else's order returns 404. Source — `api/orders.ts:31`, the ownership check every other order route runs. The request is silent on this. Check — `test_cancel_scopes_to_owner`, unmet on any 2xx.
 4. Stays working — the order list still returns shipped and open orders unchanged. Source — the existing contract. Check — the `orders_list` suite, unmet on any changed row.
 
-Slices: one, `an open order can be cancelled from the account page`. All four criteria arrive at the same seam, an HTTP request to the orders API.
+Slices: one, `an open order can be cancelled from the account page`. All four criteria arrive at the same entry point, an HTTP request to the orders API.
 
 Wiring: `api/routes.ts:142` — `router.post('/orders/:id/cancel', cancelOrder)`. Without that line the handler is a well-tested function nothing can reach.
 
@@ -21,7 +21,7 @@ Stops: criteria only, one line, keep moving. No strategic trigger, because the r
 
 Record: criteria 1 and 2 quote a person, so both get entries. Criterion 3 cites a repo fact, so it gets none.
 
-## 2. Two seams — a flow crossing two screens
+## 2. Two entry points — a flow crossing two screens
 
 Request: "users should be able to invite a teammate and see the invite pending."
 
@@ -30,7 +30,7 @@ Request: "users should be able to invite a teammate and see the invite pending."
 3. Observable — opening a used or expired link shows an expired state and creates no account. Source — user, on the follow-up about resent links: "once I resend, the first link should be scrap". Check — `test_expired_link_creates_no_account`, unmet if an account exists after.
 4. Stays working — the members list still renders for an org with no pending invites. Source — the existing contract. Check — `members_list` suite.
 
-Slices: two, named for what each one lets someone do — `invite shows up as pending`, then `the invite email opens the accept screen`. Criteria 1 and 4 land at the members screen, and 2 and 3 land at the mail and the accept route. Different seams, different slices.
+Slices: two, named for what each one lets someone do — `invite shows up as pending`, then `the invite email opens the accept screen`. Criteria 1 and 4 land at the members screen, and 2 and 3 land at the mail and the accept route. Different entry points, different slices.
 
 Wiring: slice one at `screens/Members.tsx:210` — `<InviteForm onSubmit={createInvite} />`. Slice two at `jobs/index.ts:17`, the `invite.created` subscription.
 

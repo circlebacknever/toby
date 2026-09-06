@@ -1,0 +1,76 @@
+{
+  "label": "explain",
+  "recorded": "2026-09-06",
+  "scored_by": "evals/suites/explain.md, read by a person, plus the sentence measurements below",
+  "runs": [
+    {
+      "file": "runs/explain-answers.md",
+      "skill": "before the three hard limits",
+      "longest_sentence": [
+        34,
+        43,
+        24,
+        33
+      ],
+      "welds": [
+        1,
+        2,
+        0,
+        1
+      ],
+      "words": [
+        55,
+        108,
+        41,
+        72
+      ]
+    },
+    {
+      "file": "runs/explain-answers-2.md",
+      "skill": "limits added as prose",
+      "longest_sentence": [
+        31,
+        42,
+        21,
+        29
+      ],
+      "welds": [
+        1,
+        2,
+        0,
+        1
+      ],
+      "words": [
+        56,
+        86,
+        37,
+        67
+      ],
+      "note": "Advisory wording moved nothing. A 42-word sentence survived."
+    },
+    {
+      "file": "runs/explain-answers-3.md",
+      "skill": "limits numbered and hard",
+      "longest_sentence": [
+        20,
+        23,
+        23,
+        26
+      ],
+      "welds": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "words": [
+        35,
+        59,
+        38,
+        51
+      ],
+      "note": "Q2, the beginner question, went from 108 words and two welds to 59 and none."
+    }
+  ],
+  "note": "Q4 backed every claim and named the unverified half a guess in all three runs. The evidence rule held from the start; the length rule needed numbers."
+}

@@ -1,30 +1,30 @@
 skill                           body   front    refs  files
 toby-artifact-style             4905     151   15852      6
-toby-code-review                2792     107    4303      1
-toby-explain                    1351      68     386      1
-toby-feature-dev                5364     251    5404      3
-toby-game                        886     174    4962      6
-toby-learning                   2728     130    2396      2
+toby-code-review                2792     107    4300      1
+toby-explain                    1428     157     370      1
+toby-feature-dev                5370     251    5412      3
+toby-game                        886     174    4963      6
+toby-learning                   2734     130    2396      2
 toby-simplify-code              1798      88    2061      1
 toby-squall                      956      97       0      0
-toby-swd-clarity                2384     102     977      1
-toby-swd-complexity             2523     154   16969      6
+toby-swd-clarity                2384     142     977      1
+toby-swd-complexity             2523     154   16970      6
 toby-swd-docs                   2084     125    1826      1
 toby-swd-environment            1548     124       0      0
 toby-swd-experiment             1186     151       0      0
-toby-swd-interfaces             3398     138   18154      7
-toby-swd-modules                3544     154   17460      7
+toby-swd-interfaces             3398     138   18155      7
+toby-swd-modules                3551     154   17464      7
 toby-swd-strategy               1790     159    1522      1
 toby-swd-testing                2452     131       0      0
-toby-voice                      1152     108   12677      6
+toby-voice                      1179     108   14344      7
 
-total body tokens: 42841
-total frontmatter tokens (always resident): 2412
+total body tokens: 42964
+total frontmatter tokens (always resident): 2541
 
 co-load totals by routing group (bodies only, no references opened):
-  feature-change     18175
+  feature-change     18182
   review              4590
-  feature-dev         9606
-  prose               1152
+  feature-dev         9612
+  prose               1179
 
-operating guide: 7096 tokens, resident every turn
+operating guide: 7444 tokens, resident every turn

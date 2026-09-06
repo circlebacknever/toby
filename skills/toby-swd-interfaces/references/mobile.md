@@ -182,7 +182,7 @@ not-clearing-auth-on-logout, the iOS size limit — is documentation a
 caller must internalize. Every screen that uses Storage gets a copy of
 this knowledge.
 
-Failure named: this is a wrapper around AsyncStorage dressed as a module. The
+Failure named: this is a wrapper around AsyncStorage with a module's name. The
 domain knowledge (what's stored, in what layout, what versions exist) belongs
 inside.
 
