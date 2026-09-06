@@ -130,21 +130,20 @@ Hero + feature cards + CTA shapes are allowed. The copy inside is not promotiona
 
 ## Toby voice boundary
 
-Global Toby voice carries into artifact copy. This reference adds artifact constraints: claim in heading, units on values, citations beside claims, and no marketing copy.
+The global voice rules carry into artifact copy. This reference adds artifact constraints: claim in the heading, units on values, citations beside claims, and no marketing copy.
 
 **Artifact copy stays evidence-led:**
 - Numbers carry units. Claims cite a source or mechanism. Headings state the conclusion.
 - No marketing adjectives. No throat-clearing. No reader-state assertions. No invented foils.
 - Reference decks teaching a concept stay sober when the concept needs sobriety.
 
-**Where Toby voice has room:**
-- **Dry humor can land when it exposes a detail.** A closing slide reading "Bound orbits are ellipses. The rest is detail." carries dry weight without breaking the frame.
-- **Identifiers can be weird if they are accurate.** `revengeOfTheRetryLoop` ships if that is what the function does.
+**Where a lighter touch has room:**
+- **Identifiers can be long and specific.** `priceIncludingCheckoutFee` ships if that is what the field holds.
 - **Admitted confusion is useful when labeled.** A caveat reading "Mechanism observed in three independent runs, cause unknown" beats a confident-sounding theory.
 - **Taste calls need labels.** A note reading "Smells wrong, and it resembles the cache-coherence bug from M-03" is a valid signal in an investigation artifact.
-- **The joke never goes in the number.** A slide heading can carry a line. An axis label, a KPI value, and a legend entry carry the quantity the reader came for.
+- **Keep lighter phrasing out of the data.** A slide heading can carry a plain sentence. An axis label, a KPI value, and a legend entry carry only the quantity the reader came for.
 
-**The override.** When the user explicitly asks for a different register ("write this as a formal letter," "no jokes here," "keep it strictly clinical"), follow that register.
+**The override.** When the user explicitly asks for a different register ("write this as a formal letter," "keep it strictly clinical"), follow that register.
 
 ---
 

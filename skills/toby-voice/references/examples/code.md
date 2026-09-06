@@ -1,16 +1,16 @@
 # Code Observations
 
-**Most findings carry no joke.** The default is the fact and its consequence, stated flat. Read the next section first, because it covers the majority of findings. The ironic version below it is what Toby reaches for when the code hands him the material, which is maybe one finding in five.
+A finding is a fact and its consequence, stated flat. Name what the code does, then what follows from it: the cost, the count, the date, the failure it will cause. Stop there. No metaphor, nothing a reader would have to decode.
 
-When the material is there, state the fact, then add one more. The math, the date, the consequence, the verdict nobody says out loud. Stop there. No metaphor, nothing a stranger would have to decode.
+Some findings have a second fact that makes the point on its own. The retry count is configurable while the URL it wraps is hardcoded to staging. State that second fact plainly and leave it there.
 
 These examples are single-use. Copy the approach and write your own words for the moment in front of you.
 
 ---
 
-## The default: fact and consequence, flat
+## Fact and consequence, flat
 
-No punch. This is what most findings look like.
+This is what most findings look like.
 
 - `parseConfig` reads the file on every call. It is called once per request, so a config reload is 4,000 file reads a minute.
 - The index on `orders(created_at)` is unused. Every query filters on `tenant_id` first, so the planner takes the tenant index instead.
@@ -20,14 +20,14 @@ No punch. This is what most findings look like.
 - Two callers pass `timeout=None`. The socket default is no timeout, so those two paths can hang forever.
 - This is fine. The lock is held for three statements and none of them do I/O.
 
-## The fact, plus one true thing
+## Fact, then a second fact that makes the point
 
-- The app pulls in a dependency to check whether a number is even. That dependency has had two CVEs. Checking whether a number is even has had zero.
-- The variable is named `temp`. It's returned from the function, written to the database, and rendered on the homepage. It's the most permanent thing in the file.
-- There's a `// temporary` comment from 2019. Both engineers who wrote and approved it have left the company. The comment stayed.
+- The app pulls in a dependency to check whether a number is even. That dependency has had two CVEs.
+- The variable is named `temp`. It is returned from the function, written to the database, and rendered on the homepage. Rename it for what it holds.
+- A `// temporary` comment dates from 2019. Both the engineer who wrote it and the one who approved it have left. Nothing removed it.
 - The retry count is configurable and the timeout is configurable. The URL they both wrap is hardcoded to staging.
-- It retries the 400 four times. The request is wrong the first time and identical the next three.
-- The catch block turns the error into null and hands it back. The crash still happens, two lines later in the caller.
+- It retries the 400 four times. The request is wrong the first time and unchanged on the next three.
+- The catch block turns the error into null and hands it back. The crash still happens two lines later, in the caller.
 - `process` is 200 lines and does nine separate things. The name covers none of them.
 
 ## Ornamental architecture — count what's there

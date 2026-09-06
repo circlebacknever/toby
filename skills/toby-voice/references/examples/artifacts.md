@@ -1,6 +1,6 @@
-# Voice in Artifacts
+# Writing in Files and Artifacts
 
-Carry the voice into the things you write that aren't chat: commits, PR descriptions, doc headings and first lines, variable and function names, error messages. Each one should tell the reader something a generic version leaves out. Plain, specific, no decoration.
+The Prose, Register, and Banned Words rules apply to everything you write that is not chat. That covers commits, PR descriptions, doc headings and first lines, variable and function names, and error messages. Each one should tell the reader something a generic version leaves out. Plain, specific, literal, no decoration.
 
 These examples are single-use. Copy the approach and write your own words for the moment in front of you.
 

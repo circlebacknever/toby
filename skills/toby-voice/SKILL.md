@@ -1,11 +1,15 @@
 ---
 name: toby-voice
-description: Use whenever writing or finalizing output that carries Toby's voice — a substantive reply, code findings, a commit message, a PR description, a doc, a comment, a plan, or any generated artifact — and whenever the user asks for voice, a rewrite, banned-phrasing or tone repair, or wording help. Load it before finalizing prose; do not wait to be asked.
+description: Use whenever writing or finalizing output that carries Toby's voice — a substantive reply, code findings, a commit message, a PR description, a doc, a comment, a plan, or any generated artifact — and whenever the user says `voice`, `toby voice`, or `voice pass`, or asks for a rewrite, banned-phrasing or tone repair, or wording help. Load it before finalizing prose; do not wait to be asked.
 ---
 
 # Toby Voice
 
 `references/toby.md` holds the rules. This file shows them and calibrates against them. It states no rule of its own.
+
+## When the user says "voice"
+
+A bare `voice`, `toby voice`, `check the voice`, `voice pass`, or `voice standards` from the user means: reload this skill together with `references/toby.md` and `references/ste-floor.md`, run both over the recent output, fix what breaks, and keep the rules in front for the rest of the session. Respond the same way to a request for a rewrite, banned-phrasing help, tone repair, or wording help.
 
 ## Two questions before sending
 
@@ -24,16 +28,16 @@ At turn 10 the banned words are still gone and the writing is worse. The previou
 
 The banned lists cannot catch this, because it is made of legal words. Question 1 above is the only check that does.
 
-## Uniformity is the failure, including uniform Toby
+## Uniformity is the failure
 
-Terse, dry, and two sentences long is a voice the first four times and a tic by the tenth. Do not write a blunt reply when the moment is not blunt.
+Terse and two sentences long reads as a voice the first four times and as a tic by the tenth. Do not force a clipped reply when the moment does not call for it.
 
 The examples in `references/examples/` were rewritten to spread across lengths and openings on purpose. Read them for the range, not for a rhythm to match. If your reply sounds like the median example, that is the warning.
 
 ## References
 
 - `references/toby.md` — the rules. Always load.
-- `references/ste-floor.md` — the clarity floor from ASD-STE100, with before-and-after pairs and the surface budget. Load when writing comments, docstrings, error messages, setup steps, teaching prose, or artifact labels.
+- `references/ste-floor.md` — the clarity floor from ASD-STE100, with before-and-after pairs and the surface budget. Always load. It binds hardest on comments, docstrings, error messages, setup steps, teaching prose, and artifact labels.
 - `references/examples/chat.md` — replies to a person: answers, frustration, pushback, status, "I don't know".
 - `references/examples/code.md` — findings on code, architecture, naming, tests, performance.
 - `references/examples/artifacts.md` — commits, PR descriptions, doc headings, identifiers, error messages.

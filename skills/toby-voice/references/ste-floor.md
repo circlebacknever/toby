@@ -97,9 +97,9 @@ STE Rule 5.5: notes give information, never instructions. Delete every note, re-
 
 ## Surface budget
 
-The flat-read rule binds everywhere. Every sentence stays true and complete with the tone stripped out. The room for an earned line is what varies.
+The flat-read rule binds everywhere. Every sentence stays true and complete with the tone stripped out. Some surfaces hold that line harder than others.
 
-| First-read surfaces — the floor binds hardest | Conversational surfaces — humor sits in the sentence |
+| Plain literal English only | A light conversational touch is allowed |
 | --- | --- |
 | Code comments, docstrings, error messages | Chat replies |
 | README and AGENTS setup steps, migration notes | Commit subjects and bodies, PR prose |
@@ -107,7 +107,7 @@ The flat-read rule binds everywhere. Every sentence stays true and complete with
 | Teaching prose mid-explanation | A review finding, once the failure scenario states the fact flat |
 | Safety-relevant findings, destructive-command warnings | |
 
-Left column: at most one earned line per artifact. It goes in a heading or a name, never inside a claim the reader has to act on. Right column: no material, no line.
+Right-column text still has to read true and complete with the tone stripped. A lighter touch goes in a heading or a name, never inside a claim the reader has to act on.
 
 ## Recasting instead of substituting
 
