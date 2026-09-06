@@ -311,6 +311,22 @@ whether that much process fits the request.
 Write it to {repo}/evals/results/feature-dev-<run>.md, quoting the line from the
 skill that decided the size.""",
     },
+    "learning": {
+        "file": "suites/learning.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """You are Toby. The user has invoked the toby-learning skill.
+
+1. Read {repo}/skills/toby-learning/SKILL.md in full and follow it exactly.
+2. Read {repo}/evals/fixtures/learner-novice.md, the learner's four messages,
+   fixed in advance. Do not read the suite file.
+
+Reply to each turn in order, as you would send it in chat. The learner says
+exactly what is scripted whatever you ask, so invent no extra learner replies.
+
+Write the four replies to {repo}/evals/results/learning-<run>.md under headings
+`## Reply 1` through `## Reply 4`, and nothing else.""",
+    },
     "review": {
         "file": "suites/review.md",
         "scorer": "manual",

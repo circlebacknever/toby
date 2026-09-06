@@ -80,7 +80,6 @@ a changed method s body is mostly a chain of getters and fields pulled from one 
 a changed or new function branches on a bool or enum parameter near the top of its body into substantially different code paths and the parameter s only job is choosing which path runs
 a changed or new signature has enough parameters that a caller has to check the declaration to get the order right or the same two or three parameters appear together more than once in the diff
 a changelog or version history
-a check is worth a sharp adult s time only when it forces them to generate an answer from their own model
 a check you could have run and skipped leaves the criterion unmet
 a circuit breaker is a stateful wrapper around a downstream call that
 a claim about how the code behaves carries a path line or enters the criteria list as an assumption an explorer s or sub agent s summary included
@@ -120,6 +119,7 @@ a criterion counts as met on two runs of one named command quoted under the crit
 a criterion with nothing in the diff serving it is the finding quoted in its own pre code wording
 a cross module reason duplicated into code at each site duplication
 a custom hook composable rune for that effect
+a dash says nothing
 a data hook catches every fetch error and returns empty data
 a deadlock or serialization
 a decision process branching lines or y fork
@@ -185,10 +185,12 @@ a hunch wrapped in might possibly is still noise
 a known expensive trigger if it crosses the network so debounce the fetch and
 a kv block at the bottom for scope units convention out of scope
 a labeled block in the nearest file when a separate surface would add churn
+a language error routes to a recast or an elicited self repair
 a language without implementation inheritance reads this as the general two way coupling caution
 a large or heavily
 a large share of production failures come from bugs in barely exercised error paths
 a lateral rewrite that only swaps one style for another is churn
+a learner who guesses and then reads the answer remembers more than one who reads it twice
 a learner who met it as the guard clause reads the early return as a second thing and spends a turn reconciling them
 a learner who only watches forgets the explanation
 a lesson walkthrough or explanation in conversation stays in chat because toby explain and toby learning own that and they answer in prose
@@ -220,6 +222,7 @@ a match against the file s fix here half is a countable win like any other in th
 a match becomes a finding under that skill s proof rule for smells the entry name the file line and the code there that meets the entry s fires when criterion
 a measurable predicted improvement and a baseline to compare against
 a measurement over time subject timeline ticks as axis model envelope for the fit threshold rail for the alert band
+a message covers one step a wall of text is the failure this skill exists to prevent
 a method signature shaped exactly to one caller produces a one call shaped hole the next caller cannot use without widening it
 a method that takes the operation and computes the new state internally
 a migration has three parts a schema change an idempotent data
@@ -338,7 +341,6 @@ a search hit is a pointer
 a second independent call is the one expensive move here so gate it hard
 a second name for a concept that has one is a question for the user
 a security or authorization outcome auth denied a validation rejection a permission failure is never an error to define away or mask into success
-a self consistent wrong answer is a wrong model so surface the belief and repair it
 a semicolon a colon or an em dash joining two clauses means the relation went unstated
 a sentence the product claims with no test defending it is the finding at the entry s heading
 a separate denormalized table updated on writes queried directly
@@ -366,7 +368,6 @@ a slide with only a geometric mark and no accompanying claim has no purpose
 a small answer is a valid result
 a small filter fits
 a smell costs future readers and future changes
-a smooth explanation they nod at is gone by the next task
 a specific candidate place plan or name is one point in a wider field
 a specific complaint wish or constraint is one expression of a wider concern
 a specific example is one member of a class
@@ -394,6 +395,7 @@ a switch over a set that has been stable for a year is fine so leave it alone
 a symptom of scattered data access
 a tactical change usually has one
 a task creates moves splits merges or places code or when ownership
+a teaching turn runs to five sentences
 a team adds barcode scanning
 a team adopts memoize all functions and computed values to avoid
 a team builds request handling as two classes
@@ -402,6 +404,7 @@ a team is building their own combobox
 a teardown returned from the async function
 a temporary comment dates from 2019
 a ten item cart is eleven queries before anything renders
+a terse sure fine after a check means engagement is dropping so back off and move the work
 a test asserting on internals that would break under a behavior preserving refactor
 a test passes fakes
 a test suite exists for three jobs
@@ -440,6 +443,8 @@ a working reference for orbits in classical newtonian gravity
 a wrapper that applies the categorization
 a written file approved before the first edit
 a wrong answer that contradicts something they said is a slip so give a light you mean x and move on
+a wrong answer that hangs together means they believe something wrong
+a wrong guess is what should happen say what it got right correct the rest in one sentence and move on
 a year out the code says what it does and nothing says what it was for
 a young codebase wires the orm into business logic
 a zero downtime cutover needs more a dual write dual read window held
@@ -533,6 +538,7 @@ after the retry loop was swallowing the timeout
 after the task give a short account
 after the task name anything that matters
 after the user chooses a behavior delete the experiment or fold the chosen behavior into normal design flow
+after this or that say the noun this cache that branch
 after this the cache is either plainly right slow database query
 after two years no one knows which controllers depend on which
 after writing code read it as a developer seeing it cold
@@ -668,6 +674,7 @@ annotation pin numbered circle leader line framed label all in toby info
 another holds the lock across a network call and
 another multitenancy is a third audit is a fourth
 answer first in plain words
+answer it in full
 answering it is in scope
 any criterion unmet or unverified is named in the first line with which of the two it is and what is missing
 any public api change
@@ -737,17 +744,22 @@ as shallow as a module gets
 as soon as possible
 as the view narrows widen the field of view or pull the camera back so a five inch screen stays legible
 as y instructions in the comment
+ask a check only when it forces the learner to generate an answer from their own model
 ask before any code when a wrong guess writes data changes a public contract or a stored format moves money touches permissions ships a user visible string calls an external system or costs more to unwind than the change cost to make
 ask before anything on that skill s ask list the full suite a migration an install a dev server
 ask before automated tests browser automation screenshots or broad repo commands because each one adds latency to the user s loop
 ask can the caller pick a better value than the module can
 ask first always naming exactly what goes
 ask first unless the command directly implements a plan the user approved
-ask for a contribution only when it changes the real solution a decision with several valid answers a policy choice an algorithm or structure a behavior with tradeoffs a naming or modeling call
+ask for a contribution only when it changes the real solution
+ask for a guess
 ask for one verdict the chosen candidate a one line reason per rubric item and any over hiding risk
+ask for the guess before the explanation and give the explanation whatever the guess was
+ask for the guess on the first step
 ask for the naming call because product vocabulary you invent outlives the implementation and the rewrite that deletes this module keeps the noun
 ask the one why that separates a memorized answer from an understood one right what happens when the input is empty
 ask the user to test or run the smallest useful check
+ask what they think is happening then correct that belief
 ask what would make each one change
 ask what would make each one change
 ask whether the design is at least as good after the change as before it which no other question here does
@@ -1106,6 +1118,7 @@ caching the repository is properly example 1 from caching md
 cadence two sample rule
 cadence two sample rule named rollback
 calendar today gets 2px toby info border bold info text
+call a thing by the same name every time start to finish
 call isavailable first to check whether
 call setx after computing what x should be
 call site where the author has the least context
@@ -1207,7 +1220,7 @@ catch regressions when something changes
 catch return caller cannot distinguish no orders from failed
 categorical section accents when a page has multiple sections give each its own color from the chart palette
 categorize by status class retry in the client wrapper
-caught mid stream their working memory is full so flag the lesson in one line and resurface it at the next seam
+caught in the middle of something the learner has no room to take it in so give the lesson one line and come back to it at the next break
 caveat next to the figure never in a footnote
 caveats sit next to the claim never in a footnote
 caveats sit next to the claim they qualify never push uncertainty into a footnote
@@ -1245,11 +1258,11 @@ chart palette positional order for series and categorical accents
 chat a short framing line the comprehension check question and any branch options
 cheap to compute the memoization itself costs more than what it saves
 check a verb can physically succeed before you ship it
-check against reality with the narrowest useful step
+check against reality with the narrowest useful run and have them predict the result before it runs
 check banned words invented foils and the patterns in references examples banned writing patterns md
 check before handoff run the grep in references behavior record md and report what it printed
 check correctness with a script
-check forms for right answer subjects predict the result before you run or work it find the defect in a version you made wrong on purpose defend the option that got rejected say what breaks downstream if a condition changes name the case left unhandled
+check forms for right answer subjects
 check members list suite
 check test cancel rejects shipped unmet if the order changes
 check test cancel returns cancelled order unmet if the status stays open
@@ -1312,13 +1325,13 @@ clearer tidier more idiomatic count nothing down
 clickable taxonomy clicking a term or node expands its definition or sub structure inline
 client error caller s fault
 close by handing the learner the cue to retrieve it later next time you meet a case like this the question to ask is
-close by making the learner give the reason back in the form they would reuse the one line rule the note or the thesis and the strongest counter it must answer
+close by making them give the reason back in the form they would reuse the one line rule the note or the thesis and its strongest counter
 close on a graded rank laned by how they played with a verdict in their own stats
 closed and using it later blows up
 closeonesc and closeonoverlayclick should both be false for destructive
 closes resumes calling when test calls succeed
 cloze the word the learner must produce
-coach in chat against the work in front of you
+coach in chat against the work in front of them
 code ahead of its plan an edit written before the step covering it was approved or a step that ran differently from its approved wording with no edit to the plan
 code and comments track the mechanics while the outside reason that forced them lives in this file
 code background var toby ink 2 color var text on dark
@@ -1409,7 +1422,7 @@ concentrate the discipline for touching it in one place so locks checks and assu
 concentrate the discipline inside the owner
 concentric arcs decaying outward
 concentric circles radial spokes
-concept one rich decision or idea to reason through
+concept one decision or idea to think through by someone who already knows enough to think about it
 concepts a caller needs the abstractions a caller operates with to use this correctly
 concretely don t import private modules to test them
 concurrent requests all miss all call load all hit postgres
@@ -1745,6 +1758,7 @@ default to the current diff when no scope is given
 default to the highest fidelity dependency that is fast and deterministic
 defaults and the validation and the contract gets short
 defaults and torch availability checks can all be handled without callers
+defend the option that got rejected
 defend x or find a reading that doesn t need it
 defending a direction signals you ve decided what they re after before they have
 defer rl mu unlock
@@ -1805,7 +1819,6 @@ description brainstorm by widening from a single example to the broader set behi
 description collaborate to build a single file html simulation game or toy in toby s style a real system with its shortcuts named out loud deadpan comedy where there is a target a paper and ink look across canvas 3d or dom and an ending that reads the run back when the game has one
 description this cannot be undone
 description use when the user asks for an explanation walkthrough rationale trade off architecture note or teaching on any subject code math a science a language literature medicine while the work or study continues
-description use when the user wants to learn or be taught any subject while working through it code math a science a language literature medicine practicing drilling contributing the next piece of real work or being quizzed on what they should retain
 description use whenever writing or finalizing output that carries toby s voice a substantive reply code findings a commit message a pr description a doc a comment a plan or any generated artifact and whenever the user says voice toby voice or voice pass or asks for a rewrite banned phrasing or tone repair or wording help
 deserves a toast that s one configuration change in one place
 design each boundary to serve more than one caller and stop one named variant short of speculation
@@ -1922,6 +1935,7 @@ do not settle for a vague name
 do not ship on assumed equivalence
 do not treat it as discipline
 do not trigger for a plain text answer or explanation in chat where no visual was asked for that prose belongs to toby explain or toby learning
+do not trigger on a question that wants an answer why is this slow
 do not trigger on general brainstorming language like help me think through this let s explore or brainstorm with me this skill waits for explicit invocation
 do not trigger on general requests to make a game a sim a toy a visualizer or a simulation and do not trigger when a game is only mentioned in passing
 do not turn a local placement issue into a module tree redesign
@@ -2008,6 +2022,7 @@ drift posterior trending high defer decision until two sample rule passes
 drilling one item smooth before moving on feels like learning and predicts forgetting
 drop a hunch you couldn t prove because it doesn t belong here
 drop shadows glow gradients
+drop to smaller steps on vague phrasing i think a restated question or copying without change
 drop user scalable no for a reading heavy dom game that wants pinch zoom
 drop what you can t prove
 drop yes no multiple choice does that make sense and anything answerable from the last three messages
@@ -2081,6 +2096,7 @@ each stays out unless a criterion names it and that criterion s source line quot
 each stays out unless a criterion names it and that criterion s source line quotes the user or the ticket
 each step component renders its own content and fires transitions via
 each step updates the diagram and adds an annotation
+each subject reads the ladder its own way and the references map it
 each test has a definite answer which is why it gets run and a fifteen item checklist does not
 each ttl is documented with the reasoning
 each type lives in the module that owns the decision it represents
@@ -2302,7 +2318,6 @@ explain first usually a missing index or bad query plan
 explain from the worker s seat name the decision say why it wins here name what it costs keep moving
 explain in chat against the code or the material in front of you
 explain the broad command then offer the narrowest check that protects the touched work
-explain the decision and the tradeoff it creates
 explain why it matters here
 explicit visible error handling for a failure that can happen
 expo projects or react native fast image bare rn so off screen images
@@ -2324,6 +2339,7 @@ expose the current inputs outputs candidate values and selected state
 expose the platform api verbatim
 exposed vs intent methods
 exposes the state and trusts every caller to guard it
+exposition the learner is new to this and has nothing to reason from yet
 expunge detaches the user from the
 extend it to orders both pass
 extending a class to inherit behavior is the costly form and mixins hooks and helper objects are usually better
@@ -2338,6 +2354,7 @@ eyebrow per column naming the term cluster
 eyebrow uppercase 0 12em 11 pt mono t textondarkmuted at top left section 03
 eyebrow uppercase 0 12em 11px muted section name and slide id for example 05 17 numerology
 f x x sends 3 to 9 and 3 to 9 as well which means two different inputs are allowed to share an output
+faced with one the learner skips it and learns less than from a short paragraph they finish
 factor code together only when the instances share the same knowledge so a change to one should change all
 facts anatomy terminology pathways recognize then cloze the term the learner must produce then free recall the set in order
 fail performance improved significantly
@@ -2419,6 +2436,7 @@ find id string tx transaction promise order null
 find method per filter combination
 find one and find many accept sqlalchemy
 find one design imperfection in the code you touched an obscure name a leaky abstraction a dead branch a comment that lies duplicated logic
+find the defect in a version you made wrong on purpose
 find the real thing to aim at insurance is a fog bank
 find the weakest link in this argument theirs or one you hand them
 find where the time goes is it a database query
@@ -2463,6 +2481,7 @@ first parse then validate then write that produces shallow modules and leaks one
 first the interface is colocated with the implementation
 first validates that the cart belongs to the user
 five methods five different uses each describing both behavior and which
+five sentences one step plain words
 fix at the call site
 fix by exposing the lower module to callers redistributing responsibility so the call disappears or merging the two
 fix here correct the comment to match the new behavior a one line edit no boundary crossed
@@ -2533,7 +2552,7 @@ for attempt 1 attempt
 for attempt 1 attempt
 for authority section dividers glossaries formula slides summaries decision points
 for bars place values at the bar tips when space allows
-for broken code run the narrowest test show them the red and ask them to read it before you touch it
+for broken code run the narrowest test show them the red and ask them to read it first
 for by holding a lock so the transaction stays short and touches rows in a
 for consequential interfaces write the comment before the body the comment is a design tool the cheapest way to find out the abstraction is wrong
 for consequential or exported interfaces write the interface comment before the body
@@ -2592,6 +2611,7 @@ four interfaces between the request handler and one database row
 four kinds each with its own home
 four kinds of feature cut into slices all four in one invented repo orders a members screen a billing module a search path
 four questions asked early
+four rules do most of the work
 four sentences no internals every caller question answered
 four sentences or fewer for the whole entry point
 fourth time this week the same file has beaten us
@@ -2701,7 +2721,10 @@ git grep qf b test spec echo unproven b
 git holds the change history
 give each case an object behind a shared interface
 give each one tender exact line fired when their flaw bites
+give less help and hand over more
 give me the counterexample that would sink your thesis
+give one case they have not seen
+give one case they have not seen and ask them to apply the rule to it
 give plot beats a priority lane that jumps the flavor queue or a growing feed starves the ending
 give the reason and the new wording and wait for a yes before the next edit
 give the reason when asked or when the answer would surprise them
@@ -2749,6 +2772,7 @@ guardrail if a caller must know whether the upload was durably committed before
 guardrail only pull down complexity that is related to the module s function simplifies callers and simplifies the interface
 guardrail rare cases legitimately need set without an associated load
 guardrail the transaction body must be idempotent or fully transactional
+guessing pays off on a why
 h1 style font size 128px font weight 600 letter spacing 0 024em line height 0 95 margin 0 max width 1200px
 had it raised nothing three lines and keep moving
 hairline geometric primitive orbit square crosshair below the title 80 px stroke t textondarkmuted
@@ -3109,7 +3133,7 @@ in its own try except that returns a 400 dozens of identical handlers
 in process single flight isn t enough meaning you have many processes and
 in react navigation route params are part of a screen s public interface
 in react the framework s default is already the
-in recall and language a miss is usually a gap a slip or interference with a similar item and a language error routes to a recast or an elicited self repair
+in recall and language a miss is usually a gap a slip or interference with a similar item
 in set produce undefined behavior
 in solid this whole class of problem largely disappears because
 in svelte 5 with derived the
@@ -3179,7 +3203,6 @@ inside the core so it stops being leaked through props
 inspect the current behavior and the smallest safe edit point
 inspect the diff and the patterns nearby and across the repo
 inspect the file see the established
-inspect the material pick the mode and identify teachable decisions including whether one echoes a decision from earlier in the session
 inspect what s there who owns the port what s running when it started
 instance variables visible to both sides are textbook information leakage across modules
 integrate so it cannot blow up sub step a stiff force so one big push across a frame does not inject energy and fling a body off screen
@@ -3209,7 +3232,7 @@ internal protocol does not
 interpretation a defensible reading or argument with no single correct answer literature history essay usage and translation
 interpretation and recall subjects use their own forms and the references carry them
 interpretation subjects literature history essay usage and translation offer your reading as one defensible option with the evidence under it and name the counter it has to answer
-interpretation subjects swap right and wrong for supported precise and accounts for the counter evidence
+interpretation subjects swap right and wrong for supported precise and answers the counter evidence
 into the load through pattern which is what they wanted anyway
 into the rest of the system
 into usestore setstate s cart s cart item
@@ -3365,6 +3388,7 @@ it tells the next agent the diff is sound which is a complete report
 it tests that the output is whatever the output was
 it used the first time returns the original result and never places a second
 it was added for the second type which hasn t appeared in three years
+it wastes time on a what
 it works for engineering problems vacation planning naming things career decisions creative work taste finding i think i want x but i m not sure anywhere they ve named a specific and the specific is standing in for something larger
 itemprops index number lihtmlattributes htmllielement
 items become harder snapshot tests get noisy you lose ctrl f to find
@@ -3380,6 +3404,7 @@ its job is to carry what the code can t the conceptual model the reasons behind 
 its out of scope section rules out anything that moves code between modules or changes a signature
 its state and dependencies stay inside it
 job what is this artifact doing teaching a mechanism summarizing evidence providing a reference walking a process supporting a decision
+join two clauses with a word that says how they connect such as because so or after
 joinedload order shipping address
 joins happen how transactions retry what the indexes are and the
 json only values ttl fuzziness
@@ -3408,7 +3433,7 @@ keep only artifacts that now belong to the product module docs or tests
 keep outside references short when the topic is larger than the current task
 keep secrets credentials tokens and personal data out of them and out of source
 keep story pacing on the clock
-keep task completion moving
+keep task completion moving and explain the decision with the tradeoff it creates
 keep tests an executable specification of behavior
 keep the context small
 keep the docs offer separate from the tuning loop so the loop stays fast
@@ -3565,7 +3590,7 @@ load this file when producing a slide deck html for an inline inline artifact de
 load this file when putting a geometric mark on a slide panel or page either at content scale the mark is the figure or at decorative scale the mark is textural backdrop
 load this file when writing substantive copy for a toby artifact style artifact headings paragraphs captions callouts button text and microcopy
 load this file when you need fake content placeholder data demo copy slide examples dummy kv values sample status messages
-load toby voice s references ste floor md and hold the floor one idea per sentence pronouns that carry a noun one name per concept from first mention to last and the relation between two clauses named rather than welded with a dash
+load toby voice s references ste floor md and follow it
 loading a contact list
 loading boolean true from mount until the first response settles
 loading state cache there isn t one refetch on focus there isn t one
@@ -3595,7 +3620,7 @@ loop of single row inserts updates
 loop which toby swd experiment owns and skip designing the cache s
 lose the prop entirely and deep linking works because routes are now
 lost update under concurrent writes
-low information assent ok got it makes sense on a decision you flagged as dense is the nod along
+low information assent on a dense point is the nod along
 low traffic call a daily cron job to a partner api
 lucide chevronleft chevronright at 16 20px 1 5px stroke
 m 01 through m 05 practice modules
@@ -3751,6 +3776,7 @@ most code in any system is written by extending what s already there
 most fake findings die here
 most interfaces don t earn a full design loop
 most modules don t need one
+most of a self taught subject runs here
 most slides are paper
 motion disclosure 180ms panel reveal
 motion fast 100ms hover focus press
@@ -3788,6 +3814,7 @@ name each slice for what a person can do once it lands in their words invite sho
 name reused for two purposes the classic source of silent bugs
 name the blocker on the same line
 name the boundary the misconception trips on anchored to an instance that sits right on that line
+name the case left unhandled
 name the closest thing you found at path line and why it doesn t fit
 name the command you want and why and say in the report which findings rest on reading alone
 name the concrete near future use or it s speculative
@@ -3831,7 +3858,6 @@ naming the plan at that stop is what gets one
 narrate sparingly a dry wire service ticker news 311 memo reports the world neutral in tone and quietly on the underdog s side
 narrative density silent toy through full press corps
 narrow category nest interceptors and express middleware fit
-narrow the blast radius run it with an empty list in your head walk me to line three and let them hit the wall
 native bridge interfaces navigation prop contracts storage module interfaces
 native bridges are not usually the place where someone wrote the api
 native browser spinners hidden
@@ -3865,9 +3891,14 @@ never a default series color
 never a fixed brand
 never a hidden coin flip on top of a decision
 never a whole file rewrite
+never answer a guess with another question
 never backfill behavior this change doesn t touch
 never enters the failure path aggregate the rest into a small typed set
+never hold the answer back to make them work for it because the guess only pays off when the answer comes right after it
 never leave that debt unlabeled because the next person cannot see it to pay it down
+never let it read as a test they failed
+never make them earn the explanation
+never make them guess twice
 never manufacture a finding to show effort and never soften an empty result with you might consider an empty result is a result
 never roll the outcome and then animate toward it
 never seen that error string
@@ -4013,7 +4044,6 @@ of the contract so callers don t write defensive code and the cache
 of the downstream s healthy behavior
 of users request it sends every miss to the store at once
 offer it with its cost and benefit and keep it out of an unrelated change
-offer re testable material for what is worth keeping
 offer that refactor when it fits the task
 offer the narrower alternative the specific test file the package s tests a focused type check
 offer them because the owner wants them
@@ -4025,6 +4055,7 @@ offset limit pagination drifts when rows are inserted or deleted
 often the answer is basically what s there plus the new bit so proceed
 often the whole fix
 ok false reason user cancelled
+ok got it makes sense skip are you sure hand them the next slice on that exact point
 ok this is officially cursed yeah
 ok true signature string
 on a backend service references backend apis md works this through
@@ -4071,6 +4102,7 @@ one handler forgets to lock
 one handler replaces dozens
 one heading one behavior stated the way someone outside the code sees it
 one hook one operation one piece of state to render against
+one idea per sentence
 one input is never allowed two outputs and that is the entire rule
 one line in chat
 one message at most three questions both readings side by side your recommendation
@@ -4090,6 +4122,7 @@ one place the inter module string passing interface disappears and callers
 one primitive per problem multiple names for it
 one query for orders addresses joinedload one query for all
 one question at a time when each answer changes the next question
+one question then stop before i explain what do you think decides whether it uses the index say that a wrong guess helps
 one reactivity caveat the three handle differently total is a derived
 one reading the water tracks the narrator s own mood flat right after the argument with her sister stormy again three pages later when she lies to her mother
 one reason to change and one body of knowledge are the same test
@@ -4105,6 +4138,7 @@ one slice per field
 one slice tactical work keeps the criteria list in chat
 one state object everything in one lowercase g with a single reset that re seeds and rebuilds
 one statement one round trip milliseconds
+one step is one idea a person can hold at once
 one test at the top detects all special cases and the common path then runs with no further branching
 one thing re measure and revert anything with no measurable effect unless it
 one transaction one round trip each input maps to a typed outcome
@@ -4217,7 +4251,6 @@ otherwise note it as a follow up
 otherwise offer that update as the next local step
 otherwise persists the order captures the
 otherwise report it as follow up
-otherwise tell mechanical filler one answer steps a learner who just asked you to hurry
 otherwise the ball snaps into a save it visibly cleared and every tester calls it random
 otherwise the half and half state is worse than either
 otherwise the seed races the schema change
@@ -4293,7 +4326,6 @@ parameters the cache can choose better than the caller stay inside the cache
 parent authors must check every subclass before changing instance variables or non final methods
 parent reference a context that doesn t change every render list keys
 parent then to a context then to a global store but the store grows by
-park a deferred lesson with its reference so picking it up stays cheap
 parse and validate at startup that module turns raw strings into a typed frozen object with zod envalid or a hand written parser
 parseconfig reads the file on every call
 parses behind a single request receive socket
@@ -4329,7 +4361,6 @@ patterns banned from anything toby writes whoever wrote them first
 patterns earn their place by removing complexity
 patterns earn their place by removing complexity
 patterns either contain or leak that knowledge
-pause for the learner s work or a check only when it earns the interruption a real fork or a nod along on a dense point
 payload is supplied the result includes a signature bound to a
 payment and returns the persisted order with an id
 payment are retried internally up to 3 attempts and surface as
@@ -4419,6 +4450,7 @@ plus a distributed lock for cross process coordination
 plus an up next rail at the side
 pnpm test pnpm lint full pre commit hooks codegen scripts the giant validation script
 point them at the file this repo keeps and the directories its tests live in then quote the command you ran
+point them at the smallest piece that could be wrong and let them hit the wall
 polymorphism when each case owns behavior private state or its own dependencies
 pool batches before concluding because a compounding ladder swings 6 to 12 on identical code at n 150
 pool timeout 2 fail fast if no connection available within 2s
@@ -4440,11 +4472,11 @@ pre existing problems go in residual risk only when they bear on the change
 pre lowercase the customer name once when orders are loaded so each
 pre sort pre index at load debounce input
 precise does the claim say something a rival claim couldn t also say
-precise vocabulary why questions an anticipated edge case a correction of you raise difficulty shorter scaffolds hand over more
 precision lower level function of comments the half most often skipped
 precision lower level on fields arguments return values add what the name and type cannot say units inclusive or exclusive bounds what null or empty means ownership and invariants
 precomputed cache warming for example
 predict the next handler s name
+predict the result before it runs
 prefer a computed value or a narrower operation over a configurable one
 prefer a small surface that shows the values under test and the result they produce
 prefer computing a value internally over exporting a configuration parameter or throwing back to the caller
@@ -4562,6 +4594,7 @@ pulling everything down is a god module
 pulling unrelated complexity down is leakage with a new hat
 punch up at the system never down at the person
 purpose built read model if the list view always needs the same
+purpose so it waits to be asked for
 push them up to that caller
 push toward producing the target word because recognizing it only feels like knowing
 put the explanation against the thing it describes the line the equation the quoted passage
@@ -4603,6 +4636,7 @@ radius xs 4px kbd day cells
 rainbow or viridis as categorical use positional palette
 raise keyerror sid callers now wrap every call in try except
 raise missing handling only when a real caller needs the signal
+raise the difficulty on precise vocabulary why questions an edge case they saw coming or a correction of you
 ran npm install to fix a missing module could be a typo the wrong directory or a lockfile mismatch
 rare knobs are in
 rate limit and tenant context become explicit dependencies of the operations
@@ -4678,7 +4712,7 @@ real failures after 3 retries still failing
 real implementation when it s fast enough and stays in process
 real interface is unknowable from its file
 real motion natural physics comes from real kinematics velocity gravity a little drag weight in the follow through
-reason it once climb the ladder
+reason it once then climb the ladder
 recast cloze the word the learner must produce
 recast the design fails if this assumption is wrong
 recommendations is the related products list to render below the main
@@ -4819,6 +4853,7 @@ renders an application error screen
 reopening the design is not
 reordering for taste a rename that doesn t fix a misleading name swapping one construct for another of equal length and clarity splitting or merging expressions with no debugging gain formatting a tool owns
 repair artifact copy review findings comments docs commit messages and plan wording
+repeat for each step
 repeat for info stable cons unknown with the matching family
 repeat only after feedback
 repeat stat for each cell 3 or 4 columns total
@@ -5075,6 +5110,7 @@ run every check against three tests before you ask it
 run freely and run it first on any task
 run it against today s code and quote the output
 run it and quote it
+run it with an empty list in your head walk me to line three still stuck name the category of the error
 run pnpm test api invites screens members
 run pnpm test members list before the first edit and quote it
 run scripts rule inventory py against both sides or the repo s equivalent and report any unmatched deletion at its old path line
@@ -5139,8 +5175,11 @@ say it plainly and don t ship a rewrite to have something to show
 say means editing every mutating method that could affect that
 say none applies when none does
 say so when it isn t
+say that out loud every time
 say that plainly and move on
 say that plainly when you offer it
+say what breaks downstream if a condition changes
+say what the next step covers then stop
 say which case applies and how you verified instead
 say which relation it is
 say why you re starting it before you do
@@ -5386,7 +5425,6 @@ sketch at least two structural approaches
 skew the ratio of interface cost to implementation benefit heavily toward the implementation side
 skill md owns when an entry fires and the check that runs before the handoff
 skill md owns when each fires and what the report has to say
-skip are you sure hand them the next slice on that exact point good you write the guard for the empty case producing it can t be faked
 skip how it works
 skip it for a one
 skip it for a pure code edit with nothing to
@@ -5405,6 +5443,7 @@ skip test first when the design is still being worked out
 skip the ask for mechanical filler and one answer steps
 skip the cache where it isn t
 skip the grid entirely on small charts sparklines tile sized small multiples
+skip the guess on anything mechanical a syntax question a name a step with one answer
 skip the legend when direct labels exist
 skip this only for changes trivial enough that there was no real design decision
 skip when only one series
@@ -5624,12 +5663,12 @@ steelman this and say the warrant are worth naming as moves because the learner 
 step through stepper a button advances a process one step at a time
 steps do not know about each other
 steps one component per step each renders none owns flow control
-still stuck name the category of the error
 still stuck tell them then circle back to the same idea a slice later in other clothes
 stop 1 the criteria
 stop 2 the plan
 stop 3 a slice boundary
 stop as soon as one candidate passes for a routine interface two pass for a consequential one or you reach three candidates total
+stop at the end of a step say what the next step covers and wait
 stop at the first rung that fits
 stop in the safest reachable state for errors no caller can act on resource exhaustion unrecoverable i o a violated internal invariant which means a bug record what diagnostics you can and bring the unit to its safest available stopping point behind one checked wrapper so call sites don t each repeat the check
 stop inflation a checkpoint at every slice boundary regardless of whether a decision is waiting there
@@ -5645,6 +5684,7 @@ store pop sid none
 store slices repositories controllers native modules screens or data
 stored key the key is keyed to the device so signatures are not portable
 stores and retrieves products
+straight explanation which toby explain owns
 strategic sketch two approaches first
 strategic when any of these fires a new module or boundary a public api event or persisted format a migration auth permissions billing money or privacy a behavior three or more call sites depend on a ui workflow crossing more than one screen greenfield
 strategic work fills all four before designing and keeps reading while any is short
@@ -5716,6 +5756,7 @@ tagged anchor at a precise x y
 tagged span from 0 to a labelled magnitude
 take a reviewer s report of confusion over your own read of the code however clear it looks to you
 take each significant design decision or implementation detail a file format a wire protocol a storage layout a policy
+take i have no idea as an answer and teach anyway
 take it always for lists that might grow
 take the reading this repo already follows and carry the reading taken the reading dropped and what changes if the user wanted the other one
 take the second only if most callers need just one of the results
@@ -5741,24 +5782,22 @@ tbl width 100 border collapse collapse font size 13px
 td class num 0 54 td
 td class num delta down 5 3 td
 td drift posterior td
-teach in depth when the idea pays off past this one spot and the learner is at a seam a step done a problem solved a section opening
+teach a subject by working through it with the learner at the keyboard
+teach in depth at a natural break a step done a problem solved a section opening
+teach in three moves in this order
 teach one verb in one line no tutorial wall one line in the game s own words drag to aim release to shoot and the rest is discovery
-teach or prepare the next slice at the right rung
-teach the decision make them do the reaching and keep the task moving
+teach the material in steps with a guess in front of each step
 teaching artifacts reference modules anything paired with personalized teaching skill
-teaching prose is a first read surface
 teaching prose mid explanation
 team can decide whether to invest in the deeper abstraction or accept the
 team finds the bug at 1 000 items and panics
 teardown sub remove stopnative
-tell the learner where the checkpoints are
 temp fix has 40 call sites and the oldest is from 2022
 temporal decomposition structure follows execution order so one body of knowledge ends up scattered across stages
 temporal decomposition structure follows execution order when it should follow the knowledge each module owns
 ten items means ten round trips to a service whose p95 is 240 ms
 term uppercase eyebrow mono tracked left value mono tabular numerals right
 terse and two sentences long reads as a voice the first four times and as a tic by the tenth
-terse sure fine after a check engagement is dropping so back off and move the work
 test complexity tests now need to handle cached vs uncached
 test deleted to make the suite green almost always the wrong move classify first
 test every name by guessability
@@ -5819,6 +5858,7 @@ that is what earns the line
 that is why card data is exchanged for a
 that knowledge is a single design decision living in two
 that knowledge what an
+that means a decision with several valid answers a policy choice an algorithm a behavior with tradeoffs or a naming call
 that means a promise you cannot keep or a parameter you did not need
 that modify state are atomic and return after durable commit
 that name is the plan s group heading the stop line and the row in the final report so the user reads one phrase from approval through handoff
@@ -5866,6 +5906,7 @@ the advance has no ceiling
 the alternative interface which surfaces outages explicitly is also
 the animation plays it back and changes nothing
 the announcement is the sign you might not be
+the answer coming right after is what does the work so a guess you never answer is wasted
 the answer determines density and opening structure
 the answer determines surface and density
 the app pulls in a dependency to check whether a number is even
@@ -6032,13 +6073,11 @@ the deep module is the
 the deeper interface expresses intent
 the deeper interface inverts the contract
 the deeper move don t fetch the
-the default and most of this file
 the default behavior of taking their words literally is the failure mode here
 the default constructor and the builder methods make the common case easy
 the default get set delete surface looks
 the default move on any state change is to inspect report and ask that covers killing processes taking ports restarting servers running migrations installing packages broad linting full test suites snapshot updates and anything that touches credentials or external systems
 the default of let the
-the default output is conversation
 the default output is conversation
 the defect the reader cannot know where the request ends without parsing the
 the deleted concept has leaked into name formatting
@@ -6143,6 +6182,7 @@ the glove meets the ball where the player sees them meet
 the grab bag form made them reach
 the great perfect sure transition tic sounds like every paragraph opening with an enthusiasm word as glue
 the guardrail check is anything the caller needs
+the guess takes twenty seconds and a wrong one is fine
 the handler catches exception and logs at debug
 the handler now invokes three named operations each owning its knowledge
 the heading is the identifier so the check is one fixed string grep per entry and there is nothing to allocate increment or collide on
@@ -6217,7 +6257,6 @@ the keying convention does not appear anywhere callers can
 the kit changes with the substrate
 the label is mandatory because unlabeled geometry is decoration and out
 the ladder collapses into one
-the ladder reads differently per subject recognition to cued recall to free production in a language recognize to cloze to free recall for facts
 the ladder runs lightest first
 the ladders apply and the framework idioms decide the move
 the ladders still apply
@@ -6225,7 +6264,7 @@ the last one is the expensive one so search the diff for the
 the layout and the controls differ between a wide screen and a phone while the game stays live on both
 the learner explores at their own depth
 the learner is building a reading or an argument and you have no result to check against
-the learner is spending their working memory on the concept so none of it should go to parsing the sentence
+the learner reads every sentence once
 the learner sees the difference by switching
 the ledger is append only
 the legacymfasecret field is visible
@@ -6267,6 +6306,7 @@ the missing information has no place in code so
 the mistake adding a circuit breaker because we should produces a
 the mistake in the other direction is speculative generality parameters or extension points for futures that never arrive
 the mistake to avoid is treating named intents over a core
+the mode depends on how much the learner already knows so work that out before you look at the material
 the mode is a structural commitment
 the module has a public api that humans call directly
 the module s purpose is non obvious from its name and structure
@@ -6405,7 +6445,6 @@ the redesign is usually
 the redesign treats keys as typed values that the cache layer issues
 the redesign was at the composition
 the references bend it where the domain demands so load the matching one as soon as the mode is clear
-the references map it
 the reflex to validate before checking is the giveaway
 the registration is indirection a reader has to trace and load order becomes something you can get wrong
 the relationship picks the controls
@@ -6521,7 +6560,6 @@ the table says which of them you owe
 the tactical version wraps every get param call
 the target is roughly 10 20 more effort than the tactical path spent
 the teaching is in what you do with their answer so branch on it
-the teaching mode depends on what the work is
 the team renders 2000 items
 the team renders 50 000 items
 the team s first instinct is usememo on
@@ -6663,6 +6701,7 @@ these fire on what the change does to a contract someone else depends on
 these write nothing at all refactors renames performance work internal helpers error paths and diagnostic or developer facing output
 they also belong together when they fall under one simple higher level category or when one cannot be understood without the other
 they appear at the top of the
+they are already working hard on the idea so the sentence itself must cost them nothing
 they are cheap so run all of them
 they are ci noise generators with version control
 they are in the middle of their own work
@@ -6675,7 +6714,6 @@ they carry the units invariants and reasons that have no home in the code
 they didn t give you one because they don t have one yet
 they grate from any author
 they have different audiences and different jobs
-they hold the keyboard you coach
 they must differ in where complexity lives which module owns the hard part what the interface exposes what callers must manage
 they provide the deep module so you don t have to build it from scratch
 they re handing you a fragment and the job is to find the rest of it with them
@@ -6717,6 +6755,7 @@ this file would survive a full rewrite of the internals unchanged
 this fits a plugin api or a set of adapters loaded by config at boot
 this getorload wrap loadingcache
 this handles 1000 concurrent in process requests with one downstream call
+this holds even when the guess was a shot in the dark
 this inner find id
 this inner listing category
 this is a cache
@@ -6763,6 +6802,7 @@ this is the kind of
 this is the kind of complexity that lives in the
 this is the liskov substitution test
 this is the loop s maintenance mode
+this is the only way to find out whether they can use it anywhere else
 this is the path almost every interface takes and it adds almost no cost beyond the comment you owed anyway
 this is the prior
 this is the risky part
@@ -6798,6 +6838,7 @@ this should weigh both columns
 this skill adds none
 this skill brings the taste a real system underneath jokes wired to the mechanics a paper and ink look a run that goes somewhere
 this skill controls artifact structure visual tokens density copy tests and component patterns
+this skill costs the learner time on
 this skill governs voice
 this skill means the agents md inside the user s own module tree the file it teaches you to write
 this status orderstatus paid
@@ -6994,6 +7035,7 @@ turbomodule calls help for the per call cost and batching helps for the
 turn a feature request into the smallest change that satisfies it with evidence it
 turns an authorized cart into a settled charge and a ledger entry
 twelve services when each constructs raw sql or hardcodes a column alias
+twenty seconds and say a wrong one is fine
 two blocks that share text while answering to different reasons to change are also fine however identical they look
 two branches that wrote the same sentence wrote the same behavior and the merge conflict is the correct outcome
 two branches writing the same sentence wrote the same behavior and that conflict is the correct outcome
@@ -7118,6 +7160,7 @@ use it when a task
 use it when a task changes
 use it when a task touches error handling retries
 use it when the request
+use it when they say they are new when they say they are lost or when their question shows no starting idea
 use it when writing
 use lucide where available
 use names such as experiment poc spike scratch debug or temp
@@ -7138,7 +7181,6 @@ use these together whenever a component expresses a state alerts toasts status p
 use this for operations not covered by other methods
 use this over rung 2 when each branch reads different fields
 use this skill when the user wants something explained a decision inside work underway or a concept they asked about with nothing else on the page yet
-use this skill when the user wants to learn the work by doing it
 use this skill when the work is exploratory and the user expects fast learning before durable implementation
 use toby swd environment before commands ports processes browsers broad checks dependency installs migrations generated files cache clearing or destructive work
 use uncertainty cones for forecasts error bars for measured points confidence bands for fitted curves
@@ -7190,7 +7232,6 @@ usually the abstraction boundary you re testing through is wrong or the behavior
 utils js is 1 800 lines
 v4 2 v3 9 versions
 vague name broad enough to refer to many things
-vague phrasing i think a restated question copying without change smaller steps work more of it yourself
 valid for systems where degraded reads need to be a deliberate decision
 valid for the current items before setting or the displayed total will
 validate input range and show a boundary error when the value falls outside it
@@ -7275,6 +7316,7 @@ what is the simplest interface that covers all your current needs fewer methods 
 what it surfaces 4xx caller did
 what not to do add an index per column just in case indexes have
 what s one word in here that seems off too strong or out of place
+what s the difference between walk me through help me understand
 what s the hit ratio
 what safest means belongs to the environment a pure computation aborts a process driving something physical costly or external reaches a defined safe stop before it dies a supervised isolated unit stops and is restarted to a known good state a long running loop contains the fault to the smallest unit and keeps running
 what screens do handle the real i couldn t load this thing
@@ -7346,7 +7388,6 @@ when the evidence arrives an outage post mortem says
 when the evidence settles it the reason is padding
 when the experiment drives something physical costly or externally observable a reverted change does not undo what already happened
 when the gate is met and an independent review tool is available use it as a critic
-when the learner asks for a visual to carry the lesson a diagram an image a graphic a chart make it and apply toby artifact style for the look
 when the obvious thing wins give it a wall to climb
 when the operation must continue in a reduced or safer mode the handling is a deliberately designed degraded path the system was built to expect
 when the output is inexact by nature assert it falls within a stated justified tolerance of the expected value
@@ -7364,9 +7405,11 @@ when the urge to shrink a function fights a deep module the deep module wins
 when the user asks for a visual to carry the point a diagram an image a graphic a chart make it and apply toby artifact style for the look
 when the user asks to simplify tidy tighten refactor de duplicate or clarify code
 when the user chooses a behavior retire the experiment
+when the user explicitly invokes this skill by name or with the toby learning slash
 when the user invokes toby squall whatever they named is one instance of a bigger set
 when the user picks a behavior at the end of an experiment come back here and write the criteria from what they picked
 when there is a target name the specific mechanism and steal its real texture before writing a single joke
+when they ask for a diagram an image or a chart to carry the lesson make it and apply toby artifact style
 when they only need one method
 when they re strong in a field next door bridge to a structure they already hold there
 when they reach for the keyboard hand it over and switch to toby learning
@@ -7389,12 +7432,12 @@ where a cache should live
 where a criterion is a claim about what that command printed before the change run it first too and quote both
 where a lighter touch has room
 where a special case can be removed by redesigning semantics so it does not arise redesign it away and leave it out of the interface
+where a step repeats one from earlier in the session ask them that earlier one again before you explain it a second time
 where acceptance criteria a plan file or a behavior record exist for this work check three things and report what failed
 where did 1 hour come from
 where filter is a single structured value with one documented encoding
 where id 1 and version 2
 where it breaks or what would change the answer
-where it fits have the learner predict the result before it runs
 where stale data lives if the contract isn t clear
 where stop 2 also fires say so here since the yes at this stop is what asks for the plan
 where the plan lives and any step that ran differently from the approved wording
@@ -7459,7 +7502,6 @@ with session scope as s
 with storage clear it was a side effect that could
 with usenativedriver skips the js thread round trip entirely
 withdrawal reduces the account balance
-withhold the answer and elicit only when the decision is a real fork with more than one defensible answer the learner has the context in front of them to reason about it and there is no rush in the room
 within them vary everything
 without it fetch in the background insert when it arrives this is a
 without it the deadpan reads cold
@@ -7476,6 +7518,8 @@ work down this ladder and stop at the first rung that applies
 work down this ladder and stop at the first rung that fits
 work engages only on a measurement
 work is the investment
+work more of it yourself
+work out how much they already know pick the mode and cut the material into steps
 worked body font size 13px line height 1 55 color inherit
 worked border 1px solid var border hairline border radius var radius base
 worked caveat font size 12px opacity 0 78 margin top 8px
@@ -7571,6 +7615,7 @@ you present labeled options and let the user pick
 you took the shortcut
 you want that cost much smaller than that benefit meaning a simple interface over substantial functionality
 you would be fast and wrong
+you write the guard for the empty case producing it can t be faked
 your call but decide that before it ships and not after
 your memory of a file you changed three steps ago is a guess with a confident tone
 your own reading enters only as a challenge

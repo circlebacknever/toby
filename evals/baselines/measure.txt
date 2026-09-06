@@ -4,7 +4,7 @@ toby-code-review                2792     107    4303      1
 toby-explain                    1351      68     386      1
 toby-feature-dev                5364     251    5404      3
 toby-game                        886     174    4962      6
-toby-learning                   2383      73    2396      2
+toby-learning                   2728     130    2396      2
 toby-simplify-code              1798      88    2061      1
 toby-squall                      956      97       0      0
 toby-swd-clarity                2384     102     977      1
@@ -16,10 +16,10 @@ toby-swd-interfaces             3398     138   18154      7
 toby-swd-modules                3544     154   17460      7
 toby-swd-strategy               1790     159    1522      1
 toby-swd-testing                2452     131       0      0
-toby-voice                      1152     108   12652      6
+toby-voice                      1152     108   12677      6
 
-total body tokens: 42496
-total frontmatter tokens (always resident): 2355
+total body tokens: 42841
+total frontmatter tokens (always resident): 2412
 
 co-load totals by routing group (bodies only, no references opened):
   feature-change     18175
@@ -27,4 +27,4 @@ co-load totals by routing group (bodies only, no references opened):
   feature-dev         9606
   prose               1152
 
-operating guide: 7071 tokens, resident every turn
+operating guide: 7096 tokens, resident every turn

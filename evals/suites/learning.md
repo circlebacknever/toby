@@ -1,47 +1,38 @@
 # Learning suite
 
-Does the skill change what the agent does, against plain chat with the same
-question? The user's complaint is that it does not, and this is how that gets
-settled.
+Two questions. Does the skill change what the agent does? And does a beginner
+get taught without being buried?
 
-Both arms answer the same four learner turns, fixed in advance so the input is
-identical. One arm loads `toby-learning`. The other has the operating guide and
-nothing else.
+## Suite A — does it change anything
 
-## The scripted learner
+Four scripted learner turns in `fixtures/learner-turns.md`, answered twice: once
+with the skill loaded, once with the operating guide alone. Recorded runs are
+`runs/learning-with-skill.md` and `runs/learning-plain-chat.md`.
 
-Turn 1
-> Why is this query still slow? I added an index on `created_at` but EXPLAIN
-> still shows a seq scan. The table has 2M rows.
-> `SELECT * FROM events WHERE created_at > now() - interval '30 days'`
+Counted per arm: questions that force the learner to produce something, turns
+that end with the learner owing something, and whether turn 4's "ok that makes
+sense" gets accepted or handed work.
 
-Turn 2
-> Oh. So should I just add more indexes?
+Recorded result: with the skill, three of each and the assent refused. Plain
+chat, none of either and the assent accepted.
 
-Turn 3
-> I think it's because the planner thinks the index is slower? Not sure.
+## Suite B — the beginner path
 
-Turn 4
-> ok that makes sense
+`fixtures/learner-novice.md`. The learner invokes the skill and says they know
+nothing. This is the case the skill was rebuilt for, and it is the one that
+fails quietly, because a wall of text reads as thorough.
 
-Turn 4 is the test the skill writes a rule for. `ok that makes sense` on a dense
-point is the nod-along, and the skill says to hand the learner the next slice on
-that exact point rather than accept it.
+A passing run:
 
-## What gets counted
+- asks for a guess before each step, and says a wrong guess is fine
+- answers every guess in the same message that follows it, always
+- runs to five sentences or fewer per reply
+- covers one step per reply and says what the next step is
+- ends by asking the learner to state the rule
+- uses no word outside its ordinary meaning
 
-Per arm, across the four replies:
+A failing run withholds an answer to make the learner work for it, asks a second
+question in place of an answer, or sends a reply longer than five sentences.
 
-- **Elicitations** — questions that force the learner to produce something from
-  their own model. A question answerable from the text just sent does not count.
-- **Assertions** — explanatory sentences the learner did not have to work for.
-- **Keyboard handovers** — turns that end with the learner owing something.
-- **Nod-along handled** — does turn 4 give them work on the dense point, or
-  accept the assent and close.
-- **Rule stated back** — is the learner ever asked to restate the rule in their
-  own words.
-
-## What a failing skill looks like
-
-The two arms produce the same counts. A skill that only makes the explanation
-tidier has not taught anything the chat would not have.
+Recorded result in `runs/learning-novice.md`: four replies at three to four
+sentences each, a guess in front of every step, and every guess answered.

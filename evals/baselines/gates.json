@@ -1,7 +1,5 @@
 {
-  "accepted_lost_rules": [
-    "description use when the user wants to learn or be taught any subject while working through it code math a science a language literature medicine practicing drilling contributing the next piece of real work or being quizzed on what they should retain"
-  ],
+  "accepted_lost_rules": [],
   "coload_tokens": {
     "feature-change": 18175,
     "feature-dev": 9606,
@@ -13,7 +11,7 @@
     "toby-explain": 1351,
     "toby-feature-dev": 5364,
     "toby-game": 886,
-    "toby-learning": 2383,
+    "toby-learning": 2728,
     "toby-simplify-code": 1798,
     "toby-squall": 956,
     "toby-swd-clarity": 2384,
@@ -29,12 +27,12 @@
   },
   "warning_classes": {
     "banned word": 0,
-    "buried lead": 18,
+    "buried lead": 16,
     "cross-skill collision": 1,
-    "invented foil": 4,
+    "invented foil": 3,
     "latin abbreviation": 0,
     "missing skip clause": 2,
-    "over-length sentence": 57,
+    "over-length sentence": 49,
     "over-long paragraph": 19,
     "sense-scoped word": 9,
     "unreferenced file": 0

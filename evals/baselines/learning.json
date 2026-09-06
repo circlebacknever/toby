@@ -1,0 +1,32 @@
+{
+  "label": "learning",
+  "recorded": "2026-09-06",
+  "scored_by": "a person reading evals/suites/learning.md",
+  "runs": [
+    {
+      "file": "runs/learning-with-skill.md",
+      "elicitations": 3,
+      "handovers": 3,
+      "nod_along_refused": true
+    },
+    {
+      "file": "runs/learning-plain-chat.md",
+      "elicitations": 0,
+      "handovers": 0,
+      "nod_along_refused": false
+    },
+    {
+      "file": "runs/learning-novice.md",
+      "sentences_per_reply": [
+        4,
+        4,
+        3,
+        4
+      ],
+      "guess_before_every_step": true,
+      "every_guess_answered": true,
+      "note": "The rebuild around guess-then-tell. No reply withholds an answer."
+    }
+  ],
+  "note": "Suite A shows the skill changes behavior. Suite B shows a beginner gets taught in steps without a wall of text, which is what the rebuild was for."
+}
