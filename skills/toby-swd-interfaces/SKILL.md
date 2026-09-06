@@ -2,9 +2,9 @@
 name: toby-swd-interfaces
 description: >-
   Design the callable surface before the implementation. Use it when a task
-  adds or changes a function, method, class, component prop surface, hook
-  return shape, composable, REST endpoint, gRPC service, repository, cache
-  surface, or message contract. It owns the comment test, the parameter
+  adds or changes a function, method, class, component props, hook return
+  type, composable, REST endpoint, gRPC service, repository, cache interface,
+  or message contract. It owns the comment test, the parameter
   budget, and the general-purpose bias. Skip it when the question is where
   the code should live, which `toby-swd-modules` owns, and skip it when
   adding a field beside an identical one already in that file.
@@ -12,11 +12,11 @@ description: >-
 
 # Toby SWD Interfaces
 
-The interface is everything a caller must know to use a module correctly. That is the signature, plus the informal contract only comments can carry: behavior, side effects, ordering constraints, errors. The interface is the cost the module imposes on the rest of the system. The implementation is the benefit. You want that cost much smaller than that benefit, meaning a simple interface over substantial functionality. For a message-channel boundary, the "signature" is the message contract: the request and response payload shapes, what survives serialization, and the delivery guarantees.
+The interface is everything a caller must know to use a module correctly. That is the signature, plus the informal contract only comments can carry: behavior, side effects, ordering constraints, errors. The interface is the cost the module imposes on the rest of the system. The implementation is the benefit. You want that cost much smaller than that benefit, meaning a simple interface over substantial functionality. For a message-channel boundary, the "signature" is the message contract: the request and response types, what survives serialization, and the delivery guarantees.
 
 Interface-first design exists to find that interface before implementation locks in a bad one. It also uses the interface itself as the earliest possible signal that the design is wrong. Treat a comment you can't write short and internals-free as a bug report. It arrives while the abstraction is still only text.
 
-This applies identically across the stack. A class's public methods. A function's signature. A service's endpoints. A component's props, a hook's return shape, a repository's query methods, a cache's get-or-load surface, a message contract across a process boundary. All are interfaces, and everything below applies to each.
+This applies identically across the stack. A class's public methods. A function's signature. A service's endpoints. A component's props, a hook's return type, a repository's query methods, a cache's get-or-load contract, a message contract across a process boundary. All are interfaces, and everything below applies to each.
 
 ## Bias toward somewhat general-purpose
 
@@ -24,14 +24,14 @@ Make this framing decision before the procedure, because it constrains every ste
 
 Four questions, asked early:
 
-- **What is the simplest interface that covers all your current needs?** Fewer methods, each carrying broader semantics, so the surface stays small as needs grow.
+- **What is the simplest interface that covers all your current needs?** Fewer methods, each carrying broader semantics, so the interface stays small as needs grow.
 - **In how many situations will this method be used?** A method serving one call site is a candidate for inlining or for redesign into something that serves more.
 - **Is this API easy to use for the common case today?** General-purpose interfaces fail when they make the easy thing hard. A `find(query)` is better than thirty `findByXAndYAndZ` only if `find(...)` is also easy to call for the common case.
 - **Will this generalize without becoming a god interface?** Generality with a clear single purpose is depth. Generality across unrelated purposes is sprawl.
 
 The mistake in the other direction is speculative generality: parameters or extension points for futures that never arrive. "Somewhat" is the operative word. Cover today's needs and one or two near-future variants you can name. Stop there.
 
-The interface-segregation principle is the floor here: no caller should depend on parts of the surface it does not use. A consumer that needs one method gets an interface with one method. On a backend service, `references/backend-apis.md` works this through.
+The interface-segregation principle is the floor here: no caller should depend on parts of the interface it does not use. A consumer that needs one method gets an interface with one method. On a backend service, `references/backend-apis.md` works this through.
 
 Each parameter forces every caller to answer a question. Before adding one, check whether the module can compute or decide the value itself. A default lowers the burden and keeps the coupling, because the caller still reads the default to know the behavior. Prefer a computed value or a narrower operation over a configurable one.
 
@@ -45,7 +45,7 @@ Before sketching, state in one sentence what this module encapsulates. "How user
 
 Most interfaces don't earn a full design loop. Spend effort in proportion to how expensive the interface is to get wrong, judged from signals already in front of you:
 
-- **Consequential**: exported or public, has or will have several callers, crosses a module/service/process boundary, is a shipped component's prop surface, or encodes a contract costly to change later (persisted format, published API, anything other teams build on).
+- **Consequential**: exported or public, has or will have several callers, crosses a module/service/process boundary, is a shipped component's props, or encodes a contract costly to change later (persisted format, published API, anything other teams build on).
 - **Routine**: private, one caller, changed easily in one place, thin helper.
 
 Routine interfaces take the cheap path in step 4. Reserve the full loop for consequential ones.
@@ -63,7 +63,7 @@ This bar is checkable by reading. A vague bar collapses into taste, and this one
 
 The comment test applies to parameter objects too. A short entry-point comment that stays short only because a query or command object absorbs the complexity is not a pass. Run the same test on that object's contract. When the contract crosses a serialization boundary, what survives that crossing is part of the contract. The comment carries it: no functions, no live references, no cycles.
 
-**For consequential interfaces, write the comment before the body.** The comment is a design tool — the cheapest way to find out the abstraction is wrong. Writing the body first traps you in the structure of whatever you wrote. Writing the comment first lets you reject a bad shape while it's still text.
+**For consequential interfaces, write the comment before the body.** The comment is a design tool — the cheapest way to find out the abstraction is wrong. Writing the body first traps you in the structure of whatever you wrote. Writing the comment first lets you reject a bad design while it's still text.
 
 ### 4. Default to the cheap path; escalate only when it matters
 
@@ -82,7 +82,7 @@ If the ceiling is hit with nothing passing, hand the strongest candidate to the 
 
 A second independent call is the one expensive move here, so gate it hard. Make it only when the interface is consequential and two or more candidates passed. For a routine interface, or when only one passed, take the first passing candidate.
 
-When the gate is met and an independent review tool is available, use it as a critique surface. Send it the surviving signatures and interface comments only, with no implementations and no hint of your preference. Send the comment-test predicate too, and this rubric in priority order: common-case caller burden, generality, efficiency, then depth without over-hiding (step 7). Ask for one verdict: the chosen candidate, a one-line reason per rubric item, and any over-hiding risk. Treat the verdict as evidence you weigh. Choose deliberately, and fix a real over-hiding risk before writing any body.
+When the gate is met and an independent review tool is available, use it as a critic. Send it the surviving signatures and interface comments only, with no implementations and no hint of your preference. Send the comment-test predicate too, and this rubric in priority order: common-case caller burden, generality, efficiency, then depth without over-hiding (step 7). Ask for one verdict: the chosen candidate, a one-line reason per rubric item, and any over-hiding risk. Treat the verdict as evidence you weigh. Choose deliberately, and fix a real over-hiding risk before writing any body.
 
 If the human rejects all candidates, treat their stated reason as one new flaw-seed and generate exactly one more directed candidate, then stop. A rejection is a redirect that costs you one directed candidate.
 
@@ -94,7 +94,7 @@ Apply the same test whenever you later change a public interface, before touchin
 
 Hiding complexity is the goal, with one hard limit. Information the caller needs must stay in the interface. Tunable performance config, errors the caller must handle, durability or visibility guarantees, ordering the caller depends on. Hiding any of these to make the interface look smaller is its own defect, and it produces modules nobody can use correctly.
 
-Apply progressive disclosure to the signature. The common case stays on the primary surface, required and simple. Advanced or rarely needed config moves to a separate optional surface, an options object with defaults that work. A caller doing the ordinary thing reads only the first two or three parameters.
+Apply progressive disclosure to the signature. The common case stays in the main signature, required and simple. Advanced or rarely needed config moves to a separate options object with defaults that work. A caller doing the ordinary thing reads only the first two or three parameters.
 
 Where a special case can be removed by redesigning semantics so it does not arise, redesign it away and leave it out of the interface. An interface that accepts input from outside the program is a trust boundary: a request, a message, a deserialized payload. The module that owns the contract validates that input. The boundary owns the check.
 
@@ -119,18 +119,18 @@ Run this list against the finished interface before calling it done. A match aga
 - **Pass-through method**: an entry point that only forwards to another with a near-identical signature.
 - **Implementation in the interface comment**: the comment describes internals.
 - **Hard to describe**: a complete comment for the entry point has to be long.
-- **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax — the same shape as the implementation, definitionally shallow. Replace with operations that name intent (`reserve`, `markPaid`) and enforce invariants. Keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it owned by another module. There the data is the contract, and depth lives in the module that owns the behavior.
-- **One method per caller-shape**: a finder/handler/query method per combination of conditions, growing without bound. Compress with a value object or query parameter that lets one method cover the cluster.
+- **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax, so it costs a caller as much as the implementation would. Definitionally shallow. Replace with operations that name intent (`reserve`, `markPaid`) and enforce invariants. Keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it owned by another module. There the data is the contract, and depth lives in the module that owns the behavior.
+- **One method per caller variation**: a finder/handler/query method per combination of conditions, growing without bound. Compress with a value object or query parameter that lets one method cover the cluster.
 - **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy interface adopted on the belief that patterns are good, while the problem does not have the structure the pattern solves. Patterns earn their place by removing complexity.
 
 ## References
 
-Open one. Read the stack file for the surface you are designing, and open a subject file only when that subject is the contract:
+Open one. Read the stack file for the interface you are designing, and open a subject file only when that subject is the contract:
 
 - `references/examples.md` — Foundational cases (rate limiter, UserCard, file upload).
 - `references/runtime-config.md` — where deploy config enters, validation at boot, injecting typed values, the composition root.
-- `references/web.md` — React, Solid, Svelte. Hook return shapes, component prop contracts, store slice interfaces.
-- `references/mobile.md` — React Native. Native bridge interfaces, navigation prop contracts, storage module shapes.
+- `references/web.md` — React, Solid, Svelte. Hook return types, component prop contracts, store slice interfaces.
+- `references/mobile.md` — React Native. Native bridge interfaces, navigation prop contracts, storage module interfaces.
 - `references/backend-apis.md` — Java/Spring, Go, TypeScript backends. Service interfaces, REST/gRPC contracts.
 - `references/databases.md` — Repository interface, query interface, transaction interface.
-- `references/caching.md` — Cache get-or-load contract, invalidation surface.
+- `references/caching.md` — Cache get-or-load contract, invalidation methods.

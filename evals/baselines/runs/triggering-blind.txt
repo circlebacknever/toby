@@ -1,0 +1,25 @@
+P1 fired: toby-swd-interfaces, toby-swd-complexity, toby-swd-strategy, toby-swd-testing, toby-feature-dev
+P2 fired: toby-swd-modules, toby-swd-strategy, toby-swd-docs
+P3 fired: toby-feature-dev, toby-swd-interfaces, toby-swd-strategy, toby-swd-testing, toby-swd-modules
+P4 fired: toby-swd-environment
+N1 fired: toby-swd-clarity
+N2 fired: toby-code-review
+N3 fired: toby-swd-experiment
+N4 fired: (none)
+
+N1 phrase notes:
+- toby-swd-clarity FIRED on: "Use it for naming, comments, docstrings, conventions, and control flow a reader trips on"
+- toby-swd-strategy did NOT fire, explicit skip: "Skip it for read-only investigation, a rename, a formatting pass..."
+- toby-swd-testing did NOT fire, explicit skip: "Skip it when the change moves no behavior: a rename, a formatting pass, a comment edit."
+
+N2 phrase notes:
+- toby-code-review FIRED on: "Use it for code review, PR review, diff review, commit review, working-tree review"
+- toby-simplify-code did NOT fire, explicit skip: "Skip it when the user asked for findings and no edit, which toby-code-review owns."
+
+N3 phrase notes:
+- toby-swd-experiment FIRED on: "Use it for a spike, a proof of concept, a parameter sweep, a throwaway debug surface, a manual test"
+- toby-swd-complexity did NOT fire, explicit skip: "Skip it for a throwaway parameter loop, which toby-swd-experiment owns."
+
+N4 phrase notes:
+- toby-swd-interfaces did NOT fire, explicit skip: "skip it when adding a field beside an identical one already in that file"
+- toby-feature-dev did NOT fire, explicit skip: "Skip it for a one-file edit following a pattern already in that file"

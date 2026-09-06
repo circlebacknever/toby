@@ -41,7 +41,7 @@ Run the changed code before writing findings, as a hunt for what you have missed
 
 Feed changed arithmetic and changed predicates the inputs a read glides over: negative, zero, empty, and the value either side of every boundary. Then paste what came back into the Consequence line. Sign errors, unit mismatches, and totals that disagree with what got stored surface here and appear in no catalog.
 
-A design smell holds three different lines: the entry name from references/smells.md, the file:line, and the code there that meets the entry's Fires-when criterion. A smell costs future readers and future changes. Demanding a runtime consequence of it would therefore drop every real one or invent a consequence for it. The drop rule above still governs — three lines you can fill from the file, or there's no finding.
+A design smell holds three different lines: the entry name from `references/smells.md`, the file:line, and the code there that meets the entry's Fires-when criterion. A smell costs future readers and future changes. Demanding a runtime consequence of it would therefore drop every real one or invent a consequence for it. The drop rule above still governs — three lines you can fill from the file, or there's no finding.
 
 Add one line of fix direction when it isn't plain. Don't restate the code back, because they have the diff. Order findings by which bites hardest.
 
@@ -85,7 +85,7 @@ One finding at most, at file:line, naming `toby-swd-strategy`. The author was al
 ## What to catch
 
 - Bugs: logic errors, null handling, race conditions, stale state, cleanup gaps, invalid assumptions, unreachable code, data loss.
-- Regressions: a changed public contract, UI state, API shape, persistence, permissions, or workflow.
+- Regressions: a changed public contract, UI state, API contract, persistence, permissions, or workflow.
 - Security: auth, authorization, injection, secrets, path traversal, unsafe parsing, CSRF, SSRF, XSS, data exposure.
 - A swallowed or dropped error a caller needs to stay correct or recover.
 - Missing coverage: new behavior or a regression path with no useful test, including a bug fix that ships without a regression test.
@@ -94,13 +94,13 @@ One finding at most, at file:line, naming `toby-swd-strategy`. The author was al
 - A try/catch, guard, or validation for a condition already ruled out by the surrounding types, contract, or an earlier check, only when that proof can be quoted from the code.
 - A new or changed public interface whose comment leans on call-order words ("first", "then", "after"), references internals, runs past four sentences, or leaves a caller unable to use it correctly from the comment alone.
 - A structural change — a moved or split module, a changed public API, a cross-module decision — that leaves an existing AGENTS.md or README stale.
-- A design smell matching a named entry in references/smells.md, only when the entry's criteria can be quoted against the code. Method length on its own and the bare presence of a comment stay non-findings no matter what the catalog calls them.
+- A design smell matching a named entry in `references/smells.md`, only when the entry's criteria can be quoted against the code. Method length on its own and the bare presence of a comment stay non-findings no matter what the catalog calls them.
 
 ## Don't flag
 
 - Method length on its own. A long method with a simple signature doing one coherent job is fine. Length is a finding only when it causes a named problem.
 - An error the code deliberately makes impossible (validated upstream, unreachable by type) or correctly lets crash. Raise missing handling only when a real caller needs the signal.
-- Code that's correct but over-built, awkwardly named, or non-idiomatic. If it doesn't match a named entry in references/smells.md, that's behavior-preserving cleanup, out of scope here. When a reader would trip on it, check the catalog's exception for whatever it resembles first. An exception that covers it means the code is right and you say nothing. Otherwise drop one pointer at the end — "cleanup candidate: file:line" — no severity, no argument. At most two. More than that means you're reviewing for taste. A match against a named entry there counts as a finding, covered under What to catch.
+- Code that's correct but over-built, awkwardly named, or non-idiomatic. If it doesn't match a named entry in `references/smells.md`, that's behavior-preserving cleanup, out of scope here. When a reader would trip on it, check the catalog's exception for whatever it resembles first. An exception that covers it means the code is right and you say nothing. Otherwise drop one pointer at the end — "cleanup candidate: file:line" — no severity, no argument. At most two. More than that means you're reviewing for taste. A match against a named entry there counts as a finding, covered under What to catch.
 - Style nits a formatter or linter catches.
 
 ## A skills or config diff reviews differently

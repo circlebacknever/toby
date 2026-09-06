@@ -1,0 +1,48 @@
+### toby-swd-strategy
+Decide whether this change leaves the design better or worse before writing it. Use it for non-trivial work: a feature, a bug fix with behavioral risk, a refactor, a public API or module-boundary change, or an edit where the quick patch adds a special case or a hidden dependency. It owns the design pass and the near-future variants, and it routes the resulting decisions to `toby-swd-modules` and `toby-swd-interfaces`. Skip it for read-only investigation, a rename, a formatting pass, a throwaway spike, and any change whose structure the surrounding code already fixes.
+
+### toby-swd-modules
+Decide where code lives and which module owns which knowledge. Use it when a task creates, moves, splits, merges, or places code, or when ownership crosses functions, classes, services, files, packages, components, hooks, store slices, repositories, controllers, native modules, screens, or data layers. It owns placement, the split-or-merge call, and the definition of a deep module. Skip it when the question is what one signature exposes, which `toby-swd-interfaces` owns, and skip it for an edit inside one existing module that adds no new boundary.
+
+### toby-swd-interfaces
+Design the callable surface before the implementation. Use it when a task adds or changes a function, method, class, component props, hook return type, composable, REST endpoint, gRPC service, repository, cache interface, or message contract. It owns the comment test, the parameter budget, and the general-purpose bias. Skip it when the question is where the code should live, which `toby-swd-modules` owns, and skip it when adding a field beside an identical one already in that file.
+
+### toby-swd-complexity
+Decide whether an error path, a retry, a cache, or an optimization has earned its place. Use it when a task touches error handling, retries, validation, recovery paths, caching, concurrency, batching, or a measured performance problem. Two things here are cheap: removing error conditions that need not exist, and refusing speculative optimization. Heavier performance work engages only on a measurement. Skip it for a throwaway parameter loop, which `toby-swd-experiment` owns, and skip designing the cache's surface, which `toby-swd-interfaces` owns.
+
+### toby-swd-clarity
+Make the code readable to whoever inherits it. Use it for naming, comments, docstrings, conventions, and control flow a reader trips on, inside the code being touched. It leaves already-clear surrounding code alone. Skip it for module documentation files, which `toby-swd-docs` owns, and for the design of a contract, which `toby-swd-interfaces` owns.
+
+### toby-swd-testing
+Keep tests an executable specification of behavior. Use it when writing, changing, deleting, weakening, or snapshotting a test, and whenever a behavior change in production code needs a test to follow it. It owns regression tests for a fix and the refusal to make a failing test green by tweaking the assertion. Skip it when the change moves no behavior: a rename, a formatting pass, a comment edit. Skip it for a throwaway spike, which `toby-swd-experiment` owns.
+
+### toby-swd-docs
+Keep the two module documents accurate: AGENTS.md for agents writing code in a module, README.md for humans using it. Use it when a task changes module structure, a public API, a cross-module decision, an extension rule, or human-facing module usage. One of each per meaningful module root, never per folder, and check the existing file for accuracy before editing it. Skip it for code comments and docstrings, which `toby-swd-clarity` owns.
+
+### toby-swd-environment
+Treat the machine as the user's. Use it on any task that runs a command, starts or stops a process, takes a port, installs a dependency, runs a migration or seed script, updates a snapshot, clears a cache, edits credentials or settings, or otherwise changes state outside the edit itself. It owns command classification, port discipline, long-running processes, and the ask-list. Skip it for a pure code edit with nothing to run.
+
+### toby-swd-experiment
+Run a discovery loop when the behavior is not decided yet. Use it for a spike, a proof of concept, a parameter sweep, a throwaway debug surface, a manual test, or an iteration driven by user feedback. It owns small reversible changes, exposing state for inspection, deferring durable tests during discovery, and deleting or folding in the experiment once the user chooses. The word throwaway outranks every noun after it, so this owns the retry, timeout, and test questions raised inside a spike. Skip it for work the user intends to keep.
+
+### toby-feature-dev
+Turn a feature request into the smallest change that satisfies it, with evidence it works and the requirement written where a future reader can audit it. Skip it for a one- file edit following a pattern already in that file, a review or cleanup pass over code that exists, read-only investigation or explanation, and anything the user framed as a spike, proof of concept, or throwaway, which belongs to toby-swd-experiment. Use it when the user asks to build, add, implement, wire up, or finish a behavior spanning more than one file or one call site: a ticket, a product ask, a half-built feature, an endpoint, screen, job, or flag, or a bug fix whose repair is new behavior. Use it when the request leaves "done" undefined and code has to start anyway. It owns mode, acceptance criteria, discovery, slicing, the plan the operator approves, approval stops, the behavior record, and handoff, and routes method to the toby-swd-* skills.
+
+### toby-code-review
+Report the real risks in a change the user asked about, and stop. Use it for code review, PR review, diff review, commit review, working-tree review, or findings on changed code: bugs, regressions, missing tests, security issues, and repo-rule breaks. It reports and does not repair. Skip it when the user asked for the code to be changed, which `toby-simplify-code` owns.
+
+### toby-simplify-code
+Reduce complexity in recently changed code while preserving behavior and tests. Use it when the user asks to simplify, tidy, tighten, refactor, de-duplicate, or clarify code that already works. It edits the code. Skip it when the user asked for findings and no edit, which `toby-code-review` owns.
+
+### toby-game
+Collaborate to build a single-file HTML simulation game or toy in Toby's style: a real system with its shortcuts named out loud, deadpan comedy where there is a target, a paper-and-ink look across canvas, 3D, or DOM, and an ending that reads the run back when the game has one. Trigger only when the creator explicitly invokes this skill by name or with the /toby-game slash command. Do not trigger on general requests to make a game, a sim, a toy, a visualizer, or a simulation, and do not trigger when a game is only mentioned in passing. Genre, theme, and tone are the creator's to pick each run; the example games show the range the style already covers.
+
+### toby-squall
+Brainstorm by widening from a single example to the broader set behind it. Trigger only when the user explicitly invokes the skill by name or with the `/toby-squall` slash command. Do not trigger on general brainstorming language like "help me think through this," "let's explore," or "brainstorm with me." This skill waits for explicit invocation.
+
+### toby-learning
+Teach a subject by working through it, with the learner at the keyboard. Trigger only when the user explicitly invokes this skill by name or with the `/toby-learning` slash command. Do not trigger on a question that wants an answer: "why is this slow", "what's the difference between", "walk me through", "help me understand". Those get a straight explanation, which `toby-explain` owns. This skill costs the learner time on purpose, so it waits to be asked for.
+
+### toby-explain
+Use when the user asks for an explanation, walkthrough, rationale, trade-off, architecture note, or teaching on any subject — code, math, a science, a language, literature, medicine — while the work or study continues. Answer in chat.
+

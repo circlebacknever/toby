@@ -30,7 +30,7 @@ Make changed code simpler to read and keep behavior identical. A lateral rewrite
 - A comment that narrates what the code plainly says; a name that records history while hiding purpose.
 - A try/catch, guard, or branch defending against a condition that can't occur, the kind toby-swd-complexity's error ladder already defines out of existence — removing it is one fewer branch or catch block.
 
-**A design smell from references/smells.md.**
+**A design smell from `references/smells.md`.**
 
 - A match against the file's "Fix here" half is a countable win like any other in this section, so fix it in the same pass.
 
@@ -66,7 +66,7 @@ Mechanical means a pure rename, a dead-code deletion, or a swap where the edge f
 The edge per class:
 
 - Idiom swap — null, undefined, and empty handling match; iteration order holds; short-circuit and laziness hold; the same exception type is thrown.
-- Library substitution — error type and shape, ordering and stability, locale and timezone, and precision all match. A change in performance class (linear to quadratic, sync to async) is a behavior change, so leave it.
+- Library substitution — error type and message, ordering and stability, locale and timezone, and precision all match. A change in performance class (linear to quadratic, sync to async) is a behavior change, so leave it.
 - Repo-pattern reuse — the helper's defaults match the inline code: timeouts, retries, logging, caching, what it throws. A helper that also logs is not equivalent to code that didn't.
 - Early return or predicate extraction — the same side effects run before the return, and the extracted predicate has none of its own.
 
@@ -79,7 +79,7 @@ The edge per class:
 
 ## Out of scope
 
-Moving code between modules, changing a signature, or altering a public return shape is behavior-changing work. If a cleanup isn't small, local, and behavior-preserving, leave it. When it matches the "Flag, don't fix" half of references/smells.md, or a red flag in toby-swd-modules, toby-swd-interfaces, or toby-swd-complexity, name the smell and the skill that owns it. Otherwise, note it as a follow-up. If you spot a real bug or a security issue while cleaning up, don't fix it here, because that's a behavior change. Flag it only when you can state the input that triggers it and why no guard catches it. A vague "this might be buggy" is noise. Then recommend a review pass.
+Moving code between modules, changing a signature, or altering a public return type is behavior-changing work. If a cleanup isn't small, local, and behavior-preserving, leave it. When it matches the "Flag, don't fix" half of `references/smells.md`, or a red flag in toby-swd-modules, toby-swd-interfaces, or toby-swd-complexity, name the smell and the skill that owns it. Otherwise, note it as a follow-up. If you spot a real bug or a security issue while cleaning up, don't fix it here, because that's a behavior change. Flag it only when you can state the input that triggers it and why no guard catches it. A vague "this might be buggy" is noise. Then recommend a review pass.
 
 ## Process
 

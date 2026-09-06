@@ -485,7 +485,51 @@ ROUTING_GROUPS = {
 }
 COLOAD_TOKEN_CEILING = 19000
 
-SKIP_CLAUSE_RE = re.compile(r"\bskip (?:it|this skill)\b", re.I)
+# These two never fire on their own. A request to make a game, or to brainstorm,
+# reaches them only when the user names the skill or types its slash command.
+# The rule lives in two places that can drift apart, so both are checked: the
+# description the host tool reads when deciding, and the routing line in the
+# operating guide. toby-game had the clause in its description and no line in
+# the guide at all, which left the rule stated once and enforced nowhere.
+INVOKE_ONLY_SKILLS = ["toby-game", "toby-squall", "toby-learning"]
+INVOKE_ONLY_DESCRIPTION_RE = re.compile(
+    r"trigger only when the (?:user|creator) explicitly invokes", re.I
+)
+
+
+def check_invoke_only(errors: list[str]) -> None:
+    guide = BASE_TOBY.read_text()
+    for name in INVOKE_ONLY_SKILLS:
+        skill_md = REPO_ROOT / "skills" / name / "SKILL.md"
+        if not skill_md.exists():
+            continue
+        desc = description_text(skill_md.read_text())
+        if not INVOKE_ONLY_DESCRIPTION_RE.search(desc):
+            errors.append(
+                f"{name} must fire only on explicit invocation, and its description "
+                "does not say so. Write \"Trigger only when the user explicitly invokes\"."
+            )
+        if not re.search(rf"Use `{name}` only when the user invokes it by name", guide):
+            errors.append(
+                f"base/toby.md Skill Routing has no invoke-only line for {name}, "
+                "so the routing block does not hold the rule its description states."
+            )
+        for pattern in (r"\bUse `" + name + r"` (?:for|when|whenever)\b",):
+            if re.search(pattern, guide):
+                errors.append(
+                    f"base/toby.md routes {name} on conditions, and it fires only on "
+                    "explicit invocation."
+                )
+
+
+# An anti-trigger is written two ways. Most skills say "skip it for X". The
+# invoke-only skills say "trigger only when ... by name" and then name what must
+# not fire them. Reading only the first form reported three skills as having no
+# anti-trigger while they carried the strictest ones in the repo.
+SKIP_CLAUSE_RE = re.compile(
+    r"\bskip (?:it|this skill)\b|\bdo not trigger\b|\btrigger only when\b|\bonly when the user invokes\b",
+    re.I,
+)
 
 # A section that opens on a declarative states a thesis and buries the rule under
 # it. The reader pays for that in every skill, and no other check sees it.
@@ -572,7 +616,21 @@ def check_cross_skill_collisions(warnings: list[str]) -> None:
                 seen.setdefault(key, skill_dir.name)
 
 
-REFERENCE_RE = re.compile(r"`?references/([A-Za-z0-9_./-]+\.md)`?")
+# Two citation styles reach the same file. Every skill but one writes
+# `references/foo.md`; toby-game wrote a bare `foo.md` in its References list.
+# Matching only the prefixed form made this check blind to that whole file, and
+# a pointer at a deleted `visual-identity.md` survived inside the blind spot.
+REFERENCE_RE = re.compile(r"`references/([A-Za-z0-9_./-]+\.md)`")
+BARE_REFERENCE_RE = re.compile(r"`([A-Za-z0-9_-]+\.md)`")
+
+# Filenames a skill names because they exist in the user's repo or in this one,
+# never because they sit under references/. Without this the bare-name pass
+# reads every mention of AGENTS.md as a broken pointer.
+NOT_A_REFERENCE = {
+    "SKILL.md", "AGENTS.md", "README.md", "CLAUDE.md", "CHANGELOG.md",
+    "plan.md", "intent.md", "spec.md", "REVIEW.md", "behavior.md",
+    "copilot-instructions.md", "toby-instructions.md", "toby.md",
+}
 
 
 def check_reference_reachability(errors: list[str], warnings: list[str]) -> None:
@@ -582,7 +640,13 @@ def check_reference_reachability(errors: list[str], warnings: list[str]) -> None
         named: set[str] = set()
         for path in [skill_dir / "SKILL.md"] + (sorted(refs_dir.rglob("*.md")) if refs_dir.exists() else []):
             text = path.read_text()
-            for match in REFERENCE_RE.finditer(text):
+            matches = list(REFERENCE_RE.finditer(text))
+            if refs_dir.exists():
+                matches += [
+                    m for m in BARE_REFERENCE_RE.finditer(text)
+                    if m.group(1) not in NOT_A_REFERENCE
+                ]
+            for match in matches:
                 # A skill may cite another skill's reference, and that path is
                 # relative to the other skill. toby-learning points at
                 # toby-voice's ste-floor.md, which is correct and not a break.
@@ -769,6 +833,7 @@ def main() -> int:
     check_cross_skill_collisions(warnings)
     check_reference_reachability(errors, warnings)
     check_description_backticks(errors)
+    check_invoke_only(errors)
     check_anti_triggers(warnings)
     check_buried_leads(warnings)
     if args.check_install:

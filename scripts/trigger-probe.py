@@ -20,6 +20,12 @@ INCLUDE = [
     "toby-swd-complexity", "toby-swd-clarity", "toby-swd-testing",
     "toby-swd-docs", "toby-swd-environment", "toby-swd-experiment",
     "toby-feature-dev", "toby-code-review", "toby-simplify-code",
+    # The invoke-only pair. A routing surface that omits them cannot catch them
+    # firing, which is the one thing the eval has to prove about them.
+    "toby-game", "toby-squall",
+    # Both answer questions a working session raises, so a routing surface
+    # without them cannot show which one a real learning moment reaches.
+    "toby-learning", "toby-explain",
 ]
 
 

@@ -64,6 +64,7 @@ Block already there? Only the block changes. No block? The installer waits for `
 - `skills/toby-*` - the skills.
 - `scripts/install.sh` - the installer.
 - `scripts/validate-skills.py` - the validator.
+- `evals/` - the regression suite. `evals/README.md` says how to run it and how to add a case.
 
 The operating guide owns safety, work loop, skill routing, verification posture, and voice. Skills own task method. Toby keeps the boundary visible, since mixed guidance turns into paperwork with hinges.
 
@@ -71,7 +72,7 @@ A skill points at the guide by calling it "the operating guide" and never by a f
 
 ## Skills
 
-The first five workflow skills are adapted from Anthropic skills. Toby kept the workflow shape, rewrote the instructions, and packaged them as `toby-*` names:
+The first five workflow skills are adapted from Anthropic skills. Toby kept the workflow, rewrote the instructions, and packaged them as `toby-*` names:
 
 - `toby-code-review` - tight findings for diffs and PRs.
 - `toby-explain` - explain a decision while the work keeps moving.
@@ -93,9 +94,9 @@ The SWD skills come from Toby reading two books people usually argue about in se
 Ousterhout gives him the structure vote. `toby-swd-strategy`, `toby-swd-modules`, and `toby-swd-interfaces` care about design before tactical code. They favor deep modules, smaller caller burden, interface comments, and contracts written before bodies. Martin contributes the local habits Toby still wants: names, readable flow, behavior tests, and small functions when the split earns its keep. Refactoring comes after the boundary is sound. When a local habit creates shallow interfaces, hides a contract, or lets tests steer design into a cul-de-sac, Toby picks the boundary rule. Settle the floor plan before the desk drawer.
 
 - `toby-swd-environment` - treat the user's machine like a guest would: look around and ask before touching processes, ports, or data.
-- `toby-swd-strategy` - weigh how today's change shapes every change after it, so the codebase stays easy to work in.
+- `toby-swd-strategy` - weigh how today's change constrains every change after it, so the codebase stays easy to work in.
 - `toby-swd-modules` - decide where code lives so each module hides its own mess and callers stay light.
-- `toby-swd-interfaces` - shape the contract a caller sees, keeping it small for the work it does.
+- `toby-swd-interfaces` - design the contract a caller sees, keeping it small for the work it does.
 - `toby-swd-testing` - write tests that pin behavior and catch regressions without freezing the implementation in place.
 - `toby-swd-complexity` - keep error handling and performance work deliberate, so complexity doesn't pile up unnoticed.
 - `toby-swd-clarity` - name things well and keep code obvious on read, since reading happens far more than writing.
@@ -107,10 +108,22 @@ Ousterhout gives him the structure vote. `toby-swd-strategy`, `toby-swd-modules`
 Before you push:
 
 ```sh
-python3 scripts/validate-skills.py skills
+python3 evals/run.py gates
 scripts/install.sh --dry-run --tool all
 git diff --check
 ```
+
+`evals/run.py gates` runs the validator and then compares this tree against the
+numbers in `evals/baselines/gates.json`: warnings by kind, body tokens per
+skill, co-load tokens per routing group, and the list of rules that have left
+the repo. It goes red when any of them gets worse. When the change is meant to
+move one, `evals/run.py record` writes the new number down, and that is the step
+that makes an improvement stick.
+
+`tests/test-gates.py` seeds a regression against each gate and checks it goes
+red, so a gate cannot quietly lose the ability to fail. The evals that need a
+model to write something live beside these and never gate, because five samples
+of the voice suite on identical inputs scored 1, 1, 4, 4, and 11.
 
 Full install test that never touches your real home:
 

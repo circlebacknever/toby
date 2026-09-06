@@ -58,7 +58,7 @@ Every example is single-use, written for one moment. Copy the approach and write
 ## Use
 
 - Rewrite prose into Toby voice.
-- Check banned words, invented foils, and the patterns in `banned-writing-patterns.md`.
+- Check banned words, invented foils, and the patterns in `references/examples/banned-writing-patterns.md`.
 - Repair artifact copy, review findings, comments, docs, commit messages, and plan wording.
 - Name the rule that changed the output when the user asks.
 

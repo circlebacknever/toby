@@ -105,7 +105,7 @@ await AsyncStorage.multiRemove(['authToken', 'refreshToken', 'feed:cache:v2', 'u
 ```
 
 Information-leakage check. The decision "what key holds the feed
-cache, what shape it's stored in, what version it is" is reflected in two
+cache, what format it's stored in, what version it is" is reflected in two
 modules (`FeedScreen` and `LogoutFlow`). The same applies to theme prefs, auth
 tokens, onboarding flags. Changing a key requires editing every site that
 touched it, and `LogoutFlow` is destined to drift behind every new key.
@@ -227,7 +227,7 @@ lives inside the module, where iOS-vs-Android permission flow, camera index
 defaults, and torch-availability checks can all be handled without callers
 knowing. Adding a second scanning screen takes one line.
 
-The same shape applies to other bridges: location, push notifications,
+The same treatment applies to other bridges: location, push notifications,
 biometrics, file pickers. Each is one body of knowledge — the platform's
 contract for that capability — and a deep module hides the protocol behind a
 small caller-facing interface.
@@ -276,7 +276,7 @@ export const FeedRepo = {
 const { data, loading, error, refresh } = useFeed();   // a hook over FeedRepo
 ```
 
-`Result<T>` is one shape every caller handles — success, failure, offline. Auth
+`Result<T>` is one type every caller handles — success, failure, offline. Auth
 header, base URL, retry policy, and offline cache live inside `FeedRepo`. The
 two screens shrink to rendering code.
 

@@ -11,18 +11,18 @@ You bring the idea. This skill brings the taste — a real system underneath, jo
 
 It exists to kill the notes you would otherwise give twice:
 
-- "make it funnier" → the wider in-world register — `comedy-and-narrative.md`
-- "the jokes repeat" → serialize, escalate, draw without replacement — `comedy-and-narrative.md`
-- "there's no story, it doesn't flow" → a run is an arc that plants and pays off — `comedy-and-narrative.md`
-- "the feed flashes, a line every frame" → fire on a real change, paced — `comedy-and-narrative.md`
-- "feels random, feels unfair" → agency over dice, surface the gamble — `gameplay.md`
-- "it solved itself instantly, the answer is trivial" → the win is earned through structure — `gameplay.md`
-- "the physics looks wrong, the hit doesn't match the screen" → collide on what's drawn, real motion — `gameplay.md`
-- "the sim blows up or drifts after a while" → integrate so it cannot detonate, assert finite — `architecture.md`
-- "it doesn't feel like a game" → the world ticks and answers at once — `gameplay.md`
-- "the instructions are too long" → one verb in one line — `gameplay.md`
-- "it breaks on mobile" → live controls relocate, never hide — `cross-device.md`
-- "it looks generic" → paper, ink, one red, one light, always breathing — `visual-identity.md`
+- "make it funnier" → the wider in-world register — `references/comedy-and-narrative.md`
+- "the jokes repeat" → serialize, escalate, draw without replacement — `references/comedy-and-narrative.md`
+- "there's no story, it doesn't flow" → a run is an arc that plants and pays off — `references/comedy-and-narrative.md`
+- "the feed flashes, a line every frame" → fire on a real change, paced — `references/comedy-and-narrative.md`
+- "feels random, feels unfair" → agency over dice, surface the gamble — `references/gameplay.md`
+- "it solved itself instantly, the answer is trivial" → the win is earned through structure — `references/gameplay.md`
+- "the physics looks wrong, the hit doesn't match the screen" → collide on what's drawn, real motion — `references/gameplay.md`
+- "the sim blows up or drifts after a while" → integrate so it cannot detonate, assert finite — `references/architecture.md`
+- "it doesn't feel like a game" → the world ticks and answers at once — `references/gameplay.md`
+- "the instructions are too long" → one verb in one line — `references/gameplay.md`
+- "it breaks on mobile" → live controls relocate, never hide — `references/cross-device.md`
+- "it looks generic" → paper, ink, one red, one light, always breathing — `references/visual-identity.md`
 
 ## Opening move
 
@@ -36,7 +36,7 @@ Place the game on a few axes, propose one combination with a reason, then let th
 - **narrative density** — silent toy through full press corps
 - **tone** — warm through bleak to the dread register
 - **player relationship** — observer, funder, or twitch actor
-- **session shape** — endless toy through bounded run with a graded ending
+- **session length** — endless toy through bounded run with a graded ending
 - **render** — 2D canvas, 3D, or DOM
 
 ## The build
@@ -45,12 +45,12 @@ Loop first: the sim ticks, something changes, the player interferes, it matters 
 
 ## References
 
-- `architecture.md` — the one-file skeleton and the engineering spine
-- `gameplay.md` — how it feels to play
-- `comedy-and-narrative.md` — the voice and the story
-- `visual-identity.md` — the look
-- `cross-device.md` — live on desktop and phone
-- `calibration-and-testing.md` — prove it
+- `references/architecture.md` — the one-file skeleton and the engineering spine
+- `references/gameplay.md` — how it feels to play
+- `references/comedy-and-narrative.md` — the voice and the story
+- `references/visual-identity.md` — the look
+- `references/cross-device.md` — live on desktop and phone
+- `references/calibration-and-testing.md` — prove it
 
 ## The games behind it
 

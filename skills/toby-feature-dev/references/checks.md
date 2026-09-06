@@ -2,12 +2,12 @@
 
 Two lists toby-feature-dev checks work against. The don't-build catalog runs while scope is still being fixed. The red-flag list runs against finished work, before the handoff. SKILL.md owns when each fires and what the report has to say. This file owns the entries and their names, so a handoff can cite one in three words and a reader can come look it up.
 
-## Don't build — seven shapes
+## Don't build — seven entries
 
 Each stays out unless a criterion names it and that criterion's Source line quotes the user or the ticket. Never write a criterion to license one of these, which is what the catalog exists to stop. When one ships anyway, name the entry and the criterion that carried it.
 
 - **The one-caller config option** — a setting, hook, or extension point exactly one call site reads. A slice flag ships with the slice that deletes it. This one ships with a default. It is set to `true` today and it will be set to `true` when the repo is archived.
-- **The wrapper over one instance** — a new module, layer, or adapter standing in front of a single implementation. The second instance is what tells you the shape. Widen the surface you already have per toby-swd-interfaces and wait for it.
+- **The wrapper over one instance** — a new module, layer, or adapter standing in front of a single implementation. The second instance is what tells you the pattern. Widen the interface you already have per toby-swd-interfaces and wait for it.
 - **Handling for a ruled-out condition** — error handling for a state the types or an earlier check already exclude. A catch block that has never caught anything is a comment with a runtime cost.
 - **The adjacent feature, and the adjacent bug** — the thing the request implies, and the defect you found on the way to it. "While I was in there" is how a two-file diff becomes a nine-file diff. Name each as a follow-up and stop. The one exception is toby-swd-strategy's reactive pass: a small local cleanup inside a file a criterion already named, reported on its own line.
 - **The uninvited migration** — a migration, rename, or reorganization no criterion asked for. It arrives as free work in somebody else's review, and they have to decide whether to trust it.

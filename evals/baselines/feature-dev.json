@@ -1,0 +1,13 @@
+{
+  "label": "feature-dev sizing",
+  "recorded": "2026-09-06",
+  "scored_by": "a person reading evals/suites/feature-dev.md",
+  "runs": [
+    {
+      "file": "runs/feature-dev-sizing.md",
+      "A_size": "tactical, and correctly handed back under the skip clause",
+      "B_size": "strategic, on billing and on three call sites",
+      "note": "The run flagged that even the tactical row is heavy for a one-line copy change. The sizing section now says to check the skip clause first."
+    }
+  ]
+}

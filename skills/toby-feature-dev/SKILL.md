@@ -16,11 +16,11 @@ description: >-
 
 # Toby Feature Dev
 
-Build the thing that was asked for, in pieces someone can watch land. Do not build the nine-file diff that arrives finished with every decision already made inside it, which is the failure this skill exists to prevent. The user's options are accept it or throw it away, and one of those is much faster. A small answer is a valid result: "the repo already does this at file:line", "this is a four-line change", "this needs one decision from you before any code". Nobody has ever been annoyed to hear the feature already exists.
+Build the thing that was asked for, in pieces someone can watch land. The failure this skill prevents is the nine-file diff that arrives finished, every decision already made inside it. The user can accept it or throw it away. A small answer is a valid result. "The repo already does this at file:line." "This is a four-line change." "This needs one decision from you before any code." Nobody has ever been annoyed to hear the feature already exists.
 
 ## The running order
 
-Mode. Discovery. Criteria. Slices. Stop 1. Design. Plan. Stop 2. Build the slice, prove it, record it. Stop 3. Handoff. This file owns that order, and the toby-swd-* skills own what good engineering looks like at each step. The rest of this file is the ways each step gets skipped.
+Mode. Size. Discovery. Criteria. Slices. Stop 1. Design. Plan. Stop 2. Build the slice, prove it, record it. Stop 3. Handoff. This file owns that order and how much of it a change owes. The toby-swd-* skills own what good engineering looks like at each step.
 
 ## Pick the mode before anything else
 
@@ -29,16 +29,41 @@ Two modes, and picking wrong is expensive in both directions. A throwaway spike 
 - **Experiment**, on the operating guide's experiment triggers — spike, proof of concept, throwaway, compare options, tune it while I watch. Hand the loop to toby-swd-experiment and stand down: no criteria, no slices, no record, no stops beyond that skill's own. Say in one line that this is experiment mode and what would move it to durable.
 - **Durable implementation**, everything else, which is the rest of this file.
 
-When the user picks a behavior at the end of an experiment, come back here and write the criteria from what they picked. The spike proves behavior and decides no structure. toby-swd-experiment's finish phase deletes the throwaway surface, and what survives gets the greenfield or brownfield read on its own merits. Durable work that stalls on a value no amount of reading can settle drops into toby-swd-experiment for that one question, then returns with the answer.
+When the user picks a behavior at the end of an experiment, come back here and write the criteria from what they picked. The spike proves behavior and decides no structure. toby-swd-experiment's finish phase deletes the throwaway code, and what survives gets the greenfield or brownfield read on its own merits. Durable work that stalls on a value no amount of reading can settle drops into toby-swd-experiment for that one question, then returns with the answer.
 
 Every durable feature loads toby-swd-strategy: a full design pass before any code on strategic or greenfield work, its brownfield read and reactive-investment pass on tactical work. The operating guide's standing routes fire here on their own conditions and this file never narrows them. The skills that fired name the active-skills line.
 
+## Size the work before anything else
+
+Two sizes. Pick one before discovery, say which in a line, and read the table for what each gate costs at that size.
+
+**Strategic** when any of these fires: a new module or boundary; a public API, event, or persisted format; a migration; auth, permissions, billing, money, or privacy; a behavior three or more call sites depend on; a UI workflow crossing more than one screen; greenfield. These fire on what the change does to a contract someone else depends on. Contact alone stays tactical. Adding an optional parameter with a default to an exported function is contact. Changing what it returns, or what its callers must handle, is a trigger.
+
+**Tactical** otherwise, which is most work.
+
+Before either, check that this skill should be running at all. A one-file edit following a pattern already in that file is in this skill's own skip clause, so make the edit and say what you changed. A criteria line for a copy change is the ceremony this file exists to avoid.
+
+| Gate | Tactical | Strategic |
+|---|---|---|
+| Acceptance criteria | one line, in chat | the three-line form below, one per behavior |
+| Discovery | the file that owns the behavior, and its test | all four, with the sibling feature read end to end |
+| Slices | one | named, one task group each |
+| Stop 1, the criteria | show them and keep moving | show them and wait |
+| Stop 2, the plan | none | a written file, approved before the first edit |
+| Stop 3, a slice boundary | none | only where the next slice depends on the answer |
+| The Check line | name the command | run it against today's code and quote the output |
+| Behavior record | only when the request names a behavior | every criterion |
+
+Size up mid-run when a trigger you did not see fires, and say so in one line when you do. Size down never. A change that looked tactical and turned out to touch permissions was strategic the whole time.
+
+The gates below say what each one is. The table says which of them you owe.
+
 ## Discover before designing
 
-**Brownfield, which is nearly always.** The repo has already decided most of this, so go find where. Fill all four before designing, and keep reading while any is short:
+**Brownfield, which is nearly always.** The repo has already decided most of this, so go find where. Strategic work fills all four before designing and keeps reading while any is short. Tactical work owes the first and the third:
 
 - The file that owns this behavior today.
-- The nearest shipped feature of the same shape — same layer, same data path. Read it end to end: route, handler, model, test, doc. The new code follows its structure unless you name a reason to differ. One clause on what that feature got right tells the user which pattern they are about to have two of.
+- The nearest shipped feature built the same way, on the same layer and the same data path. Read it end to end: route, handler, model, test, doc. The new code follows its structure unless you name a reason to differ. One clause on what that feature got right tells the user which pattern they are about to have two of.
 - The test covering the behavior about to change, or "none — searched <what you searched>".
 - The call sites that would notice the change.
 
@@ -51,30 +76,32 @@ Both modes:
 
 ## Every criterion is its own proof
 
-Write each acceptance criterion as three short lines before any code, plus one for what stays working: the behavior beside this one the change has to leave alone. Missing one of the three means it isn't a criterion, so ask, or drop it. Three to six covers most features. A one-slice change often has one, and criteria two and three exist because the range said three.
+Write each acceptance criterion as three short lines before any code, plus one for what stays working: the behavior beside this one the change has to leave alone. Missing one of the three means it isn't a criterion, so ask, or drop it. Write one criterion per behavior the request names, and stop there. A tactical change usually has one.
 
 - **Observable** — given a starting state, when an action happens, the user or caller sees a result, at the seam they touch: "an expired token gets a 401, and the retry after refresh returns the account." The seam is where something outside the changed module arrives — an HTTP request, a CLI invocation, a screen someone opens, a queue message, an exported symbol another module calls. A line checkable only by reading the diff is the diff with a checkbox on it, so rewrite it or cut it.
 - **Source** — the user sentence or ticket line it came from, quoted, or the repo fact that forces it, cited at path:line. A repo fact with no path:line is your preference. Source to a repo fact only where the request is silent on that behavior.
-- **Check** — the command that shows it holding, run once against today's code before the criteria go to the user, with its output quoted at checkpoint 1. That starting run is what makes the criterion provable later, and a criterion whose check cannot run yet says so at the stop, before anyone approves it. Name the result that would mean the criterion is unmet; a check with no failing result passed before you wrote it. `unverified` is available when the run needs something out of reach: an approval-gated command, a credential, an external service, a device. Name the blocker on the same line. A check you could have run and skipped leaves the criterion unmet.
+- **Check** — the command that shows it holding, named before any code. Strategic work runs it against today's code first and quotes the output at stop 1, because that starting run is what makes the criterion provable later. Tactical work names the command and runs it after. Either way, a criterion whose check cannot run at all says so before anyone approves it. Name the result that would mean the criterion is unmet; a check with no failing result passed before you wrote it. `unverified` is available when the run needs something out of reach: an approval-gated command, a credential, an external service, a device. Name the blocker on the same line. A check you could have run and skipped leaves the criterion unmet.
 - Reuse the vocabulary already in the schema, the routes, and the UI. A second name for a concept that has one is a question for the user. When the request as worded and the problem as described disagree, name the gap first. Building the words exactly is how a feature ships correct and useless.
 
 **Criteria are fixed text once coding starts.** Widening one is a note in the next report. Dropping or narrowing one changes what the user asked for. Give the reason and the new wording, and wait for a yes before the next edit.
 
 ## Ambiguity
 
-Read the request again hunting for a second defensible reading. Two readings that produce different observable behavior mean it is ambiguous, and the criteria list records the outcome either way. Record the second reading you found, or the one line saying you looked and the request holds one. What a wrong guess costs decides what happens next.
+Read the request again hunting for a second defensible reading. Two readings that produce different observable behavior mean it is ambiguous, and the criteria list records the outcome either way. What a wrong guess costs decides what happens next.
 
-- **Ask before any code** when a wrong guess writes data, changes a public contract or a stored shape, moves money, touches permissions, ships a user-visible string, calls an external system, or costs more to unwind than the change cost to make. One message, at most three questions, both readings side by side, your recommendation.
+- **Ask before any code** when a wrong guess writes data, changes a public contract or a stored format, moves money, touches permissions, ships a user-visible string, calls an external system, or costs more to unwind than the change cost to make. One message, at most three questions, both readings side by side, your recommendation.
 - **Ship it marked `assumed`** when a wrong guess costs one edit to undo. Take the reading this repo already follows, and carry the reading taken, the reading dropped, and what changes if the user wanted the other one. `assumed: standard behavior` marks nothing and settles nothing.
-- **Ship the reversible half marked `blocked`** when nobody is available to answer — a scheduled run, or a user gone quiet after you asked. Record the question verbatim and stop where the irreversible part starts. Do not mark a question blocked before asking it.
+- **Ship the reversible half marked `blocked`** when nobody is available to answer. Record the question verbatim and stop where the irreversible part starts, and never mark a question blocked before asking it.
 
 Questions the repo answers, questions about anything one edit undoes, and questions the user already answered earn no stop.
 
 ## Cut the work into slices
 
-A slice is the criteria that land observable together at one seam. Criteria reaching different seams — a route and a scheduled job, two screens, an API and a migration a caller can see — are different slices. One slice is the normal case.
+Tactical work has one slice and owes only the four ship conditions below, so read those and move on. The naming and the cut matter once there are two.
 
-Name each slice for what a person can do once it lands, in their words: `invite shows up as pending`, `search matches a full SKU`. That name is the plan's group heading, the checkpoint line, and the row in the final report, so the user reads one phrase from approval through handoff. `Slice 2 of 3` names the counting.
+A slice is the criteria that land observable together at one seam. Criteria reaching different seams are different slices: a route and a scheduled job, two screens, an API and a migration a caller can see.
+
+Name each slice for what a person can do once it lands, in their words: `invite shows up as pending`, `search matches a full SKU`. That name is the plan's group heading, the stop line, and the row in the final report, so the user reads one phrase from approval through handoff. `Slice 2 of 3` names the counting.
 
 A slice ships when all four hold:
 
@@ -87,19 +114,19 @@ Cutting by layer is the classic wrong cut, catalogued as **layer cut** in `refer
 
 ## Checkpoints
 
-Three stops, on the running order above. The machine-safety stops in the operating guide and toby-swd-environment stay in force alongside them.
+Three stops, on the running order above. The sizing table says which of them you owe. The machine-safety stops in the operating guide and toby-swd-environment stay in force at either size.
 
-1. **The criteria, before the first edit.** Show the list under the heading `What done means for [task]`, each criterion carrying its check's starting run, then the slice cut by name. Tactical work with one slice gets one line and keeps moving. Any strategic trigger, wait. Where checkpoint 2 also fires, say so here, since the yes at this stop is what asks for the plan.
-2. **The plan, after the design pass and before the first edit on strategic or multi-slice work.** Written file, reviewed and approved before execution. See below.
-3. **The slice boundary where the next slice's shape depends on the answer** — a decision surfaced, a criterion that turned out wrong, a strategic trigger discovery missed. Open with what the user can now do that they couldn't this morning, in the slice's name, then what proved it, then what the next slice does, and wait. A boundary carrying no such question gets the same three lines and keeps moving, catalogued as **stop inflation** in `references/checks.md`.
+1. **The criteria, before the first edit.** Show the list under the heading `What done means for [task]`, then the slice cut by name. Where stop 2 also fires, say so here, since the yes at this stop is what asks for the plan.
+2. **The plan, after the design pass and before the first edit.** A written file, reviewed and approved before execution. See below.
+3. **The slice boundary where the next slice depends on the answer** — a decision surfaced, a criterion that turned out wrong, a strategic trigger discovery missed. Open with what the user can now do that they couldn't this morning, in the slice's name, then what proved it, then what the next slice does, and wait. A boundary carrying no such question gets the same three lines and keeps moving, catalogued as **stop inflation** in `references/checks.md`.
 
-Strategic triggers: a new module or boundary; a public API, event, or persisted shape; a migration; auth, permissions, billing, money, or privacy; a behavior three or more call sites depend on; a UI workflow crossing more than one screen; greenfield. These fire on what the change does to the surface. Contact alone stays tactical. Adding an optional parameter with a default to an exported function is contact, while changing what it returns or what its callers must handle is a trigger. Never write "assuming yes, proceeding" past a stop, which leaves this skill with no checkpoints at all.
+Never write "assuming yes, proceeding" past a stop, which leaves this skill with no checkpoints at all.
 
 ## The plan document
 
 The operating guide owns the format — `Toby's plan for [task]`, task groups, checkboxes, a verification block ending each group. This file owns when the plan gets written and what a step carries for someone to approve it. Do not agree a plan in scrollback, because nobody can check it off.
 
-- **Written when** the user asks, which includes the yes at checkpoint 1 on strategic or multi-slice work. Naming the plan at that stop is what gets one. One-slice tactical work keeps the criteria list in chat.
+- **Written when** the user asks, which includes the yes at stop 1. Naming the plan at that stop is what gets one.
 - **Where** the repo already keeps plans. With nowhere obvious, propose a path and get a yes, the same gate the behavior record gets.
 - **Opens with** the mode, the one-line problem, the criteria in their pre-code wording, and what's out of scope, then one task group per slice in the order they ship, each carrying its slice's name and ending in its verification block. An operator approving a plan is approving the boundary as much as the work.
 - **Anything on** the operating guide's or toby-swd-environment's ask-list — migration, install, seed, snapshot, deletion, process or port — appears as its own step with the exact command.
@@ -112,7 +139,7 @@ The operating guide owns the format — `Toby's plan for [task]`, task groups, c
 - Write what the design called for. Shrinking the code below the design while implementing means the design was wrong, so go fix the design and say you did.
 - Confirm every symbol this change didn't define — library function, config field, env var, CLI flag, component prop, error type — against the installed source or the pinned manifest, unless this repo already calls it somewhere you can cite at path:line. The lockfile version is what runs. Docs for a later one are a guess.
 - Re-read a file before editing it a second time when anything else happened in between. Your memory of a file you changed three steps ago is a guess with a confident tone.
-- When the change alters an existing callable surface, run the caller sweep toby-swd-interfaces owns and carry its result into the handoff. Mark every call site updated, unaffected, or out of scope with a reason. A call site missing from that list means the search never ran.
+- When the change alters an existing callable surface, run the caller sweep `toby-swd-interfaces` owns and carry its result into the handoff.
 - Refactors go in their own commit unless the refactor is what makes the behavior fit.
 
 ## Prove the slice before starting the next
@@ -133,13 +160,13 @@ A year out, the code says what it does and nothing says what it was for. The nex
 
 - **Fires** when the request holds words for a behavior — the user's or the ticket's — and the record doesn't state it yet. `references/behavior-record.md` holds what writes no entry and where an inferred behavior goes. A run that writes none names its reason from that list.
 - **Home** is a prose file the repo already keeps for stated behavior. With nothing present, propose `docs/behavior.md` and get a yes before creating it, the same gate the plan file gets.
-- **Entry** is a heading holding the behavior in one sentence — trigger plus observable result, at the public interface toby-swd-testing tests through, naming no function, file, or internal state — plus who asked, quoted, and when. Two sentences means two behaviors, so split them. The test description quotes that sentence verbatim, character for character, in whatever string the harness reads.
+- **Entry** is a heading holding the behavior in one sentence: trigger plus observable result, at the public interface `toby-swd-testing` tests through, naming no function, file, or internal state. Add who asked, quoted, and when. Two sentences means two behaviors, so split them. The test description quotes that sentence verbatim, character for character.
 - **Check**, before handoff: run the grep in `references/behavior-record.md` and report what it printed. Every line it prints is a sentence the product claims and no test defends, and each one gets named in the handoff.
-- **Retire** an entry in the diff that deletes its test, and edit a falsified sentence in the diff that falsifies it. Both moves are in `references/behavior-record.md`, with the entry rules in full and what to do when two branches write the same sentence.
+- **Retire** an entry in the diff that deletes its test, and edit a falsified sentence in the diff that falsifies it. `references/behavior-record.md` carries both, the entry rules in full, and the two-branch case.
 
 ## Don't build
 
-`references/checks.md` holds the seven shapes that get built without anyone asking for them. Each stays out unless a criterion names it and that criterion's Source line quotes the user or the ticket. Read the seven before writing the plan's out-of-scope line, or before the first edit where there is no plan. Never write a criterion yourself to license one of them, which is what the catalog exists to stop.
+`references/checks.md` holds the seven things that get built without anyone asking for them. Each stays out unless a criterion names it and that criterion's Source line quotes the user or the ticket. Read the seven before writing the plan's out-of-scope line, or before the first edit where there is no plan. Never write a criterion yourself to license one of them, which is what the catalog exists to stop.
 
 ## Resuming half-built work
 
@@ -162,6 +189,6 @@ Then the operating guide's list: anything incomplete or risky, tests deleted or 
 
 ## References
 
-- `references/checks.md` — the seven don't-build shapes and the eight red flags, each under the entry name a handoff cites.
+- `references/checks.md` — the seven don't-build entries and the eight red flags, each under the name a handoff cites.
 - `references/behavior-record.md` — what the record skips, the entry and binding rules in full, the grep, retiring, and the two-branch case.
-- `references/examples.md` — worked slice cuts for four feature shapes, greenfield and brownfield, a plan with steps at approval detail, and a filled behavior record with its bindings and a retired entry.
+- `references/examples.md` — worked slice cuts for four kinds of feature, greenfield and brownfield, a plan with steps at approval detail, and a filled behavior record with its bindings and a retired entry.

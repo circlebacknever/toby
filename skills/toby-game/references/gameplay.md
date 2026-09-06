@@ -8,7 +8,7 @@ Laws of feel, paid for with rebuilds. A pure toy or sim has no outcome — no ve
 
 **Real motion.** Natural physics comes from real kinematics — velocity, gravity, a little drag, weight in the follow-through. An animation that plays the same regardless of force reads as fake, so let a ball arc and a body settle.
 
-**It has to feel alive.** The sim ticks on its own, the world answers a touch at once, and interference visibly matters. A screen where nothing moves until the player acts reads as a form. (Idle motion is in `visual-identity.md`.)
+**It has to feel alive.** The sim ticks on its own, the world answers a touch at once, and interference visibly matters. A screen where nothing moves until the player acts reads as a form. (Idle motion is in `references/visual-identity.md`.)
 
 **Teach one verb in one line.** No tutorial wall — one line in the game's own words ("drag to aim, release to shoot"), and the rest is discovery. Long instructions mean the control is not legible.
 
@@ -18,10 +18,10 @@ Laws of feel, paid for with rebuilds. A pure toy or sim has no outcome — no ve
 
 **Difficulty is structural before numerical.** Six 62% rounds finish 5% of the time, no matter the tuning, because the odds multiply as p^n. Reshape with best-of-N, a checkpoint, a story-flavored mulligan, then tune. Tie difficulty to the player's behavior and clamp it. Keep story pacing on the clock.
 
-**The win has to be earned.** A smooth ramp to a trivial answer is a dead game, because the player or the optimizer finds it once and never looks again. Earn the good line through structure: a barrier to clear, a plateau that breaks only when a real move is found, a surprising regime that is reachable and never free. When the obvious thing wins, give it a wall to climb. (`calibration-and-testing.md` measures it: random and skilled input must land in different places.)
+**The win has to be earned.** A smooth ramp to a trivial answer is a dead game, because the player or the optimizer finds it once and never looks again. Earn the good line through structure: a barrier to clear, a plateau that breaks only when a real move is found, a surprising regime that is reachable and never free. When the obvious thing wins, give it a wall to climb. (`references/calibration-and-testing.md` measures it: random and skilled input must land in different places.)
 
 **Don't let it repeat.** Draw content without replacement, reward varied play and punish the streak, and let the world's reactions escalate as the run goes.
 
 **Two sides share one catalog.** An opponent reads the same state and buys from the same shelf the player does, escalating on a schedule.
 
-For the dread register, the feel inverts — anticipation over surprise, the unstoppable approach with no ceiling. See `comedy-and-narrative.md`.
+For the dread register, the feel inverts — anticipation over surprise, the unstoppable approach with no ceiling. See `references/comedy-and-narrative.md`.

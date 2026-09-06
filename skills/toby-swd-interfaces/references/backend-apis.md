@@ -194,8 +194,8 @@ charge.
 
 ## Example 3 — Go service interface declared at the consumer
 
-When one service consumes another, the question is what shape the
-consumer-side interface takes. The temptation is to define a "convenient"
+When one service consumes another, the question is what the consumer-side
+interface should expose. The temptation is to define a "convenient"
 interface with everything the consumer might want.
 
 ```go

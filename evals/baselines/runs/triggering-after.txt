@@ -1,0 +1,50 @@
+P1 fired: toby-swd-interfaces, toby-swd-complexity, toby-swd-testing
+P1 expected: toby-swd-interfaces, toby-swd-complexity, toby-swd-testing
+P1 false-fires: none
+P1 missed: none
+P1 reason: interfaces fires on "method... repository" as a callable-surface change; complexity fires on the Redis-fallback/null-on-missing error path; testing fires because the new method is a behavior change needing a test. Modules was considered for the "AccountRepository" noun match but its trigger requires ownership crossing multiple entities, which a single new method inside one existing repository does not do, so it stayed out.
+
+P2 fired: toby-swd-modules, toby-swd-strategy, toby-swd-docs
+P2 expected: toby-swd-modules, toby-swd-strategy, toby-swd-docs
+P2 false-fires: none
+P2 missed: none
+P2 reason: modules fires directly on "split it" placement language; strategy fires on "module-boundary change"/refactor; docs fires because splitting one file into several changes module structure. Clarity was held back since this is a structural split, not a naming/readability pass, matching its scope description.
+
+P3 fired: toby-feature-dev
+P3 expected: toby-feature-dev (plus whatever it routes to)
+P3 false-fires: none
+P3 missed: none
+P3 reason: "Build the CSV export" is exactly the multi-file, undefined-done feature-request shape toby-feature-dev's description claims; simplify-code and code-review need explicit simplify/review verbs, neither present, so they stayed out.
+
+P4 fired: toby-swd-environment
+P4 expected: toby-swd-environment
+P4 false-fires: none
+P4 missed: none
+P4 reason: "Run the pending migration... re-seed it" matches environment's trigger phrase "runs a migration or seed script" verbatim; no code is being designed or placed, so strategy/modules/interfaces/testing have nothing to attach to.
+
+N1 fired: toby-swd-clarity
+N1 expected: toby-swd-clarity
+N1 false-fires: none
+N1 missed: none
+N1 reason: renaming `usr` to `user` is pure naming, clarity's core trigger; strategy and testing each carry an explicit skip clause naming "a rename" verbatim, so both stayed out.
+
+N2 fired: toby-code-review
+N2 expected: exactly one of toby-code-review / toby-simplify-code
+N2 false-fires: none
+N2 missed: none
+N2 reason: "Review my changes" matches code-review's trigger word "review" directly; simplify-code requires an explicit simplify/tidy/refactor verb, which the prompt does not contain, so only one skill fired.
+
+N3 fired: toby-swd-experiment
+N3 expected: toby-swd-experiment
+N3 false-fires: none
+N3 missed: none
+N3 reason: "Try a few values... Throwaway" is experiment's named "parameter sweep"/"throwaway" trigger; complexity, strategy, and testing each carry an explicit skip clause naming "throwaway" spikes/loops, so the retry/timeout nouns did not pull them in.
+
+N4 fired: none
+N4 expected: none (toby-swd-clarity at most)
+N4 false-fires: none
+N4 missed: none
+N4 reason: "the same way `email` is done two lines up" lands squarely in three separate skip clauses at once: feature-dev's "one-file edit following a pattern," interfaces' "adding a field beside an identical one already in that file," and strategy's "structure the surrounding code already fixes" — all three stayed dark.
+
+TOTAL false-fires across N1-N4: 0
+TOTAL missed across P1-P4: 0

@@ -1,0 +1,44 @@
+{
+  "label": "reference loaded",
+  "recorded": "2026-09-06",
+  "git_rev": "working tree, uncommitted",
+  "scores": [
+    1,
+    1,
+    4,
+    4,
+    11
+  ],
+  "samples": [
+    "runs/voice-arm-a.md",
+    "runs/voice-arm-a2.md",
+    "runs/voice-orig-1.md",
+    "runs/voice-orig-2.md",
+    "runs/voice-orig-3.md"
+  ],
+  "arms": {
+    "reference loaded": [
+      1,
+      1,
+      4,
+      4,
+      11
+    ],
+    "no reference": [
+      8,
+      8,
+      12,
+      4,
+      3
+    ],
+    "writing-sections extract": [
+      7,
+      9
+    ],
+    "extract plus Self Review": [
+      5,
+      4
+    ]
+  },
+  "note": "Ranges overlap across nearly their whole length. Two samples an arm read as a clean win and five took it back. Treat any single score as uninformative."
+}

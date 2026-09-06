@@ -48,11 +48,11 @@ orders = (
 
 One query for orders + addresses (joinedload), one query for all
 line_items (selectinload by order ids), one query for all products
-(selectinload by product ids). 351 queries → 3. Same code shape as
+(selectinload by product ids). 351 queries → 3. Same code as
 before, and the eager-load hint is the only change.
 
 **Purpose-built read model.** If the list view always needs the same
-shape, build a query that returns it directly:
+fields, build a query that returns them directly:
 
 ```python
 def list_orders_for_display(customer_id):
@@ -253,7 +253,7 @@ cost. The right count is the few that serve your real query patterns.
 
 Measurement validates: `EXPLAIN ANALYZE` your hot queries before shipping.
 The plan tells you whether the optimizer is using the index you expected.
-If it isn't, the index is the wrong shape for the query — fix the index
+If it isn't, the index does not match the query — fix the index
 or the query.
 
 This is design-time naturally-efficient work. The wrong default — no

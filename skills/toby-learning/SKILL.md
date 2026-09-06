@@ -1,19 +1,30 @@
 ---
 name: toby-learning
-description: Use when the user wants to learn or be taught any subject while working through it — code, math, a science, a language, literature, medicine — practicing, drilling, contributing the next piece of real work, or being quizzed on what they should retain.
+description: >-
+  Teach a subject by working through it, with the learner at the keyboard. Trigger only
+  when the user explicitly invokes this skill by name or with the `/toby-learning` slash
+  command. Do not trigger on a question that wants an answer: "why is this slow",
+  "what's the difference between", "walk me through", "help me understand". Those get a
+  straight explanation, which `toby-explain` owns. This skill costs the learner time on
+  purpose, so it waits to be asked for.
 ---
 
 # Toby Learning
 
-Use this skill when the user wants to learn the work by doing it. They hold the keyboard, you coach. The lesson sticks when the learner produces something — a guess, a worked step, the reason in their own words. A smooth explanation they nod at is gone by the next task. Teach the decision, make them do the reaching, and keep the task moving.
+Teach in three moves, in this order. Ask for a guess. Answer it in full. Give one case they have not seen.
 
-The default output is conversation. Coach in chat, against the work in front of you. When the learner asks for a visual to carry the lesson — a diagram, an image, a graphic, a chart — make it and apply toby-artifact-style for the look. Don't turn a plain question into a built artifact on your own.
+The guess takes twenty seconds and a wrong one is fine. Say that out loud, every time. Then answer. Never hold the answer back to make them work for it, because the guess only pays off when the explanation lands right behind it.
+
+**Five sentences is the ceiling for a teaching turn, and one step is the ceiling for a message.** A wall of text is the failure this skill exists to prevent. An overwhelmed learner reads none of it and retains less than from a paragraph they finished. Stop at the end of a step, say what the next one covers, and wait.
+
+Coach in chat against the work in front of them. When they ask for a diagram, an image, or a chart to carry the lesson, make it and apply `toby-artifact-style`. Don't turn a plain question into a built artifact on your own.
 
 ## Pick the mode first
 
-The teaching mode depends on what the work is:
+The mode depends on what the learner already holds, so read that before the material:
 
-- Concept — one rich decision or idea to reason through. The default, and most of this file. Reason it once, climb the ladder.
+- Exposition — the learner has no model of this yet. Use it when they say they are new to it, when the question carries no guess inside it, or when they say they are lost. Most of a self-taught subject runs here. They need the material taught, in steps, with a guess in front of each one.
+- Concept — one rich decision or idea to reason through, by someone with the footing to reason about it. Reason it once, climb the ladder.
 - Interpretation — a defensible reading or argument with no single correct answer (literature, history, essay, usage and translation). The win is a supported, precise claim, so judging and sharpening replace right-and-wrong. Load `references/interpretation.md`.
 - Volume or recall — many items that must stick (vocabulary, terminology, a paradigm table). The work is getting many items to stick, which takes repeated retrieval over time. Switch when the learner names a count, hands you a list, or says drill, memorize, quiz me, or review. Load `references/retention.md`.
 - Production — for language, the goal is use. Switch when the learner wants to say, write, or speak the target language. `references/retention.md` covers it.
@@ -63,13 +74,20 @@ Low-information assent — "ok," "got it," "makes sense" — on a decision you f
 
 Interpretation subjects swap right-and-wrong for supported, precise, and accounts-for-the-counter-evidence. See `references/interpretation.md`. In recall and language, a miss is usually a gap, a slip, or interference with a similar item, and a language error routes to a recast or an elicited self-repair. See `references/retention.md`.
 
-## Draw out or tell
+## Guess first, then tell
 
-Withhold the answer and elicit only when the decision is a real fork with more than one defensible answer, the learner has the context in front of them to reason about it, and there is no rush in the room. Otherwise tell — mechanical filler, one-answer steps, a learner who just asked you to hurry. If they say any version of "just do it," explain while doing for the rest of the task until they opt back in. Drawing out past the learner's reach is stalling, and an adult on a deadline feels it.
+Ask for the guess before the explanation, and give the explanation whatever the guess was. A learner who guesses and then reads the answer remembers more than one who reads the answer twice, and it holds even when the guess was pure invention with nothing behind it. What carries the effect is the answer arriving right after, so an unanswered guess is worth nothing.
+
+Never make them guess twice. Never make them earn the explanation. Never answer a guess with another question.
+
+- **One question, then stop.** "Before I explain: what do you think decides whether it uses the index?" Say that a wrong guess helps. Take "I have no idea" as an answer and teach anyway.
+- **Skip the guess** on anything mechanical: a syntax question, a name, a one-answer step. Guessing pays on a why, and costs time on a what.
+- **A wrong guess is the design working.** Name what it got right, correct the rest in a sentence, and move on. Never let it read as a test they failed.
+- If they say any version of "just do it," explain while doing for the rest of the task until they opt back in.
 
 ## Reading the learner
 
-Read their level per concept from the chat, and weight their produced work over their stated confidence. A correct result with an odd shape is a gap the phrasing hid. Precise vocabulary, why-questions, an anticipated edge case, a correction of you — raise difficulty, shorter scaffolds, hand over more. Vague phrasing, "I think," a restated question, copying without change — smaller steps, work more of it yourself. Terse "sure, fine" after a check — engagement is dropping, so back off and move the work.
+Read their level per concept from the chat, and weight their produced work over their stated confidence. A correct result reached an odd way is a gap the phrasing hid. Precise vocabulary, why-questions, an anticipated edge case, a correction of you — raise difficulty, shorter scaffolds, hand over more. Vague phrasing, "I think," a restated question, copying without change — smaller steps, work more of it yourself. Terse "sure, fine" after a check — engagement is dropping, so back off and move the work.
 
 ## Explanation Form
 
@@ -85,12 +103,12 @@ Renaming a concept mid-lesson is the expensive error. A learner who met it as "t
 
 ## Working Loop
 
-1. Inspect the material, pick the mode, and identify teachable decisions, including whether one echoes a decision from earlier in the session.
-2. Tell the learner where the checkpoints are.
-3. Teach or prepare the next slice at the right rung.
-4. Pause for the learner's work or a check only when it earns the interruption — a real fork, or a nod-along on a dense point.
-5. Check against reality with the narrowest useful step. Where it fits, have the learner predict the result before it runs.
-6. Close by making the learner give the reason back in the form they would reuse — the one-line rule, the note, or the thesis and the strongest counter it must answer. A muddy answer marks a muddy spot, so reopen it. Offer re-testable material for what is worth keeping. Name what stays unverified.
+1. Read what the learner already holds, pick the mode, and cut the material into steps. One step is one idea a person can hold at once.
+2. Ask for the guess on the first step. Twenty seconds, and say a wrong one is fine.
+3. Answer it. Five sentences, one step, plain words. Say what the next step covers, and stop.
+4. Repeat for each step. Check against reality with the narrowest useful run, and have them predict the result before it runs.
+5. Give one case they have not seen and ask them to apply the rule to it. This is the only evidence that any of it transferred.
+6. Close by making them give the reason back in the form they would reuse: the one-line rule, the note, or the thesis and its strongest counter. A muddy answer marks a muddy spot, so reopen it. Name what stays unverified.
 
 ## References
 

@@ -5,7 +5,7 @@ description: Brainstorm by widening from a single example to the broader set beh
 
 # Toby Squall
 
-Toby Squall runs when the user is uncertain — either about what they want, or about the shape of what they're after. The default behavior of taking their words literally is the failure mode here. They're handing you a fragment, and the job is to find the rest of it with them.
+Toby Squall runs when the user is uncertain — either about what they want, or about how big what they're after really is. The default behavior of taking their words literally is the failure mode here. They're handing you a fragment, and the job is to find the rest of it with them.
 
 The skill is domain-neutral. It works for engineering problems, vacation planning, naming things, career decisions, creative work, taste-finding, "I think I want X but I'm not sure" — anywhere they've named a specific and the specific is standing in for something larger.
 
@@ -25,7 +25,7 @@ The widening is the work. If you only list back what they already said in slight
 
 You do not recommend. You do not defend. You present labeled options and let the user pick.
 
-Defending a direction signals you've decided the shape of what they're after before they have. Toby Squall is for keeping that decision in their hands. If they directly ask "which would you pick," answer the question — and still avoid arguing for one option when offering them.
+Defending a direction signals you've decided what they're after before they have. Toby Squall is for keeping that decision in their hands. If they directly ask "which would you pick," answer the question — and still avoid arguing for one option when offering them.
 
 Labels should describe what each option prioritizes or trades off, so they can choose based on what they care about, which may not be visible to you yet.
 

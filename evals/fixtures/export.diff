@@ -1,0 +1,45 @@
+diff --git a/app/reports/views.py b/app/reports/views.py
+index 3f2a1b0..9c4d7e2 100644
+--- a/app/reports/views.py
++++ b/app/reports/views.py
+@@ -38,6 +38,26 @@ def report_view(request):
+     rows = Row.objects.filter(account=request.account)
+     return render(request, "reports/index.html", {"rows": rows})
+ 
++
++def export_csv(request):
++    start = request.GET.get("start")
++    end = request.GET.get("end")
++    rows = Row.objects.filter(created__gte=start, created__lte=end)
++
++    response = HttpResponse(content_type="text/csv")
++    response["Content-Disposition"] = 'attachment; filename="report.csv"'
++    writer = csv.writer(response)
++    writer.writerow(["date", "sku", "amount"])
++    for row in rows:
++        writer.writerow([row.created, row.sku, row.amount])
++    return response
+diff --git a/app/reports/urls.py b/app/reports/urls.py
+index 1a2b3c4..5d6e7f8 100644
+--- a/app/reports/urls.py
++++ b/app/reports/urls.py
+@@ -3,4 +3,5 @@ from . import views
+ urlpatterns = [
+     path("reports/", views.report_view, name="reports"),
++    path("reports/export/", views.export_csv, name="export"),
+ ]
+diff --git a/tests/test_export.py b/tests/test_export.py
+new file mode 100644
+index 0000000..abc1234
+--- /dev/null
++++ b/tests/test_export.py
+@@ -0,0 +1,9 @@
++import pytest
++
++
++def test_range_filter(client, account, rows):
++    response = client.get("/reports/export/?start=2026-01-01&end=2026-01-31")
++    assert response.status_code == 200
++    body = response.content.decode()
++    assert "2026-01-15" in body
++    assert "2025-12-30" not in body

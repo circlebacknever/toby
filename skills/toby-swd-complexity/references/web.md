@@ -3,7 +3,7 @@
 The web stack has its own complexity patterns. Errors arrive from three
 sources at once (network, render, user input) and performance pressure
 arrives from a fourth (re-renders, large lists, memoization decisions).
-The ladders apply, and the framework idioms shape the move.
+The ladders apply, and the framework idioms decide the move.
 
 ---
 
@@ -63,7 +63,7 @@ level: the widget-level boundary is the masking layer. Aggregation: the
 route-level boundary aggregates everything that bubbled past per-widget.
 Just-crash: the app-level fallback is the just-crash equivalent.
 
-Same shape in Solid (`ErrorBoundary` is built in) and Svelte (boundary
+Same treatment in Solid (`ErrorBoundary` is built in) and Svelte (boundary
 components in libraries like `svelte-error-boundary` or the framework's
 own error pages in SvelteKit).
 
@@ -136,7 +136,7 @@ that used the same pattern.
 for that state — and this page renders only the states it owns. The `error`
 and `stale` arms are absent by design. The error cases collapse into the
 rungs above — the client's retry, the interceptor, the boundary — and never
-reach the component. Same shape, fewer arms because the handling moved.
+reach the component. Same treatment, fewer arms because the handling moved.
 
 ---
 

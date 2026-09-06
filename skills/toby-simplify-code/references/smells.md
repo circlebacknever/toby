@@ -9,7 +9,7 @@ This file closes the gap. Every entry below is either:
 
 ## Fix here
 
-- **Comment invalidated at a distance.** A change makes a comment somewhere else in the codebase wrong — a caller's documented assumption, an invariant note at a distant call site, a doc comment describing behavior that just changed. Fires when the diff changes a function's behavior, return shape, error conditions, or an invariant, and a search for callers or the described behavior turns up a comment still asserting the old one. Fix here: correct the comment to match the new behavior — a one-line edit, no boundary crossed. Exception: only flag what you can name — a specific file:line and the exact clause the diff makes false. "Something elsewhere might describe this" isn't checkable. Drop it.
+- **Comment invalidated at a distance.** A change makes a comment somewhere else in the codebase wrong — a caller's documented assumption, an invariant note at a distant call site, a doc comment describing behavior that just changed. Fires when the diff changes a function's behavior, return type, error conditions, or an invariant, and a search for callers or the described behavior turns up a comment still asserting the old one. Fix here: correct the comment to match the new behavior — a one-line edit, no boundary crossed. Exception: only flag what you can name — a specific file:line and the exact clause the diff makes false. "Something elsewhere might describe this" isn't checkable. Drop it.
 
 - **Dead function or class.** A function, method, or class that compiles and could run, but nothing calls it anymore. Fires when the diff removes its last caller, or a repo-wide grep for the symbol name turns up only its own definition. Fix here: delete it. Nothing else in the repo names it, so removing it touches no signature and no caller — pure line reduction. Exception: anything exported or public that code outside this repo might consume, and anything reached through reflection, dependency injection, dynamic dispatch, or a test-only harness. Grep the identifier as a string, confirm export status, before you delete.
 
@@ -19,7 +19,7 @@ This file closes the gap. Every entry below is either:
 
 ## Flag, don't fix
 
-Each of these needs a change this skill's Out of scope note already excludes: a signature, a public return shape, or which module owns what. Name the entry, the file:line, and the skill listed, then leave the code alone.
+Each of these needs a change this skill's Out of scope note already excludes: a signature, a public return type, or which module owns what. Name the entry, the file:line, and the skill listed, then leave the code alone.
 
 `toby-code-review`'s `references/smells.md` owns the full entry for every name below: the definition, the Fires-when criterion you quote against the code, and the exception that makes it a non-finding. Read it there before flagging. Keeping a second copy here is how the accessors entry ended up in four files with three wordings.
 

@@ -1,0 +1,30 @@
+{
+  "label": "review of a seeded diff",
+  "recorded": "2026-09-06",
+  "scored_by": "a person reading evals/suites/review.md",
+  "runs": [
+    {
+      "file": "runs/review-old.md",
+      "skill": "before the compliance pass",
+      "caught": [
+        "account scoping bug"
+      ],
+      "missed": [
+        "unvalidated date params"
+      ],
+      "notes": "bundled both missing tests into one finding, named no owning skill"
+    },
+    {
+      "file": "runs/review-new.md",
+      "skill": "after the compliance pass",
+      "caught": [
+        "account scoping bug",
+        "criterion 2 unmet",
+        "criterion 3 unmet",
+        "unvalidated date params"
+      ],
+      "missed": [],
+      "notes": "routed the security bug to toby-swd-interfaces, which owns nothing about it. The frame now says a bug needs no routing, so a later run should not repeat it."
+    }
+  ]
+}

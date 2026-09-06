@@ -149,7 +149,7 @@ payment to the payments service and address validation to the address package.
 
 ## Example 4 — Frontend: checkout feature README.md
 
-This module's README.md is minimal because it serves developers already inside the codebase, with none of the orientation a shared library owes outside callers. A README.md here only exists because the context shape is non-obvious to developers onboarding to this part of the codebase.
+This module's README.md is minimal because it serves developers already inside the codebase, with none of the orientation a shared library owes outside callers. A README.md here only exists because the context contents are non-obvious to developers onboarding to this part of the codebase.
 
 ```markdown
 # Checkout Feature
@@ -189,5 +189,5 @@ Existing steps stay unchanged.
   produces inconsistent UI state.
 ```
 
-The cross-module note about context shape lives in AGENTS.md. The README
+The cross-module note about context contents lives in AGENTS.md. The README
 only explains what a developer needs to use the feature correctly.

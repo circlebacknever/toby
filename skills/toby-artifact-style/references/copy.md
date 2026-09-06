@@ -119,7 +119,7 @@ Match the qualifier to the epistemic state. Don't hedge a known claim or strip a
 
 ## Marketing-shaped layouts
 
-Hero + feature cards + CTA shapes are allowed. The copy inside is not promotional.
+Hero + feature cards + CTA layouts are allowed. The copy inside is not promotional.
 
 - **Hero headline** = what the thing does. "Models p95 latency under burst load" passes. "Built for performance you'll love" fails.
 - **Feature card** = a concrete behavior + the measurement that backs it. "Detects threshold breach within 50 ms. Tested at n = 10⁴ events/sec."

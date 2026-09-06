@@ -1,6 +1,6 @@
 # Worked cuts
 
-Four feature shapes, cut into slices, all four in one invented repo: orders, a members screen, a billing module, a search path. The behavior record at the bottom is what these four left behind, which is why it holds two of them and one retirement. Each shape shows the criteria in full, the slice order and its name, the wiring line that proves the slice is reachable, and where a stop earns its place. The paths are invented. The shape is what survived contact with a real repo.
+Four kinds of feature, cut into slices, all four in one invented repo: orders, a members screen, a billing module, a search path. The behavior record at the bottom is what these four left behind, which is why it holds two of them and one retirement. Each one shows the criteria in full, the slice order and its name, the wiring line that proves the slice is reachable, and where a stop earns its place. The paths are invented. The method is what survived contact with a real repo.
 
 Every criterion below carries all three lines, because a criterion missing one is the thing the skill tells you to drop.
 
@@ -34,7 +34,7 @@ Slices: two, named for what each one lets someone do — `invite shows up as pen
 
 Wiring: slice one at `screens/Members.tsx:210` — `<InviteForm onSubmit={createInvite} />`. Slice two at `jobs/index.ts:17`, the `invite.created` subscription.
 
-Stops: criteria, then a plan file, since this spans two slices. Slice one ends on a boundary carrying a real question. The pending row shows the address, and whether it also shows the inviter and the expiry decides the second slice's shape. Stop there. Had it raised nothing, three lines and keep moving.
+Stops: criteria, then a plan file, since this spans two slices. Slice one ends on a boundary carrying a real question. The pending row shows the address, and whether it also shows the inviter and the expiry decides what the second slice does. Stop there. Had it raised nothing, three lines and keep moving.
 
 Slice one depends on slice two to be worth anything. An invite that creates a row and mails nobody is half-built behavior a user can reach. So `invites.form` defaults off, slice one is observed with it on, and the flag flips for real when slice two's send lands. Slice two's last checkbox deletes it. A staging flag still set after its slice ships is a config option nobody decided to add.
 
@@ -52,13 +52,13 @@ Nothing nearby resembles this: no metering module, no counter storage, no billin
 
 Greenfield's extra work, before the second file exists:
 
-- Nearest conventions the repo already has: `billing/` for money-adjacent modules and the `jobs/` daily aggregate shape used by `jobs/revenue_rollup.ts`. Extend those two. Don't invent a third layout.
-- Boundary written once, per toby-swd-modules and toby-swd-interfaces: the module exposes `seatCountForDay(workspace, date)` and owns the storage shape behind it. Callers never touch rows.
+- Nearest conventions the repo already has: `billing/` for money-adjacent modules and the `jobs/` daily aggregate pattern used by `jobs/revenue_rollup.ts`. Extend those two. Don't invent a third layout.
+- Boundary written once, per toby-swd-modules and toby-swd-interfaces: the module exposes `seatCountForDay(workspace, date)` and owns the storage layout behind it. Callers never touch rows.
 - The naming call goes to the user. `seat`, `member`, and `active user` mean the same thing today and one of them is about to appear on an invoice.
 
 Slices: two — `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI is what keeps slice one from being a layer cut nobody can open.
 
-Stops: criteria, then the design pass, then the plan. Both a persisted shape and money are strategic triggers, so the design lines are owed before the plan can name a file.
+Stops: criteria, then the design pass, then the plan. Both a persisted format and money are strategic triggers, so the design lines are owed before the plan can name a file.
 
 ## 4. Changing behavior that already ships
 

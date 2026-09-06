@@ -1,0 +1,36 @@
+### toby-swd-strategy
+Every code change either invests in the system's future or borrows against it. Use this skill for non-trivial software engineering work: features, bug fixes with behavioral risk, refactors, public API or module-boundary changes, and edits where a quick patch may add special cases or hidden dependencies. Skip it for read-only investigation, tiny mechanical edits, formatting-only churn, and changes whose structure is already fixed by the surrounding code.
+
+### toby-swd-modules
+Module boundaries determine where complexity hides or dies. Use this skill when a task creates, moves, splits, merges, or places code, or when a change raises ownership questions across functions, classes, services, files, packages, React components, hooks, store slices, repositories, controllers, native modules, screens, cache layers, or data-layer modules.
+
+### toby-swd-interfaces
+Design the public contract before the implementation. Use this skill when a task adds or changes a function, method, class, component, hook, composable, REST endpoint, gRPC service, repository, cache, or any other callable surface. The interface is the cost the module imposes on the system, and a bad one compounds across every caller forever.
+
+### toby-swd-complexity
+Complexity compounds when error handling and performance work are handled tactically — scattered across call sites, added speculatively, piled up with each new case. Use this skill when a task touches errors, retries, validation, recovery paths, performance, caching, concurrency, batching, or special cases. The cheap moves are to remove unnecessary error conditions and refuse speculative optimization. The heavier performance work engages only on a measured problem.
+
+### toby-swd-clarity
+Code communicates — to agents, to future maintainers, to whoever inherits this. Use this skill when naming, comments, conventions, exported contracts, confusing control flow, or obvious-on-read structure are part of a code change. It is a focused clarity pass for backend, frontend, scripts, and configs. It stays scoped to the code being touched and leaves already-clear surrounding code alone.
+
+### toby-swd-testing
+Tests are executable specifications of behavior. Apply this skill on every task that writes, modifies, or deletes tests — new test files, additions to existing suites, bug fix regression tests, snapshot updates, test rewrites. Also apply whenever production code is changing and tests need to follow. The default reflex of "make the failing test green by tweaking the assertion" is how suites rot into theater. Backend and frontend alike.
+
+### toby-swd-docs
+Two artifacts live in every meaningful module: AGENTS.md (for agents writing code here) and README.md (for humans using or maintaining this module). Use this skill when a task changes module structure, public APIs, cross-module decisions, extension rules, or human-facing module usage. Check existing docs for accuracy before editing them. One of each per meaningful module root, never per folder.
+
+### toby-swd-environment
+The machine running this code belongs to the user. Apply this skill on every task that runs commands, starts or stops processes, takes ports, installs dependencies, runs migrations, updates snapshots, or otherwise changes state outside the immediate edit. Covers command classification, port discipline, long-running processes, repo-guidance commands, and what to ask before doing. The agent is a guest in a real environment with real state. Nothing is disposable.
+
+### toby-swd-experiment
+Run exploratory engineering loops when behavior is being discovered through rapid experiments, proof-of-concept work, spikes, throwaway debug surfaces, parameter tweaks, manual tests, or user feedback. Use when an agent needs to make small reversible changes, expose state for inspection, defer durable tests during discovery, and delete or fold in the experiment after the user chooses the behavior.
+
+### toby-feature-dev
+Turn a feature request into the smallest change that satisfies it, with evidence it works and the requirement written down where a future reader can audit it. Use when the user asks to build, add, implement, wire up, or finish a behavior spanning more than one file or one call site: a ticket, a product ask, a half-built feature to continue, an endpoint, screen, job, or flag to add, or a bug fix whose repair is new behavior. Use it when the request leaves "done" undefined and code has to start anyway. This skill owns the shape of the work — mode, acceptance criteria, discovery, slicing, the plan the operator approves before execution, approval stops, the behavior record, handoff — and routes method to the toby-swd-* skills. Skip it for a one-file edit following a pattern already in that file, a review or cleanup pass over code that exists, read-only investigation or explanation, and anything the user framed as a spike, proof of concept, or throwaway, which belongs to toby-swd-experiment.
+
+### toby-code-review
+Use when the user asks for code review, PR review, diff review, commit review, working-tree review, or concise findings on changed code, especially bugs, regressions, missing tests, security issues, and repo-rule breaks.
+
+### toby-simplify-code
+Use when the user asks to simplify, tidy, tighten, refactor, de-duplicate, clarify, or reduce complexity in recently changed code while preserving behavior and tests.
+

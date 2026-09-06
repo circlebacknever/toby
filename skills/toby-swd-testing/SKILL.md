@@ -14,7 +14,7 @@ description: >-
 
 A test suite exists for three jobs. Pin down what the system does so callers can rely on it. Catch regressions when something changes. Make refactoring safe enough that the team will do it. A suite that locks in implementation details does worse than nothing. It slows every change, lies about coverage, and trains the team to ignore failures.
 
-**Describe behavior at the public interface.** Inputs go in, outputs come out, observable side effects show up where callers would notice them. Internal call order, private method signatures, the order helpers fire, and intermediate data shapes are invisible from outside the module and should be invisible to the test. Write tests that survive a correct refactor. A test that fails because you renamed a helper while preserving behavior is detecting the diff and nothing else.
+**Describe behavior at the public interface.** Inputs go in, outputs come out, observable side effects show up where callers would notice them. Internal call order, private method signatures, the order helpers fire, and intermediate data types are invisible from outside the module and should be invisible to the test. Write tests that survive a correct refactor. A test that fails because you renamed a helper while preserving behavior is detecting the diff and nothing else.
 
 ## Name tests by behavior
 

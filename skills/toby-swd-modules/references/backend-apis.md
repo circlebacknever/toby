@@ -64,7 +64,7 @@ public class OrderController {
 ```
 
 `AuthzGuard` is one module owning authorization decisions, and `ResponseBuilder`
-owns response shape. Each is deep behind a small interface. `OrderController`
+owns the response type. Each is deep behind a small interface. `OrderController`
 composes them as injected fields, narrow and named for
 what they do. The old `currentUser` was reachable from anywhere.
 
@@ -127,7 +127,7 @@ field." The class is now deep: a few intent methods, substantial invariant
 enforcement behind them.
 
 This is the same point as the depth check. `getX/setX` makes the
-interface and the implementation the same shape. That's the definition of a
+interface and the implementation the same size. That's the definition of a
 shallow module.
 
 ---

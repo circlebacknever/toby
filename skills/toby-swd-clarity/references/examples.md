@@ -72,7 +72,7 @@ otherwise delete and reintroduce the bug.
 
 ---
 
-## Example 4 — Frontend: generic container and state-shape comments
+## Example 4 — Frontend: generic container and state-layout comments
 
 A hook returns a loosely shaped object:
 
@@ -81,7 +81,7 @@ return [data, err, l];   // caller does result[0], result[2]...
 ```
 
 This is the generic-container failure: positional, unlabeled, meaning obscured.
-Return a named shape, and comment the fields (data-structure-member comments,
+Return a named type, and comment the fields (data-structure-member comments,
 the category most often missed on frontend state):
 
 ```ts

@@ -2,3 +2,7 @@
 .DS_Store
 # editor swap files
 *.swp
+
+# Eval scratch. The suites and baselines are tracked; a run is not.
+evals/results/*
+!evals/results/.gitkeep

@@ -147,7 +147,7 @@ type User struct {
 ```
 
 `User` plays three roles at once: database row, JSON DTO, and domain entity.
-Every consumer of `User` is now coupled to schema columns, JSON wire shape,
+Every consumer of `User` is now coupled to schema columns, JSON wire format,
 and internal hashing implementation. The `LegacyMfaSecret` field is visible
 everywhere even though only one migration cared about it.
 
@@ -170,7 +170,7 @@ type UserDTO struct { ... }                   // JSON shape, owned by the API la
 
 Each type lives in the module that owns the decision it represents. The
 storage row format can be changed without touching anything outside
-`internal/store`. The JSON shape can evolve without coupled migrations. The
+`internal/store`. The JSON format can evolve without coupled migrations. The
 domain `User` only carries what the rest of the system needs to know about
 users — a much smaller surface than every row column. Schema secrets stay
 secret.
@@ -252,7 +252,7 @@ Two ways to make the interface's cost visible:
   include=[Order.shipping_address, Order.line_items, LineItem.product])`. The
   hidden N+1 is now an explicit join, and callers that don't ask don't get the
   cost.
-- **Return a purpose-built shape.** If the use case is "list orders with
+- **Return a purpose-built type.** If the use case is "list orders with
   product names," the repo provides
   `order_repo.list_for_display(customer_id)`. It returns a flat dataclass with
   exactly the fields needed, produced by one query. Callers cannot
@@ -274,6 +274,6 @@ precondition documented nowhere.
   service never owns it. The repository is the natural home for read-through
   caching because it already owns the data-access contract.
 - **Read models versus write models** become natural splits when one query
-  shape is wildly different from the entity shape (reporting, dashboards).
+  type is wildly different from the entity (reporting, dashboards).
   That's a deliberate split per the split/merge check, and most apps don't need
   it.

@@ -42,7 +42,7 @@ Beyond the signatures above, Toby Artifact ships ~60 components total.
 - **Number field** — mono digits with tabular numerals; stacked +/− on the right. Native browser spinners hidden.
 - **OTP field** — N mono slots (default 6) with optional `groupAt` separator. Backspace walks back.
 - **Checkbox** + **CheckboxGroup** — group has `row` modifier for inline layout.
-- **Radio** + **RadioGroup** — same shape as Checkbox.
+- **Radio** + **RadioGroup** — built the same way as Checkbox.
 - **Switch** — alias of **Toggle**. One primitive.
 - **Toggle** — 36×20 track + thumb. On = ink track, paper thumb.
 - **Slider** — mono value displayed right of the label, tabular numerals.

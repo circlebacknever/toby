@@ -1,0 +1,16 @@
+P1 fired: toby-swd-interfaces, toby-swd-complexity, toby-swd-testing, toby-swd-strategy
+P2 fired: toby-swd-modules, toby-swd-strategy, toby-simplify-code, toby-swd-docs
+P3 fired: toby-feature-dev, toby-swd-interfaces, toby-swd-testing, toby-swd-strategy
+P4 fired: toby-swd-environment
+N1 fired: toby-swd-clarity
+N2 fired: toby-code-review
+N3 fired: toby-swd-experiment
+N4 fired: (none)
+N5 fired: (none)
+N6 fired: (none)
+
+TOTAL false-fires across N1-N6: 1
+TOTAL missed across P1-P4: 0
+
+N5 decisive phrase: "Trigger only when the creator explicitly invokes this skill by name or with the /toby-game slash command."
+N6 decisive phrase: "Do not trigger on general brainstorming language like 'help me think through this,' 'let's explore,' or 'brainstorm with me.'"

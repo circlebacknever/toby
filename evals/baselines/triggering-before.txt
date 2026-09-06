@@ -1,0 +1,50 @@
+P1 fired: toby-swd-interfaces, toby-swd-complexity, toby-swd-testing, toby-swd-strategy
+P1 expected: toby-swd-interfaces, toby-swd-complexity, toby-swd-testing
+P1 false-fires: toby-swd-strategy
+P1 missed: none
+P1 reason: strategy's phrase "non-trivial software engineering work: features... public API or module-boundary changes" reads a new repository method as a feature/public-API change, so it fires alongside the correct interfaces/complexity/testing picks.
+
+P2 fired: toby-swd-modules, toby-swd-strategy, toby-swd-docs, toby-swd-clarity
+P2 expected: toby-swd-modules, toby-swd-strategy, toby-swd-docs
+P2 false-fires: toby-swd-clarity
+P2 missed: none
+P2 reason: clarity's trigger phrase "exported contracts" matches a file split that changes what each new module exports, even though the task is structural, not a naming/readability pass.
+
+P3 fired: toby-feature-dev
+P3 expected: toby-feature-dev
+P3 false-fires: none
+P3 missed: none
+P3 reason: no other description's trigger nouns are explicit enough in the prompt (no "endpoint," "function," or "method" stated) to pull in interfaces or strategy directly.
+
+P4 fired: toby-swd-environment
+P4 expected: toby-swd-environment
+P4 false-fires: none
+P4 missed: none
+P4 reason: "runs migrations" is a literal phrase in environment's description and nothing else in the prompt matches another skill's nouns.
+
+N1 fired: toby-swd-clarity, toby-swd-testing
+N1 expected: toby-swd-clarity
+N1 false-fires: toby-swd-testing
+N1 missed: none
+N1 reason: testing's catch-all clause "apply whenever production code is changing and tests need to follow" has no size floor, so it fires on a single-file rename even though strategy's own text explicitly excludes "tiny mechanical edits."
+
+N2 fired: toby-code-review
+N2 expected: toby-code-review (or toby-simplify-code, exactly one)
+N2 false-fires: none
+N2 missed: none
+N2 reason: "review my changes" contains code-review's own trigger word "review" verbatim; simplify-code's trigger list (simplify, tidy, tighten, refactor, de-duplicate, clarify) has no matching noun in the prompt, so it does not co-fire.
+
+N3 fired: toby-swd-experiment, toby-swd-complexity, toby-swd-strategy, toby-swd-testing
+N3 expected: toby-swd-experiment
+N3 false-fires: toby-swd-complexity, toby-swd-strategy, toby-swd-testing
+N3 missed: none
+N3 reason: complexity's own trigger list literally names "retries" and the prompt says "retry backoff" and "timeouts"; strategy's generic "non-trivial software engineering work" phrase reads the backoff tuning as a feature/bug-risk task; testing's "whenever production code is changing" clause fires on the same manual-test language the experiment skill was written to override.
+
+N4 fired: toby-feature-dev, toby-swd-interfaces, toby-swd-strategy
+N4 expected: none (toby-swd-clarity at most)
+N4 false-fires: toby-feature-dev, toby-swd-interfaces, toby-swd-strategy
+N4 missed: none
+N4 reason: feature-dev's trigger word "add" matches before its own skip clause ("a one-file edit following a pattern already in that file") is weighed; interfaces' trigger list names "component" explicitly and ContactForm is a component; strategy's "features" phrase catches the same "add a field" wording.
+
+TOTAL false-fires across N1-N4: 7
+TOTAL missed across P1-P4: 0

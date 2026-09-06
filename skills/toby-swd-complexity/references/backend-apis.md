@@ -192,7 +192,7 @@ without it; fetch in the background; insert when it arrives." This is a
 design move. It defines the recommendation's slowness out of the user's
 critical path entirely, so the timeout never even comes into play.
 
-This is the same shape as `examples.md` Example 1 ("define the error out
+This is the same problem as `examples.md` Example 1 ("define the error out
 of existence") applied to latency. The most reliable way to handle a slow
 dependency is to remove it from your critical path.
 
@@ -295,7 +295,7 @@ act on a partial success. An all-or-nothing variant rejects the whole batch
 and names the row that broke it. A flat array of successes can express
 neither.
 
-This is the same shape as the mobile bridge example — N+1 over a network.
+This is the same problem as the mobile bridge example — N+1 over a network.
 The cure is bulk APIs at the boundary that crosses the network. Within
 the application, the row-by-row code can stay (it's clearer), but at the
 network boundary, batch.

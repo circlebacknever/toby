@@ -261,7 +261,7 @@ parameter off every method.
 
 ## Example 4 — Migration as an interface
 
-Migrations are an interface between code versions. The shape they take
+Migrations are an interface between code versions. What they expose
 determines what's possible.
 
 Candidate A — the schema-mutation script:
@@ -290,7 +290,7 @@ The migration's contract is more complex than the script suggests. The thing tha
 is the difference between "schema migration" and "data migration". The
 script does the former and offers no story for the latter.
 
-Redesigning the *interface to migrations* — the general shape, beyond this one migration — helps:
+Redesigning the *interface to migrations*, past this one migration, helps:
 
 ```python
 class Migration:

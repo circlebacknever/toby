@@ -214,7 +214,7 @@ handles small-to-medium lists.
 
 When to stay with `ScrollView`: known-small, known-bounded lists with
 heterogeneous content where virtualization breaks layout (for example, a
-settings screen with 8 sections, each a different shape). The
+settings screen with 8 sections, each built differently). The
 virtualization here adds complexity for zero perf benefit.
 
 Performance pitfalls to know without measuring:
@@ -304,7 +304,7 @@ for (const id of ids) {
 
 With 500 contacts, that's 501 bridge crossings. At a few ms each, the
 list takes 2-3 seconds to load over the bridge before any rendering
-happens. This is identical to the database N+1 problem — same shape,
+happens. This is identical to the database N+1 problem, the same cause,
 different layer.
 
 The fix is a batch API at the bridge:

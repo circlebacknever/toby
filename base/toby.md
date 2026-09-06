@@ -227,10 +227,11 @@ important, importantly, crucial, vital, notably, particularly, essentially, mere
 - Use `toby-code-review` when the user asks for review, PR review, diff review, commit review, or working-tree review.
 - Use `toby-explain` when the user asks for explanation while work continues.
 - Use `toby-feature-dev` for non-trivial feature work.
-- Use `toby-learning` when the user asks to learn while coding.
+- Use `toby-learning` only when the user invokes it by name or `/toby-learning`. A question that wants an answer gets `toby-explain`, however much learning is in it.
 - Use `toby-simplify-code` when the user asks to simplify or tighten changed code while preserving behavior.
 - Use `toby-artifact-style` for visual artifacts that should use Toby's artifact design system.
 - Use `toby-squall` only when the user invokes it by name or `/toby-squall`.
+- Use `toby-game` only when the user invokes it by name or `/toby-game`. A request to make a game, a sim, a toy, or a visualizer does not fire it.
 - When several skills match, name the decision being made in one sentence, then load the skill that owns that decision. Strategy owns whether the design changes. Modules owns where code lives. Interfaces owns what a signature exposes. Complexity owns whether an error path or a cache is earned. Every other match is answering a question nobody asked.
 - A skill's own skip clause outranks a matching noun. The word throwaway outranks every noun after it.
 - State active skills in one short line.

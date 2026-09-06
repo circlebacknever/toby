@@ -55,7 +55,7 @@ Move the code toward that structure. Often the answer is "basically what's there
 
 ## Brownfield Work
 
-On existing code, read the current shape before choosing a design. Identify the smallest local refactor that would make the requested change fit naturally. If that refactor is small, scoped to touched code, and lowers future cost, offer it with its cost and benefit before doing it. If it would expand the task, name the tradeoff and let the user choose between the refactor and the smaller tactical change.
+On existing code, read the current design before choosing a new one. Identify the smallest local refactor that would make the requested change fit naturally. If that refactor is small, scoped to touched code, and lowers future cost, offer it with its cost and benefit before doing it. If it would expand the task, name the tradeoff and let the user choose between the refactor and the smaller tactical change.
 
 ## When the quick fix is the correct call
 

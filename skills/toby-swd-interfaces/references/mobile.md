@@ -168,7 +168,7 @@ Comment, complete:
 
 > Wraps AsyncStorage. Values must be strings; serialize JSON yourself. Keys
 > are conventionally namespaced with a colon (e.g., 'user:theme',
-> 'feed:cache:v2'). When changing the shape of stored data, bump the key's
+> 'feed:cache:v2'). When changing the layout of stored data, bump the key's
 > version suffix (':v1' to ':v2') so old clients don't read corrupted data.
 > clear() removes everything including auth tokens; use deleteSpecific keys
 > on logout instead. The set() method does not validate value size; on
@@ -183,7 +183,7 @@ caller must internalize. Every screen that uses Storage gets a copy of
 this knowledge.
 
 Failure named: this is a wrapper around AsyncStorage dressed as a module. The
-domain knowledge (what's stored, what shape, what versions exist) belongs
+domain knowledge (what's stored, in what layout, what versions exist) belongs
 inside.
 
 Redesign as typed accessors per domain:
@@ -313,14 +313,14 @@ Three sentences. Two improvements at the contract level:
 This second move encodes "allowed" as presence of the action, so a parallel
 boolean never exists. It is the kind of contract redesign the comment test
 reveals, because writing "permissions may be undefined for an instant" is the
-signal that the shape is wrong.
+signal that the design is wrong.
 
 ---
 
 ## Platform notes
 
 - **iOS/Swift, Android/Kotlin**: same checks. A `ViewController` or
-  `Fragment` accepting twelve init parameters has the same shape as the
+  `Fragment` accepting twelve init parameters costs a caller as much as the
   RN screen passing a `user` object through route params. Identity in,
   state through composition.
 - **Flutter**: route params are arguments, and the same

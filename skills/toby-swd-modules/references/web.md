@@ -39,14 +39,14 @@ function ProductPage({ id }: { id: string }) {
 }
 ```
 
-The exact same shape, repeated, in `OrderPage`, `CustomerPage`, `InvoicePage`.
+The exact same block, repeated, in `OrderPage`, `CustomerPage`, `InvoicePage`.
 Every component re-implements: cancellation on unmount, error semantics,
 loading state, cache (there isn't one), refetch on focus (there isn't one
 either), retry on transient failure (nope). The "interface to fetching" is a
 30-line block of `useEffect` machinery duplicated everywhere.
 
 This is information leakage in slow motion. The decisions "how do
-we cancel," "what's the loading state shape," "what counts as an error" are
+we cancel," "what the loading state holds," "what counts as an error" are
 encoded in every component. The day you change one — say, you want errors to
 include a `retry-after` hint — is the day you edit fifteen components.
 
@@ -239,8 +239,8 @@ This is classitis at the store level. Auth, theme, cart, coupons, and
 notifications share nothing except a tendency to live globally. Selectors
 get longer and longer, all components subscribe to the same store, and every
 mutation can in principle touch anything. The "interface" of the store
-is the entire state shape exposed by getter and the entire set of mutations
-exposed by name. An interface that is the whole state shape makes the store
+is the entire state layout exposed by getter and the entire set of mutations
+exposed by name. An interface that is the whole state layout makes the store
 as shallow as a module gets.
 
 Re-slice by knowledge (the decompose-by-knowledge check). Each slice owns one body of state and the
@@ -308,7 +308,7 @@ recomputes on change. Selecting the bare method (`s.total`) or calling
 value goes stale.
 
 Each slice is now a deep module. The interface (`add`, `remove`, `total`,
-`applyCoupon`) expresses intent, and the state shape and the invariants live
+`applyCoupon`) expresses intent, and the state layout and the invariants live
 inside. Components call `Cart.add(item)`. The grab-bag form made them reach
 into `useStore.setState((s) => ({ cart: [...s.cart, item] }))`. The "what
 counts as a duplicate" rule

@@ -1,0 +1,41 @@
+{
+  "label": "descriptions after Group 2, plus the invoke-only probes",
+  "recorded": "2026-09-06",
+  "false_fires_N1_N4": 0,
+  "missed_P1_P4": 0,
+  "before": {
+    "false_fires_N1_N4": 7,
+    "missed_P1_P4": 0,
+    "false_fires": [
+      "N1 toby-swd-testing",
+      "N3 toby-swd-complexity",
+      "N3 toby-swd-strategy",
+      "N3 toby-swd-testing",
+      "N4 toby-feature-dev",
+      "N4 toby-swd-interfaces",
+      "N4 toby-swd-strategy"
+    ]
+  },
+  "runs": [
+    {
+      "file": "runs/triggering-after.txt",
+      "false_fires": 0,
+      "missed": 0,
+      "note": "instructions mentioned honouring skip clauses"
+    },
+    {
+      "file": "runs/triggering-blind.txt",
+      "false_fires": 0,
+      "missed": 0,
+      "note": "no mention of skip clauses"
+    },
+    {
+      "file": "runs/triggering-invokeonly.txt",
+      "false_fires": 0,
+      "missed": 0,
+      "note": "first run covering N5 and N6. Neither invoke-only skill fired on a prompt naming every noun in its description."
+    }
+  ],
+  "note": "A false fire on N1-N6 is the regression that matters. N5 and N6 cover the invoke-only pair, where a single firing is a defect rather than a cost. Runs recorded before N5 and N6 existed answer eight scenarios of ten, and the scorer says so.",
+  "scored_by": "evals/run.py compare triggering, from the fenced directive blocks in suites/triggering.md"
+}

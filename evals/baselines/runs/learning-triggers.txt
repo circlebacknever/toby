@@ -1,0 +1,20 @@
+L1 fired: toby-swd-complexity
+L2 fired: none
+L3 fired: none
+L4 fired: none
+L5 fired: none
+L6 fired: none
+L7 fired: none
+L8 fired: toby-swd-complexity
+
+Note: toby-learning and toby-explain do not appear anywhere in descriptions-current.txt. That file is the entire routing surface, so both skills fired 0/8 regardless of prompt content — there is no entry for a host tool to match against.
+
+Missing phrase from toby-learning's description ("wants to learn or be taught any subject while working through it... practicing, drilling, contributing the next piece of real work, or being quizzed on what they should retain") for each prompt, judged as if the skill existed in the surface:
+L1: missing "wants to learn or be taught" — reads as a live debugging question, not a learning request.
+L2: missing "practicing, drilling... quizzed" — asks for a walkthrough, not a drill or retention check.
+L3: none missing — "Teach me how Postgres decides..." matches "wants to learn or be taught" directly. Would fire on phrase content alone; it doesn't fire only because the skill is absent from the file.
+L4: missing "wants to learn or be taught" and "practicing, drilling... quizzed" — a flat definitional question, no learning-loop framing.
+L5: none missing — "get better at writing SQL" and "Quiz me" map onto "practicing" and "being quizzed" almost word for word. Would fire on phrase content alone; blocked only by the skill's absence from the file.
+L6: missing "wants to learn or be taught" — asks for rationale behind a past decision, not a learning request.
+L7: missing "practicing, drilling... quizzed" — "help me understand" asks for explanation, not a learning loop.
+L8: missing "practicing, drilling... quizzed" — frames a mistake to diagnose, not a drill or retention check.

@@ -1,16 +1,16 @@
 # Worked Examples — Web SPAs (React, Solid, Svelte)
 
 Interfaces in web SPAs are mostly invisible at compile time and fail at
-runtime. A hook's return shape, a component's prop contract, and a store
+runtime. A hook's return type, a component's prop contract, and a store
 slice's method surface are read by every consumer. Getting them wrong costs
 the same as a bad backend API. A public API's blast radius crosses company
 lines, while this one stays inside your own team.
 
-These examples walk the comment test on the shapes you'll touch most.
+These examples walk the comment test on the contracts you'll touch most.
 
 ---
 
-## Example 1 — Hook return shape: positional tuple vs typed result
+## Example 1 — Hook return type: positional tuple against typed result
 
 A pattern that grows in React codebases:
 
@@ -77,7 +77,7 @@ mean here" question from every caller. A discriminated union expresses the
 contract in the type system, so the caller no longer needs to remember
 invariants.
 
-Solid and Svelte versions use the same shape (signals or stores wrapping the
+Solid and Svelte versions work the same way (signals or stores wrapping the
 discriminator).
 
 ---
@@ -201,9 +201,9 @@ The comment is long because the "interface" is `setX` for each field, but
 the real operations the cart supports (add an item, apply a coupon, pick
 shipping) carry invariants the store doesn't enforce. Every caller now owns
 those invariants. The store's interface and its implementation have the
-same shape, which makes it the canonical shallow module.
+same names, which makes it the canonical shallow module.
 
-Failure named: the slice exposes the state shape and leaves the operations to
+Failure named: the slice exposes the state layout and leaves the operations to
 callers. Invariants live in callers.
 
 Redesign — interface expresses intent, slice enforces invariants:
@@ -240,7 +240,7 @@ six operations expressing intent, but the implementation owns dedup,
 validation, total computation, coupon validity, async network calls during
 `applyCoupon`, and rollback semantics.
 
-Same shape in Solid (`createStore`) and Svelte (`writable` + module). The
+Same treatment in Solid (`createStore`) and Svelte (`writable` + module). The
 intent-method interface transcends the framework.
 
 ---
