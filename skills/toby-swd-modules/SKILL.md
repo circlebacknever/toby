@@ -1,11 +1,14 @@
 ---
 name: toby-swd-modules
 description: >-
-  Module boundaries determine where complexity hides or dies. Use this skill
-  when a task creates, moves, splits, merges, or places code, or when a change
-  raises ownership questions across functions, classes, services, files,
-  packages, React components, hooks, store slices, repositories, controllers,
-  native modules, screens, cache layers, or data-layer modules.
+  Decide where code lives and which module owns which knowledge. Use it when
+  a task creates, moves, splits, merges, or places code, or when ownership
+  crosses functions, classes, services, files, packages, components, hooks,
+  store slices, repositories, controllers, native modules, screens, or data
+  layers. It owns placement, the split-or-merge call, and the definition of
+  a deep module. Skip it when the question is what one signature exposes,
+  which `toby-swd-interfaces` owns, and skip it for an edit inside one
+  existing module that adds no new boundary.
 ---
 
 # Toby SWD Modules
@@ -16,16 +19,7 @@ Module structure decides who owns which knowledge and how much callers must know
 
 ## Bias toward somewhat general-purpose
 
-Before the checks, one framing decision. When you design a module's interface, the functionality reflects your current needs, but the interface should support more than one. A module designed for exactly one caller produces a one-call-shaped hole that the next caller cannot use without widening it.
-
-Four questions, asked early:
-
-- What is the simplest interface that covers all your current needs? (Fewer methods, broader semantics.)
-- In how many situations will this method be used? A method serving one call site is a candidate for inlining or for redesign into something serving more.
-- Is this API easy to use for the common case today? General-purpose interfaces fail when they make the easy thing hard.
-- Will this generalize without becoming a god interface? Generality with a clear single purpose is depth. Generality across unrelated purposes is sprawl.
-
-The mistake to avoid in the other direction is speculative generality — adding parameters or extension points for futures that never arrive. "Somewhat" is the operative word. Cover today's needs and one or two near-future variants that you can name. Stop there.
+Design each boundary to serve more than one caller, and stop one named variant short of speculation. A module shaped to exactly one caller leaves a one-call-shaped hole the next caller has to widen. `toby-swd-interfaces` owns the four questions that apply this and the speculative-generality limit. Load it when the placement decision also creates a callable surface.
 
 ## The checks
 
@@ -41,13 +35,13 @@ Two pieces belong together when they share knowledge, or when using one almost a
 
 ### 2. Information-leakage check
 
-For each significant design decision or implementation detail — a file format, a wire protocol, a storage layout, a policy — count how many modules would need to change if it changed. More than one is leakage, which means the boundary is wrong. Move that knowledge so it lives in exactly one module.
+Take each significant design decision or implementation detail: a file format, a wire protocol, a storage layout, a policy. Count how many modules would need to change if it changed. More than one is leakage, which means the boundary is wrong. Move that knowledge so it lives in exactly one module.
 
-Shared signatures are not leakage when each participant adds distinct functionality. Don't flag: an interface known to caller and implementer, a dispatcher and the handlers it selects, several implementations of one interface, or a decorator and the object it wraps. Leakage is a hidden decision duplicated across modules.
+Shared signatures are not leakage when each participant adds distinct functionality. Don't flag an interface known to caller and implementer, a dispatcher and its handlers, several implementations of one interface, or a decorator and its object. Leakage is a hidden decision duplicated across modules.
 
 ### 3. Pull complexity downward
 
-When complexity is unavoidable and related to a module's job, the module absorbs it, and callers don't. A module has more callers than authors. The author should take the harder side.
+Put unavoidable complexity inside the module, when it is related to that module's job. A module has more callers than authors, so the author takes the harder side.
 
 Prefer computing a value internally over exporting a configuration parameter or throwing to the caller. Before exposing a parameter, ask whether the caller can choose a better value than the module can.
 
@@ -64,7 +58,7 @@ A decorator that adds little is a shallow pass-through in disguise. Before addin
 
 ### 5. Prefer composition over implementation inheritance
 
-The underlying defect is two-way coupling: any mechanism where a shared-behavior provider and its consumers can each silently break the other. Implementation inheritance is the common form. Default methods on an interface or trait, or a generic module that makes hidden assumptions about its argument, can reproduce it. A language without implementation inheritance reads this as the general two-way-coupling caution.
+Watch for two-way coupling: any mechanism where a shared-behavior provider and its consumers can each silently break the other. Implementation inheritance is the common form. Default methods on an interface or trait, or a generic module that makes hidden assumptions about its argument, can reproduce it. A language without implementation inheritance reads this as the general two-way-coupling caution.
 
 Interface inheritance and implementation inheritance carry very different cost profiles.
 
@@ -106,17 +100,15 @@ Two forms of conditional are a design smell. The first gains a branch every time
 
 Work down this ladder and stop at the first rung that fits.
 
-1. **Remove the branch.** Can the type answer for itself, so the caller stops asking? Can the common path take the edge input with no special case? The `toby-swd-complexity` error ladder opens with this same move. It is often the whole fix.
-2. **Data-driven dispatch.** Branches that select a small behavior by a tag value become a lookup map. `Record<Kind, Handler>` makes a missing entry a compile error. No pattern name, no class.
-3. **Discriminated union with an exhaustive switch.** Branches that read different fields keep the switch. Add `default: assertNever(x)` so the compiler fails the build when a variant is added. A single dispatch point the compiler guards is fine.
-4. **Polymorphism.** When each case owns behavior, private state, or its own dependencies, give each an object behind a shared interface. This is the `Gateway` design in `toby-swd-strategy`'s examples. It earns its place when the case set is open and each case holds state the others do not.
-5. **Registry.** When new cases must be addable without editing a central file, each implementation registers itself. This fits a real extension point: a plugin surface, or config-selected adapters at boot. It is the heaviest rung.
+1. **Remove the branch** — the type answers for itself, or the common path takes the edge input. Often the whole fix.
+2. **Data-driven dispatch** — a lookup map, when the branch selects a small behavior by a tag value.
+3. **Discriminated union with an exhaustive switch** — when branches read different fields. Guard it with `assertNever`.
+4. **Polymorphism** — when each case owns behavior, private state, or its own dependencies.
+5. **Registry** — when new cases must be addable without editing a central file. The heaviest rung.
 
-Move up a rung only when the case bodies carry weight. An enum switch over one-liners never needs an object per arm, so rung 2 is its ceiling. Rungs 4 and 5 need two conditions at once: a case set that visibly grows, and case bodies that own state or dependencies.
+Move up a rung only when the case bodies carry weight. Rungs 4 and 5 need two conditions at once: a case set that visibly grows, and case bodies that own state or dependencies. `references/replace-the-conditional.md` carries the reasoning per rung and a worked example of each.
 
 Greenfield: build the dispatch from the start. Brownfield: a scattered conditional is a scoped refactor. Offer it with its cost and benefit, and keep it out of an unrelated change.
-
-See `references/replace-the-conditional.md` for the React, React Native, and backend forms.
 
 ## Brownfield Work
 
@@ -136,13 +128,13 @@ Run this list against the diff before calling a boundary decision done.
 - **Repetition**: nontrivial code repeated, so factor it to one place.
 - **Classitis / over-subdivision**: many shallow modules whose interfaces sum to more complexity than they remove (frontend: over-componentization).
 - **Deep implementation-inheritance hierarchy**: subclasses you can't read without reading the parent, parents you can't change without checking the subclasses. Two-way coupling masquerading as reuse.
-- **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax — the same shape as the implementation, definitionally shallow. Replace with operations that name intent (`reserve`, `markPaid`) and enforce invariants. Keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it owned by another module. There the data is the contract, and depth lives in the module that owns the behavior.
+- **Accessors as the public surface**: a module whose surface is mostly per-field get/set is definitionally shallow. The `toby-swd-interfaces` red flags carry the replacement and the plain-data exception.
 - **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy applied for its own sake, when the problem does not have the shape the pattern solves. Patterns earn their place by removing complexity.
 - **Conditional that grows per domain change**: a `switch` or `if` chain that takes a new arm every time the domain gains a case, or the same branch decision copied across call sites. Convert it with the ladder in "Replace the growing conditional." A single stable dispatch point over a closed set is not this flag.
 
 ## References
 
-Worked examples organized by domain. Read the file matching the code you are in:
+Open one. Read the stack file matching the code you are placing, and open a subject file only when that subject is the change:
 
 - `references/examples.md` — Python backend and React web. The canonical starting cases.
 - `references/replace-the-conditional.md` — the five-rung ladder with a worked example per rung, then React, React Native, and backend forms.

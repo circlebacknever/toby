@@ -1,15 +1,18 @@
 ---
 name: toby-swd-docs
 description: >-
-  Two artifacts live in every meaningful module: AGENTS.md (for agents writing
-  code here) and README.md (for humans using or maintaining this module). Use
-  this skill when a task changes module structure, public APIs, cross-module
-  decisions, extension rules, or human-facing module usage. Check existing docs
-  for accuracy before editing them. One of each per meaningful module root,
-  never per folder.
+  Keep the two module documents accurate: AGENTS.md for agents writing code
+  in a module, README.md for humans using it. Use it when a task changes
+  module structure, a public API, a cross-module decision, an extension
+  rule, or human-facing module usage. One of each per meaningful module
+  root, never per folder, and check the existing file for accuracy before
+  editing it. Skip it for code comments and docstrings, which
+  `toby-swd-clarity` owns.
 ---
 
 # Toby SWD Docs
+
+This skill means the `AGENTS.md` inside the user's own module tree, the file it teaches you to write. Toby's operating guide is a different file, already loaded by the host tool, and these rules never mean it.
 
 A module carries two categories of information that can't live in the code itself. The code says *what*. These files say *why*, *who this is for*, and *how to think about it*.
 
@@ -61,7 +64,7 @@ Update AGENTS.md whenever a structural change makes it wrong: responsibility mov
 
 ## README.md — for humans using or maintaining this module
 
-A README.md is for the human reading the code. The agent writing the code is served by AGENTS.md. Its job is to explain how to think about this module and how to work with its public surface — what it does, why it exists, and what someone needs to know before touching it or calling it.
+A README.md is for the human reading the code. AGENTS.md serves the agent writing it. A README says what this module does, why it exists, and what a caller needs to know before calling it.
 
 README.md files are sparse by design. Most modules don't need one. Create one when:
 
@@ -106,5 +109,11 @@ Update when the public API changes, when a new constraint is added, or when a us
 ## Brownfield Work
 
 When work touches an existing meaningful module, check whether the nearest module root already has an AGENTS.md. If it does not, offer to create one with only the facts learned from the current change. If responsibility moves, a public API changes, or a cross-module rule appears, update the nearest AGENTS.md when it is in scope. Otherwise offer that update as the next local step. Keep the offer small and concrete, tied to the module you just inspected.
+
+## Compliance check
+
+Before calling a docs change done, run both red-flag lists against the file you
+wrote and name any entry that fired. A red-flag list nothing runs is
+decoration.
 
 See `references/examples.md` for backend and frontend examples of both files.

@@ -1,37 +1,45 @@
 ---
 name: toby-swd-clarity
 description: >-
-  Code communicates — to agents, to future maintainers, to whoever inherits
-  this. Use this skill when naming, comments, conventions, exported contracts,
-  confusing control flow, or obvious-on-read structure are part of a code
-  change. It is a focused clarity pass for backend, frontend, scripts, and
-  configs. It stays scoped to the code being touched and leaves already-clear
-  surrounding code alone.
+  Make the code readable to whoever inherits it. Use it for naming,
+  comments, docstrings, conventions, and control flow a reader trips on,
+  inside the code being touched. It leaves already-clear surrounding code
+  alone. Skip it for module documentation files, which `toby-swd-docs` owns,
+  and for the design of a contract, which `toby-swd-interfaces` owns.
 ---
 
 # Toby SWD Clarity
 
-Code is read far more than it is written. The decisions you make about names, comments, and consistency compound across every future read — every debug session, every onboarding, every agent that touches this code next. Bad clarity is one of the most durable forms of complexity because it slows everything downstream while never appearing in a diff as the problem.
+Code is read far more than it is written. Names, comments, and consistency compound across every future read: every debug session, every onboarding, every agent that touches this code next. Bad clarity outlasts every other kind of complexity. It slows everything downstream and never shows up in a diff as the problem.
 
 **"Good code is self-documenting" is false.** Correct that before you start. Only signatures can be expressed in code. The behavior, side effects, units, invariants, and reasons a reader needs live in the designer's head and have no representation in the code itself. Good names reduce the need for comments, but they never remove it. Treat comments as the mechanism by which abstraction is delivered. They carry the units, invariants, and reasons that have no home in the code.
 
 ## Naming
 
-Test every name by guessability. A developer who sees this name alone, with no declaration, documentation, or surrounding code, should guess what it holds or does — and what it is not. Pick the few words that capture what matters, and omit the rest. Treat the name as an abstraction.
+Test every name by guessability. Show the name alone, with no declaration, documentation, or surrounding code. A developer should guess what it holds or does, and what it does not. Pick the few words that capture what matters, and omit the rest. Treat the name as an abstraction.
 
 Scale specificity to scope. A variable whose entire span of use fits in a few visible lines can be terse (a loop index `i`). A variable across a large span, a field, an argument, or anything exported needs a precise name. Over-specific is also a defect. An argument named `selection` for a method that works on any range misleads.
 
 Generic names (`data`, `value`, `result`, `status`, `flag`, `count`) are a smell when the scope is non-trivial. Acceptable only when the meaning is visible at a glance.
 
-Use names consistently: one name for one purpose, never that name for a second purpose, and the purpose narrow enough that every variable with the name behaves the same. When you need several of the same kind, keep the common root and add a distinguishing prefix (`srcBlock`, `dstBlock`). Boolean names read as predicates (`cursorVisible`, `isReady`, `hasChildren`). Every word must add information: drop redundant type or class-name words (`fileObject` → `file`), no Hungarian notation.
+Use names consistently. One name, one purpose, never that name for a second purpose. Keep the purpose narrow enough that every variable carrying the name behaves the same. When you need several of the same kind, keep the common root and add a distinguishing prefix (`srcBlock`, `dstBlock`). Boolean names read as predicates (`cursorVisible`, `isReady`, `hasChildren`). Every word must add information: drop redundant type or class-name words (`fileObject` → `file`), no Hungarian notation.
 
 **Hard-to-name red flag**: if no precise, intuitive, not-too-long name emerges after real effort, the thing being named probably has an unclear or mixed purpose. That is a design signal, so split or rethink it. Do not settle for a vague name. The signal is about the operation as a whole. A single dense expression that computes one nameable result is one abstraction, even when its internal steps have no good individual names.
 
 ## Comments
 
-Comments come in four kinds, each with its own home: interface (what a caller needs, with no internals), data-structure member (what a non-trivial field holds — units, null meaning, bounds, ownership), implementation intuition (why a non-obvious block does what it does), and cross-module (a decision spanning modules, stated once in a discoverable place and pointed to). Keep implementation detail out of the interface.
+Four kinds, each with its own home.
 
-An **interface comment** describes behavior, arguments, return value, side effects, exceptions, and caller preconditions — the abstraction. If it has to describe internals to be complete, the module is shallow, and that is a redesign signal. Reach for the design, since better wording won't fix a leaky abstraction. Write interface comments before the implementation, because they are a design tool.
+| Kind | Sits on | Carries |
+|---|---|---|
+| Interface | the entry point | what a caller needs, with no internals |
+| Data-structure member | a non-trivial field | units, what null means, bounds, ownership |
+| Implementation intuition | a non-obvious block | why it does what it does |
+| Cross-module | one discoverable place | a decision spanning modules, stated once and pointed to |
+
+Keep implementation detail out of the interface.
+
+An **interface comment** describes the abstraction: behavior, arguments, return value, side effects, exceptions, and caller preconditions. If it has to describe internals to be complete, the module is shallow, and that is a redesign signal. Reach for the design, since better wording won't fix a leaky abstraction. Write interface comments before the implementation, because they are a design tool.
 
 Comment at a different level than the code. A comment pitched at the code's own level just restates it and rots in place:
 
@@ -40,17 +48,17 @@ Comment at a different level than the code. A comment pitched at the code's own 
 
 Delete comments whose content is already obvious from the adjacent code, including comments that just restate the name. Document each decision once, in the most obvious place. Cross-reference a called method from its call site. Re-explaining it there gives you two copies that drift apart. For a design decision that spans modules, put it in one discoverable central place and point to it from the affected sites.
 
-Leave these uncommented: operations the code already shows (`i++ // increment i`), restatements of the name, commented-out code, change history (git holds that), and anything the type already proves.
+Leave these uncommented: operations the code already shows (`i++ // increment i`), restatements of the name, commented-out code, and anything the type already proves. Git holds the change history.
 
 Logs and diagnostics are a surface too. Keep secrets, credentials, tokens, and personal data out of them, and out of source. Naming a field sensitive in a comment is worth more than the value in a log line.
 
 ## Consistency
 
-Similar things done the same way; dissimilar things done differently — both halves carry weight. Before introducing any convention (naming, structure, error handling, style, test layout), inspect the local file and project and mimic what's already there. Reuse exact names already established for a concept.
+Similar things done the same way, dissimilar things done differently. Both halves carry weight. Before introducing any convention (naming, structure, error handling, style, test layout), inspect the local file and project and mimic what's already there. Reuse exact names already established for a concept.
 
 Factor code together only when the instances share the same knowledge, so a change to one should change all. Blocks that look alike but answer to different reasons are separate decisions that happen to share text. Merging them couples things that should move apart, and the next change tears them back out.
 
-Don't "improve" an existing convention casually. Before introducing an inconsistency, both must be true: you have significant new information that wasn't available when the convention was set, and the new approach is enough better to justify converting every existing use. If you change it, leave no instance of the old convention behind. Half-adopted conventions are worse than either option alone, because they destroy a reader's ability to draw safe conclusions from a familiar-looking pattern.
+Don't "improve" an existing convention casually. Before introducing an inconsistency, both must hold. You have information that was not available when the convention was set. The new approach is enough better to justify converting every existing use. If you change it, leave no instance of the old convention behind. Half-adopted conventions are worse than either option alone, because they destroy a reader's ability to draw safe conclusions from a familiar-looking pattern.
 
 ## Obviousness
 
@@ -67,7 +75,7 @@ The fix for unavoidable surprise is a comment where the reader will hit it. Use 
 
 ## Proportionality
 
-The cheap checks — naming, comment presence, obvious-on-read — apply on every edit. The expensive moves — converting every instance of a convention, adding a design-notes file — are reserved for code that is exported, crossed by several callers, or costly to change later.
+The cheap checks apply on every edit: naming, comment presence, obvious-on-read. The expensive ones are converting every instance of a convention and adding a design-notes file. Reserve those for code that is exported, crossed by several callers, or costly to change later.
 
 ## Brownfield Work
 

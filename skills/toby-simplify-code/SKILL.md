@@ -1,6 +1,10 @@
 ---
 name: toby-simplify-code
-description: Use when the user asks to simplify, tidy, tighten, refactor, de-duplicate, clarify, or reduce complexity in recently changed code while preserving behavior and tests.
+description: >-
+  Reduce complexity in recently changed code while preserving behavior and tests. Use it
+  when the user asks to simplify, tidy, tighten, refactor, de-duplicate, or clarify code
+  that already works. It edits the code. Skip it when the user asked for findings and no
+  edit, which `toby-code-review` owns.
 ---
 
 # Toby Simplify Code

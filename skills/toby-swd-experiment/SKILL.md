@@ -1,12 +1,14 @@
 ---
 name: toby-swd-experiment
 description: >-
-  Run exploratory engineering loops when behavior is being discovered through
-  rapid experiments, proof-of-concept work, spikes, throwaway debug surfaces,
-  parameter tweaks, manual tests, or user feedback. Use when an agent needs to
-  make small reversible changes, expose state for inspection, defer durable
-  tests during discovery, and delete or fold in the experiment after the user
-  chooses the behavior.
+  Run a discovery loop when the behavior is not decided yet. Use it for a
+  spike, a proof of concept, a parameter sweep, a throwaway debug surface, a
+  manual test, or an iteration driven by user feedback. It owns small
+  reversible changes, exposing state for inspection, deferring durable tests
+  during discovery, and deleting or folding in the experiment once the user
+  chooses. The word throwaway outranks every noun after it, so this owns the
+  retry, timeout, and test questions raised inside a spike. Skip it for work
+  the user intends to keep.
 ---
 
 # Toby SWD Experiment
@@ -106,3 +108,7 @@ Reversibility here means software reversibility. When the experiment drives some
 - Tests written for behavior still being discovered.
 - State hidden from the user while asking for feedback.
 - Experiment code left behind after selection.
+
+Check the loop against this list before handing the result back, and name any
+entry that fired. The last one is the expensive one, so search the diff for the
+markings before saying the experiment is finished.

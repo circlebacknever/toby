@@ -1,17 +1,18 @@
 ---
 name: toby-swd-testing
 description: >-
-  Tests are executable specifications of behavior. Apply this skill on every
-  task that writes, modifies, or deletes tests — new test files, additions to
-  existing suites, bug fix regression tests, snapshot updates, test rewrites.
-  Also apply whenever production code is changing and tests need to follow. The
-  default reflex of "make the failing test green by tweaking the assertion" is
-  how suites rot into theater. Backend and frontend alike.
+  Keep tests an executable specification of behavior. Use it when writing,
+  changing, deleting, weakening, or snapshotting a test, and whenever a
+  behavior change in production code needs a test to follow it. It owns
+  regression tests for a fix and the refusal to make a failing test green by
+  tweaking the assertion. Skip it when the change moves no behavior: a
+  rename, a formatting pass, a comment edit. Skip it for a throwaway spike,
+  which `toby-swd-experiment` owns.
 ---
 
 # Toby SWD Testing
 
-A test suite exists for three jobs: pin down what the system does so callers can rely on it, catch regressions when something changes, and make refactoring safe enough that the team will do it. Do those three jobs. A suite that locks in implementation details does worse than nothing, because it slows every change, lies about coverage, and trains the team to ignore failures.
+A test suite exists for three jobs. Pin down what the system does so callers can rely on it. Catch regressions when something changes. Make refactoring safe enough that the team will do it. A suite that locks in implementation details does worse than nothing. It slows every change, lies about coverage, and trains the team to ignore failures.
 
 **Describe behavior at the public interface.** Inputs go in, outputs come out, observable side effects show up where callers would notice them. Internal call order, private method signatures, the order helpers fire, and intermediate data shapes are invisible from outside the module and should be invisible to the test. Write tests that survive a correct refactor. A test that fails because you renamed a helper while preserving behavior is detecting the diff and nothing else.
 
@@ -35,13 +36,13 @@ If you can't name the behavior, you don't know what you're testing. That is a de
 
 Tests at the boundary survive refactors. Tests that reach into internals do not.
 
-Concretely: don't import private modules to test them. Don't assert on private state. Don't verify that helper X was called before helper Y unless that call sequence is the observable contract — which is rare. Mock external dependencies at the system boundary. Internal collaborators stay real, because mocking them couples the test to current structure.
+Concretely: don't import private modules to test them. Don't assert on private state. Don't verify that helper X was called before helper Y unless that call sequence is the observable contract, which is rare. Mock external dependencies at the system boundary. Internal collaborators stay real, because mocking them couples the test to current structure.
 
 When a behavior is hard to test through the public interface, the abstraction is usually too coarse. The fix is to extract a smaller module with a real interface, then test through it. Do not reach into internals to "make it testable". That failure is what toby-swd-modules exists to prevent.
 
 ## Narrow assertions
 
-An assertion should fail when the behavior under test changes. It should not fail when something incidental changes — a timestamp, a key order, a formatting tweak, a new optional field in a response.
+An assertion should fail when the behavior under test changes. It should not fail when something incidental changes: a timestamp, a key order, a formatting tweak, a new optional field in a response.
 
 Useful patterns:
 - Assert on the specific value or field that proves the behavior happened.
@@ -55,7 +56,7 @@ Before accepting a snapshot update, read the diff and confirm every change is in
 
 ## How much to test
 
-Cover the contract's distinct observable outcomes — the success path, each documented failure mode, and the boundary conditions — then stop. One behavioral concept per test; multiple asserts are fine when they prove one behavior. A behavioral outcome can be pinned by example (one named scenario) or by property (an invariant that holds over a range of generated inputs). Prefer whichever states the contract more directly.
+Cover the contract's distinct observable outcomes, then stop: the success path, each documented failure mode, and the boundary conditions. One behavioral concept per test, and multiple asserts are fine when they prove one behavior. A behavioral outcome can be pinned by example (one named scenario) or by property (an invariant that holds over a range of generated inputs). Prefer whichever states the contract more directly.
 
 ## Each test stands alone
 
@@ -70,11 +71,11 @@ Write the test before the implementation when the behavior is well-defined. Two 
 
 Skip test-first when the design is still being worked out. Letting the next failing test drive the next bit of implementation is TDD as a substitute for design. You end up with a feature-shaped pile of code and no real abstraction. Do the design pass first (see toby-swd-strategy and toby-swd-modules), then write tests against the interface you settled on.
 
-Also skip test-first when no relevant test harness exists, the change is documentation-only, the edit is pure formatting or metadata, or the only useful verification would require unsafe external state. Say which case applies and how you verified instead.
+Also skip test-first in four cases. No relevant harness exists, the change is documentation-only, the edit is formatting or metadata, or the only useful verification needs unsafe external state. Say which case applies and how you verified instead.
 
 ### Experiment loops
 
-Defer test writing and test runs while behavior is still being discovered through toby-swd-experiment, user feedback, a proof of concept, a throwaway spike, parameter tuning, design exploration, or manual observation. Record candidate values and what the user observed. Once the user chooses the behavior, add or update tests for the durable contract if a reliable harness can protect it.
+Defer test writing and test runs while the behavior is still being discovered. That covers `toby-swd-experiment`, user feedback, a proof of concept, a spike, parameter tuning, design exploration, and manual observation. Record candidate values and what the user observed. Once the user chooses the behavior, add or update tests for the durable contract if a reliable harness can protect it.
 
 If the user says they will run manual tests or asks for no automated validation, treat that as the verification source for the loop. Report skipped checks during cleanup, when the throwaway work is deleted or folded into the project.
 
@@ -101,9 +102,9 @@ Classify the failing test before changing it. Four buckets:
 3. **Behavior is obsolete.** Remove the test and explain why in the commit message.
 4. **Bad test** — coupled to internals, asserts on incidental data, or doesn't test what its name claims. Rewrite it to protect the same useful behavior through a better interface.
 
-Read a test you can't classify until you understand it. Mass-updating snapshots, deleting cases that "break a lot," or replacing strong assertions with weaker ones to land a PR leaves a suite that passes and protects nothing.
+Read a test you can't classify until you understand it. Three habits leave a suite that passes and protects nothing: mass-updating snapshots, deleting cases that "break a lot," and weakening assertions to land a PR.
 
-When you do delete or weaken a test deliberately, report the test name, the behavior it protected, why that behavior is obsolete or wrong, and what coverage replaces it. No silent removals.
+When you delete or weaken a test deliberately, report four things. The test name, the behavior it protected, why that behavior is obsolete, and what coverage replaces it. No silent removals.
 
 ## Brownfield Work
 

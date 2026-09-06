@@ -26,3 +26,9 @@ Check the finished work against all eight before writing the handoff. Every one 
 - **The placeholder in a production path** — a TODO, a hardcoded return standing in for real work, an unimplemented branch, a swallowed error, a fixture the runtime reads.
 - **Partial work reported whole** — a multi-slice feature handed over as done, with the remainder demoted to a closing note that begins "the rest is just wiring".
 - **Nothing accounts for it** — a file in the diff tracing to no criterion and no reported cleanup, a user-quoted behavior with no record entry, a record entry no test quotes, or an assumption stated mid-run and missing from the handoff.
+
+## Process failure modes — cited from the body
+
+- **Layer cut.** A slice named for a layer, when it should be named for what a person can do. "The data layer" fails the slice bar twice: its only demo is a passing test suite, and the thing the user asked for is three diffs out. Re-cut to a seam a user reaches.
+- **Stop inflation.** A checkpoint at every slice boundary regardless of whether a decision is waiting there. Six stops on a six-slice feature is the skill running for its own benefit. A boundary with no open question gets three lines and keeps moving.
+- **Plan ceremony.** A plan file written for a four-line change. One-slice tactical work keeps the criteria list in chat.

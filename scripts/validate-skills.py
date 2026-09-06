@@ -38,7 +38,13 @@ OPERATING_GUIDE_PATHS = [
 
 # Kept byte-identical to base/toby.md by sync.sh, so it is scanned as the guide
 # rather than as a skill file.
+#
+# Measured, not assumed. Deleting it scored 8 voice defects against 1 for the
+# full re-read, and a writing-sections-only extract scored 4.5. The duplicate
+# costs 6,800 tokens a prose turn and buys the voice. evals/README.md has the
+# runs.
 VOICE_REFERENCE_COPY = REPO_ROOT / "skills" / "toby-voice" / "references" / "toby.md"
+
 
 # Ceiling every current CLI target accepts (agentskills/Kiro allow up to 1024;
 # Claude Code allows more). Stay under this and the skill loads everywhere.
@@ -339,12 +345,15 @@ def prose_only(text: str) -> str:
 def prose_paths() -> list[Path]:
     """Every markdown file Toby's prose rules apply to."""
     paths = sorted(p for p in (REPO_ROOT / "skills").rglob("*.md"))
-    paths.append(REPO_ROOT / "README.md")
+    # Repo-root markdown faces the same floor as a skill. A plan or a design note
+    # that ships banned words is the same defect in a file nobody validated.
+    paths.extend(sorted(REPO_ROOT.glob("*.md")))
     paths.append(REPO_ROOT / "base" / "toby.md")
     # AGENTS.md and instructions/** are generated from base/toby.md by sync.sh,
     # so scanning them would report every finding five times over.
     generated = {
         REPO_ROOT / "skills" / "toby-voice" / "references" / "toby.md",
+        REPO_ROOT / "AGENTS.md",
     }
     return [p for p in paths if p not in generated]
 
@@ -459,6 +468,276 @@ def check_ste_conformance(warnings: list[str]) -> None:
                 )
 
 
+# A SKILL.md body over this loads more than any single task reads. The number is
+# the largest body that measured useful, rounded up, and it fails rather than
+# warns because a body creeps past it one paragraph at a time.
+BODY_TOKEN_CEILING = 5600
+
+# Skills that load together on one task. The total is what a turn actually pays.
+ROUTING_GROUPS = {
+    "feature-change": [
+        "toby-swd-strategy", "toby-swd-modules", "toby-swd-interfaces",
+        "toby-swd-complexity", "toby-swd-clarity", "toby-swd-testing",
+        "toby-swd-docs",
+    ],
+    "feature-dev": ["toby-feature-dev", "toby-swd-strategy", "toby-swd-testing"],
+    "review": ["toby-code-review", "toby-simplify-code"],
+}
+COLOAD_TOKEN_CEILING = 19000
+
+SKIP_CLAUSE_RE = re.compile(r"\bskip (?:it|this skill)\b", re.I)
+
+# A section that opens on a declarative states a thesis and buries the rule under
+# it. The reader pays for that in every skill, and no other check sees it.
+IMPERATIVE_OPENERS = re.compile(
+    r"^(?:\*\*)?(?:"
+    r"[A-Z][a-z]+(?:e|t|d|k|p|n|y|w|x|r|l|m|g|h|s)?\b"
+    r")"
+)
+# Verbs that actually open a rule. Kept explicit, because part-of-speech guessing
+# on one word flags every noun that looks like a verb.
+IMPERATIVES = {
+    "add", "apply", "ask", "avoid", "build", "call", "cap", "check", "choose",
+    "close", "collapse", "compare", "confirm", "cover", "cut", "declare",
+    "decide", "default", "defer", "delete", "design", "do", "drop", "escalate",
+    "establish", "explain", "find", "fix", "flag", "fold", "follow", "give",
+    "handle", "hide", "hold", "inspect", "keep", "leave", "list", "load",
+    "look", "make", "mark", "match", "measure", "merge", "move", "name",
+    "never", "offer", "open", "order", "pick", "pin", "point", "prefer",
+    "prove", "pull", "put", "raise", "read", "record", "reduce", "refuse",
+    "reject", "remove", "rename", "replace", "report", "require", "reserve",
+    "resist", "resolve", "return", "review", "rewrite", "run", "say", "scope",
+    "send", "set", "show", "skip", "sketch", "split", "start", "state", "stay",
+    "stop", "take", "tell", "test", "track", "treat", "trim", "turn", "use",
+    "verify", "wait", "weigh", "widen", "write", "don't", "do not", "prefer",
+    "create", "see", "spend", "treat", "cover", "note", "only", "start",
+    "sketch", "assume", "count", "push", "reach", "carry", "own", "opt",
+    "update", "document", "describe", "raise", "hunt", "quote", "collapse",
+    "watch", "weigh", "gate", "trust", "batch", "cache", "log",
+}
+
+
+def skill_dirs() -> list[Path]:
+    root = REPO_ROOT / "skills"
+    return sorted(d for d in root.iterdir() if d.is_dir() and (d / "SKILL.md").exists())
+
+
+def body_of(text: str) -> str:
+    if not text.startswith("---\n"):
+        return text
+    end = text.find("\n---", 4)
+    return text if end < 0 else text[end + 4 :]
+
+
+def tokens(text: str) -> int:
+    return round(len(text) / 4)
+
+
+def check_token_budget(errors: list[str], warnings: list[str]) -> None:
+    """Bodies and co-load groups have a ceiling, so a gain cannot regress quietly."""
+    sizes: dict[str, int] = {}
+    for skill_dir in skill_dirs():
+        size = tokens(body_of((skill_dir / "SKILL.md").read_text()))
+        sizes[skill_dir.name] = size
+        if size > BODY_TOKEN_CEILING:
+            errors.append(
+                f"{skill_dir.name} body is ~{size} tokens, over the {BODY_TOKEN_CEILING} ceiling"
+            )
+    for group, members in ROUTING_GROUPS.items():
+        total = sum(sizes.get(name, 0) for name in members)
+        if total > COLOAD_TOKEN_CEILING:
+            errors.append(
+                f"routing group {group!r} co-loads ~{total} tokens, over the {COLOAD_TOKEN_CEILING} ceiling"
+            )
+
+
+def check_cross_skill_collisions(warnings: list[str]) -> None:
+    """One sentence in two SKILL.md bodies means two owners and a coming drift."""
+    seen: dict[str, str] = {}
+    for skill_dir in skill_dirs():
+        text = prose_only((skill_dir / "SKILL.md").read_text())
+        for line in text.splitlines():
+            if not is_prose_line(line):
+                continue
+            for sentence in sentences_in(line.strip()):
+                key = re.sub(r"[^a-z ]", " ", sentence.lower())
+                key = re.sub(r"\s+", " ", key).strip()
+                if len(key.split()) < 8:
+                    continue
+                if key in seen and seen[key] != skill_dir.name:
+                    warnings.append(
+                        f"sentence duplicated in {seen[key]} and {skill_dir.name}, "
+                        f"pick one owner: {sentence.strip()[:70]}..."
+                    )
+                seen.setdefault(key, skill_dir.name)
+
+
+REFERENCE_RE = re.compile(r"`?references/([A-Za-z0-9_./-]+\.md)`?")
+
+
+def check_reference_reachability(errors: list[str], warnings: list[str]) -> None:
+    """Every named reference exists, and every reference file is named."""
+    for skill_dir in skill_dirs():
+        refs_dir = skill_dir / "references"
+        named: set[str] = set()
+        for path in [skill_dir / "SKILL.md"] + (sorted(refs_dir.rglob("*.md")) if refs_dir.exists() else []):
+            text = path.read_text()
+            for match in REFERENCE_RE.finditer(text):
+                # A skill may cite another skill's reference, and that path is
+                # relative to the other skill. toby-learning points at
+                # toby-voice's ste-floor.md, which is correct and not a break.
+                lead = text[max(0, match.start() - 60) : match.start()]
+                if re.search(r"`toby-(?!" + skill_dir.name[5:] + r")[a-z-]+`", lead):
+                    continue
+                named.add(match.group(1))
+                target = refs_dir / match.group(1)
+                if not target.exists():
+                    errors.append(
+                        f"{path.relative_to(REPO_ROOT)} names references/{match.group(1)}, which does not exist"
+                    )
+        if not refs_dir.exists():
+            continue
+        for path in sorted(refs_dir.rglob("*.md")):
+            rel = path.relative_to(refs_dir).as_posix()
+            if rel not in named:
+                warnings.append(f"reference file nothing points at: {path.relative_to(REPO_ROOT)}")
+
+
+SPLIT_BACKTICK_RE = re.compile(r"`[^`\n]*\s[^`\n]*`")
+
+
+def check_description_backticks(errors: list[str]) -> None:
+    """A folded description wraps, and a wrap inside backticks renames a skill.
+
+    `toby-swd-clarity` broke across two lines once and rendered as
+    `toby-swd- clarity`, which points at nothing. The routing line reads that
+    string, so the skip clause stopped naming a real skill.
+    """
+    for skill_dir in skill_dirs():
+        desc = description_text((skill_dir / "SKILL.md").read_text())
+        if desc.count("`") % 2:
+            errors.append(f"{skill_dir.name} description has an unclosed backtick")
+        for match in SPLIT_BACKTICK_RE.finditer(desc):
+            if "toby-" in match.group(0):
+                errors.append(
+                    f"{skill_dir.name} description names {match.group(0)!r}, "
+                    "which is a skill name broken across a line wrap"
+                )
+
+
+def check_anti_triggers(warnings: list[str]) -> None:
+    """A description with no skip clause fires on every adjacent task."""
+    for skill_dir in skill_dirs():
+        desc = description_text((skill_dir / "SKILL.md").read_text())
+        if not SKIP_CLAUSE_RE.search(desc):
+            warnings.append(
+                f"{skill_dir.name} description carries no skip clause, so nothing stops it over-firing"
+            )
+
+
+# A rule may open on its condition ("Before finishing, check ...") or state
+# itself with a modal ("An assertion should fail when ..."). Both lead with the
+# rule. Only a sentence that leads with neither is burying it.
+LEADING_CONDITION_RE = re.compile(
+    r"^(?:before|when|whenever|if|after|once|where|while|unless|until|for|on|in)\b[^,.]{0,90},\s*",
+    re.I,
+)
+MODAL_RE = re.compile(r"\b(?:must|should|never|always|has to|have to|belongs?|stays?|goes?|wins?)\b", re.I)
+
+
+def first_word(sentence: str) -> str:
+    text = LEADING_CONDITION_RE.sub("", sentence.strip().lstrip("*"))
+    match = re.match(r"\**([A-Za-z']+)", text)
+    return match.group(1).lower() if match else ""
+
+
+# A short opener is not a buried lead, whatever its grammar. "Four kinds, each
+# with its own home." costs a reader nothing. The failure this check exists for
+# is the long abstract preamble that pushes the rule into paragraph three, so
+# the length floor is what keeps it from firing on prose readers find clear.
+BURIED_LEAD_MIN_WORDS = 16
+
+
+def leads_with_rule(sentence: str) -> bool:
+    stripped = sentence.strip()
+    if stripped.endswith(":"):
+        return True
+    if len(stripped.split()) < BURIED_LEAD_MIN_WORDS:
+        return True
+    if first_word(stripped) in IMPERATIVES:
+        return True
+    head = " ".join(stripped.split()[:12])
+    return bool(MODAL_RE.search(head))
+
+
+def check_buried_leads(warnings: list[str]) -> None:
+    """A `##` section that opens on a declarative buries its rule under a thesis.
+
+    Heuristic on prose, so it warns. It catches the failure that costs a reader
+    the most and that sentence length and banned words never see: a file that
+    passes every floor check while stating its point in paragraph three.
+    """
+    for skill_dir in skill_dirs():
+        path = skill_dir / "SKILL.md"
+        text = prose_only(path.read_text())
+        rel = path.relative_to(REPO_ROOT)
+        blocks = re.split(r"^(#{2,3} .+)$", text, flags=re.M)
+        for heading, body in zip(blocks[1::2], blocks[2::2]):
+            line_no = line_for_offset(text, text.index(heading))
+            for line in body.splitlines():
+                if not is_prose_line(line):
+                    continue
+                opening = sentences_in(line.strip())
+                if not opening:
+                    continue
+                if not leads_with_rule(opening[0]):
+                    warnings.append(
+                        f"section opens on a thesis, lead with the rule: {rel}:{line_no} "
+                        f"({heading.strip()[:40]})"
+                    )
+                break
+
+        desc = description_text(path.read_text())
+        opening = sentences_in(desc)
+        if opening and not leads_with_rule(opening[0]):
+            warnings.append(
+                f"description opens on a thesis, lead with what the skill does: {rel}"
+            )
+
+
+INSTALL_TARGETS = [
+    Path.home() / ".codex" / "skills",
+    Path.home() / ".claude" / "skills",
+    Path.home() / ".copilot" / "skills",
+    Path.home() / ".kiro" / "skills",
+]
+
+
+def check_install_drift(warnings: list[str]) -> None:
+    """The installed copies are what actually runs, so say when they differ.
+
+    A warning, not an error. A machine with nothing installed is a valid state,
+    and so is a machine mid-edit. A before-and-after measured against a stale
+    install compares two unknown vintages, which is what this is here to say.
+    """
+    for root in INSTALL_TARGETS:
+        if not root.exists():
+            continue
+        stale = []
+        for skill_dir in skill_dirs():
+            installed = root / skill_dir.name / "SKILL.md"
+            if not installed.exists():
+                stale.append(f"{skill_dir.name} (missing)")
+            elif installed.read_text() != (skill_dir / "SKILL.md").read_text():
+                stale.append(skill_dir.name)
+        if stale:
+            warnings.append(
+                f"installed copy differs from the repo in {root}: {', '.join(stale[:6])}"
+                + (f" and {len(stale) - 6} more" if len(stale) > 6 else "")
+                + ". Run scripts/install.sh --force."
+            )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("skills_root", nargs="?", default="skills")
@@ -466,6 +745,11 @@ def main() -> int:
         "--strict",
         action="store_true",
         help="fail the run on warnings too. Heuristic checks warn by default so they never gate CI.",
+    )
+    parser.add_argument(
+        "--check-install",
+        action="store_true",
+        help="also compare the installed copies under $HOME against the repo.",
     )
     args = parser.parse_args()
 
@@ -481,6 +765,14 @@ def main() -> int:
     check_voice_compliance(errors, warnings)
     check_single_source(errors)
     check_ste_conformance(warnings)
+    check_token_budget(errors, warnings)
+    check_cross_skill_collisions(warnings)
+    check_reference_reachability(errors, warnings)
+    check_description_backticks(errors)
+    check_anti_triggers(warnings)
+    check_buried_leads(warnings)
+    if args.check_install:
+        check_install_drift(warnings)
 
     for warning in warnings:
         print(f"warn: {warning}", file=sys.stderr)

@@ -1,12 +1,14 @@
 ---
 name: toby-swd-strategy
 description: >-
-  Every code change either invests in the system's future or borrows against it.
-  Use this skill for non-trivial software engineering work: features, bug fixes
-  with behavioral risk, refactors, public API or module-boundary changes, and
-  edits where a quick patch may add special cases or hidden dependencies. Skip
-  it for read-only investigation, tiny mechanical edits, formatting-only churn,
-  and changes whose structure is already fixed by the surrounding code.
+  Decide whether this change leaves the design better or worse before
+  writing it. Use it for non-trivial work: a feature, a bug fix with
+  behavioral risk, a refactor, a public API or module-boundary change, or an
+  edit where the quick patch adds a special case or a hidden dependency. It
+  owns the design pass and the near-future variants, and it routes the
+  resulting decisions to `toby-swd-modules` and `toby-swd-interfaces`. Skip
+  it for read-only investigation, a rename, a formatting pass, a throwaway
+  spike, and any change whose structure the surrounding code already fixes.
 ---
 
 # Toby SWD Strategy
@@ -22,14 +24,14 @@ The deliverable is a system whose design is at least as good after your change a
 For anything beyond a one-line change, don't implement the first idea.
 
 - State the change in one sentence, including the obvious near-future variants ("today it's one provider; tomorrow there will be three").
-- Sketch at least two structural approaches. They must differ in *where complexity lives* — which module owns the hard part, what the interface exposes, what callers must manage. Pick the one with the simplest caller-side interface, even if its insides are harder.
+- Sketch at least two structural approaches. They must differ in *where complexity lives*: which module owns the hard part, what the interface exposes, what callers must manage. Pick the one with the simplest caller-side interface, even when its insides are harder. This asks for two placements of the work, so it does not conflict with the single-candidate rule in `toby-swd-interfaces`, which governs one signature once the placement is settled.
 - Check the near-future variants against your design. If a likely next change would force callers to change or add a new special case, adjust now while it's cheap.
 - If those variants are new cases picked by a tag or type, design the dispatch now. Use a lookup map when the case bodies are small, an interface with implementations when each case owns state. `toby-swd-modules` has the ladder. Greenfield builds it in; brownfield offers it as a scoped refactor.
 - Proportionality: a real one-liner doesn't need an architecture review. The design pass scales to the size of the decision.
 
 ## While writing — pull complexity to the right place
 
-A good module is deep: a simple interface over substantial work. The interface is the cost the module imposes on the rest of the system, and the implementation is the benefit. Skew that ratio heavily toward the implementation side.
+Put the hard part where it costs the fewest callers. Skew the ratio of interface cost to implementation benefit heavily toward the implementation side. `toby-swd-modules` defines the deep module and carries the checks that find a shallow one.
 
 Resist exposing internal mechanics, config knobs, or special cases just because they're the shortest path from where you are. Every parameter a caller must manage is overhead distributed across every future call site. Prefer computing a value internally over exporting a configuration parameter or throwing back to the caller.
 
@@ -84,6 +86,12 @@ Skip this only for changes trivial enough that there was no real design decision
 - **Tactical tornado.** Large volume of working code, fast, each piece adding a special case or dependency. That velocity degrades design, so do not count it as progress.
 - **Deferring cleanup to "after this."** There is always another after this. Make the investment today, in this change, because a deferred investment never happens.
 - **Big-bang redesign.** Trying to fix the whole architecture in one pass is the waterfall failure mode. Accrete the design from many small correct decisions instead.
+
+## Compliance check
+
+Before calling the change done, state in one line which anti-pattern above the
+change came closest to and what stopped it. Say "none applies" when none does.
+An unrun list is a list nobody read.
 
 ## Worked examples
 

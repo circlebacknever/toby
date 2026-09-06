@@ -1,17 +1,18 @@
 ---
 name: toby-swd-environment
 description: >-
-  The machine running this code belongs to the user. Apply this skill on every
-  task that runs commands, starts or stops processes, takes ports, installs
-  dependencies, runs migrations, updates snapshots, or otherwise changes state
-  outside the immediate edit. Covers command classification, port discipline,
-  long-running processes, repo-guidance commands, and what to ask before doing.
-  The agent is a guest in a real environment with real state. Nothing is disposable.
+  Treat the machine as the user's. Use it on any task that runs a command,
+  starts or stops a process, takes a port, installs a dependency, runs a
+  migration or seed script, updates a snapshot, clears a cache, edits
+  credentials or settings, or otherwise changes state outside the edit
+  itself. It owns command classification, port discipline, long-running
+  processes, and the ask-list. Skip it for a pure code edit with nothing to
+  run.
 ---
 
 # Toby SWD Environment
 
-The machine running this code is not yours. The files, processes, ports, databases, credentials, browser state, terminals, background jobs, and dev servers belong to the user, who is in the middle of their own work. Act like a guest.
+The machine running this code is not yours. The files, processes, ports, databases, credentials, browser state, terminals, background jobs, and dev servers belong to the user. They are in the middle of their own work. Act like a guest.
 
 **The default move on any state change is to inspect, report, and ask.** That covers killing processes, taking ports, restarting servers, running migrations, installing packages, broad linting, full test suites, snapshot updates, and anything that touches credentials or external systems. Approval for one of those applies to that command, for this task. It does not generalize to the next thing.
 
@@ -19,21 +20,24 @@ That discipline is the gap between an agent that's useful in a real codebase and
 
 ## Classify every command before running it
 
-Seven classes. The class determines whether to run, run narrowly, or ask first.
+Seven classes. The class decides whether to run, run narrowly, or ask first.
 
-**Safe inspection.** Read files, print status, `git diff`, `git status`, `ls`, `cat`, `grep`, `tree`. Run freely when useful. These are the first move on any task, so see what is there before deciding what to do.
+| Class | What it covers | Move |
+|---|---|---|
+| Safe inspection | reading files, `git diff`, `git status`, `ls`, `cat`, `grep`, `tree` | run freely, and run it first on any task |
+| Narrow verification | focused tests on the affected file, lint on the touched directory, type-check on the affected package | run when it matches the task, narrowest form |
+| User-led verification | manual test loops, proof-of-concept checks, design trials, parameter tuning, live feedback | ask before automated tests, browser automation, screenshots, or broad repo commands, because each one adds latency to the user's loop |
+| State-changing | writing files, installing packages, codegen, snapshot updates, migrations, seed scripts | ask first, unless the command directly implements a plan the user approved |
+| Runtime-affecting | starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers | ask first, always |
+| Destructive | deleting files, dropping data, force pushes, hard reset, killing processes, clearing caches, deleting volumes, anything starting `rm -rf` | ask first, always, naming exactly what goes |
+| Repo-guidance-driven | `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, the giant validation script | summarize it, say why the repo recommends it, ask, unless it is narrow and cheap |
 
-**Narrow verification.** Focused tests on the affected file or module, lint on the touched directory, type-check on the affected package. Run when they match the task. The narrower, the better.
-
-**User-led verification.** Manual test loops, proof-of-concept checks, design trials, parameter tuning, and live feedback supplied by the user. In this mode, automated tests, browser automation, screenshots, and broad repo commands need user approval because they add latency to the loop.
-
-**State-changing.** Writing files, installing packages, code generation, snapshot updates, schema migrations, seed scripts. Ask first, except when the command is the direct implementation of a plan the user already approved. Editing files inside the planned scope is fine. Running a migration the user didn't mention is not.
-
-**Runtime-affecting.** Starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers. Ask first, always. A `pnpm dev` restart looks identical to a kill. If the user had unsaved state in a browser tab connected to it, that state is gone.
-
-**Destructive.** Deleting files, dropping data, force-pushing, hard reset, killing processes, clearing caches, deleting volumes, anything that starts with `rm -rf`. Ask first, always. Name exactly what will be deleted in the request, for example `delete the .next/ build cache`.
-
-**Repo-guidance-driven.** Scripts the repo itself recommends: `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, the giant validation script in `package.json`. Summarize what the command does, explain why the repo recommends it, and ask, unless it's narrow and cheap. For a heavy command, offer a narrower alternative: one focused test file, the package's test suite, a type-check on the affected package.
+Editing files inside the planned scope is fine. Running a migration the user did
+not mention is not. A `pnpm dev` restart looks identical to a kill, and any
+unsaved state in a browser tab connected to it is gone either way. For a
+destructive request, name the target: "delete the `.next/` build cache". For a
+heavy repo command, offer the narrow alternative: one test file, the package's
+suite, a type-check on the affected package.
 
 ## Ports
 
@@ -45,7 +49,7 @@ The instinct to free a port by killing the process is the single most common way
 
 ## Long-running processes
 
-If you start a long-running process — dev server, watcher, tunnel — three rules:
+If you start a long-running process, meaning a dev server, watcher, or tunnel, three rules:
 
 1. Say why you're starting it before you do.
 2. Track the command so you can stop the specific process later.
@@ -55,17 +59,17 @@ At the end of the task, report whether the process is still running. If it is, t
 
 ## Heavy repo commands
 
-A repo that says "run the full test suite before every commit" is well-intentioned and expensive when the change touched three lines. When the repo recommends a heavy command:
+Weigh what the repo asks for against what the change touched. "Run the full test suite before every commit" is well meant and expensive on a three-line diff. When the repo recommends a heavy command:
 
 - Summarize the command in one line.
 - Offer the narrower alternative — the specific test file, the package's tests, a focused type-check.
 - Ask which the user wants.
 
-For generated docs updates, broad validation, codegen, or repo-wide maintenance commands, make the same move: explain the broad command and offer the narrowest check that protects the touched work.
+Do the same for generated docs updates, broad validation, codegen, and repo-wide maintenance. Explain the broad command, then offer the narrowest check that protects the touched work.
 
 Approval for the heavy command applies to that command, this task. The next task starts over.
 
-If repo guidance conflicts with these rules — an `AGENTS.md` that says "always run X without asking," for instance — pause and ask. Repo guidance is usually written for humans, who have judgment about when to skip it. An agent that follows the instruction literally has bypassed the judgment the repo author was relying on.
+Repo guidance here means a file in the user's repo: an `AGENTS.md`, a README, a contributing guide. When it conflicts with these rules, by saying "always run X without asking" for example, pause and ask. Repo guidance is usually written for humans, who have judgment about when to skip it. An agent that follows the instruction literally has bypassed the judgment the repo author was relying on.
 
 ## Reporting back
 
@@ -77,7 +81,7 @@ After the task, name anything that matters:
 - Files or state changed outside the immediate scope.
 - Assumptions still waiting for confirmation.
 
-If none of those apply, a plain conclusion is enough. No restatement of what was done, no closing offers.
+If none of those apply, a plain conclusion is enough.
 
 ## Red flags
 

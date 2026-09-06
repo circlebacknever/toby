@@ -1,17 +1,17 @@
 ---
 name: toby-feature-dev
 description: >-
-  Turn a feature request into the smallest change that satisfies it, with evidence it works and
-  the requirement written down where a future reader can audit it. Use when the user asks to
-  build, add, implement, wire up, or finish a behavior spanning more than one file or one call
-  site: a ticket, a product ask, a half-built feature to continue, an endpoint, screen, job, or
-  flag to add, or a bug fix whose repair is new behavior. Use it when the request leaves "done"
-  undefined and code has to start anyway. This skill owns the shape of the work — mode, acceptance
-  criteria, discovery, slicing, the plan the operator approves before execution, approval stops,
-  the behavior record, handoff — and routes method to the toby-swd-* skills. Skip it for a
-  one-file edit following a pattern already in that file, a review or cleanup pass over code that
-  exists, read-only investigation or explanation, and anything the user framed as a spike, proof
-  of concept, or throwaway, which belongs to toby-swd-experiment.
+  Turn a feature request into the smallest change that satisfies it, with evidence it
+  works and the requirement written where a future reader can audit it. Skip it for a one-
+  file edit following a pattern already in that file, a review or cleanup pass over code
+  that exists, read-only investigation or explanation, and anything the user framed as a
+  spike, proof of concept, or throwaway, which belongs to toby-swd-experiment. Use it when
+  the user asks to build, add, implement, wire up, or finish a behavior spanning more than
+  one file or one call site: a ticket, a product ask, a half-built feature, an endpoint,
+  screen, job, or flag, or a bug fix whose repair is new behavior. Use it when the request
+  leaves "done" undefined and code has to start anyway. It owns mode, acceptance criteria,
+  discovery, slicing, the plan the operator approves, approval stops, the behavior record,
+  and handoff, and routes method to the toby-swd-* skills.
 ---
 
 # Toby Feature Dev
@@ -55,7 +55,7 @@ Write each acceptance criterion as three short lines before any code, plus one f
 
 - **Observable** — given a starting state, when an action happens, the user or caller sees a result, at the seam they touch: "an expired token gets a 401, and the retry after refresh returns the account." The seam is where something outside the changed module arrives — an HTTP request, a CLI invocation, a screen someone opens, a queue message, an exported symbol another module calls. A line checkable only by reading the diff is the diff with a checkbox on it, so rewrite it or cut it.
 - **Source** — the user sentence or ticket line it came from, quoted, or the repo fact that forces it, cited at path:line. A repo fact with no path:line is your preference. Source to a repo fact only where the request is silent on that behavior.
-- **Check** — the test or manual step that will show it holding, named now, plus the result that would mean the criterion is unmet. A check with no failing result passed before you wrote it. `unverified` is available when running the check needs something out of reach — an approval-gated command, a credential, an external service, a device — and the blocker gets named on the same line. A check you could have run and skipped leaves the criterion unmet.
+- **Check** — the command that shows it holding, run once against today's code before the criteria go to the user, with its output quoted at checkpoint 1. That starting run is what makes the criterion provable later, and a criterion whose check cannot run yet says so at the stop, before anyone approves it. Name the result that would mean the criterion is unmet; a check with no failing result passed before you wrote it. `unverified` is available when the run needs something out of reach: an approval-gated command, a credential, an external service, a device. Name the blocker on the same line. A check you could have run and skipped leaves the criterion unmet.
 - Reuse the vocabulary already in the schema, the routes, and the UI. A second name for a concept that has one is a question for the user. When the request as worded and the problem as described disagree, name the gap first. Building the words exactly is how a feature ships correct and useless.
 
 **Criteria are fixed text once coding starts.** Widening one is a note in the next report. Dropping or narrowing one changes what the user asked for. Give the reason and the new wording, and wait for a yes before the next edit.
@@ -83,15 +83,15 @@ A slice ships when all four hold:
 - It stands correct on its own. Half-built behavior a user can reach is a defect, so a slice depending on a later one ships behind a flag defaulted off, or waits. A flagged slice meets the observation bar with the flag on. Name the flag, how to turn it on, and the slice that deletes it.
 - It's reachable from outside its own module. Name the wiring at path and line: the registered route, the render site, the caller of the exported symbol, the CLI subcommand, the event subscription.
 
-Cutting by layer is the classic wrong cut. "The data layer" fails the bar twice: its only demo is a passing test suite, and the thing the user asked for is three diffs out. Four cuts worked end to end, brownfield and greenfield, live in `references/examples.md`.
+Cutting by layer is the classic wrong cut, catalogued as **layer cut** in `references/checks.md`. Four cuts worked end to end, brownfield and greenfield, live in `references/examples.md`.
 
 ## Checkpoints
 
 Three stops, on the running order above. The machine-safety stops in the operating guide and toby-swd-environment stay in force alongside them.
 
-1. **The criteria, before the first edit.** Show the list under the heading `What done means for [task]`, then the slice cut by name. Tactical work with one slice gets one line and keeps moving. Any strategic trigger, wait. Where checkpoint 2 also fires, say so here, since the yes at this stop is what asks for the plan.
+1. **The criteria, before the first edit.** Show the list under the heading `What done means for [task]`, each criterion carrying its check's starting run, then the slice cut by name. Tactical work with one slice gets one line and keeps moving. Any strategic trigger, wait. Where checkpoint 2 also fires, say so here, since the yes at this stop is what asks for the plan.
 2. **The plan, after the design pass and before the first edit on strategic or multi-slice work.** Written file, reviewed and approved before execution. See below.
-3. **The slice boundary where the next slice's shape depends on the answer** — a decision surfaced, a criterion that turned out wrong, a strategic trigger discovery missed. Open with what the user can now do that they couldn't this morning, in the slice's name, then what proved it, then what the next slice does, and wait. A boundary carrying no such question gets the same three lines and keeps moving. Six stops on a six-slice feature is the skill running for its own benefit.
+3. **The slice boundary where the next slice's shape depends on the answer** — a decision surfaced, a criterion that turned out wrong, a strategic trigger discovery missed. Open with what the user can now do that they couldn't this morning, in the slice's name, then what proved it, then what the next slice does, and wait. A boundary carrying no such question gets the same three lines and keeps moving, catalogued as **stop inflation** in `references/checks.md`.
 
 Strategic triggers: a new module or boundary; a public API, event, or persisted shape; a migration; auth, permissions, billing, money, or privacy; a behavior three or more call sites depend on; a UI workflow crossing more than one screen; greenfield. These fire on what the change does to the surface. Contact alone stays tactical. Adding an optional parameter with a default to an exported function is contact, while changing what it returns or what its callers must handle is a trigger. Never write "assuming yes, proceeding" past a stop, which leaves this skill with no checkpoints at all.
 
@@ -99,7 +99,7 @@ Strategic triggers: a new module or boundary; a public API, event, or persisted 
 
 The operating guide owns the format — `Toby's plan for [task]`, task groups, checkboxes, a verification block ending each group. This file owns when the plan gets written and what a step carries for someone to approve it. Do not agree a plan in scrollback, because nobody can check it off.
 
-- **Written when** the user asks, which includes the yes at checkpoint 1 on strategic or multi-slice work. The operating guide writes plans on an explicit ask, and naming the plan at that stop is what gets one. One-slice tactical work keeps the criteria list in chat. A plan file for a four-line change is the ceremony this file spends the rest of its length avoiding.
+- **Written when** the user asks, which includes the yes at checkpoint 1 on strategic or multi-slice work. Naming the plan at that stop is what gets one. One-slice tactical work keeps the criteria list in chat.
 - **Where** the repo already keeps plans. With nowhere obvious, propose a path and get a yes, the same gate the behavior record gets.
 - **Opens with** the mode, the one-line problem, the criteria in their pre-code wording, and what's out of scope, then one task group per slice in the order they ship, each carrying its slice's name and ending in its verification block. An operator approving a plan is approving the boundary as much as the work.
 - **Anything on** the operating guide's or toby-swd-environment's ask-list — migration, install, seed, snapshot, deletion, process or port — appears as its own step with the exact command.
@@ -151,14 +151,14 @@ Check the finished work against all eight entries in `references/checks.md`, plu
 
 ## Final response
 
-Lead with the behavior that now exists, stated the way the user would observe it. Match length to the change. Any criterion unmet or unverified is named in the first line, with which of the two it is and what is missing. A report that closes with what didn't land is written in the order that flatters it. Items 1 and 2 always appear. Dropping any other section is a claim you checked it and found it empty.
+Lead with the behavior that now exists, stated the way the user would observe it. Any criterion unmet or unverified is named in the first line, with which of the two it is and what is missing. A report that closes with what didn't land is written in the order that flatters it.
+
+Two sections this file adds, and both always appear:
 
 1. Each criterion in its pre-code wording, marked met with the check that proved it, or unverified with why. Multi-slice work lists each slice by name, done or not-done, with its evidence.
 2. Behavior record entries written, edited, or retired, and the result of the check. A run where none fired says so and why. Where the plan lives, and any step that ran differently from the approved wording.
-3. Placeholders left in a production path, at file:line.
-4. Assumptions still standing, each phrased so the user can settle it in a word, and the questions this run couldn't resolve.
-5. Found and left alone — what you skipped on purpose and the follow-ups you walked past, one line each, handed to the skill that owns it.
-6. The manual steps for whatever you couldn't run.
+
+Then the operating guide's list: anything incomplete or risky, tests deleted or weakened, heavy commands skipped, processes left running, assumptions still waiting. Phrase each standing assumption so the user can settle it in a word, and name the questions this run could not resolve. Add placeholders left in a production path at file:line, and what you found and left alone, one line each, handed to the skill that owns it. Dropping a section is a claim you checked it and found it empty.
 
 ## References
 
