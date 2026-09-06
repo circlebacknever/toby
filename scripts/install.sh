@@ -5,10 +5,22 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TOOL="all"
 DRY_RUN=0
 FORCE=0
+OUTPUT_STYLE=0
+HOOKS=0
 
 usage() {
-  printf 'Usage: %s [--tool codex|claude|copilot|github|kiro|all] [--dry-run] [--force]\n' "$0"
+  printf 'Usage: %s [--tool codex|claude|copilot|github|kiro|all] [--output-style] [--dry-run] [--force]\n' "$0"
   printf '       github is an alias for copilot (GitHub Copilot CLI, ~/.copilot).\n'
+  printf '\n'
+  printf '  --hooks         Install the voice checker and the two hooks to\n'
+  printf '                  ~/.claude/toby, then print the settings.json block to\n'
+  printf '                  paste. Does not edit settings.json itself.\n'
+  printf '  --output-style  Claude Code only. Install the writing rules as an output\n'
+  printf '                  style, and install the shorter CLAUDE.md that leaves them\n'
+  printf '                  out. Costs about 200 tokens more than the default, and\n'
+  printf '                  puts the rules in the system prompt. You must then turn\n'
+  printf '                  the style on: /config, Output style, Toby. Without that\n'
+  printf '                  step the voice rules are not loaded at all.\n'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -23,6 +35,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --force)
       FORCE=1
+      shift
+      ;;
+    --output-style)
+      OUTPUT_STYLE=1
+      shift
+      ;;
+    --hooks)
+      HOOKS=1
       shift
       ;;
     -h|--help)
@@ -84,6 +104,42 @@ install_skills() {
   done
 }
 
+install_hooks() {
+  # The checker and the two hooks, with the two files they read. Four scripts and
+  # base/toby.md, which holds the banned-word list they check against.
+  local kit="$HOME/.claude/toby"
+  run mkdir -p "$kit/scripts" "$kit/base" "$kit/hooks"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    printf '[dry-run] install the voice checker and hooks to %s\n' "$kit"
+    return
+  fi
+  run cp "$ROOT/scripts/validate-skills.py" "$kit/scripts/"
+  run cp "$ROOT/scripts/voice-check.py" "$kit/scripts/"
+  run cp "$ROOT/base/toby.md" "$kit/base/"
+  run cp "$ROOT/hooks/voice-stop-check.py" "$kit/hooks/"
+  run cp "$ROOT/hooks/voice-write-check.py" "$kit/hooks/"
+
+  printf '\nvoice checker installed:\n'
+  printf '  %s/scripts/voice-check.py\n\n' "$kit"
+  printf 'To run the hooks as well, add this to %s/.claude/settings.json:\n\n' "$HOME"
+  cat <<JSON
+{
+  "hooks": {
+    "PostToolUse": [
+      { "matcher": "Write|Edit", "hooks": [
+        { "type": "command", "command": "python3 $kit/hooks/voice-write-check.py" } ] }
+    ],
+    "Stop": [
+      { "hooks": [
+        { "type": "command", "command": "python3 $kit/hooks/voice-stop-check.py" } ] }
+    ]
+  }
+}
+JSON
+  printf '\nThis installer does not edit settings.json. Paste the block yourself,\n'
+  printf 'merging it with any hooks already there.\n\n'
+}
+
 install_output_style() {
   # Claude Code only. The style lands in the system prompt, which is why the
   # voice rules go here as well as in CLAUDE.md.
@@ -94,7 +150,10 @@ install_output_style() {
     return
   fi
   run cp "$ROOT/output-styles/toby.md" "$target"
-  printf 'output style installed. Turn it on with /config, then Output style, then Toby.\n'
+  printf '\noutput style installed, and CLAUDE.md now leaves the writing rules out.\n'
+  printf 'Turn the style on before you write anything:\n'
+  printf '  /config, then Output style, then Toby\n'
+  printf 'Until you do, the voice rules are not loaded.\n\n'
 }
 
 install_instruction_file() {
@@ -172,8 +231,14 @@ install_codex() {
 
 install_claude() {
   install_skills "$HOME/.claude/skills"
-  install_instruction_file "$ROOT/instructions/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md" merge
-  install_output_style
+  if [[ "$OUTPUT_STYLE" -eq 1 ]]; then
+    # The style carries the writing rules, so CLAUDE.md leaves them out. Both
+    # together would put the same 4,900 tokens in front of every turn twice.
+    install_instruction_file "$ROOT/instructions/claude/CLAUDE-floor.md" "$HOME/.claude/CLAUDE.md" merge
+    install_output_style
+  else
+    install_instruction_file "$ROOT/instructions/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md" merge
+  fi
 }
 
 install_copilot() {
@@ -197,6 +262,10 @@ if [[ "$TOOL" == "all" || "$TOOL" == "copilot" ]]; then
 fi
 if [[ "$TOOL" == "all" || "$TOOL" == "kiro" ]]; then
   install_kiro
+fi
+
+if [[ "$HOOKS" -eq 1 ]]; then
+  install_hooks
 fi
 
 printf 'Toby package install complete for --tool %s\n' "$TOOL"

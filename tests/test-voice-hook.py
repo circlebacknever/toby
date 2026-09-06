@@ -91,7 +91,68 @@ for reply in CLEAN:
 
 print()
 print(f"{len(BREAKS)} seeded breaks, {len(BREAKS) - failures + false_positives} caught.")
-print(f"{len(CLEAN)} clean replies, {false_positives} false positives.")
-if failures:
+print(f"{len(CLEAN)} ordinary replies, {false_positives} false positives.")
+
+# --- the write hook, and the FIX/DECIDE split ---------------------------------
+import tempfile as _tf
+
+WRITE_HOOK = Path(__file__).resolve().parents[1] / "hooks" / "voice-write-check.py"
+CHECKER = Path(__file__).resolve().parents[1] / "scripts" / "voice-check.py"
+notes: list[str] = []
+
+
+def run_write_hook(body: str, suffix: str = ".md") -> int:
+    with _tf.NamedTemporaryFile("w", suffix=suffix, delete=False) as handle:
+        handle.write(body)
+        written = handle.name
+    payload = json.dumps({
+        "hook_event_name": "PostToolUse", "tool_name": "Write",
+        "tool_input": {"file_path": written},
+    })
+    result = subprocess.run([sys.executable, str(WRITE_HOOK)], input=payload,
+                            capture_output=True, text=True)
+    Path(written).unlink()
+    return result.returncode
+
+
+def expect(label: str, got: int, want: int) -> None:
+    if got == want:
+        print(f"ok   {label}")
+    else:
+        print(f"FAIL {label} (exit {got}, wanted {want})")
+        notes.append(label)
+
+
+print()
+expect("write hook flags a banned word in a written file",
+       run_write_hook("This uses a robust approach.\n"), 2)
+expect("write hook stays quiet on ordinary prose",
+       run_write_hook("The parser reads the header, then the body. Both are UTF-8.\n"), 0)
+expect("write hook ignores a non-prose file",
+       run_write_hook("This uses a robust approach.\n", suffix=".py"), 0)
+
+# A judgement call must never gate anything, or the group gets waved away.
+with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
+    handle.write("The hook return shape is fine here.\n")
+    decide_file = handle.name
+out = subprocess.run([sys.executable, str(CHECKER), decide_file], capture_output=True, text=True)
+Path(decide_file).unlink()
+expect("a DECIDE finding does not fail the run", out.returncode, 0)
+
+# The guide lists every banned word. Scanning it for them returned 107 findings
+# once, which is how a tool teaches its reader to ignore it.
+GUIDE = Path(__file__).resolve().parents[1] / "base" / "toby.md"
+guide_out = subprocess.run([sys.executable, str(CHECKER), str(GUIDE), "--fix-only"],
+                           capture_output=True, text=True)
+expect("the guide is not scanned for the words it defines", guide_out.returncode, 0)
+if "states the banned words" not in guide_out.stdout:
+    print("FAIL the checker did not say why the word checks were off")
+    notes.append("defining note")
+if "DECIDE" not in out.stdout:
+    print("FAIL the DECIDE group was not printed")
+    notes.append("decide printed")
+
+print()
+if failures or notes:
     raise SystemExit(1)
-print("Stop hook fixtures passed.")
+print("Voice hook and checker fixtures passed.")

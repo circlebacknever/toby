@@ -1,0 +1,40 @@
+EVERYTHING ON DISK
+  every markdown file in the repo       220328
+  all skill bodies                       42964
+  all reference files                   106610
+
+RESIDENT, every turn, before any skill fires
+  operating guide                         7444
+  18 skill descriptions                  2541
+  default layout total                    9985
+  --output-style layout total            10185   (+200 against default)
+
+WHEN A SKILL FIRES  (bodies only, no reference opened)
+  scenario                          bodies    turn  as % of resident
+  a question, answered                1428   11413     14%
+  a rename                            2384   12369     24%
+  a command or migration              1548   11533     16%
+  review my changes                   2792   12777     28%
+  a throwaway spike                   1186   11171     12%
+  one method on a repository          8373   18358     84%
+  split a module                      7425   17410     74%
+  a feature, tactical                 9612   19597     96%
+  a feature, strategic               21168   31153    212%
+  learning, invoked                   2734   12719     27%
+  a visual artifact                   4905   14890     49%
+
+VOICE, which loads on any prose turn
+  toby-voice body                         1179
+  references/toby.md, the guide again     7444
+  references/plain-language.md            1038
+  a prose turn adds                       9661
+
+THE EXPENSIVE ONES  (largest reference each skill can open)
+  toby-voice                          7444   (tree 14344)
+  toby-artifact-style                 5490   (tree 15851)
+  toby-code-review                    4300   (tree 4300)
+  toby-swd-modules                    4180   (tree 17464)
+  toby-swd-interfaces                 3693   (tree 18154)
+
+Worst modelled turn: 31153 resident and loaded, before a reference opens.
+A skill firing wrongly costs its whole body. The largest is 5370.

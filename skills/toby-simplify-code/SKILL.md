@@ -48,7 +48,7 @@ Make changed code simpler to read and keep behavior identical. A lateral rewrite
 
 ## Not a simplification
 
-Reordering for taste, a rename that doesn't fix a misleading name, swapping one construct for another of equal length and clarity, splitting or merging expressions with no debugging gain, formatting a tool owns. None of these clear the countable-win bar, so leave them.
+Count none of these as a simplification. Reordering for taste. A rename that does not fix a misleading name. Swapping one construct for another of equal length and clarity, splitting or merging expressions with no debugging gain, formatting a tool owns. None of these clear the countable-win bar, so leave them.
 
 ## Idiom or local style
 
@@ -59,9 +59,9 @@ Reordering for taste, a rename that doesn't fix a misleading name, swapping one 
 
 ## Behavior drifts quietly
 
-A change ships one of two ways: a test covers the touched path and passes, or the change is mechanical and you show why the edge can't fire.
+Ship a change one of two ways. A test covers the touched path and passes, or the change is mechanical and you show why the edge can't fire.
 
-Mechanical means a pure rename, a dead-code deletion, or a swap where the edge for its class is provably unreachable, and you quote why ("can't be null — typed string, no | null"). Anything where the edge could fire is edge-crossing. It needs a covering test, or you leave it and note the edge that needs one. Do not ship on assumed equivalence.
+Mechanical means a pure rename, a dead-code deletion, or a swap where the edge for its class is provably unreachable. Quote why ("can't be null, typed string, no | null"). Anything where the edge could fire is edge-crossing. It needs a covering test, or you leave it and note the edge that needs one. Do not ship on assumed equivalence.
 
 The edge per class:
 
@@ -79,7 +79,9 @@ The edge per class:
 
 ## Out of scope
 
-Moving code between modules, changing a signature, or altering a public return type is behavior-changing work. If a cleanup isn't small, local, and behavior-preserving, leave it. When it matches the "Flag, don't fix" half of `references/smells.md`, or a red flag in toby-swd-modules, toby-swd-interfaces, or toby-swd-complexity, name the smell and the skill that owns it. Otherwise, note it as a follow-up. If you spot a real bug or a security issue while cleaning up, don't fix it here, because that's a behavior change. Flag it only when you can state the input that triggers it and why no guard catches it. A vague "this might be buggy" is noise. Then recommend a review pass.
+Leave anything that moves code between modules, changes a signature, or alters a public return type. All of that is behavior-changing work.
+
+Leave any cleanup that is not small, local, and behavior-preserving. When it matches the "Flag, don't fix" half of `references/smells.md`, or a red flag in toby-swd-modules, toby-swd-interfaces, or toby-swd-complexity, name the smell and the skill that owns it. Otherwise, note it as a follow-up. If you spot a real bug or a security issue while cleaning up, don't fix it here, because that's a behavior change. Flag it only when you can state the input that triggers it and why no guard catches it. A vague "this might be buggy" is noise. Then recommend a review pass.
 
 ## Process
 
@@ -91,4 +93,4 @@ Moving code between modules, changing a signature, or altering a public return t
 
 ## Final response
 
-Lead with what got simpler, ordered by how much reading effort each change saves, and the number each one drove down. For every change, state in one clause the edge you checked and how you know it held — the covering test, or why the edge can't fire. If behavior couldn't be proven preserved, say what remains unknown. A structural smell spotted but left alone gets one line naming the smell and the skill that owns it, kept apart from what changed.
+Lead with what got simpler, ordered by how much reading effort each change saves. Give the number each one drove down. For every change, state in one clause the edge you checked and how you know it held. Name the covering test, or say why the edge can't fire. If behavior couldn't be proven preserved, say what remains unknown. A structural smell spotted but left alone gets one line naming the smell and the skill that owns it, kept apart from what changed.

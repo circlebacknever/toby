@@ -41,7 +41,7 @@ Run the changed code before writing findings, as a hunt for what you have missed
 
 Feed changed arithmetic and changed predicates the inputs a read glides over: negative, zero, empty, and the value either side of every boundary. Then paste what came back into the Consequence line. Sign errors, unit mismatches, and totals that disagree with what got stored surface here and appear in no catalog.
 
-A design smell holds three different lines: the entry name from `references/smells.md`, the file:line, and the code there that meets the entry's Fires-when criterion. A smell costs future readers and future changes. Demanding a runtime consequence of it would therefore drop every real one or invent a consequence for it. The drop rule above still governs — three lines you can fill from the file, or there's no finding.
+A design smell holds three different lines: the entry name from `references/smells.md`, the file:line, and the code there that meets the entry's Fires-when criterion. A smell costs future readers and future changes. Demanding a runtime consequence of it would therefore drop every real one or invent a consequence for it. The drop rule above still governs. Three lines you can fill from the file, or there's no finding.
 
 Add one line of fix direction when it isn't plain. Don't restate the code back, because they have the diff. Order findings by which bites hardest.
 
@@ -113,7 +113,7 @@ Review a change to a `SKILL.md`, an operating guide, a hook, or an agent config 
 
 ## Final report
 
-Match length to the change. A diff with nothing wrong gets one line: no findings, plus residual risk if any — named specifically, with why it stayed unverified. A trivial diff gets at most one finding. Then, in order, dropping any section that's empty:
+Match length to the change. A diff with nothing wrong gets one line: no findings, plus residual risk if any. Name that risk specifically, with why it stayed unverified. A trivial diff gets at most one finding. Then, in order, dropping any section that's empty:
 
 1. Findings.
 2. A question — something you'd ask the author, only when the answer needs information the code can't give (runtime config, an external service, product intent). Drop a hunch you couldn't prove, because it doesn't belong here.

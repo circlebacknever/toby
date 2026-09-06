@@ -7,9 +7,9 @@ description: Apply Toby's artifact design system whenever a visual artifact is b
 
 Make every artifact under this system look like it was made for this exact content. That is the bar, every session.
 
-Toby Artifact Style is a constraint set. Tokens, copy constraints, and visual rules are tight. Structural choices stay wide: dense reference card, spacious single claim, ink-heavy authority piece, paper-first reading surface, animated process, static evidence panel, three-slide lesson, or twenty-slide reference deck. Make those choices per artifact.
+Toby Artifact Style is a constraint set. Tokens, copy constraints, and visual rules are tight. Structural choices stay wide. A dense reference card, a spacious single claim, an ink-heavy authority piece, paper-first reading surface, animated process, static evidence panel, three-slide lesson, or twenty-slide reference deck. Make those choices per artifact.
 
-The failure mode for any design system is convergence — every artifact starting to look like every other artifact. When you feel yourself reaching for the same layout you built last time, stop and pick a different one. The constraints protect quality, and structure stays free to vary. Within them, vary everything.
+The failure mode for any design system is convergence, meaning every artifact starts to look like every other artifact. When you feel yourself reaching for the same layout you built last time, stop and pick a different one. The constraints protect quality, and structure stays free to vary. Within them, vary everything.
 
 ## Three principles
 
@@ -139,7 +139,7 @@ Hard rules against convergence.
 
 ## Callout philosophy — soft / tint / text per hue
 
-Every semantic hue has a three-step palette. Use these together whenever a component expresses a state — alerts, toasts, status pills, badges, callouts, worked-example rows, KPI accent stripes. The whole component reads as one coherent color family.
+Every semantic hue has a three-step palette. Use these together whenever a component expresses a state: alerts, toasts, status pills, badges, callouts, worked-example rows, KPI accent stripes. The whole component reads as one coherent color family.
 
 ```css
 /* soft = pale bg · tint = mid border · text = saturated dark fg */

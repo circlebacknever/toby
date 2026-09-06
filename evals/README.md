@@ -51,6 +51,23 @@ sentence clear a 60 percent overlap on their own, and "Mock external
 dependencies at the system boundary" survived exactly that way while the rule
 was gone.
 
+## Checking prose by hand
+
+`scripts/voice-check.py` runs every rule against a file, a directory, or stdin.
+It splits findings into FIX, which has no judgement in it and exits 1, and
+DECIDE, which prints the sentence and never fails the run.
+
+The split exists because the two get handled differently, and because a single
+undifferentiated list trains a reader to wave the whole thing away. Most DECIDE
+findings are real.
+
+## Token budget
+
+`scripts/token-budget.py` prints what a turn costs, split into what is resident
+before anything fires, what a firing skill adds, and what opening a reference
+adds on top. The gates hold the per-skill and per-group ceilings. This report prints the
+picture behind them.
+
 ## Model suites
 
 ```bash
@@ -75,7 +92,7 @@ the ranges overlap.
 
 `baselines/triggering.json` — seven false firings across the over-triggering
 probes before Group 2, zero after, confirmed by a second run whose instructions
-never mentioned skip clauses. This is the number that pass actually bought.
+never mentioned skip clauses. That count is what the pass actually bought.
 
 N5 and N6 cover `toby-game` and `toby-squall`, which fire only when the user
 names them. Both stayed silent on a prompt carrying every trigger noun in their

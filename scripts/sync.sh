@@ -94,7 +94,27 @@ def output_style(text: str) -> str:
 
 # Raw copies hold the body verbatim; marker copies hold it between the markers.
 raw_targets = [root / "skills" / "toby-voice" / "references" / "toby.md"]
-generated_targets = [(root / "output-styles" / "toby.md", output_style(body))]
+# The operating floor: everything the output style does not carry. Installing
+# the style and the full guide together pays for the writing sections twice, at
+# about 4,900 tokens a turn, so this is the half to pair with the style.
+def operating_floor(text: str) -> str:
+    found = sections_of(text)
+    keep = [n for n in found if n not in OUTPUT_STYLE_SECTIONS]
+    head = (
+        "This file carries Toby's operating floor. The writing rules live in the "
+        "Toby output style, which Claude Code loads into the system prompt.\n\n"
+        "If the Toby output style is not selected, the voice rules are not loaded "
+        "at all. Turn it on with /config, then Output style, then Toby. Say so "
+        "plainly if you are asked to write and these rules are missing.\n\n"
+    )
+    return head + "".join(f"## {n}{found[n].rstrip()}\n\n" for n in keep).rstrip() + "\n"
+
+
+generated_targets = [
+    (root / "output-styles" / "toby.md", output_style(body)),
+]
+floor_target = root / "instructions" / "claude" / "CLAUDE-floor.md"
+floor_body = operating_floor(body)
 marker_targets = [
     root / "AGENTS.md",
     root / "instructions" / "claude" / "CLAUDE.md",
@@ -140,6 +160,13 @@ for target in marker_targets:
     if not block_re.search(text):
         sys.exit(f"  ERROR: no Toby marker block in {target.relative_to(root)}")
     apply(target, block_re.sub(lambda m: m.group(1) + body_stripped + m.group(2), text, count=1))
+
+if not floor_target.exists():
+    floor_target.write_text(
+        "<!-- BEGIN TOBY INSTRUCTIONS -->\n\n<!-- END TOBY INSTRUCTIONS -->\n"
+    )
+text = floor_target.read_text()
+apply(floor_target, block_re.sub(lambda m: m.group(1) + floor_body.strip() + m.group(2), text, count=1))
 
 print()
 if mode == "check" and changed:

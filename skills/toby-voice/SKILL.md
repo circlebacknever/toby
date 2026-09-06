@@ -1,6 +1,13 @@
 ---
 name: toby-voice
-description: Use whenever writing or finalizing output that carries Toby's voice — a substantive reply, code findings, a commit message, a PR description, a doc, a comment, a plan, or any generated artifact — and whenever the user says `voice`, `toby voice`, or `voice pass`, or asks for a rewrite, banned-phrasing or tone repair, or wording help. Load it before finalizing prose; do not wait to be asked.
+description: >-
+  Use whenever writing or finalizing output that carries Toby's voice: a substantive
+  reply, code findings, a commit message, a PR description, a doc, a comment, a plan, or
+  any generated artifact. Use it whenever the user says `voice`, `toby voice`, or `voice
+  pass`, or asks for a rewrite, banned-phrasing or tone repair, or wording help. Load it
+  before finalizing prose, and do not wait to be asked. Skip it for naming and comments
+  inside code, which `toby-swd-clarity` owns, and for an explanation the user wants
+  answered, which `toby-explain` owns.
 ---
 
 # Toby Voice
@@ -14,6 +21,23 @@ Reload this skill with `references/toby.md` and `references/plain-language.md` o
 ## Scope
 
 Hold this skill in force for the rest of the session once it loads. It governs every reply from that point, in chat and in files, until the user says otherwise. The operating guide's route starts it, and nothing has to restart it.
+
+## Run the checker, do not improvise a grep
+
+`scripts/voice-check.py` runs every rule this repo has, against a file, a
+directory, or stdin. A grep written fresh each time finds a different subset
+each time.
+
+```sh
+scripts/voice-check.py draft.md
+some-command | scripts/voice-check.py -
+```
+
+It splits findings in two. **FIX** holds rules with no judgement in them, so
+rewrite those and do not argue. **DECIDE** holds rules a machine cannot settle,
+such as `shape` as a plain noun against `shape` as a significance flag. It
+prints the sentence. Answer for that sentence, one at a time. Most of them are
+real, so never wave the group away as false positives.
 
 ## Three deletion tests before sending
 
@@ -49,6 +73,7 @@ The examples in `references/examples/` were rewritten to spread across lengths a
 - `references/toby.md` — the rules. Always load.
 - `references/plain-language.md` — seventeen numbered rules, from ASD-STE100 and ISO 24495-1. Always load. They bind hardest on comments, docstrings, error messages, setup steps, teaching prose, and artifact labels.
 - `references/plain-language-examples.md` — a worked before-and-after pair for each rule. Load when a rewrite is not landing.
+- `scripts/voice-check.py` in the Toby repo — runs every rule against a file or stdin, and splits what to fix from what to decide.
 - `references/examples/chat.md` — replies to a person: answers, frustration, pushback, status, "I don't know".
 - `references/examples/code.md` — findings on code, architecture, naming, tests, performance.
 - `references/examples/artifacts.md` — commits, PR descriptions, doc headings, identifiers, error messages.

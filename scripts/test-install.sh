@@ -165,11 +165,32 @@ else
   flunk safety "unmarked instruction file was modified"
 fi
 
-# The output style lands in Claude Code's system prompt, so a truncated or stale
-# copy changes how every reply reads. Compare content, not existence.
+# Default install: the full guide, and no output style. Installing both would
+# put the writing sections in front of every turn twice.
+PLAIN_HOME="$TMP_ROOT/plain"
+install_into "$PLAIN_HOME" --tool claude >/dev/null 2>&1
+if [[ -f "$PLAIN_HOME/.claude/output-styles/toby.md" ]]; then
+  flunk claude "default install shipped the output style, which duplicates the guide"
+elif ! grep -q '^## Prose$' "$PLAIN_HOME/.claude/CLAUDE.md"; then
+  flunk claude "default install left the writing rules out of CLAUDE.md"
+else
+  pass claude "default install carries the whole guide, no style"
+fi
+
+# --output-style: the style carries the writing rules and CLAUDE.md drops them.
 STYLE_HOME="$TMP_ROOT/style"
-install_into "$STYLE_HOME" --tool claude >/dev/null 2>&1
+install_into "$STYLE_HOME" --tool claude --output-style >/dev/null 2>&1
 STYLE="$STYLE_HOME/.claude/output-styles/toby.md"
+STYLE_MD="$STYLE_HOME/.claude/CLAUDE.md"
+if grep -q '^## Prose$' "$STYLE_MD"; then
+  flunk claude "--output-style left the writing rules in CLAUDE.md as well"
+elif ! grep -q '^## Skill Routing$' "$STYLE_MD"; then
+  flunk claude "--output-style dropped the operating floor from CLAUDE.md"
+elif ! grep -q '^## Prose$' "$STYLE"; then
+  flunk claude "--output-style did not put the writing rules in the style"
+else
+  pass claude "--output-style splits the guide, no section in both"
+fi
 if [[ ! -f "$STYLE" ]]; then
   flunk claude "output style did not install"
 elif ! diff -q "$ROOT/output-styles/toby.md" "$STYLE" >/dev/null; then
@@ -178,6 +199,30 @@ elif ! grep -q '^keep-coding-instructions: true$' "$STYLE"; then
   flunk claude "installed output style would switch off the coding instructions"
 else
   pass claude "output style matches the repo"
+fi
+
+# --hooks ships the checker and both hooks, and they must run from there with no
+# checkout present and no environment variable set.
+HOOK_HOME="$TMP_ROOT/hooks"
+install_into "$HOOK_HOME" --tool claude --hooks >/dev/null 2>&1
+KIT="$HOOK_HOME/.claude/toby"
+PROBE="$TMP_ROOT/probe.md"
+printf 'This uses a robust approach.\n' > "$PROBE"
+if [[ ! -f "$KIT/scripts/voice-check.py" || ! -f "$KIT/hooks/voice-write-check.py" ]]; then
+  flunk hooks "--hooks did not install the checker and the hooks"
+elif [[ ! -f "$KIT/base/toby.md" ]]; then
+  flunk hooks "--hooks did not install base/toby.md, so the banned list is missing"
+elif python3 "$KIT/scripts/voice-check.py" "$PROBE" --fix-only >/dev/null 2>&1; then
+  flunk hooks "the installed checker missed a banned word"
+else
+  pass hooks "installed checker runs standalone and catches a banned word"
+fi
+
+PAYLOAD="{\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$PROBE\"}}"
+if printf '%s' "$PAYLOAD" | python3 "$KIT/hooks/voice-write-check.py" >/dev/null 2>&1; then
+  flunk hooks "the installed write hook did not flag a banned word"
+else
+  pass hooks "installed write hook runs with no checkout and no TOBY_ROOT"
 fi
 
 if [[ "$fail" -ne 0 ]]; then

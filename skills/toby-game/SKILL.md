@@ -5,7 +5,7 @@ description: "Collaborate to build a single-file HTML simulation game or toy in 
 
 # Toby Game
 
-You bring the idea. This skill brings the taste — a real system underneath, jokes wired to the mechanics, a paper-and-ink look, a run that goes somewhere. One self-contained HTML file. Genre, theme, and tone are yours each time.
+You bring the idea. This skill brings the taste: a real system underneath, jokes wired to the mechanics, a paper-and-ink look, a run that goes somewhere. One self-contained HTML file. Genre, theme, and tone are yours each time.
 
 ## What this prevents
 
@@ -26,7 +26,7 @@ It exists to kill the notes you would otherwise give twice:
 
 ## Opening move
 
-Do not ask "what genre?" Ask two things. What system are we modeling, and what is the one surprising thing it should do when it runs? And is there a target — an institution, a ceremony, a process — and who is the underdog caught in it? A premise can have no target and be a pure toy, so do not staple a bureaucracy onto one that refuses it. When there is a target, name the specific mechanism and steal its real texture before writing a single joke.
+Do not ask "what genre?" Ask two things. What system are we modeling, and what is the one surprising thing it should do when it runs? And is there a target, meaning an institution, a ceremony, or a process? Who is the underdog caught in it? A premise can have no target and be a pure toy, so do not staple a bureaucracy onto one that refuses it. When there is a target, name the specific mechanism and steal its real texture before writing a single joke.
 
 ## The dials
 
@@ -41,7 +41,7 @@ Place the game on a few axes, propose one combination with a reason, then let th
 
 ## The build
 
-Loop first: the sim ticks, something changes, the player interferes, it matters — placeholder art, before anything else — and confirm the one surprising thing shows. Then layer by reference, and calibrate with bots. End each pass with a short status and the next dial to turn.
+Build the loop first, on placeholder art, before anything else. The sim ticks, something changes, the player interferes, it matters. Confirm the one surprising thing shows. Then layer by reference, and calibrate with bots. End each pass with a short status and the next dial to turn.
 
 ## References
 
@@ -54,4 +54,4 @@ Loop first: the sim ticks, something changes, the player interferes, it matters 
 
 ## The games behind it
 
-flux (a particle field), nbody (an orbit sandbox), gridlock (a traffic sim), denial-of-service (a DOM card-swipe satire), spot-kicks (a penalty duel), raccoon-syndicate (a heist idle). Touchstones that show the range. They are not bundled with the skill. The job is the next one in that range, wherever you point.
+Read these for the range the style already covers. Flux (a particle field), nbody (an orbit sandbox), gridlock (a traffic sim), denial-of-service (a DOM card-swipe satire), spot-kicks (a penalty duel), raccoon-syndicate (a heist idle). They are not bundled with the skill. The job is the next one in that range, wherever you point.

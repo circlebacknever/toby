@@ -254,6 +254,46 @@ def check_output_style(errors: list[str]) -> None:
         errors.append("output style must set keep-coding-instructions: true, or Toby stops engineering")
 
 
+CLAUDE_FLOOR = REPO_ROOT / "instructions" / "claude" / "CLAUDE-floor.md"
+
+
+def check_floor_complements_style(errors: list[str]) -> None:
+    """The floor file and the output style together are the whole guide.
+
+    They ship as a pair: the style holds the writing sections, CLAUDE-floor.md
+    holds the rest, and installing the full guide alongside the style would put
+    the same 4,900 tokens in front of every turn twice. A section in both, or in
+    neither, is a rule that fires twice or not at all.
+    """
+    if not CLAUDE_FLOOR.exists():
+        errors.append("instructions/claude/CLAUDE-floor.md is missing, run scripts/sync.sh")
+        return
+    base = sections_of(BASE_TOBY.read_text())
+    # Read the marked block, or the last section picks up the closing marker and
+    # reads as drift on every run.
+    try:
+        floor_block = extract_instruction_block(CLAUDE_FLOOR)
+    except ValueError as exc:
+        errors.append(str(exc))
+        return
+    floor = sections_of(floor_block)
+    style = sections_of(OUTPUT_STYLE.read_text()) if OUTPUT_STYLE.exists() else {}
+
+    for name in base:
+        in_floor, in_style = name in floor, name in style
+        if in_floor and in_style:
+            errors.append(f"section {name!r} is in both CLAUDE-floor.md and the output style")
+        elif not in_floor and not in_style:
+            errors.append(f"section {name!r} is in neither CLAUDE-floor.md nor the output style")
+    for name, body in floor.items():
+        if name not in base:
+            errors.append(f"CLAUDE-floor.md has a section base/toby.md lacks: {name!r}")
+        elif body.strip() != base[name].strip():
+            errors.append(f"CLAUDE-floor.md section {name!r} has drifted from base/toby.md")
+    if "output style" not in floor_block[:600]:
+        errors.append("CLAUDE-floor.md must say the writing rules come from the output style")
+
+
 def check_skills(skills_root: Path, errors: list[str]) -> None:
     if not skills_root.exists():
         errors.append(f"{skills_root} does not exist")
@@ -407,6 +447,7 @@ def prose_paths() -> list[Path]:
         REPO_ROOT / "skills" / "toby-voice" / "references" / "toby.md",
         REPO_ROOT / "AGENTS.md",
         REPO_ROOT / "output-styles" / "toby.md",
+        REPO_ROOT / "instructions" / "claude" / "CLAUDE-floor.md",
     }
     return [p for p in paths if p not in generated]
 
@@ -695,6 +736,8 @@ IMPERATIVES = {
     "sketch", "assume", "count", "push", "reach", "carry", "own", "opt",
     "update", "document", "describe", "raise", "hunt", "quote", "collapse",
     "watch", "weigh", "gate", "trust", "batch", "cache", "log",
+    "lead", "place", "recover", "collaborate", "ship", "reorder", "teach",
+    "build", "cut", "sketch", "reduce", "turn", "pin", "brief",
 }
 
 
@@ -961,6 +1004,7 @@ def main() -> int:
     check_skills(skills_root, errors)
     check_instruction_sync(errors)
     check_output_style(errors)
+    check_floor_complements_style(errors)
     check_stale_references(errors)
     check_review_skill(errors)
     check_operating_guide_refs(errors)

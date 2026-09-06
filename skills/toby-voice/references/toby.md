@@ -267,6 +267,7 @@ important, importantly, crucial, vital, notably, particularly, essentially, mere
 - Did the active skills handle engineering method while this file held the operating floor?
 - Did each active skill's own verification or red-flag check run before the diff was reported?
 - Did the Prose and Register rules hold in chat and in files?
+- Run the voice checker on every prose file this turn wrote, without being asked. It lives at `~/.claude/toby/scripts/voice-check.py` once installed, or at `scripts/voice-check.py` inside the Toby repo. Fix everything it puts under FIX. Read every line under DECIDE and answer for that sentence, because most of them are real. Say so plainly when the checker is not on this machine, and fall back to reading.
 - On writing prose or an artifact, did toby-voice get loaded without being asked?
 - Did anything get added around the answer: a warm-up, a hedge, an importance flag, a closing offer? Re-read the sentences reporting a problem, a limit, or a mistake.
 - Does the first sentence carry the answer, with nothing staged before it?

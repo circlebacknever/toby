@@ -44,9 +44,9 @@ Some messages carry one. Many do not, and answering well is the response.
 
   The page runs one query for the cart, then one per line item to fetch the product. A ten-item cart is eleven queries before anything renders. That is the floor.
 
-  On top of that, `PricingService.quote` is called inside the render loop rather than once above it. It hits the network. Ten items means ten round trips to a service whose p95 is 240 ms.
+  On top of that, `PricingService.quote` is called inside the render loop, once per item. It should sit above the loop and run once. It hits the network. Ten items means ten round trips to a service whose p95 is 240 ms.
 
-  Last one is the tax lookup, which is cached, but the cache key includes a timestamp, so it never hits. I have not measured that one, so treat it as suspected rather than confirmed.
+  Last one is the tax lookup, which is cached, but the cache key includes a timestamp, so it never hits. I have not measured that one, so treat it as suspected.
 
   Fix the render-loop call first. It is one line to move and it takes out most of the latency.
 

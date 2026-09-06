@@ -16,11 +16,11 @@ description: >-
 
 # Toby Feature Dev
 
-Build the thing that was asked for, in pieces someone can watch land. The failure this skill prevents is the nine-file diff that arrives finished, every decision already made inside it. The user can accept it or throw it away. A small answer is a valid result. "The repo already does this at file:line." "This is a four-line change." "This needs one decision from you before any code." Nobody has ever been annoyed to hear the feature already exists.
+Build the thing that was asked for, in pieces someone can watch land. The failure this skill prevents is the nine-file diff that arrives finished. Every decision is already made inside it, so the user can only accept it or throw it away. A small answer is a valid result. "The repo already does this at file:line." "This is a four-line change." "This needs one decision from you before any code." Nobody has ever been annoyed to hear the feature already exists.
 
 ## The running order
 
-Mode. Size. Discovery. Criteria. Slices. Stop 1. Design. Plan. Stop 2. Build the slice, prove it, record it. Stop 3. Handoff. This file owns that order and how much of it a change owes. The toby-swd-* skills own what good engineering looks like at each step.
+Mode, size, discovery, criteria, slices, stop 1, design, plan, stop 2, then build the slice, prove it, record it, stop 3, handoff. This file owns that order and how much of it a change owes. The toby-swd-* skills own what good engineering looks like at each step.
 
 ## Pick the mode before anything else
 
@@ -31,7 +31,7 @@ Two modes, and picking wrong is expensive in both directions. A throwaway spike 
 
 When the user picks a behavior at the end of an experiment, come back here and write the criteria from what they picked. The spike proves behavior and decides no structure. toby-swd-experiment's finish phase deletes the throwaway code, and what survives gets the greenfield or brownfield read on its own merits. Durable work that stalls on a value no amount of reading can settle drops into toby-swd-experiment for that one question, then returns with the answer.
 
-Every durable feature loads toby-swd-strategy: a full design pass before any code on strategic or greenfield work, its brownfield read and reactive-investment pass on tactical work. The operating guide's standing routes fire here on their own conditions and this file never narrows them. The skills that fired name the active-skills line.
+Every durable feature loads `toby-swd-strategy`. Strategic and greenfield work gets a full design pass before any code. Tactical work gets its brownfield read and its reactive-investment pass. The operating guide's standing routes fire here on their own conditions and this file never narrows them. The skills that fired name the active-skills line.
 
 ## Size the work before anything else
 
@@ -41,7 +41,7 @@ Two sizes. Pick one before discovery, say which in a line, and read the table fo
 
 **Tactical** otherwise, which is most work.
 
-Before either, check that this skill should be running at all. A one-file edit following a pattern already in that file is in this skill's own skip clause, so make the edit and say what you changed. A criteria line for a copy change is the ceremony this file exists to avoid.
+Before either, check that this skill should be running at all. A one-file edit following a pattern already in that file sits in this skill's own skip clause. Make the edit and say what you changed. A criteria line for a copy change is the ceremony this file exists to avoid.
 
 | Gate | Tactical | Strategic |
 |---|---|---|
@@ -76,7 +76,7 @@ Both modes:
 
 ## Every criterion is its own proof
 
-Write each acceptance criterion as three short lines before any code, plus one for what stays working: the behavior beside this one the change has to leave alone. Missing one of the three means it isn't a criterion, so ask, or drop it. Write one criterion per behavior the request names, and stop there. A tactical change usually has one.
+Write each acceptance criterion as three short lines before any code. Add one more for what stays working, meaning the behavior beside this one that the change has to leave alone. Missing one of the three means it isn't a criterion, so ask, or drop it. Write one criterion per behavior the request names, and stop there. A tactical change usually has one.
 
 - **Observable** — given a starting state, when an action happens, the user or caller sees a result, at the entry point they touch: "an expired token gets a 401, and the retry after refresh returns the account." An entry point is where something outside the changed module arrives. An HTTP request, a CLI invocation, a screen someone opens, a queue message, an exported symbol another module calls. A line checkable only by reading the diff is the diff with a checkbox on it, so rewrite it or cut it.
 - **Source** — the user sentence or ticket line it came from, quoted, or the repo fact that forces it, cited at path:line. A repo fact with no path:line is your preference. Source to a repo fact only where the request is silent on that behavior.
@@ -97,11 +97,11 @@ Questions the repo answers, questions about anything one edit undoes, and questi
 
 ## Cut the work into slices
 
-Tactical work has one slice and owes only the four ship conditions below, so read those and move on. The naming and the cut matter once there are two.
+Cut tactical work into one slice, which owes only the four ship conditions below. Read those and move on. The naming and the cut start mattering once there are two.
 
 A slice is the criteria that land observable together at one entry point. Criteria reaching different entry points are different slices: a route and a scheduled job, two screens, an API and a migration a caller can see.
 
-Name each slice for what a person can do once it lands, in their words: `invite shows up as pending`, `search matches a full SKU`. That name is the plan's group heading, the stop line, and the row in the final report, so the user reads one phrase from approval through handoff. `Slice 2 of 3` names the counting.
+Name each slice for what a person can do once it lands, in their words: `invite shows up as pending`, `search matches a full SKU`. That name becomes the plan's group heading, the stop line, and the row in the final report. The user reads one phrase from approval through handoff. `Slice 2 of 3` names the counting.
 
 A slice ships when all four hold:
 
@@ -124,7 +124,7 @@ Never write "assuming yes, proceeding" past a stop, which leaves this skill with
 
 ## The plan document
 
-The operating guide owns the format — `Toby's plan for [task]`, task groups, checkboxes, a verification block ending each group. This file owns when the plan gets written and what a step carries for someone to approve it. Do not agree a plan in scrollback, because nobody can check it off.
+Write the plan as a file, and never agree one in scrollback, because nobody can check that off. The operating guide owns the format: `Toby's plan for [task]`, task groups, checkboxes, and a verification block ending each group. This file owns when the plan gets written and what a step carries for someone to approve it.
 
 - **Written when** the user asks, which includes the yes at stop 1. Naming the plan at that stop is what gets one.
 - **Where** the repo already keeps plans. With nowhere obvious, propose a path and get a yes, the same gate the behavior record gets.
@@ -156,7 +156,7 @@ The operating guide owns the format — `Toby's plan for [task]`, task groups, c
 
 ## Write the behavior down
 
-A year out, the code says what it does and nothing says what it was for. The next reader audits it against their own guess and files the difference as a bug.
+Write down what the request said the behavior should be. A year out, the code says what it does and nothing says what it was for. The next reader audits it against their own guess and files the difference as a bug.
 
 - **Fires** when the request holds words for a behavior — the user's or the ticket's — and the record doesn't state it yet. `references/behavior-record.md` holds what writes no entry and where an inferred behavior goes. A run that writes none names its reason from that list.
 - **Home** is a prose file the repo already keeps for stated behavior. With nothing present, propose `docs/behavior.md` and get a yes before creating it, the same gate the plan file gets.
@@ -170,7 +170,7 @@ A year out, the code says what it does and nothing says what it was for. The nex
 
 ## Resuming half-built work
 
-Before touching code, recover the mode, the criteria list, the plan and which steps are checked off, and the last checkpoint decision from the thread, the diff, the plan file, the behavior record, and the repo. When none of them survive, rebuild them from the code that exists and the original request, show them, and confirm before continuing. Criteria read back off a diff agree with that diff, including where it was wrong. Name whichever ones you couldn't recover. Half-built experiment code is still experiment code until the user says otherwise.
+Before touching code, recover five things: the mode, the criteria list, the plan, which steps are checked off, and the last checkpoint decision. Look in the thread, the diff, the plan file, the behavior record, and the repo. When none of them survive, rebuild them from the code that exists and the original request, show them, and confirm before continuing. Criteria read back off a diff agree with that diff, including where it was wrong. Name whichever ones you couldn't recover. Half-built experiment code is still experiment code until the user says otherwise.
 
 ## Red flags
 
@@ -185,7 +185,9 @@ Two sections this file adds, and both always appear:
 1. Each criterion in its pre-code wording, marked met with the check that proved it, or unverified with why. Multi-slice work lists each slice by name, done or not-done, with its evidence.
 2. Behavior record entries written, edited, or retired, and the result of the check. A run where none fired says so and why. Where the plan lives, and any step that ran differently from the approved wording.
 
-Then the operating guide's list: anything incomplete or risky, tests deleted or weakened, heavy commands skipped, processes left running, assumptions still waiting. Phrase each standing assumption so the user can settle it in a word, and name the questions this run could not resolve. Add placeholders left in a production path at file:line, and what you found and left alone, one line each, handed to the skill that owns it. Dropping a section is a claim you checked it and found it empty.
+Then the operating guide's list. Anything incomplete or risky, tests deleted or weakened, heavy commands skipped, processes left running, assumptions still waiting.
+
+Phrase each standing assumption so the user can settle it in a word. Name the questions this run could not resolve. Add placeholders left in a production path at file:line, and what you found and left alone, one line each, handed to the skill that owns it. Dropping a section is a claim you checked it and found it empty.
 
 ## References
 
