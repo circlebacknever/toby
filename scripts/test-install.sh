@@ -76,7 +76,8 @@ while IFS='|' read -r label skills_rel instr_rel; do
   fi
 
   # Every installed skill must be byte-identical to the repo copy.
-  if [[ -d "$dir" ]] && diff -r "$ROOT/skills" "$dir" >/dev/null 2>&1; then
+  # The installer strips .DS_Store, so a Finder copy in the repo is not a difference.
+  if [[ -d "$dir" ]] && diff -r -x .DS_Store "$ROOT/skills" "$dir" >/dev/null 2>&1; then
     pass "$label" "skill contents match the repo"
   else
     flunk "$label" "installed skills differ from $ROOT/skills"

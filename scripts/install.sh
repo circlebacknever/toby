@@ -101,6 +101,8 @@ install_skills() {
       run rm -rf "$target"
     fi
     run cp -R "$skill" "$target"
+    # Finder drops .DS_Store into any folder it opens. Keep it out of the install.
+    run find "$target" -name .DS_Store -delete
   done
 }
 

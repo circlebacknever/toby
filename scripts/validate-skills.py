@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -294,6 +295,22 @@ def check_floor_complements_style(errors: list[str]) -> None:
         errors.append("CLAUDE-floor.md must say the writing rules come from the output style")
 
 
+def stray_ds_store() -> list[Path]:
+    """Return the .DS_Store files that can reach a commit or an install.
+
+    Finder writes .DS_Store into every folder it opens, so one on disk is
+    normal. .gitignore keeps it out of commits and install.sh strips it from
+    copies, which leaves a tracked file as the only defect. Outside a git
+    checkout nothing filters it, so every file on disk counts.
+    """
+    listed = subprocess.run(
+        ["git", "ls-files"], cwd=REPO_ROOT, capture_output=True, text=True
+    )
+    if listed.returncode != 0:
+        return list(REPO_ROOT.rglob(".DS_Store"))
+    return [REPO_ROOT / rel for rel in listed.stdout.splitlines() if Path(rel).name == ".DS_Store"]
+
+
 def check_skills(skills_root: Path, errors: list[str]) -> None:
     if not skills_root.exists():
         errors.append(f"{skills_root} does not exist")
@@ -304,7 +321,7 @@ def check_skills(skills_root: Path, errors: list[str]) -> None:
         if path.exists():
             errors.append(f"forbidden package path exists: {path}")
 
-    for path in REPO_ROOT.rglob(".DS_Store"):
+    for path in stray_ds_store():
         errors.append(f"remove .DS_Store: {path}")
 
     names: dict[str, Path] = {}
