@@ -107,15 +107,15 @@ install_skills() {
 }
 
 install_hooks() {
-  # The checker and the two hooks, with the two files they read. Four scripts and
-  # base/toby.md, which holds the banned-word list they check against.
+  # The checker, the two hooks, and the two files the checker reads: voice_rules.py
+  # and base/toby.md, which holds the banned-word list.
   local kit="$HOME/.claude/toby"
   run mkdir -p "$kit/scripts" "$kit/base" "$kit/hooks"
   if [[ "$DRY_RUN" -eq 1 ]]; then
     printf '[dry-run] install the voice checker and hooks to %s\n' "$kit"
     return
   fi
-  run cp "$ROOT/scripts/validate-skills.py" "$kit/scripts/"
+  run cp "$ROOT/scripts/voice_rules.py" "$kit/scripts/"
   run cp "$ROOT/scripts/voice-check.py" "$kit/scripts/"
   run cp "$ROOT/base/toby.md" "$kit/base/"
   run cp "$ROOT/hooks/voice-stop-check.py" "$kit/hooks/"

@@ -141,6 +141,7 @@ Block already there? Only the block changes. No block? The installer waits for `
 - `scripts/validate-skills.py` - the validator.
 - `output-styles/toby.md` - the voice rules as a Claude Code output style, generated from `base/toby.md`.
 - `scripts/voice-check.py` - run this for a voice pass. Every rule, on a file or stdin, split into what to fix and what to decide.
+- `scripts/voice_rules.py` - the rules the checker runs. The validator imports them too, so the checker never needs the validator.
 - `hooks/` - a Stop hook that reads the finished reply, and a PostToolUse hook that reads a file the moment it lands. `hooks/README.md` wires them up.
 - `scripts/token-budget.py` - what a turn costs, by which skills fire.
 - `evals/` - the regression suite. `evals/README.md` says how to run it and how to add a case.

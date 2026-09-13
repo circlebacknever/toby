@@ -39,14 +39,14 @@ PATTERNS = [
 ]
 
 # Words used outside their everyday meaning. Kept in step with COINED_TERMS in
-# scripts/validate-skills.py, which checks the same rule against files. This one
+# scripts/voice_rules.py, which checks the same rule against files. This one
 # checks it against the reply, which is the only surface no file check reaches.
 COINED = [
     "first-read", "blast radius", "surface area", "load-bearing", "north star",
     "forcing function", "cognitive surface", "affordance", "the shape of the work",
 ]
 
-# Figurative frames, kept in step with FIGURATIVE_FRAMES in validate-skills.py.
+# Figurative frames, kept in step with FIGURATIVE_FRAMES in voice_rules.py.
 # A sentence cannot wear a hat, and the file checks never see a reply.
 FRAMES = [
     "wearing a", "wears a", "dressed as", "in disguise", "masquerading as",

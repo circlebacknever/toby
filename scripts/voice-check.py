@@ -25,15 +25,14 @@ Exit 1 when anything lands in FIX. DECIDE never fails the run.
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import re
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location("validate_skills", REPO_ROOT / "scripts" / "validate-skills.py")
-v = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(v)
+# The rules live in voice_rules.py beside this file. The checker needs that file
+# and base/toby.md, and nothing else from the repo.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import voice_rules as v  # noqa: E402
 
 WELD_RE = re.compile(r"\w\s+—\s+\w|\w;\s+\w")
 BARE_PRONOUN_RE = re.compile(r"\b(This|That)\s+(is|was|means|makes|leaves|gets|costs|holds)\b")
