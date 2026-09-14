@@ -7,7 +7,7 @@ python3 evals/run.py gates
 ```
 
 Green means nothing regressed. Red names what did, and every number it compares
-against sits in `baselines/gates.json`.
+against is in `baselines/gates.json`.
 
 ## The two kinds of check, and why they are separate
 
@@ -39,14 +39,14 @@ runs took back.
 
 The lost-rules gate compares against `baselines/rules.txt`, a snapshot of every
 prose sentence in `skills/`. It reads zero accepted deletions today, because the
-snapshot was retaken once the skill work landed. Re-take it with
+snapshot was retaken once the skill work merged. Re-take it with
 `python3 scripts/rule-inventory.py > evals/baselines/rules.txt` followed by
 `evals/run.py record`, and only after reading what the gate reported.
 
 The gate holds a list, and not a count. A deletion arriving the same
 week as a rewording keeps the count still and swaps the contents, so the
 baseline is the sentences themselves. It also demands a complete match for a
-sentence under eight content words: three common words landing in an unrelated
+sentence under eight content words: three common words appearing in an unrelated
 sentence clear a 60 percent overlap on their own, and "Mock external
 dependencies at the system boundary" survived exactly that way while the rule
 was gone.
@@ -83,6 +83,8 @@ the ranges overlap.
 |---|---|---|---|
 | `triggering` | which skills a description makes fire, across four positive and six over-triggering prompts | `evals/run.py compare triggering` | 2 |
 | `voice` | banned words, foils, sentence length, clause welds in four written outputs | `scripts/score-voice.py` | 5 |
+| `content` | slogans, claim headings, deck titles, contributor rules, and six chat turns in a row, where register drifts | `scripts/voice-check.py` on each output, then the `content-judge` suite | 5 |
+| `content-judge` | every distracting sentence across the `content` and `voice` results, what passed, and the sentence types the writers produce | a person, reading the judge's file | 1 |
 | `review` | whether a review catches three seeded defects and reports them the way the skill specifies | a person, against `suites/review.md` | 1 |
 | `feature-dev` | whether the process a request gets matches its size | a person, against `suites/feature-dev.md` | 1 |
 | `learning` | whether a beginner gets taught in steps without a wall of text | a person, against `suites/learning.md` | 1 |
@@ -95,13 +97,13 @@ probes before Group 2, zero after, confirmed by a second run whose instructions
 never mentioned skip clauses. That count is what the pass actually bought.
 
 N5 and N6 cover `toby-game` and `toby-squall`, which fire only when the user
-names them. Both stayed silent on a prompt carrying every trigger noun in their
+names them. Both stayed silent on a prompt containing every trigger noun in their
 descriptions. `check_invoke_only` in the validator holds the same rule from the
-other side: each of them must state it in its description and carry a matching
+other side: each of them must state it in its description and have a matching
 invoke-only line in the guide's Skill Routing, and the guide may not route
 either on conditions.
 
-Each scenario carries a fenced block of directives — `Required`, `Forbidden`,
+Each scenario has a fenced block of directives — `Required`, `Forbidden`,
 `Optional`, `Exactly one of` — and the runner scores against those. The agent
 writing a run reports only what fired. It used to report its own totals while
 being told not to read the expected sets, so it guessed them, and one run
@@ -121,7 +123,7 @@ change, which is why the sizing section now says to check the skip clause before
 sizing anything.
 
 `baselines/explain.json` — three runs of the same four questions. The evidence
-rule held from the first run: every claim carried a path and a line, and "safe
+rule held from the first run: every claim cited a path and a line, and "safe
 to remove" came back as a guess with the missing test run named. The length rule
 took two tries. Written as prose it moved nothing, and a 42-word sentence
 survived. Written as three numbered limits with a word count in them, the
@@ -148,7 +150,7 @@ confused a reader here.
 
 ## The figurative-frame check
 
-A sentence cannot wear a hat. The check holds the guide's ban on invented
+This check enforces the guide's ban on invented
 metaphor, and it catches the commonest form that ban takes here: an abstract
 thing described as if it had a body or clothes.
 
@@ -199,7 +201,7 @@ from what is convenient.
 evals/
   run.py             the runner
   suites/            the cases, one file per suite
-  fixtures/          inputs a suite feeds to a subagent
+  fixtures/          inputs a suite gives to a subagent
   baselines/         recorded numbers, and runs/ for the outputs behind them
   results/           scratch from a run, ignored by git
   boundaries.md      which skill owns which decision, behind the skip clauses

@@ -1,10 +1,11 @@
 # Worked Examples — Mobile (React Native, with notes for native)
 
-Mobile interfaces have three idiosyncrasies the comment test exposes
-quickly: navigation params get serialized so the interface to a screen is
-literally a string contract, native bridges have an asymmetric cost
-profile that tempts thin wrappers, and persistent storage interfaces are
-where stale data lives if the contract isn't clear.
+In mobile code, the comment test quickly exposes problems in navigation
+params, native bridges, and persistent storage. Navigation params get
+serialized, so the interface to a screen is literally a string contract.
+Native bridges have an asymmetric cost profile that makes thin wrappers
+tempting. Persistent storage interfaces hold stale data when the contract is
+unclear.
 
 ---
 
@@ -39,10 +40,10 @@ The interface comment, complete:
 > authenticate in try/catch and handle BiometryNotAvailable,
 > BiometryNotEnrolled, and BiometryLockoutPermanent separately.
 
-Twelve sentences. Describes ordering ("Call X first, then Y"). Describes
-platform-specific protocol. The "interface" is seven separate APIs
-the caller must compose, with platform quirks layered on top. Failure
-named.
+The comment runs twelve sentences and describes ordering ("Call X first, then
+Y") and platform-specific protocol. The "interface" is seven separate APIs
+the caller must compose, with platform quirks layered on top. The comment
+test names that failure.
 
 Candidate B, the deep module:
 
@@ -70,16 +71,16 @@ Comment:
 > payload is supplied, the result includes a signature bound to a
 > per-device key (created lazily on first use).
 
-Four sentences. iOS/Android differences are gone from the caller's view,
-because they collapsed into status's discriminator. Key lifecycle, Info.plist
-errors, and lockout handling all live inside. Common callers just call
+The comment runs four sentences. iOS/Android differences are gone from the
+caller's view, because status's discriminator covers them. Key lifecycle,
+Info.plist errors, and lockout handling are all inside. Common callers call
 `prompt({ reason: 'Confirm payment' })` and switch on the result.
 
-Guardrail check: did anything caller-facing get hidden? The
+The guardrail check asks whether anything caller-facing got hidden. The
 caller still needs to know that a payload signature is per-device (so
 sending the signature to the server is meaningful only if the server
-trusts that device). One sentence covers it. The fingerprint sensor's
-internal protocol does not.
+trusts that device). One sentence in the comment states that fact, and the
+comment leaves out the fingerprint sensor's internal protocol.
 
 ---
 
@@ -114,13 +115,13 @@ The interface comment for `ProductDetail`:
 > recommendations will be empty and user will be the deep-link guest user;
 > in that case the screen shows a "log in to see recommendations" CTA.
 
-Seven sentences. Describes the data flow into the screen and what happens
-when each field is missing. The "interface" is leaking the structure of the
+The comment runs seven sentences and describes the data flow into the screen
+and what happens when each field is missing. The "interface" is leaking the structure of the
 navigating screen's state and the staleness model. The deep-link case has
 to be specially described because the contract was designed for the
 in-app-navigation path.
 
-Failure named: route params carry runtime state when they should carry only identity.
+The named failure is that route params contain runtime state when they should contain only identity.
 
 Candidate B:
 
@@ -140,20 +141,21 @@ Comment:
 > recommendations on mount via the products repository; renders a guest
 > view if the user is not signed in.
 
-Two sentences. The route is now pure identity — what to show. Loading,
+The comment runs two sentences. The route now contains only identity, which
+is what to show. Loading,
 staleness, and signed-in-vs-guest are owned by the screen itself, which
 reads `useAuth()` and a `useProduct(productId)` query. Deep links work
 because the route is serializable and small.
 
 The screen now uses identity in its route and queries (or context) for
-everything else — auth, recommendations, current user. That's the
-contract a route should have.
+everything else, such as auth, recommendations, and the current user. A
+route should have that identity-only contract.
 
 ---
 
 ## Example 3 — Persistent storage module: untyped store vs typed accessor
 
-A common pre-encapsulation interface:
+Apps often start with this interface before they encapsulate storage:
 
 ```ts
 interface Storage {
@@ -176,15 +178,15 @@ Comment, complete:
 > and the database has a configurable total cap. iOS has no comparable
 > per-key limit.
 
-Six sentences. The "interface" is `get/set/delete/clear`, but the
-operational contract — JSON serialization, key namespacing, versioning,
-not-clearing-auth-on-logout, the iOS size limit — is documentation a
-caller must internalize. Every screen that uses Storage gets a copy of
+The comment runs six sentences. The "interface" is `get/set/delete/clear`,
+but a caller must still learn the operational contract. That contract covers
+JSON serialization, key namespacing, versioning, not clearing auth on logout,
+and the iOS size limit. Every screen that uses Storage gets a copy of
 this knowledge.
 
-Failure named: this is a wrapper around AsyncStorage with a module's name. The
-domain knowledge (what's stored, in what layout, what versions exist) belongs
-inside.
+The named failure is that `Storage` is a wrapper around AsyncStorage with a
+module's name. The domain knowledge (what's stored, in what layout, what
+versions exist) belongs inside the module.
 
 Redesign as typed accessors per domain:
 
@@ -219,7 +221,7 @@ Android size limits (it batches writes or drops oldest items if needed).
 Keychain/Keystore, not AsyncStorage). The screens that use these modules
 don't know any of that.
 
-Logout becomes a deliberate composition, naming each store to drop:
+Logout code now names each store to clear:
 
 ```ts
 await Session.clear();
@@ -273,11 +275,11 @@ Comment:
 > on first mount before the user context resolves; treat undefined as
 > "not allowed."
 
-Six sentences, describes invariants about combinations of fields, "treat X
-as Y" instructions in the comment. The hook returns five named fields and
+The comment runs six sentences, describes invariants about combinations of
+fields, and gives "treat X as Y" instructions. The hook returns five named fields and
 expects the caller to coordinate them.
 
-Candidate B, smaller surface, typed state:
+Candidate B has a smaller interface and typed state:
 
 ```ts
 type OrderScreenState =
@@ -302,7 +304,7 @@ Comment:
 > (an action absent from actions is not permitted). Action methods return
 > Result so callers can surface failures without try/catch.
 
-Three sentences. Two improvements at the contract level:
+The comment runs three sentences, and the contract improves in two places:
 
 - The discriminator eliminates the "what does undefined mean" problem.
 - Permissions move from "boolean per action" to "presence of the action in
@@ -310,7 +312,7 @@ Three sentences. Two improvements at the contract level:
   to render in the wrong state. A button that checks `permissions.canRefund`
   before calling `actions.refund` is one if-statement away from a bug.
 
-This second move encodes "allowed" as presence of the action, so a parallel
+The second change encodes "allowed" as presence of the action, so a parallel
 boolean never exists. It is the kind of contract redesign the comment test
 reveals, because writing "permissions may be undefined for an instant" is the
 signal that the design is wrong.
@@ -321,10 +323,10 @@ signal that the design is wrong.
 
 - **iOS/Swift, Android/Kotlin**: same checks. A `ViewController` or
   `Fragment` accepting twelve init parameters costs a caller as much as the
-  RN screen passing a `user` object through route params. Identity in,
-  state through composition.
+  RN screen passing a `user` object through route params. Pass identity in,
+  and get state through composition.
 - **Flutter**: route params are arguments, and the same
-  identity-in/data-via-providers principle applies. Riverpod/Provider play the context role.
+  identity-in/data-via-providers principle applies, with Riverpod or Provider as the context.
 - **Native modules**: the bridge interface should hide the platform's
   protocol the way Example 1 does, regardless of which side you're writing
   on. A Swift `BiometricsBridge` that exposes `isAvailable`, `createKeys`,

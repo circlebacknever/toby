@@ -13,7 +13,7 @@ Wire it up in settings.json:
     {"hooks": {"Stop": [{"hooks": [{"type": "command",
       "command": "python3 /absolute/path/hooks/voice-stop-check.py"}]}]}}
 
-Input: the Stop hook payload on stdin, carrying transcript_path.
+Input: the Stop hook payload on stdin, containing transcript_path.
 Output: exit 0 to allow. Exit 2 with a reason on stderr to block, which hands
 the reason back to the agent for one repair pass.
 """
@@ -32,8 +32,11 @@ PATTERNS = [
     (re.compile(r"\bit'?s not\s+[^.,\n]{0,40},\s*it'?s\b", re.I), "`it's not X, it's Y` — state the thing directly"),
     (re.compile(r"\bnot just\b"), "`not just` — say what it is"),
     (re.compile(r"\brather than\b"), "`rather than` — name the thing you chose"),
-    (re.compile(r",\s*though\.?\s*$", re.M), "trailing `though` — a rider on a sentence that landed"),
-    (re.compile(r"\bthat said,", re.I), "`that said` — a rider on a sentence that landed"),
+    (re.compile(r",\s*though\.?\s*$", re.M), "trailing `though` — a rider on a sentence that was already complete"),
+    (re.compile(r"\bthat said,", re.I), "`that said` — a rider on a sentence that was already complete"),
+    # `carry` is legal only for moving an object or an arithmetic carry, and a
+    # reply about code almost never means either one.
+    (re.compile(r"\bcarr(?:y|ies|ied|ying)\b", re.I), "`carry` used as a metaphor, so write contains, has, includes, or states"),
     (re.compile(r"\b(?:hope this helps|feel free|let me know if|don't hesitate)\b", re.I),
      "relational performance — cut the closing offer"),
 ]
@@ -51,6 +54,11 @@ COINED = [
 FRAMES = [
     "wearing a", "wears a", "dressed as", "in disguise", "masquerading as",
     "with a new hat", "under the hood", "pretending to be",
+    "lives in", "lives at", "lives inside", "sits in", "sits on", "sits at",
+    "sits above", "sits outside", "land", "lands", "landed", "falls through", "rests on",
+    "feeds", "glides over", "earns its keep", "earns its place", "boils down to",
+    "low-hanging fruit", "silver bullet", "rabbit hole", "move the needle",
+    "heavy lifting", "sweet spot", "deep dive", "pain point",
 ]
 
 # The prose ceiling is 25 words. The hook fires at 40, well past it, because a

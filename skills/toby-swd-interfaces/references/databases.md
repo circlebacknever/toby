@@ -1,14 +1,14 @@
 # Worked Examples — Databases and Data Access
 
-The data layer has a few stock interfaces — repositories, query builders,
-transactions, migrations. The comment test fails on these in predictable
-ways and the redesigns are equally predictable.
+The data layer has a few stock interfaces, such as repositories, query
+builders, transactions, and migrations. The comment test fails on these in
+predictable ways, and the redesigns are equally predictable.
 
 ---
 
 ## Example 1 — Repository interface: ORM exposed vs intent methods
 
-A repository sketch the team accepted without much thought:
+The team accepted this repository sketch without much thought:
 
 ```python
 class UserRepository:
@@ -35,11 +35,11 @@ The interface comment:
 > session's lifetime, otherwise accessing relationships afterwards will
 > raise DetachedInstanceError.
 
-Eight sentences. SQLAlchemy concepts (Session, Query, expunge,
+The comment runs eight sentences. SQLAlchemy concepts (Session, Query, expunge,
 DetachedInstanceError) are part of the contract. Callers must know how
 sessions work, how to write SQLAlchemy filters, and how to manage commit
-and detachment. Failure named: this is a SQLAlchemy bindings layer pretending
-to be a domain repository.
+and detachment. The named failure is that this class is a SQLAlchemy bindings
+layer with a domain repository's name.
 
 Redesign with intent methods:
 
@@ -63,24 +63,24 @@ Comment for `update_profile`:
 > updated user. Atomic. Returns NotFound if no such user exists; returns
 > ValidationFailed with field-level reasons if any change is invalid.
 
-Three sentences. The session, ORM, query syntax, commit policy, and
+The comment runs three sentences. The session, ORM, query syntax, commit policy, and
 detachment problem are all internal. The caller writes
 `users.update_profile(id, ProfileChanges(name="new"))` and gets a typed
 result back.
 
-The depth gain: each intent method enforces invariants the bindings layer
-couldn't. `deactivate` can transactionally write the audit log and revoke
-sessions, knowing those are derived facts that shouldn't be the caller's
-to coordinate.
+The redesign gains depth, because each intent method enforces invariants the
+bindings layer could not. `deactivate` can write the audit log and revoke
+sessions in one transaction, because those are derived facts the caller
+should not coordinate.
 
 ---
 
 ## Example 2 — Query object interface design
 
 A single find method that covers every filter needs an interface that
-doesn't trade the finder-explosion for a different problem.
+replaces the one-finder-per-filter problem without creating a different problem.
 
-Candidate A — too thin:
+Candidate A is too thin:
 
 ```java
 public interface UserRepository {
@@ -96,12 +96,12 @@ Comment:
 > mismatches throw ClassCastException at runtime. Limit defaults to 200
 > if absent; values over 1000 are silently capped.
 
-Failed: untyped map pushes type errors to runtime that a typed surface would
-catch at compile time, the
-accepted keys are part of the contract documented in prose, "silently
-capped" is a leak about the implementation.
+Candidate A fails because the untyped map pushes type errors to runtime that
+a typed interface would catch at compile time. The accepted keys are part of
+the contract but appear only in prose, and "silently capped" leaks a detail
+about the implementation.
 
-Candidate B — too rigid:
+Candidate B is too rigid:
 
 ```java
 public interface UserRepository {
@@ -117,11 +117,11 @@ Comment:
 > skip role filtering. The active flag cannot be skipped; pass true or
 > false explicitly. limit must be 1..1000.
 
-Failed: null-as-skip is the same problem as the untyped map, and the
+Candidate B fails because null-as-skip is the same problem as the untyped map, and the
 "active" filter is awkward because a primitive boolean can't be optional.
 Adding the next filter changes every call site.
 
-Candidate C — the value object:
+Candidate C uses a value object:
 
 ```java
 public interface UserRepository {
@@ -150,27 +150,27 @@ Comment for `find`:
 > ignored. Results are paginated; the response includes the next page
 > token if there are more results.
 
-Three sentences. `UserQuery` has its own comment describing each filter,
+The comment runs three sentences. `UserQuery` has its own comment describing each filter,
 but it's a value object. Its contract is "what each field means", and a
 reader who needs `orgId` only reads that one comment.
 
 Offset/limit pagination drifts when rows are inserted or deleted
 mid-iteration, so a page can repeat a row or skip one.
 The opaque `pageToken` encodes a stable cursor, so paging stays correct under
-concurrent writes. That's the trade. A token and a page size cost a bit more
-surface than a bare row limit, and buy correctness under concurrent load.
+concurrent writes. A token and a page size add a little more to the interface
+than a bare row limit, and in return paging stays correct under concurrent load.
 
 The default constructor and the builder methods make the common case easy:
 `users.find(new UserQuery().withOrgId(org).withActive(true))`. The
-somewhat-general-purpose framing applies. This covers today's known queries
-and a reasonable surface of near-future ones, without becoming a god
+somewhat-general-purpose bias applies, because `UserQuery` covers today's
+known queries and a reasonable set of near-future ones without becoming a god
 interface for arbitrary searches.
 
 ---
 
 ## Example 3 — Transaction interface: explicit `tx` vs unit of work
 
-A pattern that grows in TypeScript codebases around Knex/Prisma:
+This pattern appears often in TypeScript codebases around Knex/Prisma:
 
 ```ts
 interface OrdersRepository {
@@ -206,7 +206,7 @@ The comment requires a sentence about transaction threading. Every
 repository method has the same `tx?` argument and the same caveat. The
 "interface" leaks the transaction protocol into every signature.
 
-Failure named: `tx` is a pass-through variable that every method must
+The named failure is that `tx` is a pass-through variable that every method must
 accept "in case" the caller is composing.
 
 Redesign with ambient transaction context:
@@ -248,11 +248,11 @@ Comment for `OrdersRepository.insert`:
 
 > Inserts the order and returns it with its assigned id.
 
-One sentence. The `UnitOfWork.run` contract handles the transactional
-guarantee separately.
+The comment is one sentence, because the `UnitOfWork.run` contract handles
+the transactional guarantee separately.
 
-Guardrail: did anything needed get hidden? Yes — sometimes the caller
-needs to know whether they are inside a transaction (for example, to avoid
+The guardrail asks whether the redesign hid anything callers need, and it
+did. Sometimes the caller needs to know whether they are inside a transaction (for example, to avoid
 firing an out-of-process event that would commit independently). For that
 case, expose `UnitOfWork.isActive()` as a one-method check and keep the `tx`
 parameter off every method.
@@ -261,10 +261,10 @@ parameter off every method.
 
 ## Example 4 — Migration as an interface
 
-Migrations are an interface between code versions. What they expose
-determines what's possible.
+Migrations are an interface between code versions, and what a migration
+exposes determines what is possible between those versions.
 
-Candidate A — the schema-mutation script:
+Candidate A is the schema-mutation script:
 
 ```python
 def upgrade():
@@ -274,8 +274,8 @@ def downgrade():
     op.drop_column('users', 'phone_number')
 ```
 
-The interface comment isn't usually written because Alembic scripts are
-"obvious." It isn't:
+Teams rarely write the interface comment, because Alembic scripts look
+obvious. The contract is not obvious:
 
 > Adds a phone_number column to the users table on upgrade; drops it on
 > downgrade. Note: any existing User domain objects after upgrade will
@@ -286,9 +286,9 @@ The interface comment isn't usually written because Alembic scripts are
 > data and is non-destructive only if no phone_number values were
 > written during the rolled-back window.
 
-The migration's contract is more complex than the script suggests. The thing that's leaked
-is the difference between "schema migration" and "data migration". The
-script does the former and offers no story for the latter.
+The migration's contract is more complex than the script suggests. The script leaks
+the difference between "schema migration" and "data migration". It handles
+the schema migration and offers no plan for the data migration.
 
 Redesigning the *interface to migrations*, past this one migration, helps:
 
@@ -307,8 +307,8 @@ class Migration:
     def schema_down(self): ...  # reverse-only; may lose data
 ```
 
-This is heavier than what most teams need on day one. Most teams ship
-`upgrade()` / `downgrade()` and live with it. When the comment test exposes
+The `Migration` class is heavier than what most teams need on day one. Most teams ship
+`upgrade()` / `downgrade()` and accept the gaps. When the comment test exposes
 the real interface (schema, data, code coordination across deploys), the
 team can decide whether to invest in the deeper abstraction or accept the
 limits of the shallow one. The choice is now informed.
@@ -327,4 +327,4 @@ limits of the shallow one. The choice is now informed.
 | Comment mentions "session", "connection", "cursor" | The underlying driver is leaking; hide it |
 
 When the comment refers to mechanism (sessions, queries, transactions, cursors),
-the repository is shaped around mechanism, when it should be shaped around the knowledge it owns. Re-slice.
+the repository is organized around mechanism, when it should be organized around the knowledge it owns, so redraw its boundaries around that knowledge.

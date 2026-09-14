@@ -50,19 +50,19 @@ Documenting the endpoint:
 > the response includes a next-page link, but offset >10000 is rejected
 > for performance reasons.
 
-A whole paragraph. The wire contract is leaking the implementation's
+The comment is a whole paragraph. The wire contract leaks the implementation's
 "active" interpretation, the validation rules, the performance defenses,
 and the legacy compatibility note. Every consumer reads this paragraph
-and bakes it into their client.
+and builds those rules into their client.
 
-The redesign: a query object on the wire, the implementation owns the
-defaults and the validation, and the contract gets short.
+The redesign puts a query object on the wire and lets the implementation own
+the defaults and the validation, so the contract gets short.
 
 ```http
 GET /api/users?filter=<url-encoded JSON>&page_token=...&page_size=50
 ```
 
-Where `filter` is a single structured value, with one documented encoding
+`filter` is a single structured value, with one documented encoding
 (URL-encoded JSON):
 
 ```json
@@ -84,26 +84,26 @@ Comment:
 > token is returned in the response. Page size defaults to 50, maximum
 > 200.
 
-Four sentences. Definitions of "active" and validation specifics move to
-the filter object's schema (versioned, documented separately from this
-endpoint). The pagination contract is opaque tokens, which lets the
-server change its internal offset strategy without telling clients, so
-performance defenses become invisible to callers. The endpoint is now
-shaped like its contract: "list users by criteria" with one criteria
-input and one pagination control.
+The comment runs four sentences. Definitions of "active" and validation
+specifics move to the filter object's schema (versioned, documented separately
+from this endpoint). The pagination contract uses opaque tokens, which lets the
+server change its internal offset strategy without telling clients. As a
+result, callers never see the performance defenses. The endpoint now matches
+its contract, which is "list users by criteria" with one criteria input and
+one pagination control.
 
-Guardrail: did anything get hidden that callers need? The
+The guardrail asks whether the redesign hid anything callers need. The
 performance limit on deep pagination is caller-facing. Opaque
 tokens convey it implicitly, because the token stops being valid past a limit.
 The response returns a named status the caller can branch on when that
 happens (a `400`/`410`-style "page token expired, restart paging"), so an
 expired token isn't mistaken for a transient error.
 
-One wire caveat: a query string has a practical length ceiling, because proxies
-and servers cap the URL around a few KB. A small filter fits. A large or heavily
-nested one doesn't, and encoding it as base64 only delays the wall. When the
-criteria object outgrows the URL, the same object moves to a
-`POST /api/users/search` body — identical contract, different transport.
+One wire caveat is that a query string has a practical length limit, because
+proxies and servers cap the URL around a few KB. A small filter fits, but a large
+or heavily nested one does not, and encoding it as base64 only postpones the limit.
+When the criteria object becomes too long for the URL, the same object moves to a
+`POST /api/users/search` body, which keeps the contract and changes the transport.
 That gives up GET's caching and idempotent-by-method semantics, so keep the
 GET form while the filter stays small.
 
@@ -139,13 +139,14 @@ The complete comment:
 > which is a separate transaction and may leave a captured payment with no
 > persisted order in rare cases — the reconciliation job handles these.
 
-Eleven sentences. Order ("First X, then Y"), internal exception names,
-edge-case escape hatches (`skipTaxValidation`), partial-failure semantics
-the caller must know about. Failure named at multiple levels.
+The comment runs eleven sentences. It states call order ("First X, then Y"),
+internal exception names, edge-case flags (`skipTaxValidation`), and
+partial-failure semantics the caller must know about. The comment fails the
+test at several levels.
 
 Redesign by knowledge. The procedure is "place an order from a cart," so
-the contract should look like one operation and absorb the seven validations
-the caller currently orchestrates:
+the contract should be one operation that performs the seven validations
+the caller currently coordinates:
 
 ```java
 public sealed interface OrderResult {
@@ -174,18 +175,18 @@ public enum OrderFailureReason {
 }
 ```
 
-Comment passes: four sentences, no ordering, no exception names, no
-escape hatches in the surface. The `skipTaxValidation` flag is gone,
+The comment passes, because it runs four sentences and has no call order, no
+exception names, and no edge-case flags. The `skipTaxValidation` flag is gone,
 because that policy is a property of the org, computed inside the service from
-`userId`. The "partial failure of payment capture" reality is hidden
-behind the atomic guarantee in the comment. Achieving atomicity is the
+`userId`. The atomic guarantee in the comment hides the partial failure of
+payment capture. Achieving atomicity is the
 implementation's job (saga, outbox, or two-phase). If atomicity
 cannot be guaranteed, the contract changes to expose it (returns include
 an in-progress status), but it doesn't expose the implementation strategy.
 
-The `idempotencyKey` is part of that contract too. A retry carrying the key
+The `idempotencyKey` is part of that contract too. A retry with the key
 it used the first time returns the original result and never places a second
-order. A mutation is safe to retry only when the request carries a key the
+order. A mutation is safe to retry only when the request has a key the
 server dedupes on, or the operation is naturally idempotent. The key is what
 lets a caller re-send a `placeOrder` that timed out without risking a double
 charge.
@@ -195,7 +196,7 @@ charge.
 ## Example 3 — Go service interface declared at the consumer
 
 When one service consumes another, the question is what the consumer-side
-interface should expose. The temptation is to define a "convenient"
+interface should expose. Developers are tempted to define a convenient
 interface with everything the consumer might want.
 
 ```go
@@ -220,11 +221,11 @@ The comment on this interface:
 > is for the admin checkout path. ResolveUserByEmail is for guest checkout
 > with email-only login.
 
-Five methods, five different uses, each describing both behavior and which
-caller-site uses it. Failure named: this is a grab-bag. It exists to be
-"convenient" for any future need.
+The interface has five methods for five different uses, and the comment
+describes both the behavior and the call site for each. The named failure is
+that the interface is a grab-bag that exists to be convenient for any future need.
 
-Redesign with the actually-needed method only:
+Redesign with only the method `Checkout` needs:
 
 ```go
 // pkg/orders/checkout.go
@@ -255,15 +256,15 @@ Comment for `userLookup`:
 > A user-lookup capability. GetUser returns the user with this id, or a
 > NotFound error.
 
-Two sentences. The interface is single-purpose and the comment naturally
-shrinks to match.
+The comment runs two sentences, because the interface has a single
+purpose.
 
 ---
 
 ## Example 4 — gRPC/protobuf message design
 
-Protobuf forces an explicit interface and the comment test is unusually
-revealing there.
+Protobuf forces an explicit interface, so the comment test exposes its
+problems.
 
 Candidate A:
 
@@ -292,10 +293,10 @@ Comment for `UpdateUser(UpdateUserRequest)`:
 > user's resources, which is async; callers should not assume the new role
 > is in effect immediately.
 
-A paragraph. The proto3 presence problem leaked into the contract, an
-extra protocol detail (field_mask) became a caller obligation, and the
-two side-effects (session revocation, async permission re-evaluation) are
-buried in the prose.
+The comment is a paragraph. The proto3 presence problem leaked into the
+contract, an extra protocol detail (field_mask) became a caller obligation,
+and the prose hides the two side-effects (session revocation, async
+permission re-evaluation).
 
 Redesign by intent. Separate the operations that are conceptually distinct:
 
@@ -324,15 +325,15 @@ Comments, one per RPC:
 Each comment is one to two sentences. Each RPC has one effect that the
 caller can reason about. The proto3 presence problem disappears because
 no field is "set or unset". Every field on every message is required to
-the operation. The side effects move from "buried in prose" to "named in
-the operation's purpose."
+the operation. The side effects move from hidden in the prose to named in
+the operation's purpose.
 
 On a published service, splitting `UpdateUser` into four RPCs is a
 wire-breaking change, because existing clients call an RPC that no longer exists.
 The new RPCs ship alongside the old one, which stays and is marked
 `deprecated` until callers migrate, and proto field numbers are never reused.
-Greenfield designs adopt the split directly. This is the brownfield rule the
-skill states. A surface other teams build on doesn't get broken without a
+Greenfield designs adopt the split directly. The brownfield rule in the skill
+covers this split, so do not break an interface other teams build on without a
 migration path.
 
 For high-cardinality update endpoints (admin tools that legitimately edit
@@ -355,6 +356,6 @@ form is the default, and the bulk form is the exception.
 | Producer-defined interface with 6+ methods | Consumer-side narrow interfaces |
 | Comment that says "callers must call X before Y" | Combine into one method, or hide the order behind a factory/builder |
 
-Same pattern across all stacks: when the comment swells with ordering,
-flags, exceptions, or special cases, the interface is asking the caller
-to do work that belongs inside.
+The same pattern holds in every stack. When the comment grows with ordering,
+flags, exceptions, or special cases, the interface makes the caller do work
+that belongs inside the module.

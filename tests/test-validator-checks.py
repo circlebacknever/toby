@@ -120,7 +120,7 @@ v.check_output_style(style_errors)
 check("output style is in sync", not style_errors, str(style_errors[:2]))
 style_text = v.OUTPUT_STYLE.read_text()
 check("output style keeps the coding instructions", "keep-coding-instructions: true" in style_text)
-check("output style carries every writing section",
+check("output style contains every writing section",
       all(f"## {name}" in style_text for name in v.OUTPUT_STYLE_SECTIONS))
 check("output style leaves out skill routing", "## Skill Routing" not in style_text)
 check("output style leaves out environment safety", "## Environment Safety" not in style_text)

@@ -1,23 +1,23 @@
 # Toby Artifact components
 
-Load this file when building any component for an Toby Artifact artifact — callouts, alerts, badges, status pills, stat grids, worked examples, decision rows, sparklines in tables, code blocks, dialogs, treeviews, equation blocks.
+Load this file when you build any component for a Toby Artifact Style artifact. The components include callouts, alerts, badges, status pills, stat grids, worked examples, decision rows, sparklines in tables, code blocks, dialogs, treeviews, and equation blocks.
 
-## Signature patterns — reach for these when content fits
+## Signature patterns
 
-When a request matches one of these patterns, USE it. These are the moves that give an Toby Artifact artifact its character.
+When a request matches one of these patterns, USE it. These patterns give a Toby Artifact Style artifact its recognizable look.
 
-- **Callout / Alert / Toast** — state-tinted panel using the soft / tint / text family. Title bold, body opacity 0.88.
-- **StatusPill** — dot + label, fully tinted by hue. For live system state.
-- **Badge** — mono compact chip with a count or token. Variants: ink (default), info, stable, watch, cons.
+- **Callout / Alert / Toast** — state-tinted panel in the soft / tint / text family, with a bold title and the body at opacity 0.88.
+- **StatusPill** — dot + label, fully tinted by hue, that shows live system state.
+- **Badge** — mono compact chip with a count or token. Its variants are ink (default), info, stable, watch, and cons.
 - **StatGrid (KPI grid)** — 3 or 4 columns, hairline dividers, 2px top accent strip cycling through the chart palette.
 - **Worked Example** — three rows: PREMISE (info-tinted) → DERIVATION (watch-tinted) → RESULT (stable-tinted).
 - **Decision Row** — title + meta + Approve / Hold / Reject buttons in matching semantic colors.
-- **Sparkline-in-table** — embed an 80–120px trace SVG in a table cell. Adjacent columns for Last and Δ%.
-- **Code block** — DARK theme. Ink-2 background, mono, line gutter, copy button, syntax classes (kw / num / str / com).
-- **Treeview** — hairline rule down the left of each level. Selected row uses paper-2 + 3px info inset.
+- **Sparkline-in-table** — embed an 80–120px trace SVG in a table cell. Add adjacent columns for Last and Δ%.
+- **Code block** — a DARK-theme block with an ink-2 background, mono text, a line gutter, a copy button, and syntax classes (kw / num / str / com).
+- **Treeview** — hairline rule down the left of each level. The selected row uses paper-2 with a 3px info inset.
 - **Annotation pin** — numbered circle + leader line + framed label, all in `--toby-info`.
 - **Equation block** — centered mono formula with a 2px info-colored top accent.
-- **Dialog · alert variant** — adds a 4px red top strip and red title. Only for irreversible actions.
+- **Dialog · alert variant** — adds a 4px red top strip and a red title, and it is only for irreversible actions.
 
 ---
 
@@ -26,59 +26,59 @@ When a request matches one of these patterns, USE it. These are the moves that g
 Beyond the signatures above, Toby Artifact ships ~60 components total.
 
 ### Layout & structure
-- **Topbar** — header with breadcrumb, optional id stamp, right-aligned actions. 56px tall.
-- **Sidebar** — grouped vertical nav. Selected row uses `--toby-paper-2` + 3px `--toby-info` left inset (never paper-3).
-- **Panel** — content card with eyebrow + title + actions. Variants: `default` (lifted), `flush` (paper-toned), `authority` (ink-toned).
+- **Topbar** — 56px-tall header with a breadcrumb, an optional id stamp, and right-aligned actions.
+- **Sidebar** — grouped vertical nav. The selected row uses `--toby-paper-2` with a 3px `--toby-info` left inset, and never paper-3.
+- **Panel** — content card with eyebrow + title + actions. Its variants are `default` (lifted), `flush` (paper-toned), and `authority` (ink-toned).
 - **Tabs** — info-soft tinted active tab with 3px `--toby-info` underline.
-- **Accordion** (covers Collapsible) — single-open by default; pass `multi` for multiple.
+- **Accordion** (covers Collapsible) — single-open by default, and passing `multi` lets multiple sections open.
 - **Toolbar** — inline mini-controls strip. `.toolbar__btn--on` fills with ink + `--text-on-dark`.
 - **Pagination** — 32px mono cells, tabular numerals, ellipses kept when range overflows.
-- **Breadcrumb** — slash-separated; last item is current (no link styling).
+- **Breadcrumb** — slash-separated trail. Its last item is the current page and has no link styling.
 
 ### Form controls
 - **Button** — `default` (paper), `primary` (ink), `ghost` (transparent), `consequence` (accent). `--sm` for 28px height.
 - **Input** — 36px height, info teal focus ring at 2px offset.
-- **Textarea** — multi-line Input; optional `maxLength` shows mono char count bottom-right.
-- **Number field** — mono digits with tabular numerals; stacked +/− on the right. Native browser spinners hidden.
-- **OTP field** — N mono slots (default 6) with optional `groupAt` separator. Backspace walks back.
+- **Textarea** — multi-line Input, where an optional `maxLength` shows a mono character count at the bottom right.
+- **Number field** — mono digits with tabular numerals and stacked +/− buttons on the right. The native browser spinners are hidden.
+- **OTP field** — N mono slots (default 6) with an optional `groupAt` separator. Backspace moves to the previous slot.
 - **Checkbox** + **CheckboxGroup** — group has `row` modifier for inline layout.
 - **Radio** + **RadioGroup** — built the same way as Checkbox.
-- **Switch** — alias of **Toggle**. One primitive.
-- **Toggle** — 36×20 track + thumb. On = ink track, paper thumb.
+- **Switch** — alias of **Toggle**, so both names use one primitive.
+- **Toggle** — 36×20 track + thumb. When on, the track is ink and the thumb is paper.
 - **Slider** — mono value displayed right of the label, tabular numerals.
-- **ToggleGroup** — segmented control. `.tgrp__btn--on` fills with ink + white. `white-space: nowrap`.
-- **Combobox** (covers **Select** and **Autocomplete**) — searchable by default; pass `searchable={false}` for plain Select.
-- **Calendar** — Today gets 2px `--toby-info` border + bold + info text. Selected day fills ink. Marked dates show a small red dot.
-- **DatePicker** — Calendar inside a popover; trigger shows ISO-format selected date in mono.
+- **ToggleGroup** — segmented control. `.tgrp__btn--on` fills with ink + white. Buttons use `white-space: nowrap`.
+- **Combobox** (covers **Select** and **Autocomplete**) — searchable by default, and `searchable={false}` gives a plain Select.
+- **Calendar** — Today gets a 2px `--toby-info` border, bold weight, and info text. The selected day fills with ink, and marked dates show a small red dot.
+- **DatePicker** — Calendar inside a popover, where the trigger shows the selected date in ISO format in mono.
 - **Field / Label / Fieldset** — form structure wrappers.
 
 ### Overlays & menus (consolidated)
 - **Dialog** (covers **Modal** and **AlertDialog**) — backdrop + centred panel. `kind="alert"` adds 4px red top hairline + red title.
 - **Sheet** (covers **Drawer** and **Bottomsheet**) — `side="right" | "left" | "bottom"`. Bottom variant has a drag grip.
-- **Popover** — click-anchored, click-outside dismisses. 16px padding.
-- **Tooltip** — pure hover. Dark ink panel + caret. Always above the trigger.
-- **PreviewCard** — hover card. Richer than a tooltip, lighter than a popover.
-- **Menu** — popover menu primitive. Group labels, hint shortcuts (`⌘C`, `↵`), separators, `danger` variant.
+- **Popover** — click-anchored panel with 16px padding that closes on a click outside it.
+- **Tooltip** — hover-only dark ink panel with a caret, always placed above the trigger.
+- **PreviewCard** — hover card that holds more than a tooltip and less than a popover.
+- **Menu** — popover menu primitive with group labels, hint shortcuts (`⌘C`, `↵`), separators, and a `danger` variant.
 - **ContextMenu** — right-click wrapper around Menu.
 - **Menubar** — horizontal File / Edit / View strip. `--open` state uses paper-2 + 2px info underline.
 - **NavigationMenu** — like Menubar with rich panels. Panel gets a 2px info top border.
 - **Command palette** — full-screen search with grouped items + keyboard footer.
-- **Toast** — bottom-right stack, auto-dismiss ~4s, semantic left-border + soft tinted bg.
+- **Toast** — bottom-right stack that dismisses itself after ~4s, with a semantic left border and a soft tinted background.
 
 ### Display & feedback
-- **Avatar** — initials only (no faces, no abstract art). Sizes: sm (22), md (28), lg (40). `--ink` variant for dark fill.
+- **Avatar** — initials only, with no faces and no abstract art. The sizes are sm (22), md (28), and lg (40), and the `--ink` variant has a dark fill.
 - **Badge** — see Signature.
-- **Kbd** — keyboard glyph. Mono, 2px bottom border so it looks pressable.
-- **Spinner** — 1.5px ring, 720ms linear, no glow. Sizes: md (16), lg (22).
-- **Skeleton** — shimmer placeholder. Kinds: `line` (12px), `title` (18px), `block` (64px).
-- **Progress** — 4px linear bar. Semantic kinds match state hues; `indeterminate` available.
+- **Kbd** — mono keyboard glyph with a 2px bottom border so it looks pressable.
+- **Spinner** — 1.5px ring with a 720ms linear spin and no glow. The sizes are md (16) and lg (22).
+- **Skeleton** — shimmer placeholder. Its kinds are `line` (12px), `title` (18px), and `block` (64px).
+- **Progress** — 4px linear bar whose semantic kinds match the state hues. An `indeterminate` kind is also available.
 - **Meter** — progress + min/max axis + optional consequence-red threshold mark.
 - **Separator** — `horizontal` (1px hairline) or `vertical` (1px column). `strong` modifier uses `--border-strong`.
 - **Empty state** — dashed hairline border, info-teal geometric icon, title + body + optional action.
 
 ### Data display
 - **Metric** — label + big numeric value + unit suffix + optional rail (progress strip) + optional target line.
-- **KV** — two-column definition list. Term (uppercase eyebrow, mono-tracked) left, value (mono, tabular numerals) right.
+- **KV** — two-column definition list. The term appears on the left as an uppercase mono-tracked eyebrow, and the value appears on the right in mono with tabular numerals.
 - **EvidenceTable** — `.tbl` with `.num` class for right-aligned mono columns. Header uses `--border-strong` divider.
 - **Sparkline** — inline trace SVG (80–120px wide). Use as a table cell, KV value, or stat-card adornment.
 
@@ -86,7 +86,7 @@ Beyond the signatures above, Toby Artifact ships ~60 components total.
 
 ## Consolidation rules
 
-One primitive per problem, multiple names for it. Don't invent separate components when the existing primitive already covers the case.
+Each problem has one primitive, which can go by several names. Do not invent a separate component when an existing primitive already covers the case.
 
 | Names that map to one primitive | Primitive | Differentiator |
 |---|---|---|
@@ -103,7 +103,7 @@ One primitive per problem, multiple names for it. Don't invent separate componen
 
 ## Paste-ready starter HTML
 
-Every value below references tokens defined in SKILL.md. Change copy, never the structural classes.
+Every value below references tokens defined in SKILL.md. Change the copy, but never change the structural classes.
 
 ### Callout / Alert / Toast — state-tinted panel
 
@@ -135,7 +135,7 @@ Every value below references tokens defined in SKILL.md. Change copy, never the 
 .alert__close { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; opacity: 0.6; font-size: 16px; padding: 0 4px; }
 ```
 
-The same `--*-soft / --*-tint / --*-text` triple drives status pills, badges, toasts, and worked-example rows. Build new state-tinted patterns the same way.
+The same `--*-soft / --*-tint / --*-text` triple sets the colors for status pills, badges, toasts, and worked-example rows. Build new state-tinted patterns the same way.
 
 ### Status pill — dot + label
 
@@ -320,7 +320,7 @@ The same `--*-soft / --*-tint / --*-text` triple drives status pills, badges, to
 .dec__btn--on.dec__btn--reject  { background: var(--toby-accent); color: var(--text-on-dark); }
 ```
 
-Three named verbs only. The chosen verb fills with its semantic color. Each decision needs a rationale field and a named rollback owner.
+Use only the three named verbs. The chosen verb's button fills with its semantic color. Each decision needs a rationale field and a named rollback owner.
 
 ### Code block — dark theme
 
@@ -373,7 +373,7 @@ Three named verbs only. The chosen verb fills with its semantic color. Each deci
 ## Quick rules summary
 
 - Numeric columns are always right-aligned, mono, with tabular numerals.
-- State-tinted components always read as one color family — soft bg, tint border, text fg, un-soft left strip.
+- State-tinted components always read as one color family, with a soft background, tint border, text foreground, and un-soft left strip.
 - Selected items in lists use paper-2 + 3px info inset. Paper-3 against paper-3 is invisible.
-- Focus rings are info teal, 2px outside ring at 2px offset. Never red.
-- Press states step the bg darker. The control does not move.
+- Focus rings are 2px info-teal outside rings at a 2px offset, and they are never red.
+- Press states make the background darker, and the control does not move.

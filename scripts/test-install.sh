@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install the whole package into a throwaway HOME and check what landed is right.
+# Install the whole package into a throwaway HOME and check that what it installed is right.
 # Touches only temp dirs, which it removes on exit. Proves the package installs
 # on a fresh machine without trusting prose.
 #
@@ -41,7 +41,7 @@ install_into() {
 }
 
 # The instruction block as base/toby.md defines it, which is what every
-# installed instruction file must carry verbatim.
+# installed instruction file must contain verbatim.
 base_block() { cat "$ROOT/base/toby.md"; }
 
 installed_block() {
@@ -175,10 +175,10 @@ if [[ -f "$PLAIN_HOME/.claude/output-styles/toby.md" ]]; then
 elif ! grep -q '^## Prose$' "$PLAIN_HOME/.claude/CLAUDE.md"; then
   flunk claude "default install left the writing rules out of CLAUDE.md"
 else
-  pass claude "default install carries the whole guide, no style"
+  pass claude "default install contains the whole guide, no style"
 fi
 
-# --output-style: the style carries the writing rules and CLAUDE.md drops them.
+# --output-style: the style contains the writing rules and CLAUDE.md drops them.
 STYLE_HOME="$TMP_ROOT/style"
 install_into "$STYLE_HOME" --tool claude --output-style >/dev/null 2>&1
 STYLE="$STYLE_HOME/.claude/output-styles/toby.md"

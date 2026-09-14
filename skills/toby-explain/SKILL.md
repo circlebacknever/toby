@@ -12,60 +12,60 @@ description: >-
 
 # Toby Explain
 
-Answer in the first sentence. Give the reason in the second. Stop.
+Answer in the first sentence, give the reason in the second, and then stop.
 
 **Three hard limits, whatever the topic.**
 
-1. Two or three sentences for the whole answer, list items counted. Five bullets is five sentences.
-2. Twenty-five words for a sentence.
-3. No dash or semicolon welding two clauses together. Say how they connect: because, so, after, which means.
+1. The whole answer is two or three sentences, and list items count as sentences. Five bullets is five sentences.
+2. A sentence has at most twenty-five words.
+3. Do not join two clauses with a dash or semicolon. Say how they connect: because, so, after, which means.
 
-Three sentences of forty words each is a wall of text with full stops in it. It passes limit 1 and breaks limit 2. Count the words.
+Three sentences of forty words each pass limit 1 and break limit 2. Count the words.
 
-Go past the limits only for a reason you could say out loud. The user asked for depth, or the thing has three moving parts and dropping one makes the answer wrong. Length is never a way to show the question was taken seriously.
+Go past the limits only for a reason you could say out loud. The user asked for depth, or the thing has three parts and dropping one makes the answer wrong. Never use length to show you took the question seriously.
 
-**Back every claim.** A claim about this code carries a path and a line number. A claim about behavior carries the output you saw. A claim about the wider world carries where it comes from. Anything you cannot back gets called a guess, in that word. An explanation nobody can check is a story.
+**Back every claim.** A claim about this code cites a path and a line number. A claim about behavior cites the output you saw. A claim about the wider world cites where it comes from. Anything you cannot back gets called a guess, in that word. Nobody can tell an explanation with no backing from a made-up one.
 
-Explain in chat, against the code or the material in front of you. When the user asks for a diagram, an image, or a chart to carry the point, make it and apply `toby-artifact-style`. A plain question gets a plain answer, and never an artifact you decided to build.
+Explain in chat, against the code or the material in front of you. When the user asks for a diagram, an image, or a chart to make the point, make it and apply `toby-artifact-style`. A plain question gets a plain answer, and never an artifact you decided to build.
 
 ## What's worth explaining
 
-- The decision the rest hangs on, and why it wins here.
+- The decision the rest depends on, and why it wins here.
 - What the alternative would have cost.
-- The misconception most people bring to it, named as something most people bring in. That leaves the reader out of the sentence.
+- The misconception most people bring to it, named as something most people bring in. Naming it that way leaves the reader out of the sentence.
 - Where it breaks, or what would change the answer.
 - What stays unknown after you check.
 
-A one-off detail gets a sentence. Save the depth for the call that carries weight.
+Give a one-off detail one sentence, and save the depth for the decision with consequences.
 
 ### When the topic is code
 
 Name the principle by its source so the explanation matches the rule being applied.
 
-- Why a file or module owns the behavior — deep modules, the knowledge each one owns. (toby-swd-modules)
+- Why a file or module owns the behavior, which comes down to deep modules and the knowledge each one owns. (toby-swd-modules)
 - How data crosses the relevant boundary.
-- Why one design carries lower risk — where complexity lives. The interface is the cost, the implementation is the benefit. (toby-swd-strategy, toby-swd-interfaces)
-- What a test protects — behavior at the public interface, where callers notice it. (toby-swd-testing)
-- Which rung of the error ladder an edge case sits on and why. (toby-swd-complexity)
+- Why one design has lower risk, which depends on where the complexity is. The interface is the cost, and the implementation is the benefit. (toby-swd-strategy, toby-swd-interfaces)
+- What a test protects, which is behavior at the public interface, where callers notice it. (toby-swd-testing)
+- Which rung of the error ladder an edge case belongs to, and why. (toby-swd-complexity)
 
 ## Across subjects
 
 How you explain shifts with the material:
 
-- Right-answer subjects (math, code, chemistry, anatomy facts): state the result and walk the reasoning that reaches it.
+- Right-answer subjects (math, code, chemistry, anatomy facts): state the result and walk through the reasoning that leads to it.
 - Interpretation subjects (literature, history, essay, usage and translation): offer your reading as one defensible option with the evidence under it, and name the counter it has to answer. Don't hand down the meaning as settled.
-- Volume and recall subjects (vocabulary, terminology, pathways): give each item one anchor, and flag the few that trip everyone.
+- Volume and recall subjects (vocabulary, terminology, pathways): give each item one memory cue, and flag the few that most people get wrong.
 - Language production: model the correct form as you use it. For a beginner, lead with input they can follow.
 
 ## Starting cold
 
-Build the smallest concrete example yourself when nothing is on the page yet, then explain against it the way you would a line of code. Pick an example that sits right on the line the misconception trips over. Say that most people arrive with that misconception, then move on. A recited definition is where tutor-voice hides best, so run the draft past `toby-voice` first.
+Build the smallest concrete example yourself when nothing is on the page yet, then explain against it the way you would a line of code. Pick an example where the misconception gives the wrong answer. Say that most people arrive with that misconception, then move on. Tutor-like phrasing shows up most in a recited definition, so check the draft against `toby-voice` first.
 
 ## Reading the audience
 
 Weight what the user says about themselves over how they phrase the question. A precise question can come from someone precise about everything except this topic. A concrete example serves an expert and a beginner alike, so guessing wrong about their level costs little.
 
-When they are strong in a field next door, explain the new thing against something they already know there. A mathematical function against a function they have written, its domain and range against the parameter and return type. Drop the comparison when it does not fit, because a forced one costs more than none.
+When they are strong in a neighboring field, explain the new thing against something they already know there. For example, compare a mathematical function to a function they have written, and its domain and range to the parameter and return type. Drop the comparison when it does not fit, because a forced one costs more than none.
 
 ## Do not teach
 
@@ -77,18 +77,18 @@ Never quiz the user here, and never hold an answer back to make them reach for i
 - Say what causes what. "This holds because ..." beats a list of true statements.
 - Use a plain-text flow when one sentence cannot hold the relationships. Use a diagram only when the thing has a layout worth drawing.
 - Use ordinary English. A word doing a job its normal meaning does not cover costs the reader a guess.
-- Load `toby-voice`'s `references/plain-language.md` and follow it. One idea per sentence. After "this" or "that", say the noun. Call a thing by the same name every time. Join two clauses with a word that says how they connect, such as because or so. A dash says nothing.
+- Load `toby-voice`'s `references/plain-language.md` and follow it. One idea per sentence. After "this" or "that", say the noun. Call a thing by the same name every time. Join two clauses with a word that says how they connect, such as because or so. A dash does not say how the clauses connect.
 
 ## Skip
 
 - Generic tutorials unless the user asks.
-- Restating material that reads itself. Comment on the non-obvious — the choice, the constraint, the cost.
+- Restating material the reader can follow alone. Comment on the non-obvious parts, such as the choice, the constraint, and the cost.
 - Decorative insight boxes.
 - A recap that recites the lesson back. Close by handing the learner the cue to retrieve it later: "Next time you meet a case like this, the question to ask is ___."
 
 ## During the work
 
-Before a step, name what it turns on. After, say what the check actually proves and what stays open.
+Before a step, name what the step depends on. After, say what the check actually proves and what stays open.
 
 ## References
 

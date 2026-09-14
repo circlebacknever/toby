@@ -69,7 +69,7 @@ def main() -> int:
     print(f"{len(gone)} sentences gone, {len(new)} new.")
     print(f"{len(reworded)} paired with a reworded survivor above {threshold}.")
     print(f"{len(scattered)} split across new sentences, every content word still present.")
-    print(f"{len(lost)} carrying words that left the repo. Read every one.\n")
+    print(f"{len(lost)} content words that left the repo. Read every one.\n")
     for line, best, score, missing in lost:
         print(f"LOST  {line}")
         print(f"      words gone: {', '.join(missing)}")

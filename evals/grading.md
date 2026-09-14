@@ -5,7 +5,7 @@
 Same eight prompts, three runs. `baseline/triggering.txt` is the before run.
 `evals/out/triggering-after.txt` is the after run. `evals/out/triggering-blind.txt`
 is a second after run with no mention of skip clauses in the instructions, to
-check the first run was not just following a hint.
+check whether the first run had only followed a hint.
 
 | Run | False fires across N1-N4 | Missed across P1-P4 |
 |---|---|---|
@@ -34,7 +34,7 @@ no test. `evals/out/review-old.md` and `evals/out/review-new.md`.
 
 The compliance pass is what separated the two criteria findings from the bug.
 The old skill reported "two of three required tests don't exist" as one line
-under the bug; the new one checked each criterion against the diff and quoted
+under the bug, and the new one checked each criterion against the diff and quoted
 its wording.
 
 One defect the run exposed: the new skill routed the security bug to

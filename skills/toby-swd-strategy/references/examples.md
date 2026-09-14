@@ -1,16 +1,16 @@
 # Worked Examples: The Same Task, Tactical vs Strategic
 
 Each example shows the tactical version, the smallest change that works, and
-why it quietly hurts. The strategic version follows: the structure the code
-would have had if designed with the change in mind. The code is illustrative,
-and the reasoning transfers.
+why it causes problems later. The strategic version follows, with the structure
+the code would have had if designed with the change in mind. The code is
+illustrative, and the reasoning applies to other code.
 
 ---
 
 ## Example 1 — A new requirement that "just needs a special case"
 
-A function renders user display names. New requirement: deleted users should
-show as "[deleted]".
+A function renders user display names. A new requirement says deleted users
+should show as "[deleted]".
 
 **Tactical**
 
@@ -43,8 +43,8 @@ class User:
 ```
 
 The design pass cost a minute and a near-future variant ("there will be more
-user states") drove it. Now new states are one place, callers are untouched,
-and the formatter no longer knows what "deleted" means. The interface got
+user states") drove it. Now new states go in one place, callers are untouched,
+and the formatter no longer checks for "deleted". The interface got
 simpler while the work moved to where it belongs.
 
 ---
@@ -60,29 +60,30 @@ slightly different backoff. Now there are two retry policies that drift.
 **Strategic — sketch two approaches first:**
 
 - *A: retry decorator on each call site.* Interface: callers add `@retry(...)`.
-  Hides the loop but every call site still chooses and can mis-choose policy.
+  The decorator hides the loop, but every call site still chooses its policy
+  and can choose the wrong one.
 - *B: a retrying transport the client is constructed with.* Interface: callers
   call the client normally, and retry is a property of the client, configured
   once.
 
-B has the simpler caller-side interface and absorbs the "there will be more call
-sites" variant for free. Pick B even though its insides (wrapping the
-transport, classifying retryable errors) are more work than a loop. That extra
-work is the investment. It is paid once, and every current and future call site
-collects the return.
+B has the simpler caller-side interface, and it handles the "there will be more
+call sites" variant at no extra cost. Pick B even though its insides (wrapping
+the transport, classifying retryable errors) are more work than a loop. That
+extra work is the investment, and it is paid once. Every current and future
+call site benefits from it.
 
 ---
 
 ## Example 3 — Modifying existing code under a real deadline
 
-Existing `PaymentProcessor` hardcodes one gateway. Task, due tomorrow: support a
-second gateway for one specific customer.
+The existing `PaymentProcessor` hardcodes one gateway. The task, due tomorrow,
+is to support a second gateway for one customer.
 
 Apply the test: *what would this look like if designed with two gateways in
 mind?* That design is a `Gateway` interface with two implementations and
 selection by config. It is the right design, and it is also several hours you
-do not have before the deadline. This is a legitimate quick-fix situation (hard
-external deadline, accepted cost).
+do not have before the deadline. The situation qualifies for a quick fix,
+because the deadline is hard and external and the cost is accepted.
 
 So take the tactical path deliberately and label it:
 
@@ -96,16 +97,16 @@ def process(self, payment):
     return self._charge_via_legacy(payment)
 ```
 
-You took the shortcut. What separates this from pure tactical programming is
-that the shortcut is now visible, bounded, and carries a stated exit. It reads
-as a labeled loan the next person can see and pay down. Under a deadline, write
-the IOU and state the exit.
+You took the shortcut. This fix differs from pure tactical programming because
+the shortcut is now visible and bounded, and it has a stated exit. The next
+person can see the debt and pay it down. Under a deadline, label the shortcut
+and state the exit.
 
 ---
 
 ## Example 4 — A dispatch that will grow
 
-A function routes a notification to a channel. Today: email and SMS.
+A function routes a notification to a channel. Today the channels are email and SMS.
 
 **Tactical**
 
@@ -118,13 +119,13 @@ def send(notification, user):
 ```
 
 It works. Then push is added, then Slack, then a webhook. Each one edits `send`,
-and three call sites have grown their own copy of the same `if` chain to decide
+and three call sites now have their own copy of the same `if` chain to decide
 whether a channel is available for a user.
 
 **Strategic**
 
-The near-future variant is stated in the first sentence: "today email and SMS."
-More channels are certain, so build the dispatch now:
+The word "today" in the first sentence states the near-future variant, and more
+channels are certain, so build the dispatch now:
 
 ```python
 CHANNELS: dict[str, Channel] = {
@@ -138,12 +139,12 @@ def send(notification, user):
 ```
 
 Each `Channel` owns its client, its address lookup, and its own answer to "is
-this available for this user." A new channel is one class and one entry. The
+this available for this user." Adding a channel takes one class and one entry. The
 call sites lose their copied checks, because `deliver` handles an unavailable
 channel internally.
 
-This is rung 4 of the ladder in `toby-swd-modules` — an interface with one
-implementation per case. The cost over the tactical version is a dict and an
+This dispatch is rung 4 of the ladder in `toby-swd-modules`, which is an
+interface with one implementation per case. The cost over the tactical version is a dict and an
 interface, paid once at design time.
 
 ---
@@ -151,13 +152,15 @@ interface, paid once at design time.
 ## How to calibrate the investment
 
 - The target is roughly 10–20% more effort than the tactical path, spent
-  continuously through the change. Save it up into a separate "cleanup phase"
-  and it never happens. Spend it all at once on a redesign and you have left the
-  band entirely.
-- Proactive spend: trying a second design, choosing names well, writing the
-  interface comment first so the abstraction is stable before the code.
-- Reactive spend: fixing a design flaw the moment you hit it, while you have the
-  context, plus one opportunistic improvement to code you were already in.
-- A "strategic" move that touches large parts of the codebase or blows the
-  effort well past that band has crossed into the big-bang redesign anti-pattern.
+  continuously through the change. If you save it for a separate "cleanup
+  phase", it never happens. If you spend it all at once on a redesign, you have
+  gone outside that range.
+- Proactive spending covers trying a second design, choosing names well, and
+  writing the interface comment first so the abstraction is stable before the
+  code.
+- Reactive spending covers fixing a design flaw as soon as you find it, while
+  you have the context, plus one opportunistic improvement to code you were
+  already in.
+- A "strategic" move that touches large parts of the codebase, or goes well past
+  that effort range, is the big-bang redesign anti-pattern.
   Scope down to what you can do well inside this change.

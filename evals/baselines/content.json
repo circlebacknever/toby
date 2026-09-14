@@ -1,0 +1,28 @@
+{
+  "label": "after the slogan pass",
+  "recorded": "2026-09-14",
+  "git_rev": "working tree, uncommitted",
+  "scorer": "content-judge agent, counting distracting sentences per file",
+  "scores": [
+    11,
+    6,
+    10,
+    10,
+    11
+  ],
+  "checker_findings": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "samples": [
+    "runs/2026-09-14-content-s1.md",
+    "runs/2026-09-14-content-s2.md",
+    "runs/2026-09-14-content-s3.md",
+    "runs/2026-09-14-content-s4.md",
+    "runs/2026-09-14-content-s5.md"
+  ],
+  "judge": "runs/2026-09-14-judge-r1.md"
+}

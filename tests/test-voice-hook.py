@@ -27,8 +27,13 @@ BREAKS = [
     "A five-bullet list is five sentences wearing a hat.",
     "That decorator is a shallow pass-through in disguise.",
     "Narrow the blast radius before you start guessing at the cause.",
-    "The retry wrapper sits at line 88 and the two call sites that reach it both "
-    "live in the same file, which means removing it changes nothing outside that "
+    "Two libraries carry the framework.",
+    "The rule lives in AGENTS.md, so read it first.",
+    "This finding rests on reading the diff.",
+    "When the cache is down, the request falls through to load().",
+    "Every lever feeds a formula.",
+    "The retry wrapper is at line 88 and the two call sites that reach it are both "
+    "in the same file, which means removing it changes nothing outside that "
     "module, though the test suite has not run yet so that is still open.",
 ]
 
@@ -51,7 +56,7 @@ CLEAN = [
     "Four callers. Three updated, one deliberately out of scope at reports/legacy.py:12.",
     "The comment says the buffer is bounded. It is not. cache.go:41.",
     "Skipped the full suite and ran the two files the change touches instead.",
-    "The plan lives at docs/plans/export.md. Step 3 ran differently and the file says how.",
+    "The plan is at docs/plans/export.md. Step 3 ran differently and the file says how.",
     "Yes. The behavior record has no entry for this, so I wrote one.",
     "The parser reads the header, then the body. Both are UTF-8.",
     "I renamed the flag and updated its four call sites. Suite is green.",
@@ -151,6 +156,105 @@ if "states the banned words" not in guide_out.stdout:
 if "DECIDE" not in out.stdout:
     print("FAIL the DECIDE group was not printed")
     notes.append("decide printed")
+
+# Slogans. The five sentences below each passed every check before the slogan
+# forms existed, and each is an agent's doc copy the user rewrote. The checker
+# has to raise every form on them and none on the rewrites.
+SLOGANS = """# Backplane
+
+A multi agent framework platform
+
+Users talk to agents. Agents read, call tools, and pause for people.
+
+No plugin imports an engine. No framework file names a plugin.
+
+A plugin is data. The framework compiles it.
+
+## Uniformity is the failure
+
+Two libraries carry the framework.
+
+One file causes this failure.
+
+Phase 1 of 3 in the queue migration.
+
+- Guard: none.
+
+Follow these steps to add one.
+
+- Approve the $400 monthly cost.
+- Approve the 6-week migration.
+
+A stampede under peak load is not uncommon, and complexity creeps into the handler.
+
+The result? The build is incredibly slow, and the compiler complains about the types.
+
+The wrapper provides the ability to retry, which may potentially help, and it is the ask from product.
+
+The plan is less prose, more code.
+
+Stop searching the repo, because the cause is outside it. That failure would have paged the engineer.
+
+A plugin never imports an engine directly, and Relay treats model providers as engines.
+
+### The migration moves the highest-risk jobs first
+
+- Phase 1 moves the highest-risk jobs.
+"""
+REWRITES = """# Backplane
+
+Backplane is an extensible multi-agent platform.
+
+Users instruct agents, and agents perform complex actions and wait for human feedback.
+
+New agents are created as plugins.
+
+The queue service costs $400 a month
+
+## Varied replies
+
+The platform consists of a shared generative UI toolkit and features that make it easy to build agents.
+"""
+FORMS = ["noun phrase with no verb", "clipped run of short sentences", "mirrored pair",
+         "chained pair", "one-word definition", "heading written as a claim", "sense-scoped 'carry'",
+         "setup sentence before the fact", "label with a period", "label with no value",
+         "sentence about the document", "mirrored bullets", "litotes", "abstract noun as actor",
+         "setup question", "noun doing a verb's job", "meeting jargon", "rhythm device",
+         "vague intensifier", "code given feelings", "hedge stack", "would-have stated as fact",
+         "claim about the user", "what a thing never does", "program given a judgment",
+         "bullet restates its heading"]
+
+
+def check_text(body: str) -> subprocess.CompletedProcess:
+    with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
+        handle.write(body)
+        name = handle.name
+    result = subprocess.run([sys.executable, str(CHECKER), name], capture_output=True, text=True)
+    Path(name).unlink()
+    return result
+
+
+slogan_out = check_text(SLOGANS)
+for form in FORMS:
+    if form in slogan_out.stdout:
+        print(f"ok   checker raises {form}")
+    else:
+        print(f"FAIL checker missed {form}")
+        notes.append(form)
+expect("slogan findings do not fail the run", slogan_out.returncode, 0)
+rewrite_out = check_text(REWRITES)
+for form in FORMS:
+    if form in rewrite_out.stdout:
+        print(f"FAIL checker raised {form} on a plain rewrite")
+        notes.append(f"rewrite {form}")
+expect("the plain rewrites pass", rewrite_out.returncode, 0)
+
+# Figurative verbs sit in FIX, so they fail the run. A plain sentence with the
+# same facts passes.
+verb_out = check_text("The rule lives in AGENTS.md.\n")
+expect("a figurative verb fails the run", verb_out.returncode, 1)
+plain_out = check_text("The rule is in AGENTS.md.\n")
+expect("the literal version passes", plain_out.returncode, 0)
 
 print()
 if failures or notes:

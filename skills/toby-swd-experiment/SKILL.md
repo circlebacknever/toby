@@ -15,7 +15,7 @@ description: >-
 
 Use this skill when the work is exploratory and the user expects fast learning before durable implementation.
 
-An experiment is a probe. It exists to answer a question, compare candidates, or find a value that cannot be known from static analysis alone.
+An experiment exists to answer a question, compare candidates, or find a value that cannot be known from static analysis alone.
 
 ## Mode Contract
 
@@ -54,9 +54,9 @@ Expose the current inputs, outputs, candidate values, and selected state. If the
 
 ## Disposable Markings
 
-Mark throwaway work so reversal is boring.
+Mark throwaway work so reversing it is easy.
 
-Use names such as `experiment`, `poc`, `spike`, `scratch`, `debug`, or `temp`. Keep the work behind a dev-only route, local flag, isolated file, fixture, script, or labeled block. Avoid threading experiment state into durable project flow.
+Use names such as `experiment`, `poc`, `spike`, `scratch`, `debug`, or `temp`. Keep the work behind a dev-only route, local flag, isolated file, fixture, script, or labeled block. Avoid passing experiment state through durable project code.
 
 If a change touches production behavior during discovery, keep the diff as small as the question allows and report the exact path or value changed.
 
@@ -71,7 +71,7 @@ For each pass:
 5. Record the result in the chat.
 6. Repeat only after feedback.
 
-Batching candidates hides cause and effect. The loop should make each result attributable to one change.
+Batching candidates hides which change caused which result, so run the loop so that each result traces to one change.
 
 ## Finish Phase
 
@@ -97,7 +97,7 @@ After the behavior settles, decide what durable tests should protect the contrac
 
 Use toby-swd-environment before commands, ports, processes, browsers, broad checks, dependency installs, migrations, generated files, cache clearing, or destructive work.
 
-During a user-led loop, automated checks that add latency need approval. The user is part of the instrument panel, so leave the controls where the user put them.
+During a user-led loop, automated checks that add latency need approval. The user is part of the measurement in this loop, so leave the settings where the user put them.
 
 Reversibility here means software reversibility. When the experiment drives something physical, costly, or externally observable, a reverted change does not undo what already happened. Run the candidate first in the cheapest faithful proxy available, and treat acting on the real system as a state change that needs approval.
 

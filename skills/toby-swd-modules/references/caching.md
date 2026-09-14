@@ -1,16 +1,16 @@
 # Worked Examples — Caching
 
-Caches are one of the most-common forms of "small thing that goes everywhere"
-and one of the easiest places to leak knowledge into call sites. Three things
-determine whether a cache is a deep module or a maintenance liability: where
-the cache calls live, who owns invalidation, and whether the cache or the
+Caches are among the most common small additions that spread across a codebase,
+and they easily leak knowledge into call sites. Three things determine whether
+a cache is a deep module or a maintenance liability: where the cache calls are,
+who owns invalidation, and whether the cache or the
 caller handles concurrent misses.
 
 ---
 
 ## Example 1 — Cache calls scattered across services
 
-The instinct when adding Redis to a slow endpoint:
+A developer adding Redis to a slow endpoint first writes this code:
 
 ```python
 def get_product(product_id: str) -> Product:
@@ -34,11 +34,11 @@ def get_product_listing(category: str) -> list[Product]:
     # ...same pattern repeated
 ```
 
-Two checks fail at once. Information leakage: the cache key schema
-(`"product:..."`), the TTL (600 seconds), the serialization format, and the
-invalidation rules are duplicated wherever they're touched. The different-layer
-check: the service should hold product logic, and half the code here is Redis
-bookkeeping. When the team introduces a second category-listing endpoint, the
+The information-leakage check and the different-layer check both fail. The
+cache key schema (`"product:..."`), the TTL (600 seconds), the serialization
+format, and the invalidation rules are duplicated wherever code touches them,
+which is leakage. The service should hold product logic, but half the code
+here is Redis bookkeeping, which fails the different-layer check. When the team introduces a second category-listing endpoint, the
 new author either duplicates the cache machinery or, much worse, forgets to
 invalidate. Stale listings then appear in production.
 
@@ -59,12 +59,12 @@ class ProductsRepository:
 ```
 
 The service code returns to one-line operations. The cache key schema, TTL,
-serialization, and invalidation policy live inside `ProductsRepository` (or in
+serialization, and invalidation policy are inside `ProductsRepository` (or in
 a thin caching decorator around an underlying `ProductsStore` it composes).
 Adding a new derived listing means adding a method and an entry to
-`_evict_for`; never editing fifteen services.
+`_evict_for`, and none of the fifteen services needs an edit.
 
-This is the canonical place to pull complexity down. The cache
+A cache is the canonical place to pull complexity down. The cache
 serves many callers, and the right author for the hard parts is the module
 that already owns the data.
 
@@ -72,7 +72,7 @@ that already owns the data.
 
 ## Example 2 — Cache as a decorator around storage
 
-The sound composition pattern that follows from Example 1:
+Example 1 leads to a sound composition pattern:
 
 ```typescript
 interface ProductsStore {
@@ -107,17 +107,18 @@ const products: ProductsStore = new CachedProductsStore(
 );
 ```
 
-`CachedProductsStore` earns its place as a real module. It owns:
+`CachedProductsStore` is worth a module of its own. It owns
 cache-key construction, TTL policy, eviction rules, and load-through semantics
 behind `getOrLoad`. The interface (`ProductsStore`) is identical to the
-underlying store. That is correct here, because this is the decorator case
-called out in the different-layer check as legitimate. Each implementation adds
+underlying store. The identical interface is correct here, because
+`CachedProductsStore` is the decorator case that the different-layer check
+calls legitimate. Each implementation adds
 distinct functionality. The cache version adds memoization and invalidation that
 callers cannot see and do not manage.
 
 If `CachedProductsStore` ever shrinks to forwarding without adding behavior
-(no TTL choices, no eviction logic, no stampede protection — just a `get` and
-`set`), it has degraded into a pass-through wrapper. Delete it and use `cache`
+(no TTL choices, no eviction logic, and no stampede protection, only a `get`
+and `set`), it has degraded into a pass-through wrapper. Delete it and use `cache`
 directly inside `PostgresProductsStore`.
 
 ---
@@ -126,8 +127,8 @@ directly inside `PostgresProductsStore`.
 
 A high-traffic product page caches an expensive `featuredProducts` query for
 10 minutes. When the cache key expires, a hundred concurrent requests all
-miss, all hit the database, and the system briefly tips over. The tactical
-fix at the call site:
+miss, all hit the database, and the system briefly goes down. A developer
+writes the tactical fix at the call site:
 
 ```typescript
 // in the service
@@ -145,17 +146,17 @@ async function featuredProducts(): Promise<Product[]> {
 }
 ```
 
-Three things wrong:
+The call-site fix has three problems:
 
-- The same locking dance now has to live at every cache call site that risks
+- The same locking code now has to be repeated at every cache call site that risks
   a stampede.
 - The "what to do while another caller is loading" decision is made at the
-  call site, where the author has the least context. (Wait? Return stale?
-  Return null?)
-- A bug in the lock release path takes out the cache for thirty seconds for
+  call site, where the author has the least context, and has to choose between
+  waiting, returning stale data, and returning null.
+- A bug in the lock release path disables the cache for thirty seconds for
   every key that uses this pattern.
 
-This belongs inside the cache (pull complexity down):
+The locking belongs inside the cache (pull complexity down):
 
 ```typescript
 class Cache {
@@ -176,13 +177,13 @@ class Cache {
 const featured = await cache.getOrLoad('featured', 600, () => expensiveQuery());
 ```
 
-The interface is now `getOrLoad(key, ttl, load)`. The caller writes one line.
+The interface is now `getOrLoad(key, ttl, load)`, so the caller writes one line.
 Stampede protection, stale-while-revalidate, single-flight per process, and
-distributed locking move inside the cache module where they're written once
-and right.
+distributed locking move inside the cache module, where the author writes them
+once and correctly.
 
-Same reasoning as the retry-interval example in `examples.md` Example 2:
-parameters the cache can choose better than the caller stay inside the cache.
+The retry-interval example in `examples.md` Example 2 uses the same reasoning.
+Parameters the cache can choose better than the caller stay inside the cache.
 
 ---
 
@@ -233,9 +234,9 @@ The batch importer and the admin tool call `Insert` and get correct
 invalidation automatically.
 
 For higher-volume systems this same logic moves to an event/CDC stream and a
-worker that invalidates based on database changes. The principle is the same.
-Invalidation is a decision, one module owns it, and callers don't carry the
-list.
+worker that invalidates based on database changes. The principle is the same,
+because invalidation is a decision that one module owns, and callers don't keep
+the list.
 
 ---
 
@@ -250,4 +251,4 @@ list.
 | Inside a domain method | Only for derived/computed values, and behind a clear function (`memoize` style). Not for I/O. |
 
 The phrase "we should cache this" usually means "the repository serving this
-should have a caching implementation." Reach for the lower layer first.
+should have a caching implementation." Try the lower layer first.

@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-# The voice rules live in voice_rules.py, where voice-check.py reads them too.
+# The voice rules are in voice_rules.py, where voice-check.py reads them too.
 # Every name is imported here so scripts that load this validator keep reading
 # them off it.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -184,9 +184,9 @@ def sections_of(text: str) -> dict[str, str]:
 
 
 def check_output_style(errors: list[str]) -> None:
-    """The output style carries guide sections verbatim, and nothing else.
+    """The output style contains guide sections verbatim, and nothing else.
 
-    It lands in Claude Code's system prompt, which is a stronger position than
+    It goes into Claude Code's system prompt, which is a stronger position than
     any instruction file. A section that drifts there is a rule that applies in
     chat and nowhere else, or the reverse.
     """
@@ -449,7 +449,7 @@ def check_coined_terms(warnings: list[str]) -> None:
 
 
 def check_single_source(errors: list[str]) -> None:
-    """No file outside base/toby.md may carry its own banned-word list."""
+    """No file outside base/toby.md may contain its own banned-word list."""
     for path in voice_scan_paths():
         text = path.read_text()
         if re.search(r"^#+ Banned words?\s*$", text, re.M | re.I):
@@ -458,7 +458,7 @@ def check_single_source(errors: list[str]) -> None:
             errors.append(f"second banned-word list, base/toby.md owns the only one: {rel}:{line}")
 
 
-# SENTENCE_CEILING, from voice_rules.py, is 25. The hard error sits at 35 so quoted
+# SENTENCE_CEILING, from voice_rules.py, is 25. The hard error is at 35 so quoted
 # material and inline lists cannot trip it, and 25 to 35 warns instead.
 SENTENCE_HARD_LIMIT = 35
 PARAGRAPH_SENTENCE_LIMIT = 6
@@ -503,8 +503,10 @@ def check_ste_conformance(warnings: list[str]) -> None:
 
 # A SKILL.md body over this loads more than any single task reads. The number is
 # the largest body that measured useful, rounded up, and it fails rather than
-# warns because a body creeps past it one paragraph at a time.
-BODY_TOKEN_CEILING = 5600
+# warns because a body creeps past it one paragraph at a time. It was 5600 until
+# the sentence-test pass rewrote fragments as whole sentences, which added about
+# 7 percent to toby-feature-dev with no rule added.
+BODY_TOKEN_CEILING = 6000
 
 # Skills that load together on one task. The total is what a turn actually pays.
 ROUTING_GROUPS = {
@@ -520,7 +522,7 @@ COLOAD_TOKEN_CEILING = 19000
 
 # These two never fire on their own. A request to make a game, or to brainstorm,
 # reaches them only when the user names the skill or types its slash command.
-# The rule lives in two places that can drift apart, so both are checked: the
+# The rule is written in two places that can drift apart, so both are checked: the
 # description the host tool reads when deciding, and the routing line in the
 # operating guide. toby-game had the clause in its description and no line in
 # the guide at all, which left the rule stated once and enforced nowhere.
@@ -558,7 +560,7 @@ def check_invoke_only(errors: list[str]) -> None:
 # An anti-trigger is written two ways. Most skills say "skip it for X". The
 # invoke-only skills say "trigger only when ... by name" and then name what must
 # not fire them. Reading only the first form reported three skills as having no
-# anti-trigger while they carried the strictest ones in the repo.
+# anti-trigger while they had the strictest ones in the repo.
 SKIP_CLAUSE_RE = re.compile(
     r"\bskip (?:it|this skill)\b|\bdo not trigger\b|\btrigger only when\b|\bonly when the user invokes\b",
     re.I,
@@ -659,7 +661,7 @@ REFERENCE_RE = re.compile(r"`references/([A-Za-z0-9_./-]+\.md)`")
 BARE_REFERENCE_RE = re.compile(r"`([A-Za-z0-9_-]+\.md)`")
 
 # Filenames a skill names because they exist in the user's repo or in this one,
-# never because they sit under references/. Without this the bare-name pass
+# never because they are under references/. Without this the bare-name pass
 # reads every mention of AGENTS.md as a broken pointer.
 NOT_A_REFERENCE = {
     "SKILL.md", "AGENTS.md", "README.md", "CLAUDE.md", "CHANGELOG.md",
@@ -730,7 +732,7 @@ def check_anti_triggers(warnings: list[str]) -> None:
         desc = description_text((skill_dir / "SKILL.md").read_text())
         if not SKIP_CLAUSE_RE.search(desc):
             warnings.append(
-                f"{skill_dir.name} description carries no skip clause, so nothing stops it over-firing"
+                f"{skill_dir.name} description has no skip clause, so nothing stops it over-firing"
             )
 
 

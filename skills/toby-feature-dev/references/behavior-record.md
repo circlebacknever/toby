@@ -1,34 +1,36 @@
 # The behavior record
 
-The record is the file that says what the software was asked to do, in sentences a reader can check against a test. SKILL.md owns when an entry fires and the check that runs before the handoff. This file owns the rest: what writes no entry, what an entry holds, the grep, retiring, and what happens when two branches write the same sentence.
+The record is the file that says what the software was asked to do, in sentences a reader can check against a test. SKILL.md owns when an entry fires and the check that runs before the handoff. This file owns everything else. It covers the changes that write no entry, what an entry holds, the grep, retiring, and two branches that write the same sentence.
 
 ## What writes no entry
 
-A behavior you inferred or a default you picked is a design decision, and design decisions have other homes. A value or a unit goes in the interface comment toby-swd-clarity owns, and a cross-module or externally-forced constraint goes in AGENTS.md under toby-swd-docs.
+A behavior you inferred or a default you picked is a design decision, and design decisions are recorded in other places. A value or a unit goes in the interface comment toby-swd-clarity owns, and a cross-module or externally-forced constraint goes in AGENTS.md under toby-swd-docs.
 
-These write nothing at all — refactors, renames, performance work, internal helpers, error paths, and diagnostic or developer-facing output. A bug fix writes no entry either. It edits the sentence it just falsified, in the same diff that fixes the code.
+Refactors, renames, performance work, internal helpers, error paths, and diagnostic or developer-facing output write no entry at all. A bug fix writes no entry either. It edits the sentence it just falsified, in the same diff that fixes the code.
 
 ## Home
 
-A prose file the repo already keeps for stated behavior — a spec directory, a decision-record tree. AGENTS.md and README.md are out, because toby-swd-docs puts one of each per module root, and behavior spanning roots would split. With nothing present, propose `docs/behavior.md` and get a yes before creating it. Open it with the preamble in `examples.md`, so the next reader knows what they hold before the first heading. Appends after that need no asking. Never backfill behavior this change doesn't touch.
+The record goes in a prose file the repo already keeps for stated behavior, such as a spec directory or a decision-record tree. Do not use AGENTS.md or README.md. toby-swd-docs puts one of each per module root, so a behavior spanning two roots would be split across files.
+
+When no such file exists, propose `docs/behavior.md` and get a yes before creating it. Open it with the preamble in `examples.md`, so the next reader knows what the file contains before the first heading. After that, append entries without asking. Never backfill behavior this change doesn't touch.
 
 ## The entry
 
-A heading holding the behavior in one sentence, plus who asked, quoted, and when.
+An entry is a heading that states the behavior in one sentence, plus who asked, quoted, and when.
 
-- One sentence, trigger plus observable result, written at the public interface toby-swd-testing tests through.
-- It names no function, no file, no internal state. Somebody who has never opened this repo can still tell whether the software does this.
-- Two sentences means two behaviors. Split them.
-- No IDs. The sentence is the identifier, and a sentence needing an ID to be findable was too vague to audit.
-- The quote is the words that were used — the user's message or the ticket line — with the date they were said.
+- The sentence gives the trigger and the observable result, written at the public interface toby-swd-testing tests through.
+- It names no function, no file, no internal state. Somebody who has never opened this repo can still tell whether the software does what the sentence says.
+- Two sentences means two behaviors, so split them.
+- Give entries no IDs. The sentence is the identifier, and a sentence that needs an ID to be found is too vague to audit.
+- The quote gives the exact words from the user's message or the ticket line, with the date they were said.
 
 ## The binding
 
-The test description quotes the sentence verbatim: a docstring, an `it(...)` string, a `t.Run` name, whatever the harness reads. Verbatim means character for character, because the check is a fixed-string grep and a helpfully reworded sentence reads to it as a missing test.
+The test description quotes the sentence verbatim: a docstring, an `it(...)` string, a `t.Run` name, whatever the harness reads. Verbatim means character for character, because the check is a fixed-string grep, and the grep treats a helpfully reworded sentence as a missing test.
 
 ## The check
 
-Before the handoff, every heading appears verbatim in a test.
+Before the handoff, check that every heading appears verbatim in a test.
 
 ```sh
 grep '^## ' docs/behavior.md | sed 's/^## //' | while read -r b; do
@@ -36,13 +38,13 @@ grep '^## ' docs/behavior.md | sed 's/^## //' | while read -r b; do
 done
 ```
 
-The path and the two globs are placeholders. Point them at the file this repo keeps and the directories its tests live in, then quote the command you ran.
+The path and the two globs are placeholders. Point them at the file this repo keeps and the directories containing its tests, then quote the command you ran.
 
-A run with nothing to report prints nothing. Every line it does print is a sentence the product claims and no test defends. Either the behavior was stated and never proved, or the test was deleted and took the requirement with it. Both go in the handoff. A heading with a hit proves the sentence was pasted into a description. Whether the body asserts it is on you.
+A run with nothing to report prints nothing. Every line it does print is a sentence the product claims and no test checks. Either the behavior was stated and never proved, or someone deleted the test and left the requirement with no check. Report both cases in the handoff. A heading with a hit proves the sentence was pasted into a description. You still have to check that the test body asserts it.
 
 ## Retiring
 
-Move the entry under a trailing `## Retired` heading, with the date and why, in the diff that deletes the test. An entry above that heading is a live claim. An entry below it is a claim with an end date and a reason. Nothing gets deleted outright, because the sentence that stopped being true is the only surviving record of what somebody once wanted.
+Move the entry under a trailing `## Retired` heading, with the date and why, in the diff that deletes the test. An entry above that heading is a live claim, and an entry below it is a claim with an end date and a reason. Nothing gets deleted outright, because the sentence that stopped being true is the only surviving record of what somebody once wanted.
 
 ## Two branches, one sentence
 

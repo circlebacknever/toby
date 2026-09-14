@@ -1,12 +1,12 @@
 # Worked Examples
 
-The structure and the scope decisions are what transfer. Backend and frontend, AGENTS.md and README.md.
+Reuse the structure and the scope decisions in your own modules. The examples cover a backend module and a frontend module, each with an AGENTS.md and a README.md.
 
 ---
 
 ## Example 1 — Backend: a payments service AGENTS.md
 
-Scope decision: `services/payments/` is a meaningful module that owns a real body of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` does not get its own, and that content pushes up here.
+Scope decision: `services/payments/` is a meaningful module that owns a real body of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` does not get its own, and its content moves up into this file.
 
 ```markdown
 # Payments
@@ -33,7 +33,7 @@ money path; nothing else in the system is allowed to move funds.
 ## Cross-module decisions
 - "Settlement ordering": the ledger is the source of truth; the processor
   webhook is advisory and may arrive out of order. Billing and
-  analytics consume the ledger. Affected sites carry
+  analytics consume the ledger. Affected sites contain
   `// see "Settlement ordering" in AGENTS.md`.
 
 ## Extension rules
@@ -43,13 +43,13 @@ money path; nothing else in the system is allowed to move funds.
   mutates a posted entry is a bug.
 ```
 
-Note what is absent: no function signatures, no algorithm descriptions. Those live in interface comments in `gateway.py`. This file would survive a full rewrite of the internals unchanged.
+The file has no function signatures and no algorithm descriptions, because those are in interface comments in `gateway.py`. This file would stay accurate through a full rewrite of the internals.
 
 ---
 
 ## Example 2 — Backend: payments service README.md
 
-Same module, different audience. This file is for a developer calling the payments service from outside.
+This README.md covers the same payments module for a developer who calls the service from outside.
 
 ```markdown
 # Payments Service
@@ -102,16 +102,16 @@ Full signatures and behavior are in the interface comments in `gateway.py`.
   attempt will return the original failure.
 ```
 
-Note: the README references the interface comments in `gateway.py` and lets the
-single copy there stay authoritative. Implementation details — why idempotency
-is required, how the ledger works — live in AGENTS.md. The README stays on what a
-caller needs.
+The README references the interface comments in `gateway.py` and lets the
+single copy there stay authoritative. AGENTS.md explains the implementation
+details, such as why idempotency is required and how the ledger works. The
+README covers only what a caller needs.
 
 ---
 
 ## Example 3 — Frontend: a feature module AGENTS.md and scope decision
 
-Scope decision: `features/checkout/` is a feature module — one AGENTS.md at its root. `features/checkout/components/PriceRow/` is a leaf component folder — no file. If `PriceRow` has a non-obvious contract, that goes in its prop interface comment.
+Scope decision: `features/checkout/` is a feature module, so it gets one AGENTS.md at its root. `features/checkout/components/PriceRow/` is a leaf component folder, so it gets no file. If `PriceRow` has a non-obvious contract, that contract goes in its prop interface comment.
 
 ```markdown
 # Checkout (feature)
@@ -136,7 +136,7 @@ payment to the payments service and address validation to the address package.
 - "Checkout context shape": steps read flow state only from CheckoutProvider.
   Nothing in this feature reads it via props drilled from the page. The shape
   is defined and commented at
-  CheckoutProvider; this is the central note. Step files carry
+  CheckoutProvider; this is the central note. Step files contain
   `// see "Checkout context shape" in AGENTS.md`.
 
 ## Extension rules
@@ -149,7 +149,7 @@ payment to the payments service and address validation to the address package.
 
 ## Example 4 — Frontend: checkout feature README.md
 
-This module's README.md is minimal because it serves developers already inside the codebase, with none of the orientation a shared library owes outside callers. A README.md here only exists because the context contents are non-obvious to developers onboarding to this part of the codebase.
+This module's README.md is minimal because its readers already work in the codebase and need none of the orientation a shared library gives outside callers. A README.md here only exists because the context contents are non-obvious to developers onboarding to this part of the codebase.
 
 ```markdown
 # Checkout Feature
@@ -184,10 +184,10 @@ Existing steps stay unchanged.
 
 - Tax display is blocked until address validation completes. This is a legal
   requirement. Don't try to work around it.
-- Flow state lives in `CheckoutProvider`. Do not lift it to a parent or store
+- Flow state is in `CheckoutProvider`. Do not lift it to a parent or store
   it externally — the machine enforces valid transitions and bypassing it
   produces inconsistent UI state.
 ```
 
-The cross-module note about context contents lives in AGENTS.md. The README
+The cross-module note about context contents is in AGENTS.md. The README
 only explains what a developer needs to use the feature correctly.

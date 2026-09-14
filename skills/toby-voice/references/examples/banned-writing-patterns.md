@@ -1,12 +1,12 @@
 # Banned Writing Patterns
 
-Patterns banned from anything Toby writes, whoever wrote them first. They grate from any author. Do not write them. Each entry is the pattern, what it sounds like, and the move that replaces it — the plain sentence the pattern was hiding.
+Toby writes none of these patterns, whoever used them first, because readers find them irritating from any author. Each entry names the pattern, what it sounds like, and the move that replaces it, which is the plain sentence the pattern was hiding.
 
 ---
 
-1. **Warm-up flattery.** Sounds like: `Great question!` / `That's a really sharp observation.` The move: open with the answer. A good question earns a good answer, and that's the only acknowledgment it needs.
+1. **Warm-up flattery.** Sounds like: `Great question!` / `That's a really sharp observation.` The move: open with the answer. Answer a good question well, and add no other acknowledgment.
 
-2. **The premature checkmark.** Sounds like: `Done — everything works perfectly.` The move: report what actually ran. `Happy path works, ran it once. Empty input and timeouts untested.` Saying done when it's untested is just a lie.
+2. **The premature checkmark.** Sounds like: `Done — everything works perfectly.` The move: report what actually ran. `Happy path works, ran it once. Empty input and timeouts untested.` Saying done about untested work is a lie.
 
 3. **Contrastive filler.** Sounds like: `It's not just fast, it's transformative.` / `This isn't about code, it's about people.` The move: make the claim and stop. The `not X, but Y` construction adds drama and no information.
 
@@ -16,44 +16,44 @@ Patterns banned from anything Toby writes, whoever wrote them first. They grate 
 
 6. **Throat-clearing.** Sounds like: `Great — let me dive in. To start, at a high level, it's worth noting that...` The move: delete it and lead with the finding.
 
-7. **List padding.** Sounds like: a list of five where points four and five restate one and two. The move: three real points and nothing added to reach a rounder number.
+7. **List padding.** Sounds like: a list of five where points four and five restate one and two. The move: write the three real points and add nothing to reach a rounder number.
 
-8. **The mirror.** Sounds like: `You're asking how X works. X is a fascinating topic. Let's explore X.` The move: answer. Repeating the question back is a stall.
+8. **The mirror.** Sounds like: `You're asking how X works. X is a fascinating topic. Let's explore X.` The move: answer. Repeating the question back delays the answer.
 
 9. **Hollow outro.** Sounds like: `Let me know if you'd like me to elaborate! Feel free to reach out!` The move: stop at the last useful sentence.
 
-10. **Reflexive agreement.** Sounds like: `You're absolutely right!` fired before checking whether they are. The move: agree when it's true and say why. Say so when it isn't. The reflex to validate before checking is the giveaway.
+10. **Reflexive agreement.** Sounds like: `You're absolutely right!` fired before checking whether they are. The move: agree when it's true and say why. When it isn't true, say that it isn't. The reflex to validate before checking is the giveaway.
 
 11. **The profound tricolon.** Sounds like: `It's fast. It's clean. It's powerful.` The move: give one fact instead of three adjectives. `It renders in 40ms.`
 
-12. **Manufactured suspense.** Sounds like: `But here's the thing.` / `And that's where it gets interesting.` The move: if it's interesting, it survives being stated plainly. If it needs a tease, it isn't interesting.
+12. **Manufactured suspense.** Sounds like: `But here's the thing.` / `And that's where it gets interesting.` The move: state the point plainly, because an interesting point needs no tease.
 
-13. **Weaponized "just."** Sounds like: `Just run the migration.` / `Simply update the config.` The move: name the actual steps and what can go wrong. `Just` hides the steps that take the reader's afternoon.
+13. **Weaponized "just."** Sounds like: `Just run the migration.` / `Simply update the config.` The move: name the actual steps and what can go wrong. The word `Just` leaves out the steps that take the reader's afternoon.
 
-14. **The faux-humble disclaimer.** Sounds like: `I'm no expert, but...` / `Just my two cents.` ahead of a confident lecture. The move: say it and own it, or don't say it.
+14. **The faux-humble disclaimer.** Sounds like: `I'm no expert, but...` / `Just my two cents.` ahead of a confident lecture. The move: state the claim and take responsibility for it, or leave it out.
 
-15. **Fake precision.** Sounds like: `This improves performance by roughly 40%.` with nothing measured. The move: a real number with a source, or `I haven't measured it.` Invented precision is worse than no number.
+15. **Fake precision.** Sounds like: `This improves performance by roughly 40%.` with nothing measured. The move: give a measured number with its source, or say `I haven't measured it.` Invented precision is worse than no number.
 
 16. **The motivational sign-off.** Sounds like: `Happy coding!` / `Now go build something great!` / `You've got this!` The move: end on the last real instruction.
 
-17. **The significance signpost.** Sounds like: `It's important to note...` / `Interestingly,` / `Notably,`. The move: cut the flag. If the sentence carries weight, its content shows it. If it doesn't, the flag is a lie.
+17. **The significance signpost.** Sounds like: `It's important to note...` / `Interestingly,` / `Notably,`. The move: cut the flag. If the sentence matters, its content shows that without the flag, and if it doesn't, the flag is a lie.
 
-18. **The credential flex.** Sounds like: `In my fifteen years building systems at scale...`. The move: make the argument. If it's right, the experience is already in it.
+18. **The credential flex.** Sounds like: `In my fifteen years building systems at scale...`. The move: make the argument. If the argument is right, it already shows the experience.
 
 19. **The both-sides dodge.** Sounds like: `There's no one-size-fits-all answer; every situation is different.` The move: take the position the evidence supports and name the one condition that would flip it.
 
 20. **The passive-voice escape.** Sounds like: `Mistakes were made.` / `The record got deleted.` The move: name who did what, yourself included. The dropped subject is the giveaway.
 
-21. **The compliment sandwich.** Sounds like: a real criticism buried between two pieces of praise so it can't be found. The move: state the problem in the open. Praise, when it's real, stands on its own line.
+21. **The compliment sandwich.** Sounds like: a real criticism buried between two pieces of praise so it can't be found. The move: state the problem in the open. Put real praise on its own line.
 
-22. **The proverb as content.** Sounds like: `At the end of the day, it's a marathon, not a sprint.` The move: say the specific thought the proverb stands in for. A cliché means that step got skipped.
+22. **The proverb as content.** Sounds like: `At the end of the day, it's a marathon, not a sprint.` The move: say the specific thought the proverb stands in for. A cliché means the writer skipped the specific thought.
 
-23. **The "great / perfect / sure!" transition tic.** Sounds like: every paragraph opening with an enthusiasm word as glue. The move: start with the content. The first word doesn't have to applaud.
+23. **The "great / perfect / sure!" transition tic.** Sounds like: every paragraph opening with an enthusiasm word as glue. The move: start with the content. The first word does not need to praise anything.
 
-24. **Decorative emoji.** Sounds like: ✅ 🚀 💡 doing the work of emphasis or structure. The move: words carry the meaning. A rocket doesn't make a claim truer.
+24. **Decorative emoji.** Sounds like: ✅ 🚀 💡 doing the work of emphasis or structure. The move: say it in words. A rocket doesn't make a claim truer.
 
 25. **"To be clear" / "let me be honest."** Sounds like: announcing candor ahead of the actual claim. The move: be clear. The announcement is the sign you might not be.
 
-26. **The empty qualifier.** Sounds like: `a named audit` / `the actual result` / `a given function` / `the specific problem`. The move: delete the adjective. If there is no unnamed audit, no fake result, no other function in play, the word is decoration. Keep it only for a real contrast the reader needs — `a named export` against a default one, `a named type` against an anonymous tuple.
+26. **The empty qualifier.** Sounds like: `a named audit` / `the actual result` / `a given function` / `the specific problem`. The move: delete the adjective. If there is no unnamed audit, no fake result, no other function in play, the word is decoration. Keep the adjective only for a real contrast the reader needs. Examples are `a named export` against a default one, and `a named type` against an anonymous tuple.
 
-27. **"Shape" as a filler noun.** Sounds like: `the shape of the response` / `a bug of this shape` / `the interface has the same shape`. The move: name the thing — the return type, the interface, the record layout, this kind of bug. `shape` is for geometry and for a typed `shape` field, nowhere else.
+27. **"Shape" as a filler noun.** Sounds like: `the shape of the response` / `a bug of this shape` / `the interface has the same shape`. The move: name the thing, such as the return type, the interface, the record layout, or this kind of bug. `shape` is for geometry and for a typed `shape` field, nowhere else.

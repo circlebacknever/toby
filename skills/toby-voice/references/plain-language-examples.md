@@ -1,25 +1,25 @@
 # Plain language, before and after
 
-Worked pairs for every rule in `plain-language.md`. Load this when a rule is
-unclear or a rewrite is not landing. The rules file is the one to follow.
+This file gives worked pairs for every rule in `plain-language.md`. Load this file
+when a rule is unclear or a rewrite is not working. The rules file is the one to follow.
 
 ## Before and after
 
 ### Sentence ceiling, 25 words, 20 when the reader executes it
 
-Treat the ceiling as a maximum. Vary length underneath it.
+Treat the ceiling as a maximum, and vary length underneath it.
 
 - Before (34 words): "To remove the cover assembly, first remove the four screws that attach the cover to the housing, and then, after taking the cover off the housing, remove the packing and throw it away."
 - After: "Remove the four screws holding the cover to the housing. Lift the cover off. Discard the packing."
 
-### Never buy shortness by dropping a word
+### Keep every word that does work
 
-The ceiling caps the sentence. Do not drop words to get under it.
+The ceiling caps the length of a sentence, but do not drop words to get under it.
 
 - Before: "Fixed. Tests green. Shipped."
 - After: "The retry loop was swallowing the timeout. I fixed the handler, and the four failing tests now pass. Nothing is deployed yet."
 
-The second version is longer and tells the reader what happened. The first tells them a mood.
+The second version is longer, and it tells the reader what happened, while the first only reports a mood.
 
 ### Pronouns take a noun
 
@@ -28,12 +28,12 @@ The second version is longer and tells the reader what happened. The first tells
 
 ### One name per thing
 
-Pick the repo's own identifier and hold it. A fresh synonym on second mention reads as a second thing.
+Pick the repo's own identifier and keep using it. A fresh synonym on second mention reads as a second thing.
 
 - Before: "`SessionStore` caches the token. The session cache expires it after an hour, so the credential holder needs a refresh."
 - After: "`SessionStore` caches the token. `SessionStore` expires it after an hour, so the caller needs a refresh."
 
-Three names for one object in the first version: session cache, credential holder, `SessionStore`.
+The first version uses three names for one object: session cache, credential holder, and `SessionStore`.
 
 ### Verbs as verbs
 
@@ -65,7 +65,7 @@ A semicolon, a colon, or an em dash joining two clauses means the relation went 
 
 A reader who acts on the first half of the sentence before finishing it does the right thing in the second version.
 
-### A prohibition carries the failure it prevents
+### A prohibition states the failure it prevents
 
 - Before: "Do not call this from a request handler."
 - After: "Do not call this from a request handler. It blocks for up to 30 seconds and will exhaust the connection pool."
@@ -77,27 +77,28 @@ A reader who acts on the first half of the sentence before finishing it does the
 
 ## The note test
 
-STE Rule 5.5: notes give information, never instructions. Delete every note, re-read the procedure, and confirm the reader can still finish the task. If a step lives only inside a note, it was never a note.
+STE Rule 5.5 says that notes give information, never instructions. Delete every note, re-read the procedure, and confirm the reader can still finish the task. If a step appears only inside a note, it was never a note.
 
-## Surface budget
+## Where tone is allowed
 
-The flat-read rule binds everywhere. Every sentence stays true and complete with the tone stripped out. Some surfaces hold that line harder than others.
+Every sentence on every surface must stay true and complete with the tone stripped out. Some surfaces apply that rule more strictly than others.
 
 | Plain literal English only | A light conversational touch is allowed |
 | --- | --- |
 | Code comments, docstrings, error messages | Chat replies |
 | README and AGENTS setup steps, migration notes | Commit subjects and bodies, PR prose |
-| Chart, axis, legend, and KPI labels | Doc headings, variable and test names |
-| Teaching prose mid-explanation | A review finding, once the failure scenario states the fact flat |
+| Chart, axis, legend, and KPI labels | Variable and test names |
+| Doc headings and slide titles | A review finding, once the failure scenario states the fact flat |
+| Teaching prose mid-explanation | |
 | Safety-relevant findings, destructive-command warnings | |
 
-Right-column text still has to read true and complete with the tone stripped. A lighter touch goes in a heading or a name, never inside a claim the reader has to act on.
+Right-column text still has to read true and complete with the tone stripped. Put conversational wording in a name, and never in a heading or inside a claim the reader has to act on.
 
-## Recasting instead of substituting
+## Rewriting around a banned word
 
 When a banned word has no plain replacement, rewrite the sentence. Do not reach for a rarer synonym in the same slot, because that produces stilted prose.
 
-- Banned-word swap: "Cloze the word that carries the learning." Six words of periphrasis, worse than what it replaced.
+- Banned-word swap: "Cloze the word that carries the learning." The swap spends six words saying something indirectly, and it reads worse than the word it replaced.
 - Recast: "Cloze the word the learner must produce."
 
 - Banned-word swap: "This is the load-bearing assumption of the design."
@@ -108,7 +109,7 @@ When a banned word has no plain replacement, rewrite the sentence. Do not reach 
 - Before: "This is basically just a fairly simple caching layer that essentially sits in front of the database."
 - After: "This is a caching layer in front of the database."
 
-Read it back and delete each word in turn. Basically, just, fairly, essentially: none of them changed the claim.
+Read the sentence back and delete each word in turn. Deleting basically, just, fairly, and essentially did not change the claim.
 
 ### Say who did it
 
@@ -116,9 +117,9 @@ Read it back and delete each word in turn. Basically, just, fairly, essentially:
 - After: "The migration drops the column and rebuilds the index."
 - Still right: "The file was deleted before the run started." Nobody knows who deleted it, and that is the point of the sentence.
 
-### Never invent a term
+### Invented terms
 
-Each of these was written in this repo and then flagged by a reader who could not tell what it meant.
+Someone wrote each of these terms in this repo, and a reader flagged it later because they could not tell what it meant.
 
 - Before: "Teaching prose is a first-read surface." → After: "The learner reads every sentence once."
 - Before: "a component prop surface" → After: "a component's props"
@@ -127,15 +128,83 @@ Each of these was written in this repo and then flagged by a reader who could no
 - Before: "Narrow the blast radius." → After: "Point them at the smallest piece that could be wrong."
 - Before: "One move covers all six forms below." → After: "All six below are the same habit."
 
-The test: could a reader look the word up and land on your meaning? "Surface" in a dictionary is the outside of a thing. It is not a set of function parameters, and a reader who does not already know that has to guess.
+The test is whether a reader could look the word up and find your meaning. "Surface" in a dictionary is the outside of a thing. It is not a set of function parameters, and a reader who does not already know that usage has to guess.
+
+### Whole, connected sentences
+
+An agent wrote each "Before" sentence below in a platform overview. Every one passed the checker, because the words were plain and the sentences were short.
+
+- Before: "A multi agent framework platform"
+- After: "Backplane is an extensible multi-agent platform."
+- Before: "Users talk to agents. Agents read, call tools, and pause for people."
+- After: "Users instruct agents, and agents perform complex actions and wait for human feedback."
+- Before: "Two libraries carry the framework."
+- After: "The platform consists of a shared generative UI toolkit and features that make it easy to build agents."
+- Before: "A plugin is data. The framework compiles it."
+- After: "New agents are created as plugins."
+- Before: "No plugin imports an engine. No framework file names a plugin."
+- After: delete both sentences. They list what the code does not do, and no reader of an overview assumed it did.
+
+The first before is a label with no verb. The second and fourth are runs of short sentences with no connector. The third uses `carry` for something nobody lifts. The fifth is a mirrored pair.
+
+### Literal verbs and real actors
+
+- Before: "The rule lives in `AGENTS.md`."
+- After: "The rule is in `AGENTS.md`."
+- Before: "This finding rests on reading the diff."
+- After: "I found this by reading the diff, and I did not run the handler."
+- Before: "When the cache is down, the request falls through to `load()`."
+- After: "When the cache is down, the request calls `load()` directly."
+- Before: "Every lever feeds a formula."
+- After: "Every lever changes a number in a formula."
+- Before: "Complexity creeps into the handler."
+- After: "Each new flag adds a branch to the handler."
+
+### Positive form
+
+- Before: "A stampede under peak load is not uncommon."
+- After: "A stampede under peak load is common."
+
+### Whole sentences that name the thing
+
+- Before: "Phase 1 of 3 in the queue migration."
+- After: "This commit is phase 1 of the 3-phase queue migration."
+- Before: "Guard: none."
+- After: "No check in `api/webhooks.ts` stops it."
+- Before: "One file causes this failure. `scripts/test-install.sh` fails because `~/.claude/skills/toby-voice/SKILL.md` has a hand edit."
+- After: "`scripts/test-install.sh` fails because `~/.claude/skills/toby-voice/SKILL.md` has a hand edit the repo does not have."
+- Before: "Follow these steps to add one."
+- After: delete the sentence, because the numbered steps come next.
+
+### Headings
+
+- Before: "Uniformity is the failure"
+- After: "Varied replies"
+- Before: "Geometry never carries a panel alone"
+- After: "Geometry beside a claim"
+
+A heading is a one- or two-word label or a phrase that says what the section covers. A heading that makes a claim belongs in the body as a sentence.
+
+### Checked facts
+
+- Before: "The export query takes four seconds because the `orders.created_at` index is missing." Nobody timed the query or read the schema.
+- After: "The export query is slow on the staging data. I have not timed it or checked the indexes on `orders`."
+- Before: "Stop searching the repo, because the cause is outside it."
+- After: "The cause is a hand edit in `~/.claude/skills/toby-voice/SKILL.md`, which is outside the repo."
+- Before: "Each of the 6 failures would have succeeded on a retry or paged the on-call engineer."
+- After: "On the queue service, a job that fails its third retry pages the on-call engineer."
+- Before: "Prediction: the invoice export failure would have paged the on-call engineer."
+- After: delete the bullet. A label does not make a guess about the past checkable.
+- Before, in a README overview: "Model providers are swappable engines, so a plugin never imports an engine directly."
+- After: "Model providers are swappable in Relay." The rule against importing an engine goes in the contributor section.
 
 ## What Toby refused from STE, and why
 
-STE was written for aircraft maintenance, and some of it is aerospace furniture.
+STE was written for aircraft maintenance, and some of its rules only make sense for that work.
 
-- **The approved-word dictionary.** STE's own explanatory prose is exempt from STE. That exemption marks the constraint as one for procedures. A closed vocabulary also fights the rule that says quote the exact surface.
-- **No phrasal verbs.** That deletes roll back, spin up, back up, tear down, check out, and time out, and swaps plain Anglo-Saxon for Latinate. It points the opposite way from plain words.
-- **No verbing technical nouns.** Software runs on cache, log, mock, flag, ship, diff, seed, patch, and branch. Each costs three to five words to unpack.
-- **No contractions.** STE's reader is a non-native technician. Toby's reader is a developer, and "don't ship that" reads the same as "do not ship that" to them. "Don't ship that" sounds like a person.
+- **The approved-word dictionary.** STE's own explanatory prose is exempt from STE, which shows the constraint is meant for procedures. A closed vocabulary also conflicts with the rule to reproduce identifiers and error text exactly.
+- **No phrasal verbs.** That rule would delete roll back, spin up, back up, tear down, check out, and time out, and replace plain Anglo-Saxon words with Latinate ones. It contradicts the rule to use plain words.
+- **No verbing technical nouns.** Software work uses cache, log, mock, flag, ship, diff, seed, patch, and branch as verbs. Replacing each one takes three to five words.
+- **No contractions.** STE writes for a non-native technician, but Toby writes for a developer, who reads "don't ship that" the same as "do not ship that". "Don't ship that" sounds like a person.
 - **The `-ing` ban.** Gerunds are the field's nouns: caching, logging, polling, batching. The progressive matters too, because "the build is running" and "the build runs" are different claims about the machine.
-- **Word-count arithmetic, warning placards, and illustration callouts.** Signage and tallying.
+- **Word-count arithmetic, warning placards, and illustration callouts.** These rules are about signage and tallying.

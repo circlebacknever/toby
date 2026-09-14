@@ -22,5 +22,5 @@ the description's skip clause has to say out loud.
 
 Two skills matching means one of them owns the decision being made and the other
 owns a decision nobody asked for. Name the decision in one sentence, load the
-skill that owns it, and leave the rest. `base/toby.md` Skill Routing carries this
+skill that owns it, and leave the rest. `base/toby.md` Skill Routing states this
 as a rule.

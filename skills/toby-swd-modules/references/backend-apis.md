@@ -1,13 +1,13 @@
 # Worked Examples — Backend APIs (Java/Kotlin, Go, TypeScript)
 
-Different stacks, same checks. Each example shows a real pattern you'll meet in
+The same checks apply across different stacks. Each example shows a real pattern you'll meet in
 a Spring/Nest/Go codebase and the modular structure that beats it.
 
 ---
 
 ## Example 1 — Java/Spring: BaseController as implementation inheritance
 
-The pattern, repeated in countless Spring codebases:
+Many Spring codebases repeat this pattern:
 
 ```java
 public abstract class BaseController {
@@ -33,7 +33,7 @@ public class OrderController extends BaseController {
 }
 ```
 
-The composition-over-inheritance check applies here. `BaseController` and every
+The composition-over-inheritance check applies here, because `BaseController` and every
 `*Controller` share a two-way coupling. A new field added to the base is visible
 everywhere. A base method's behavior is overridable from any subclass, and
 `currentUser` and `lastValidation` are instance variables that both sides mutate. The base class
@@ -41,8 +41,8 @@ accumulates a grab-bag of helpers because adding one is easier than designing a
 real boundary. After two years no one knows which controllers depend on which
 base behavior, and changing `BaseController` requires reading thirty files.
 
-Fix with composition. The "base" is several focused
-collaborators each controller injects:
+Fix it with composition, which turns the base class into several focused
+collaborators that each controller injects:
 
 ```java
 @RestController
@@ -69,7 +69,7 @@ composes them as injected fields, narrow and named for
 what they do. The old `currentUser` was reachable from anywhere.
 
 Logging access, which `BaseController` did via a helper, moves to a Spring
-interceptor or AOP advice. The cross-cutting concern lives in one place where
+interceptor or AOP advice. The cross-cutting concern is in one place where
 the dispatcher applies it. The old form made every handler remember to call
 it.
 
@@ -77,7 +77,7 @@ it.
 
 ## Example 2 — Java: getters/setters versus methods that express intent
 
-The Java-bean default:
+Java beans default to getters and setters:
 
 ```java
 public class Order {
@@ -96,8 +96,8 @@ public class Order {
 
 The "interface" is a list of fields with extra syntax. Callers must know to set
 `paidAt` whenever they set `status` to `PAID`, must validate `amount > 0`
-themselves, must enforce the legal status transitions. That knowledge — what an
-`Order` means — has leaked into every caller.
+themselves, must enforce the legal status transitions. The knowledge of what an
+`Order` means has leaked into every caller.
 
 The deeper interface expresses intent:
 
@@ -120,21 +120,21 @@ public class Order {
 ```
 
 Fields stay private. `markPaid` and `cancel` are the legal transitions, so
-callers can't drift the state into invalid combinations. Where a value
+callers can't move the state into invalid combinations. Where a value
 must be exposed (`amount()`), it's a method that names what the
 caller wants to know. A `getAmount` would mean only "the bytes of the
-field." The class is now deep: a few intent methods, substantial invariant
-enforcement behind them.
+field." The class is now deep, because a few intent methods hide substantial invariant
+enforcement.
 
-This is the same point as the depth check. `getX/setX` makes the
-interface and the implementation the same size. That's the definition of a
+Example 2 makes the same point as the depth check. `getX/setX` makes the
+interface and the implementation the same size, which is the definition of a
 shallow module.
 
 ---
 
 ## Example 3 — Go: define interfaces where they're consumed
 
-A common mistake imported from Java/C# into Go:
+Developers often bring this mistake from Java/C# into Go:
 
 ```go
 // pkg/users/user.go
@@ -155,14 +155,14 @@ func (s *userServiceImpl) GetUser(...) ... { ... }
 // ...
 ```
 
-Two problems. First, the interface is colocated with the implementation. Every
-consumer drags in the whole `users` package and the whole interface even
+The code has two problems. First, the interface is colocated with the
+implementation. Every consumer imports the whole `users` package and the whole interface even
 when they only need one method. Second, the interface enumerates every method
 the implementation exposes. Every method appears, so the interface only
 mirrors the struct. That's a shallow interface, because it has no asymmetry
 between cost and benefit.
 
-Idiomatic Go: each consumer declares the narrow interface it needs and nothing
+In idiomatic Go, each consumer declares the narrow interface it needs and nothing
 more, right where it uses it. The implementation in `users` is a concrete struct
 with public methods, and no one declares it implements anything explicitly.
 
@@ -183,7 +183,7 @@ methods, `orders` is unaffected because it never asked for them. Depth comes
 from the cost-to-benefit asymmetry. The consumer pays for one method's worth
 of interface and gets whatever the implementation does behind it.
 
-This is the same principle as the depth check in a different syntax. The
+A consumer-side interface in Go applies the depth check's principle in a different syntax. The
 interface should be much smaller than the implementation. Go's convention makes
 it mechanical to enforce.
 
@@ -203,10 +203,10 @@ app.use(injectTenantContext());      // reads req.user, writes req.tenant
 app.use(audit());                    // reads everything written above
 ```
 
-This is temporal decomposition (the decompose-by-knowledge check). The reason there are seven
+The middleware stack is temporal decomposition (the decompose-by-knowledge check). The reason there are seven
 middlewares is "first do this, then that, then the next thing." The thing
-being passed between them is `req`, a giant bag that each step reads from and
-writes to. Every middleware knows about fields the previous ones produced.
+being passed between them is `req`, one large object that each step reads from
+and writes to. Every middleware knows about fields the previous ones produced.
 Information about who the user is, what their permissions are, and which tenant
 they belong to is leaked across all seven modules.
 
@@ -215,10 +215,9 @@ Adding the next concern means another middleware that reads `req.user`,
 request" is whatever the union of all those fields adds up to, and no module
 owns the contract.
 
-Re-slice by knowledge. The bodies of these middlewares belong to
-distinct subjects: authentication is one body of knowledge, authorization is
-another, multitenancy is a third, audit is a fourth. Make each a module with
-its own boundary:
+Divide the code again by knowledge. The middleware bodies belong to distinct
+bodies of knowledge: authentication, authorization, multitenancy, and audit.
+Make each body of knowledge a module with its own boundary:
 
 ```ts
 @Injectable()
@@ -247,8 +246,8 @@ that need them.
 
 Cross-cutting interceptors (logging, metrics) can still exist, and they're the
 narrow category Nest interceptors and Express middleware fit. The
-seven-middleware pipeline collapses to two or three when each represents a
-real cross-cut and the rest move into named modules.
+seven-middleware pipeline shrinks to two or three middlewares when each one
+represents a real cross-cut and the rest move into named modules.
 
 ---
 
@@ -261,4 +260,4 @@ real cross-cut and the rest move into named modules.
 | Cross-cutting concern | AOP advice or `HandlerInterceptor` | Wrapping middleware at the router | Nest interceptors/guards |
 | Wide interface near implementation | One narrow interface per consumer | One narrow interface per consumer (idiomatic) | One narrow interface per consumer |
 
-The principles are the same, and the idiom is what changes.
+The principles are the same in all three stacks, and only the idiom changes.

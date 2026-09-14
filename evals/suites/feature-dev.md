@@ -18,7 +18,7 @@ that produces acceptance criteria and a named Check command for this has failed.
 > usage on the billing page. Enforce it on the API too, not just the UI.
 
 Expected: strategic, on two triggers at once. Billing is on the trigger list,
-and the behavior lands at three call sites. Owes the three-line criteria form,
+and the behavior changes at three call sites. Owes the three-line criteria form,
 all four discovery items, named slices, a wait at stop 1, a written plan, and a
 behavior-record entry per criterion.
 

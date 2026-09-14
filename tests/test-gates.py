@@ -102,12 +102,12 @@ seeded("deleted rule caught", TESTING,
 
 seeded("body growth caught", DOCS,
        add_after("# Toby SWD Docs\n",
-                 "\n" + "Filler sentence that carries no rule whatsoever. " * 90 + "\n"),
+                 "\n" + "Filler sentence that states no rule whatsoever. " * 90 + "\n"),
        "grew past 10 percent")
 
 seeded("co-load growth caught", DOCS,
        add_after("# Toby SWD Docs\n",
-                 "\n" + "Filler sentence that carries no rule whatsoever. " * 90 + "\n"),
+                 "\n" + "Filler sentence that states no rule whatsoever. " * 90 + "\n"),
        "co-load feature-change")
 
 # A skill name broken across a folded-scalar line wrap points at nothing.
@@ -118,7 +118,7 @@ seeded("split skill name caught", DOCS,
 STYLE = REPO_ROOT / "output-styles" / "toby.md"
 
 seeded("output style drift caught", STYLE,
-       lambda t: t.replace("Plain words. Concrete verbs.", "Plain words."),
+       lambda t: t.replace("Use plain words and literal verbs.", "Use plain words."),
        "drifted from base/toby.md")
 
 seeded("output style losing the coding flag caught", STYLE,

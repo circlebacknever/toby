@@ -13,7 +13,7 @@ in any of the three frameworks.
 
 ## Example 1 — Server state mixed into components
 
-The pattern most apps grow into, in every framework:
+Most apps in every framework end up with this pattern:
 
 ```tsx
 // React — fetch-in-component
@@ -39,20 +39,20 @@ function ProductPage({ id }: { id: string }) {
 }
 ```
 
-The exact same block, repeated, in `OrderPage`, `CustomerPage`, `InvoicePage`.
-Every component re-implements: cancellation on unmount, error semantics,
-loading state, cache (there isn't one), refetch on focus (there isn't one
-either), retry on transient failure (nope). The "interface to fetching" is a
+The same block is repeated in `OrderPage`, `CustomerPage`, and `InvoicePage`.
+Every component re-implements cancellation on unmount, error semantics, and
+loading state. None of them has a cache, refetch on focus, or retry on
+transient failure. The "interface to fetching" is a
 30-line block of `useEffect` machinery duplicated everywhere.
 
-This is information leakage in slow motion. The decisions "how do
-we cancel," "what the loading state holds," "what counts as an error" are
-encoded in every component. The day you change one — say, you want errors to
-include a `retry-after` hint — is the day you edit fifteen components.
+The repeated block is information leakage that grows with each new page. The
+decisions "how do we cancel," "what the loading state holds," "what counts as
+an error" are encoded in every component. If you change one decision, such as
+adding a `retry-after` hint to errors, you edit fifteen components.
 
-The deep module is a query library — TanStack Query / SWR for React,
-TanStack Query for Solid, TanStack Query or `@tanstack/svelte-query` for
-Svelte (all three frameworks ship an integration). Use one:
+The deep module is a query library, and all three frameworks ship an integration.
+React uses TanStack Query / SWR, Solid uses TanStack Query, and Svelte uses
+TanStack Query or `@tanstack/svelte-query`. Use one:
 
 ```tsx
 // React with TanStack Query
@@ -102,19 +102,19 @@ function ProductPage(props: { id: string }) {
 {/if}
 ```
 
-Cancellation, deduping, retry, cache, refetch-on-focus, request waterfalls
-across components — all owned inside one library that's deep by design. The
-component is back to rendering. When the team later decides every error
+One library that is deep by design owns cancellation, deduping, retry, cache,
+refetch-on-focus, and request waterfalls across components. The component now
+only renders. When the team later decides every error
 deserves a toast, that's one configuration change in one place.
 
-Build your own only if you have a reason. "We don't want a dependency" loses
-on cost-benefit by the third component.
+Build your own only if you have a reason. Avoiding a dependency costs more
+than it saves by the third component.
 
 ---
 
 ## Example 2 — Shared behavior via hook / composable / rune
 
-A pattern from the bad old days, still appearing in new code:
+This older pattern still appears in new code:
 
 ```tsx
 // React — higher-order component for "needs window size"
@@ -132,11 +132,11 @@ function withWindowSize<P>(Component: React.ComponentType<P & WindowSize>) {
 export default withWindowSize(withCurrentUser(withTheme(MyComponent)));
 ```
 
-This is implementation-inheritance leakage in non-class clothing. `withWindowSize` and `MyComponent` are
+The higher-order component is implementation-inheritance leakage without a class. `withWindowSize` and `MyComponent` are
 in a parent-child relationship where the wrapper invisibly injects props and
 overrides nothing visible. Yet `MyComponent` cannot be understood without
-reading the wrapper. Three wrappers deep ("wrapper hell") and the component's
-real interface is unknowable from its file.
+reading the wrapper. With three wrappers ("wrapper hell"), a reader cannot learn
+the component's real interface from its file.
 
 The composition replacement looks nearly identical across the three
 frameworks. The thing being shared is a small piece of logic, packaged as
@@ -197,24 +197,24 @@ function MyComponent() {
 <div>{size.width} × {size.height}</div>
 ```
 
-The shared behavior is a function the component calls and composes. No
-hidden injection, no wrapper chain. If a component needs three shared
+The shared behavior is a function the component calls and composes. The
+component has no hidden injection and no wrapper chain. If a component needs three shared
 behaviors, it calls three functions. They appear at the top of the
 component's body where a reader naturally meets them, in the order they
-were called. This is composition, exactly the pattern the composition-over-inheritance check recommends.
+were called. Calling shared functions is composition, the pattern the composition-over-inheritance check recommends.
 
 The same applies to the more substantial cases: data fetching (above),
 form state (below), media queries, intersection observers, undo/redo,
-keyboard shortcuts. If a behavior would otherwise tempt a base class or
-an HOC, package it as a hook/composable/rune function and call it.
+keyboard shortcuts. If a behavior would otherwise lead someone to write a base class
+or an HOC, package it as a hook/composable/rune function and call it.
 
 ---
 
 ## Example 3 — Store slice as a deep module
 
-A pattern in growing apps: state starts in a component, gets lifted to a
-parent, then to a context, then to a global store, but the store grows by
-accretion, becoming a grab-bag.
+In growing apps, state starts in a component, gets lifted to a parent, then
+to a context, then to a global store. The store then grows by accretion into
+a grab-bag.
 
 ```tsx
 // React with Zustand — the grab-bag store
@@ -235,15 +235,15 @@ const useStore = create((set) => ({
 }));
 ```
 
-This is classitis at the store level. Auth, theme, cart, coupons, and
-notifications share nothing except a tendency to live globally. Selectors
+The grab-bag store is classitis at the store level. Auth, theme, cart,
+coupons, and notifications share nothing except being global. Selectors
 get longer and longer, all components subscribe to the same store, and every
 mutation can in principle touch anything. The "interface" of the store
 is the entire state layout exposed by getter and the entire set of mutations
 exposed by name. An interface that is the whole state layout makes the store
 as shallow as a module gets.
 
-Re-slice by knowledge (the decompose-by-knowledge check). Each slice owns one body of state and the
+Divide the store again by knowledge (the decompose-by-knowledge check). Each slice owns one body of state and the
 operations that maintain its invariants.
 
 ```tsx
@@ -298,9 +298,9 @@ export const Cart = {
 };
 ```
 
-One reactivity caveat the three handle differently: `total` is a derived
-value. Solid tracks it on read — `Cart.total()` in JSX re-runs when `items`
-or `coupon` changes — and Svelte's `derived` store does the same. Zustand
+The three frameworks handle one reactivity caveat differently, because `total`
+is a derived value. Solid tracks `total` on read, so `Cart.total()` in JSX
+re-runs when `items` or `coupon` changes. Svelte's `derived` store does the same. Zustand
 doesn't track derived reads. A component reaches the live value through a
 selector that calls it, `useCart((s) => s.total())`, so the subscription
 recomputes on change. Selecting the bare method (`s.total`) or calling
@@ -308,14 +308,14 @@ recomputes on change. Selecting the bare method (`s.total`) or calling
 value goes stale.
 
 Each slice is now a deep module. The interface (`add`, `remove`, `total`,
-`applyCoupon`) expresses intent, and the state layout and the invariants live
-inside. Components call `Cart.add(item)`. The grab-bag form made them reach
+`applyCoupon`) expresses intent, and the state layout and the invariants are
+inside the slice. Components call `Cart.add(item)`. The grab-bag form made them reach
 into `useStore.setState((s) => ({ cart: [...s.cart, item] }))`. The "what
 counts as a duplicate" rule
-lives once, in `add`. Adding the next state concern (a `wishlist`)
+is in one place, `add`. Adding the next state concern (a `wishlist`)
 creates a new slice. It does not extend the same monolith.
 
-Guardrail: don't shatter into so many slices that every component imports
+Do not split the store into so many slices that every component imports
 six. Slice by real knowledge boundary (auth, cart, theme). One slice per field
 is the over-split.
 
@@ -323,7 +323,7 @@ is the over-split.
 
 ## Example 4 — Headless behavior versus mega-prop component
 
-A pattern that compounds for a year and a half:
+This component grew for a year and a half:
 
 ```tsx
 // The combobox that grew
@@ -350,11 +350,11 @@ A pattern that compounds for a year and a half:
 />
 ```
 
-This is overexposure (the depth check / a split/merge split candidate). The component's
+The mega-prop `Combobox` is overexposure (the depth check / a split/merge split candidate). The component's
 common case requires a caller to make 20 decisions, most of which are
 irrelevant most of the time. The component owns rendering, filtering,
 keyboard handling, focus management, popover positioning, multi-select,
-creation, grouping — every feature concatenated into one prop surface.
+creation, and grouping, so every feature ends up in one list of props.
 
 Two things are tangled: the *behavior* of a combobox (keyboard navigation,
 selection state, ARIA semantics, popover open/close) and the *presentation*
@@ -419,13 +419,13 @@ function createCombobox<T>(opts: { items: () => T[]; getId: (t: T) => string }) 
 The behavior is one deep module (the hook / composable / factory), and the
 presentation is whatever the consumer writes. Each `ProductCombobox`,
 `UserCombobox`, `TagCombobox` is a few lines of presentational code that
-composes the behavior. The mega-prop form crammed 20 props into one black box
-that tries to be every combobox.
+composes the behavior. The mega-prop form put 20 props into one component
+that had to serve every combobox.
 
-This pattern is what Radix, Headless UI, and Melt UI productize. Adopting
-one of those libraries is usually cheaper than writing your own. The
-principle is *why* they're structured that way. Behavior
-and presentation are different bodies of knowledge, and a single component
+Radix, Headless UI, and Melt UI package the headless pattern as libraries.
+Adopting one of those libraries is usually cheaper than writing your own. They
+are structured that way because behavior and presentation are different bodies
+of knowledge, and a single component
 that ships both ends up with a wide and shallow interface.
 
 ---
@@ -444,5 +444,5 @@ that ships both ends up with a wide and shallow interface.
 | Form state | React Hook Form, TanStack Form | Solid forms / TanStack Form | Svelte forms / TanStack Form |
 
 The principles are the same in every column. The deep module is the
-function/hook/composable/rune, components call it, shared knowledge lives
-inside it, and the rest of the framework is reactive plumbing.
+function/hook/composable/rune, components call it, shared knowledge is
+inside it, and the rest of the framework handles reactivity.

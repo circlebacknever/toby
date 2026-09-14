@@ -1,6 +1,6 @@
 # Worked Examples
 
-Original code and structures. The reasoning is what transfers.
+The code and structures below are original, and the reasoning is the part that transfers to other code.
 
 ---
 
@@ -8,16 +8,17 @@ Original code and structures. The reasoning is what transfers.
 
 A team builds request handling as two classes. `RequestReader` reads bytes off
 the socket into a string, and `RequestParser` parses the string into a
-structured request. Described as "first read, then parse" — the tell.
+structured request. The team describes the design as "first read, then parse",
+which signals temporal decomposition.
 
-The defect: the reader cannot know where the request ends without parsing the
-headers (the length header determines body size). So both classes know the
-request format. That knowledge is a single design decision living in two
-modules — leakage — and parsing code ends up duplicated. Callers also have to
+The defect is that the reader cannot know where the request ends without
+parsing the headers, because the length header determines body size. So both
+classes know the request format. That knowledge is a single design decision
+written in two modules, which is leakage, and parsing code ends up duplicated. Callers also have to
 invoke two objects in a fixed order.
 
-Fix per the decompose-by-knowledge, information-leakage, and split/merge checks: the knowledge is "the request wire format," and it
-should live in one module. Merge into one `Request` module that reads and
+The decompose-by-knowledge, information-leakage, and split/merge checks give the fix.
+The knowledge is "the request wire format," and it should be in one module. Merge into one `Request` module that reads and
 parses behind a single `Request.receive(socket)`. The format knowledge is now in
 one place, the inter-module string-passing interface disappears, and callers
 make one call. The merged module is deeper than either original.
@@ -26,19 +27,20 @@ make one call. The merged module is deeper than either original.
 
 ## Example 2 — Backend: pull complexity downward
 
-A retrying transport needs a retry interval. Tactical move: export
+A retrying transport needs a retry interval. The tactical move is to export
 `retry_interval_ms` as a configuration parameter and let operators set it.
 
-Apply the pull-complexity-down check. Ask: can the caller pick a better value than the module can? For
-a retry interval, almost never, because the module sees the actual round-trip
-times and the operator is guessing. So compute it. Measure observed response
+Apply the pull-complexity-down check by asking whether the caller can pick a
+better value than the module can. For a retry interval, the caller almost never
+can, because the module sees the actual round-trip times and the operator is
+guessing. So compute it. Measure observed response
 latency and use a multiple of it, adapting as conditions change. The parameter
 leaves the interface entirely. If a hard override is needed for some
 environment, keep it as an optional argument with that computed value as the
 default. The common case then specifies nothing.
 
-Guardrail check: this complexity is related to the transport's own job and it
-simplifies every caller, so pulling it down is correct here.
+The guardrail check passes. This complexity is related to the transport's own
+job and it simplifies every caller, so pulling it down is correct here.
 
 ---
 
@@ -46,13 +48,13 @@ simplifies every caller, so pulling it down is correct here.
 
 `currentUser` is needed by `AvatarMenu`, four levels deep. Today it is passed
 `App → Layout → Header → Toolbar → AvatarMenu`, and every intermediate
-component's props list carries `currentUser` though only the leaf uses it.
+component's props list includes `currentUser` though only the leaf uses it.
 
-This is a pass-through variable (the different-layer check). The intermediate
+`currentUser` is a pass-through variable (the different-layer check). The intermediate
 components are forced to know about a value they have no use for. Adding the
-next such value means editing the whole chain again. Fix with a shared object
-scoped to the endpoints: a `CurrentUserContext` provided near `App` and read in
-`AvatarMenu`. The intermediates lose the prop entirely. Keep the context small
+next such value means editing the whole chain again. Fix it with a shared object
+scoped to the endpoints, such as a `CurrentUserContext` provided near `App` and
+read in `AvatarMenu`. The intermediates lose the prop entirely. Keep the context small
 and its value stable, because a context that becomes a grab-bag has the
 downsides of global state.
 
@@ -64,22 +66,22 @@ only forwards its props is a pass-through method. Delete it and let callers use
 
 ## Example 4 — Frontend: classitis from over-componentization
 
-A list row is split into `<RowContainer>`, `<RowInner>`, `<RowText>`,
-`<RowMeta>`, `<RowChrome>` — five components, each a handful of lines, each only
-ever used by the one above it, none independently meaningful.
+A team splits a list row into `<RowContainer>`, `<RowInner>`, `<RowText>`,
+`<RowMeta>`, and `<RowChrome>`. Each of the five components is a handful of
+lines, only the component above it ever uses it, and none means anything alone.
 
-Subdivision cost (the split/merge check / classitis): five interfaces to learn, five files to
-flip between, dependencies hidden across them, and no information hidden by any
-boundary because none owns a distinct piece of knowledge. The relatedness
-signals all point one way. They share state, are always used together, and none
-can be understood alone. Collapse to one `<Row>` component. It is longer, and it
-is one coherent deep abstraction with a simple prop interface. The depth check
-prefers that over five shallow ones.
+The subdivision cost (the split/merge check / classitis) is five interfaces to
+learn, five files to flip between, and dependencies hidden across them. No
+boundary hides any information, because none owns a distinct piece of knowledge.
+All the relatedness signals favor merging, because the components share state,
+are always used together, and none can be understood alone. Collapse to one `<Row>` component. It is longer, and it
+is one coherent deep abstraction with a simple prop interface. Under the depth
+check, that one component beats five shallow ones.
 
-Counter-case, so this is not read as "never split". If `<Row>` also contained
+A counter-case shows that the rule is not "never split". If `<Row>` also contained
 the logic for formatting currency across locales, that *is* a distinct body of
-knowledge with reuse elsewhere. Extract it as a general-purpose helper. Split
-on a real knowledge boundary. Line count never justifies a split on its own.
+knowledge with reuse elsewhere. Extract it as a general-purpose helper, and split
+on a knowledge boundary. Line count never justifies a split on its own.
 
 ---
 

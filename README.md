@@ -1,8 +1,8 @@
 # Toby
 
-Toby's work habits, packed so they ride along to more than one machine. Clone, install, and the local assistants pick up the same vibe, caution around commands, and quiet opinions about whitespace.
+Toby is a set of work habits for coding assistants, packaged so every machine you use gets the same ones. Clone the repo and run the installer. Each local assistant then picks up the same voice, the same caution around commands, and the same quiet opinions about whitespace.
 
-Small suitcase. Toby travels light.
+The package is markdown and a few scripts, and it won't write anything outside the home directory.
 
 ## What you get
 
@@ -23,16 +23,16 @@ Small suitcase. Toby travels light.
 
 Kiro reads steering with `inclusion: always`. Everyone else gets a marked instruction block in their tool file.
 
-`github` and `copilot` point at the same target (`~/.copilot/`). Repo-level `.github/` for the cloud agent lives in each repo, so the installer leaves it alone.
+`github` and `copilot` point at the same target (`~/.copilot/`). Repo-level `.github/` for the cloud agent is in each repo, so the installer leaves it alone.
 
 ## Quick start
 
 ```sh
 git clone https://github.com/circlebacknever/toby
 cd toby
-scripts/install.sh --dry-run --tool all   # look
-scripts/install.sh --tool all             # leap
-scripts/install.sh --force.               # fall
+scripts/install.sh --dry-run --tool all          # show what would change
+scripts/install.sh --tool all                    # install for every tool
+scripts/install.sh --tool all --force            # replace Toby files already there
 ```
 
 One tool at a time:
@@ -73,11 +73,11 @@ nothing depends on remembering.
 
 ### Claude Code: pick one of two layouts
 
-The writing rules live in `CLAUDE.md`, or in an output style. Never both: that
-puts the same 4,842 tokens in front of every turn twice, which is what the flag
+The writing rules go in `CLAUDE.md`, or in an output style. Never both: that
+puts the same 6,400 tokens in front of every turn twice, which is what the flag
 below exists to prevent.
 
-**Default.** Everything in `CLAUDE.md`. Works the moment it lands, and needs no
+**Default.** Everything in `CLAUDE.md`. Works as soon as it is installed, and needs no
 further setup.
 
 ```sh
@@ -85,12 +85,12 @@ scripts/install.sh --tool claude
 ```
 
 **Output style.** The writing rules go into Claude Code's system prompt, which
-sits above `CLAUDE.md` and gets restated during a long conversation. `CLAUDE.md`
-then carries the operating floor alone: authority, verification, plan format,
+has priority over `CLAUDE.md` and gets restated during a long conversation. `CLAUDE.md`
+then contains the operating floor alone: authority, verification, plan format,
 work modes, skill routing, environment safety, the work loop, and self review.
 
 The split costs about 200 tokens more than the default, because the two files
-carry two headers where one did. Choose it for where the rules sit, and not to save
+contain two headers where one did. Choose it for where the rules sit, and not to save
 anything.
 
 ```sh
@@ -110,16 +110,16 @@ write something before the style is on.
 
 | | Default | `--output-style` |
 |---|---|---|
-| Resident tokens per turn | 7,443 | 7,643 (5,042 style, 2,601 `CLAUDE.md`) |
+| Resident tokens per turn | 9,124 | 9,312 (6,531 style, 2,781 `CLAUDE.md`) |
 | Where the writing rules sit | a user message | the system prompt |
 | Restated late in a session | no | yes |
 | Setup after install | none | `/config`, Output style, Toby |
 | Reaches a subagent | yes | no, a subagent runs its own system prompt |
 
 The last two rows are the ones to weigh. A subagent does not read the output style, so
-the file checks in `evals/` and the Stop hook still carry the rules there.
+the file checks in `evals/` and the Stop hook still apply the rules there.
 
-## Toby is careful
+## Toby is careful to avoid breaking things
 
 The installer edits one marked block and leaves the rest of the file alone:
 
@@ -129,9 +129,9 @@ The installer edits one marked block and leaves the rest of the file alone:
 <!-- END TOBY INSTRUCTIONS -->
 ```
 
-Block already there? Only the block changes. No block? The installer waits for `--force` before it adds anything. Same deal for skill folders: an existing `toby-*` stays put unless you `--force` it.
+When the block is already there, only the block changes. When there is no block, the installer waits for `--force` before it adds anything. Skill folders follow the same rule, so an existing `toby-*` folder stays until you pass `--force`.
 
-## What's in Toby's box
+## Files
 
 - `base/toby.md` - Toby's operating guide. Source of truth.
 - `AGENTS.md` - Codex's copy of it.
@@ -142,17 +142,17 @@ Block already there? Only the block changes. No block? The installer waits for `
 - `output-styles/toby.md` - the voice rules as a Claude Code output style, generated from `base/toby.md`.
 - `scripts/voice-check.py` - run this for a voice pass. Every rule, on a file or stdin, split into what to fix and what to decide.
 - `scripts/voice_rules.py` - the rules the checker runs. The validator imports them too, so the checker never needs the validator.
-- `hooks/` - a Stop hook that reads the finished reply, and a PostToolUse hook that reads a file the moment it lands. `hooks/README.md` wires them up.
+- `hooks/` - a Stop hook that reads the finished reply, and a PostToolUse hook that reads a file as soon as it is written. `hooks/README.md` wires them up.
 - `scripts/token-budget.py` - what a turn costs, by which skills fire.
 - `evals/` - the regression suite. `evals/README.md` says how to run it and how to add a case.
 
 The operating guide owns safety, work loop, skill routing, verification posture, and voice. Skills own task method.
 
-The voice rules ship three ways, because each one reaches a surface the others miss. The instruction files put them in a user message every tool reads. The output style puts the writing sections in Claude Code's system prompt, which sits above that and gets restated during a long conversation. The Stop hook reads the finished reply, which no file check can do.
+The voice rules ship three ways, because each one reaches a surface the others miss. The instruction files put them in a user message every tool reads. The output style puts the writing sections in Claude Code's system prompt, which has priority over that and gets restated during a long conversation. The Stop hook reads the finished reply, which no file check can do.
 
 Turn the style on with `/config`, then Output style, then Toby. It sets `keep-coding-instructions: true`, so the engineering behaviour is untouched.
 
-A subagent runs its own system prompt, so the output style does not reach one. The file checks and the hook still matter for that reason. Toby keeps the boundary visible, since mixed guidance turns into paperwork with hinges.
+A subagent runs its own system prompt, so the output style does not reach one. The file checks and the hook still matter for that reason. Toby keeps that boundary visible, because two files that both claim the voice rules will disagree by Thursday.
 
 A skill points at the guide by calling it "the operating guide" and never by a filename. `base/toby.md` is a path in this repo and nowhere else after install, and the installed name is `CLAUDE.md` on one tool, `AGENTS.md` on another, `copilot-instructions.md` on a third. The guide loads on every turn, so the name is all a skill needs. The validator fails on `base/toby.md` inside `skills/`. It does not police the `AGENTS.md` spelling, because `toby-swd-docs` uses that filename for the module doc in the user's own repo.
 
@@ -175,15 +175,15 @@ The rest of the standalone skills are Toby-specific:
 
 The `toby-swd-*` set is the engineering method, one skill per habit:
 
-The SWD skills come from Toby reading two books people usually argue about in separate rooms: John Ousterhout's *A Philosophy of Software Design* and Robert C. Martin's *Clean Code*. He treated both as source material, then chose the parts he trusts when he's touching real code.
+The SWD skills come from two books whose fans rarely agree. Toby read John Ousterhout's *A Philosophy of Software Design* and Robert C. Martin's *Clean Code* as source material, then kept the parts he trusts when he edits code.
 
-Ousterhout gives him the structure vote. `toby-swd-strategy`, `toby-swd-modules`, and `toby-swd-interfaces` care about design before tactical code. They favor deep modules, smaller caller burden, interface comments, and contracts written before bodies.
+Ousterhout decides the structure, so `toby-swd-strategy`, `toby-swd-modules`, and `toby-swd-interfaces` care about design before tactical code. They favor deep modules, smaller caller burden, interface comments, and contracts written before bodies.
 
-Martin contributes the local habits Toby still wants: names, readable flow, behavior tests, and small functions when the split earns its keep. Refactoring comes after the boundary is sound.
+Martin contributes the local habits Toby still wants: names, readable flow, behavior tests, and small functions when the split makes the code easier to follow. Refactoring comes after the boundary is sound.
 
-When a local habit creates shallow interfaces, hides a contract, or lets tests steer design into a dead end, Toby picks the boundary rule. Settle the floor plan before the desk drawer.
+When a local habit creates shallow interfaces, hides a contract, or lets tests steer design into a dead end, Toby picks the boundary rule. He settles the module boundaries before anyone argues about function length.
 
-- `toby-swd-environment` - treat the user's machine like a guest would: look around and ask before touching processes, ports, or data.
+- `toby-swd-environment` - treat the user's machine as the user's, so look around and ask before touching processes, ports, or data.
 - `toby-swd-strategy` - weigh how today's change constrains every change after it, so the codebase stays easy to work in.
 - `toby-swd-modules` - decide where code lives so each module hides its own mess and callers stay light.
 - `toby-swd-interfaces` - design the contract a caller sees, keeping it small for the work it does.
@@ -193,7 +193,7 @@ When a local habit creates shallow interfaces, hides a contract, or lets tests s
 - `toby-swd-docs` - keep the why and the who-it's-for in `AGENTS.md` and `README.md`, where the code can't say it.
 - `toby-swd-experiment` - spike mode: move fast to learn first, save the durable build for later.
 
-## Toby wants to live
+## Toby wants to live a long life
 
 Before you push:
 
@@ -212,7 +212,7 @@ that makes an improvement stick.
 
 `tests/test-gates.py` seeds a regression against each gate and checks it goes
 red, so a gate cannot quietly lose the ability to fail. The evals that need a
-model to write something live beside these and never gate, because five samples
+model to write something are stored beside these and never gate, because five samples
 of the voice suite on identical inputs scored 1, 1, 4, 4, and 11.
 
 Full install test that never touches your real home:
@@ -221,10 +221,10 @@ Full install test that never touches your real home:
 scripts/test-install.sh
 ```
 
-It installs into a throwaway `HOME`, then checks what landed. Skill counts are read from the repo, so adding a skill cannot leave the test quietly red. Every installed skill is compared byte-for-byte against `skills/`, and every instruction block is compared against `base/toby.md`.
+It installs into a throwaway `HOME`, then checks what it installed. Skill counts are read from the repo, so adding a skill cannot leave the test quietly red. Every installed skill is compared byte-for-byte against `skills/`, and every instruction block is compared against `base/toby.md`.
 
 It also tests the two promises above. A re-install without `--force` must refuse, text around a marker block must survive, and a file with no marker block must come back untouched. The temp dirs clear on the way out.
 
-## A small heads-up
+## Making it yours
 
-This installs Toby's taste, which is a generous word for preferences he can't stop having. Rewrite `base/toby.md`, and it turns into yours.
+This installs Toby's taste, which is a generous name for preferences he cannot stop having. Rewrite `base/toby.md`, and the preferences become yours.

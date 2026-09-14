@@ -4,8 +4,8 @@ This file covers one question about caching: *should you add a cache at all*,
 and if so, *how much complexity have you bought*? Where a cache should live
 and what its contract should be are separate questions handled elsewhere.
 
-A cache is performance complexity. The SKILL's rule applies: gate
-complexity on evidence. A cache earns its place by measurement. The
+A cache adds performance complexity, so the SKILL's rule to gate
+complexity on evidence applies. Add a cache only when a measurement justifies it. The
 default is no cache.
 
 ---
@@ -16,22 +16,21 @@ A common conversation:
 
 > "The products endpoint is slow. We should cache it."
 
-The first question — slow how? — usually doesn't get an answer. The
-fastest path from "slow" to "added Redis" involves no measurement, no
-baseline, and no idea whether the cache will help.
+The first question, which asks how it is slow, usually gets no answer. Going straight from "slow" to "added Redis" skips the measurement and
+the baseline, and leaves no idea whether the cache will help.
 
-The discipline before adding any cache:
+Do this work before adding any cache:
 
-1. **Measure the current latency.** Median, P95, P99 for the hot path.
-   "Slow" is a feeling, and numbers are a baseline.
-2. **Find where the time goes.** Is it a database query? A downstream
-   API call? CPU work in serialization? A 5x improvement in the wrong
-   layer is no improvement.
+1. **Measure the current latency.** Record the median, P95, and P99 for the
+   hot path, because "slow" is a feeling and those numbers give a baseline.
+2. **Find where the time goes.** Check whether it is a database query, a
+   downstream API call, or CPU work in serialization, because a 5x improvement
+   in the wrong layer gains nothing.
 3. **Estimate the hit ratio.** A cache that's invalidated on every
    request (because the data changes constantly, or the cache key is
    too narrow) saves nothing and costs added latency on the miss path.
-4. **Estimate the staleness tolerance.** Some data must be fresh
-   (account balances). Some can be minutes stale (product catalog).
+4. **Estimate the staleness tolerance.** Some data, such as account
+   balances, must be fresh, while a product catalog can be minutes stale.
    The TTL is a product decision, so set it from the staleness budget.
 
 After this, the cache is either plainly right (slow database query,
@@ -52,8 +51,8 @@ Decision: cache, 5-minute TTL, repository-level
 Projected P95 with cache: 50ms (miss path) / 5ms (hit path)
 ```
 
-Without this, you're carrying speculative complexity. With it, you have
-a measurable predicted improvement and a baseline to compare against.
+A cache added without this note is speculative complexity. The note gives
+you a measurable predicted improvement and a baseline to compare against.
 
 ---
 
@@ -63,12 +62,12 @@ A cache layer brings real and recurring costs. List them in full before
 deciding:
 
 - **Invalidation.** Every mutation that affects a cached value must
-  evict the right keys. This is the source of most cache bugs. Code
+  evict the right keys. Missed invalidation is the source of most cache bugs. Code
   paths that update the data without going through the caching layer
   produce stale reads.
 - **A new system to monitor.** Redis (or whatever) is now in your
   critical path. It has its own latency, outages, and operational
-  surface.
+  work.
 - **Cold-start behavior.** When the cache restarts, every request misses
   until the cache warms. If the underlying data store can't handle peak
   traffic alone, the cache restart is now a production incident.
@@ -80,17 +79,17 @@ deciding:
   paths. Snapshot tests have to be careful about TTLs. Integration
   tests need cache reset between cases.
 - **Observability cost.** Did this request hit the cache? Was that
-  cached value stale? You need metrics for hit rate, miss rate, TTL
-  effectiveness — none of which existed before.
+  cached value stale? You need metrics for hit rate, miss rate, and TTL
+  effectiveness, and none of those metrics existed before.
 
 The cache adds 5 lines of code at the call site and 50 lines of
-operational reality. The question "is the P99 latency improvement worth
-this?" should weigh both columns.
+operational work. Weigh both costs when you ask "is the P99 latency
+improvement worth this?"
 
 When the answer is yes, ship the cache. When the answer is no but the
-endpoint is too slow, the work is somewhere else: optimize
-the query, add an index, denormalize, fix the N+1. Those moves usually
-have smaller operational footprint than introducing a cache.
+endpoint is too slow, do other work, such as optimizing the query,
+adding an index, denormalizing, or fixing the N+1. Those changes usually
+add less operational work than introducing a cache.
 
 ---
 
@@ -107,20 +106,20 @@ await cache.set(key, fresh, 600);
 return fresh;
 ```
 
-Under low load, fine. Under peak load, with a popular key expiring, 1000
-concurrent requests all miss, all call `load()`, all hit Postgres.
-Postgres now handles 1000 connections for what should be a single query.
-The hot path goes from cached-fast to slower than uncached.
+Under low load, this works. Under peak load, a popular key expires and 1000
+concurrent requests all miss, all call `load()`, and all hit Postgres. The
+database now handles 1000 connections for what should be a single query, so
+the hot path becomes slower than having no cache.
 
-This is a performance problem, and the results stay correct. Eventually
-the load succeeds, the cache repopulates, things stabilize. During
-the herd, though, the system is far slower than the uncached version, because
+The stampede is a performance problem, and the results stay correct. The
+load eventually succeeds and the cache repopulates, so the system recovers. During
+the stampede, though, the system is far slower than the uncached version, because
 each load contends with 999 others.
 
-Three mitigations, in order of complexity:
+The mitigations below are in order of complexity:
 
-**Single-flight per process.** At most one in-flight load per key per
-process; concurrent waiters share the result. Most cache libraries offer
+**Single-flight per process.** Each process runs at most one in-flight load
+per key, and concurrent waiters share the result. Most cache libraries offer
 this (`getOrLoad`, `wrap`, `loadingCache`). The internal implementation
 holds a map of `key → Promise<T>` for in-flight loads.
 
@@ -149,21 +148,22 @@ async getOrLoad<T>(key: string, ttl: number, load: () => Promise<T>): Promise<T>
 ```
 
 This handles 1000 concurrent in-process requests with one downstream call.
-Across processes, you still get one call per process — usually acceptable
-unless you have hundreds of processes.
+Across processes, you still get one call per process, which is usually
+acceptable unless you have hundreds of processes.
 
 **Cross-process locking.** Add a short-lived distributed lock (Redis
 `SET NX EX`) around the load. Other processes wait briefly and read
-from cache when the lock holder finishes. Only worth the complexity when
-in-process single-flight isn't enough, meaning you have many processes and
-the load is so expensive that even one-per-process is too many.
+from cache when the lock holder finishes. Locking is worth the complexity
+only when in-process single-flight isn't enough. That happens when you have
+many processes and the load is so expensive that even one call per process
+is too many.
 
 **Stale-while-revalidate.** Continue serving the stale value to most
 callers while a single load refreshes the cache in the background. The
 hot path stays fast even during the refresh, and users see slightly-old
 data for a short window. The complexity is real (a background refresh
-worker, a "is this stale?" check). Worth it when staleness budget allows
-and load latency is significant.
+worker, a "is this stale?" check). Stale-while-revalidate is worth it when
+the staleness budget allows it and load latency is significant.
 
 Pick the lowest tier that solves the measured problem. Don't skip to
 stale-while-revalidate because it sounds clever.
@@ -178,10 +178,10 @@ A pattern that produces cache bugs:
 await cache.set('user:profile', profile, 3600);   // 1 hour, picked by author
 ```
 
-Where did 1 hour come from? The author guessed. The TTL is now a magic
-number scattered across the codebase. When the requirements change —
-"users complain that their profile changes don't show up for a long time"
-— nobody knows whether to change the TTL, where to find all the places
+The author guessed the 1-hour value, and that TTL is now a magic number
+scattered across the codebase. Suppose the requirements change because
+"users complain that their profile changes don't show up for a long time".
+Nobody knows whether to change the TTL, where to find all the places
 it's used, or whether the change will break something else.
 
 The TTL is a contract about staleness. State it as one:
@@ -201,12 +201,12 @@ await cache.set('user:profile', profile, STALENESS.USER_PROFILE);
 ```
 
 Each TTL is documented with the reasoning. Changing the staleness policy
-is a one-line edit at a named location. New caches in the codebase ask
-"which staleness category does this fit?" The guessing question — "what
-number should I put here?" — stops coming up.
+is a one-line edit at a named location. Authors of new caches ask
+"which staleness category does this fit?" Nobody has to guess "what
+number should I put here?"
 
 For data that shouldn't be cached (every read must be fresh),
-don't cache it. A 1-second TTL is a bug magnet. It caches just long
+don't cache it. A 1-second TTL causes bugs, because it caches long
 enough to produce occasional stale reads under load while delivering
 almost no hit-rate benefit.
 
@@ -228,35 +228,35 @@ async function getUserProfile(userId: string): Promise<UserProfile> {
 }
 ```
 
-Looks fine. Then measure:
+The code looks correct until you measure it:
 
 - Average user visits their profile page < once per minute.
 - 95% of `cache.get` calls return null (TTL expired between visits).
 - The cached path adds a Redis round-trip (~1ms) to every read.
 - The miss path also writes to Redis (~1ms additional).
 
-The cache adds ~2ms per request and saves time on ~5% of requests. Net
-effect: slightly slower than no cache, plus all the operational
+The cache adds ~2ms per request and saves time on ~5% of requests. The net
+effect is a path slightly slower than no cache, plus all the operational
 complexity from Example 2.
 
-This is what speculative caching produces. The cache "feels right" —
-profiles are a hot data type, after all — but the access pattern doesn't
+Speculative caching produces this result. The cache "feels right" because
+profiles are a hot data type, but the access pattern doesn't
 support it.
 
 The right move depends on the actual goal:
 
-- If the issue was "the database is slow," fix the database (Example 4
-  in `databases.md` — indexes). The cache wasn't going to help much
+- If the issue was "the database is slow," fix the database with the
+  indexes in Example 4 of `databases.md`. The cache wasn't going to help much
   because hit rate was low.
 - If the issue was "we want to reduce database load," a cache might
-  help — but with a longer TTL (and a willingness to serve up-to-1-hour
-  stale profiles) to push hit rate up. The cache earns its complexity
-  by hitting.
-- If the issue was perceived and never measured, no cache at all.
+  help with a longer TTL that pushes the hit rate up. That TTL requires a
+  willingness to serve profiles up to 1 hour stale. The cache is worth its
+  complexity only when it hits.
+- If the issue was perceived and never measured, add no cache at all.
 
-Caches earn their complexity by *hitting often enough to
-matter*. If the access pattern produces low hit rate, the cache is just
-complexity.
+A cache is worth its complexity only when it *hits often enough to
+matter*. If the access pattern produces a low hit rate, the cache adds
+complexity and nothing else.
 
 ---
 
@@ -271,6 +271,6 @@ complexity.
 | How do I know it's working? | Hit rate, miss rate, miss-path latency, all as metrics |
 | When to remove a cache? | Hit rate stays low; the work it was protecting is no longer slow |
 
-The cache decision is a complexity decision. Skip the cache where it isn't
-earned, and the system stays simpler to operate, easier to test, and clearer
-to reason about. Add a cache only on measured improvement.
+Deciding on a cache is deciding on complexity. When the evidence does not
+justify a cache, skip it, and the system stays simpler to operate, easier to
+test, and clearer to reason about. Add a cache only on measured improvement.

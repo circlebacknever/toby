@@ -14,59 +14,59 @@ description: >-
 
 This skill means the `AGENTS.md` inside the user's own module tree, the file it teaches you to write. Toby's operating guide is a different file, already loaded by the host tool, and these rules never mean it.
 
-A module carries two categories of information that can't live in the code itself. The code says *what*. These files say *why*, *who this is for*, and *how to think about it*.
+A module has two categories of information that the code itself can't express. The code says *what*, and these files say *why*, *who this is for*, and *how to think about it*.
 
-Don't conflate the two artifacts. They have different audiences and different jobs.
+Don't mix up the two files, because they have different audiences and different jobs.
 
 ---
 
 ## AGENTS.md — for agents writing code here
 
-An AGENTS.md is the single discoverable entry point for an agent working in this module. Its job is to carry what the code can't: the conceptual model, the reasons behind non-obvious decisions, and the design decisions that span modules.
+An AGENTS.md is the single discoverable entry point for an agent working in this module. Its job is to record what the code can't: the conceptual model, the reasons behind non-obvious decisions, and the design decisions that span modules.
 
-An agent without an AGENTS.md is operating blind. It doesn't know what it doesn't know, and finds out only when something breaks. Write this file like you are briefing someone smart who is meeting this code cold and has no time for surprises.
+An agent without an AGENTS.md has no record of these reasons, so it finds the gaps only when something breaks. Write this file for a capable reader who has never seen this code and needs every surprise stated up front.
 
 ### Scope — one per meaningful module
 
-Create an AGENTS.md at the root of a module, package, or feature that owns a real body of knowledge. Examples: a service, a bounded domain package, a frontend feature, a design-system package, a store module. Don't create one for a leaf folder, a single-file utility directory, or a folder that exists for file organization alone.
+Create an AGENTS.md at the root of a module, package, or feature that owns a real body of knowledge. Examples include a service, a bounded domain package, a frontend feature, a design-system package, and a store module. Don't create one for a leaf folder, a single-file utility directory, or a folder that exists for file organization alone.
 
-Many thin AGENTS.md files reproduce the over-subdivision problem, because they rot, they drift, and they train readers to ignore them. When in doubt, push the documentation up to the nearest meaningful module root.
+Many thin AGENTS.md files repeat the over-subdivision problem, because they go out of date and teach readers to ignore them. When you are unsure, move the documentation up to the nearest meaningful module root.
 
 ### Required contents, in order
 
-1. **What this module is and the problem it solves.** One or two sentences: what it does and why it exists. Skip how it works. Everything below lands easier once the reader holds this model.
-2. **Files to know and the responsibility each owns.** A short annotated list of only the files a new agent must understand to work here. State the responsibility each file owns. The implementation behind it belongs in the code.
-3. **Non-obvious design constraints.** Business, product, regulatory, or external constraints that force non-obvious decisions. When the code looks awkward because an outside requirement made it so, the reason lives here. Code and comments track the mechanics, while the outside reason that forced them lives in this file.
+1. **What this module is and the problem it solves.** Write one or two sentences on what it does and why it exists. Skip how it works. Everything below is easier to follow once the reader has this model.
+2. **Files to know and the responsibility each owns.** Give a short annotated list of only the files a new agent must understand to work here. State the responsibility each file owns. The implementation behind it belongs in the code.
+3. **Non-obvious design constraints.** List the business, product, regulatory, or external constraints that force non-obvious decisions. When the code looks awkward because an outside requirement made it so, the reason goes here. Code and comments record the mechanics, and this file records the outside reason that forced them.
 4. **Cross-module decisions.** Any design decision that touches several modules and can't be encapsulated in one of them is recorded here once. Affected sites get a one-line pointer comment (`// see "Event ordering" in AGENTS.md`). A copy of the explanation at each site drifts out of sync and gives no signal that it has.
-5. **Extension rules and invariants.** Where new files belong, conventions that must hold, patterns to match, which upstream or downstream modules a change here affects. Keep it to rules and pointers.
+5. **Extension rules and invariants.** State where new files belong, the conventions that must hold, the patterns to match, and which upstream or downstream modules a change here affects. Keep it to rules and pointers.
 
 ### Stay abstract on purpose
 
-Describe purpose, rationale, constraints, and structure. Keep implementation mechanics out. Abstract documentation survives code changes. Detail that tracks the code belongs in code comments, where it's next to the thing it describes and gets updated when that code changes. The further this content sits from the code, the longer it stays accurate.
+Describe purpose, rationale, constraints, and structure, and keep implementation mechanics out, because abstract documentation stays accurate through code changes. Detail that tracks the code belongs in code comments, where it's next to the thing it describes and gets updated when that code changes. The more abstract this content is, the longer it stays accurate.
 
 ### No duplication
 
-Reference interface comments and let them carry the behavior. Link external specs and let them stay authoritative. State each cross-module decision once here and point to it from affected code. Duplicated documentation is as dangerous as duplicated logic, and worse than absent documentation. Copies drift with no signal to the reader that what they're reading is stale.
+Reference interface comments and let them describe the behavior. Link external specs and let them stay authoritative. State each cross-module decision once here and point to it from affected code. Duplicated documentation does the same harm as duplicated logic and more harm than absent documentation. Copies go out of date, and nothing tells the reader that the copy they are reading is stale.
 
 ### Maintenance
 
-Update AGENTS.md whenever a structural change makes it wrong: responsibility moves, a file's job changes, a cross-module dependency is added or removed, a constraint changes. A stale authoritative file actively misleads. If you can't keep a section accurate at its current detail level, make it shorter and more abstract. Detailed text that no longer holds misleads every reader who trusts it.
+Update AGENTS.md whenever a structural change makes it wrong: responsibility moves, a file's job changes, a cross-module dependency is added or removed, a constraint changes. A stale file that readers treat as authoritative misleads them. If you can't keep a section accurate at its current detail level, make it shorter and more abstract. Detailed text that no longer holds misleads every reader who trusts it.
 
 ### AGENTS.md red flags
 
-- AGENTS.md in a trivial or leaf folder — over-subdivision; push it up.
-- The file describes implementation mechanics, so it will rot. Raise the level.
-- A cross-module reason duplicated into code at each site — duplication.
-- A structural change shipped without updating an AGENTS.md it invalidated.
-- Behavior documented here that belongs in an interface or field comment.
+- An AGENTS.md in a trivial or leaf folder is over-subdivision, so move it up to the nearest meaningful module root.
+- The file describes implementation mechanics, so it will go out of date. Rewrite it at a more abstract level.
+- A cross-module reason is copied into the code at each site, which is duplication.
+- A structural change shipped, and nobody updated the AGENTS.md it made wrong.
+- The file documents behavior that belongs in an interface or field comment.
 
 ---
 
 ## README.md — for humans using or maintaining this module
 
-A README.md is for the human reading the code. AGENTS.md serves the agent writing it. A README says what this module does, why it exists, and what a caller needs to know before calling it.
+Write a README.md for the human reading the code, and write AGENTS.md for the agent writing the code. A README says what this module does, why it exists, and what a caller needs to know before calling it.
 
-README.md files are sparse by design. Most modules don't need one. Create one when:
+README.md files are sparse by design, and most modules don't need one. Create one when:
 
 - The module has a public API that humans call directly.
 - The module's purpose is non-obvious from its name and structure.
@@ -77,22 +77,22 @@ Don't create one for a leaf utility, an internal helper, or anything not meant t
 
 ### Required contents
 
-1. **What this is.** One or two sentences: what problem it solves and who it's for.
-2. **How to use it.** The minimal working example. Show the common case first. Don't bury it under environment setup.
-3. **Concepts a caller needs.** The abstractions a caller operates with to use this correctly. Implementation details stay out.
-4. **Public API reference** (if not self-evident from the code). Only the public surface. Link to generated docs and let the single source stay current when possible. If the interface itself splits common calls from advanced or rarely used ones, mirror that split here. Don't flatten a tiered API into one list.
-5. **Known constraints or gotchas.** Things that will bite a user who doesn't know them: ordering requirements, required environment, edge cases the API doesn't protect against.
+1. **What this is.** Write one or two sentences on what problem it solves and who it's for.
+2. **How to use it.** Give the minimal working example, and show the common case first. Don't put environment setup ahead of it.
+3. **Concepts a caller needs.** List the abstractions a caller works with to use the module correctly, and leave implementation details out.
+4. **Public API reference** (if not self-evident from the code). Cover only the public API. When possible, link to generated docs so the single source stays current. If the interface itself splits common calls from advanced or rarely used ones, mirror that split here. Don't flatten a tiered API into one list.
+5. **Known constraints or gotchas.** List what will break for a user who doesn't know it, such as ordering requirements, required environment, and edge cases the API doesn't protect against.
 
 ### What README.md is not
 
 - A tutorial on internals. Those belong in AGENTS.md or code comments.
 - A changelog or version history.
-- A repetition of interface comments. Link to them. Don't copy.
+- A repetition of interface comments. Link to them, and don't copy them.
 - A place for implementation rationale, which is AGENTS.md's job.
 
 ### README.md maintenance
 
-Update when the public API changes, when a new constraint is added, or when a user reports confusion that a good README.md would have prevented. A README.md describing a defunct API is worse than no README.md.
+Update the README.md when the public API changes or a new constraint is added. Also update it when a user reports confusion that a good README.md would have prevented. A README.md describing an API that no longer exists is worse than no README.md.
 
 ---
 
@@ -113,7 +113,7 @@ When work touches an existing meaningful module, check whether the nearest modul
 ## Compliance check
 
 Before calling a docs change done, run both red-flag lists against the file you
-wrote and name any entry that fired. A red-flag list nothing runs is
-decoration.
+wrote and name any entry that fired, because a red-flag list that nobody
+runs catches nothing.
 
 See `references/examples.md` for backend and frontend examples of both files.

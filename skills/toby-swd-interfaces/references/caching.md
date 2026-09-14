@@ -1,8 +1,8 @@
 # Worked Examples — Caching
 
 The cache's interface determines how much of the caching mechanism leaks
-into the rest of the system. The default `get/set/delete` surface looks
-innocuous and is the most common source of cache misuse in growing
+into the rest of the system. The default `get/set/delete` interface looks
+harmless, and it is the most common source of cache misuse in growing
 codebases.
 
 ---
@@ -31,9 +31,9 @@ Comment, complete:
 > does not serialize complex types beyond JSON; non-serializable objects
 > in set produce undefined behavior.
 
-Seven sentences. Three caller obligations (load-on-miss coordination,
-JSON-only values, TTL fuzziness). The interface sits at the level of "wraps
-Redis." It should own caching for this app.
+The comment runs seven sentences and gives the caller three obligations
+(load-on-miss coordination, JSON-only values, TTL fuzziness). The interface
+works at the level of "wraps Redis," when it should own caching for this app.
 
 The deeper interface inverts the contract. The cache coordinates
 load-on-miss itself, so the caller never does:
@@ -53,18 +53,18 @@ interface Cache {
 }
 ```
 
-Comment for `getOrLoad`: four sentences (the docstring above). No load-on-miss
-coordination obligation. The cache owns single-flight per process (and
+The comment for `getOrLoad` is the four-sentence docstring above, and it gives
+the caller no load-on-miss coordination obligation. The cache owns single-flight per process (and
 optionally a distributed lock for cross-process coordination), so the
 caller writes one line.
 
 `get` and `set` are gone from the interface. They are useful internally
-to implement `getOrLoad`, but as public methods they invite the
-scattered-cache antipattern. The narrower public surface forces callers
+to implement `getOrLoad`, but public `get` and `set` lead callers into the
+scattered-cache antipattern. The narrower public interface forces callers
 into the load-through pattern, which is what they wanted anyway.
 
-Guardrail: rare cases legitimately need `set` without an associated load
-(precomputed cache warming, for example). Expose a `warm(key, value,
+The guardrail still applies, because rare cases legitimately need `set`
+without an associated load (precomputed cache warming, for example). Expose a `warm(key, value,
 ttl)` method that explicitly signals the intent. The mechanism (`set`)
 remains hidden, and the operation (`warm`) is the named contract.
 
@@ -94,17 +94,17 @@ class ProductsService {
 The service's interface (`getProduct`, `updateProduct`) is fine on its
 face. The hidden contract is that callers of the underlying
 `ProductsStore` must not bypass this service, or cached data goes stale.
-That's an implicit caller obligation that doesn't appear in any
-interface.
+That bypass rule is an implicit caller obligation that no interface
+states.
 
 Worse, the `updateProduct` author maintains a list of cache keys to
-invalidate. The next derived view (a `product:by_brand:${brand}` cache,
-say) means editing every mutating method that could affect that
-derivation.
+invalidate. When someone adds the next derived view (a
+`product:by_brand:${brand}` cache, say), they must edit every mutating method
+that could affect that derivation.
 
-Failure named: invalidation is a property of the data, but it's
-implemented as a property of the service. The cache's interface offers
-`invalidate(key)` and the service code carries the list of keys.
+The named failure is that invalidation is a property of the data, but the
+code implements it as a property of the service. The cache's interface offers
+`invalidate(key)` and the service code keeps the list of keys.
 
 Redesign by moving the cache into the data layer:
 
@@ -139,8 +139,8 @@ class CachedProductsStore implements ProductsStore {
 ```
 
 The service goes back to calling `products.find(id)` and
-`products.save(updated)`. The cache's interface has not changed. What
-changed is *who calls it*. `CachedProductsStore` is the one module that
+`products.save(updated)`. The cache keeps the same interface, and only
+*who calls it* changed. `CachedProductsStore` is the one module that
 knows the products' caching scheme. Adding a new derived view adds an
 entry to `evictDerivedFrom`, in one place.
 
@@ -149,19 +149,19 @@ The data interface (`ProductsStore`) has the same comment as before:
 > Stores and retrieves products. Operations are atomic; reads may be
 > served from cache.
 
-The cache interface is unchanged. The redesign was at the *composition*
-level — moving the cache from a peer of the service to a decorator of
-the store. This is a recurring pattern. When an interface's natural
-operation has a side effect on a peer module, the side effect probably
-belongs *inside* whichever module owns the underlying decision. The caller
-should never carry it.
+The cache interface is unchanged. The redesign changed the *composition*,
+because it moved the cache from a peer of the service to a decorator of
+the store. The same pattern recurs in other code. When an interface's natural
+operation has a side effect on a peer module, the side effect probably belongs
+*inside* whichever module owns the underlying decision. Never give it to the
+caller.
 
 ---
 
 ## Example 3 — Cache key as an interface element
 
-The naive cache treats keys as strings. That is the interface most caches
-expose, and it's where typos and version mismatches happen:
+The naive cache treats keys as strings. Most caches expose string keys, and
+string keys are where typos and version mismatches happen:
 
 ```ts
 // in productsService.ts
@@ -174,9 +174,9 @@ await cache.invalidate(`products:${id}`);     // typo — plural
 await cache.invalidate(`product:listing:${oldCategory}`);  // forgot the new category
 ```
 
-The `Cache.invalidate(key: string)` interface accepts any string. The
-keying convention is documented nowhere. Three different
-modules can each independently get the key wrong.
+The `Cache.invalidate(key: string)` interface accepts any string, and the
+keying convention is documented nowhere, so three different
+modules can each get the key wrong.
 
 The redesign treats keys as typed values that the cache layer issues:
 
@@ -208,18 +208,18 @@ Comment for `ProductsCache.getProduct`:
 > Returns the cached product, or loads it via the supplied function and
 > caches the result.
 
-One sentence. The keying convention does not appear anywhere callers can
-see.
+The comment is one sentence, and the keying convention does not appear
+anywhere callers can see.
 
-This is the same redesign pattern as `databases.md` Example 1 (ORM
-exposed vs intent methods). The shallow interface accepted a string.
-The deep interface accepts a typed identity.
+This redesign follows the same pattern as `databases.md` Example 1 (ORM
+exposed vs intent methods). The shallow interface accepted a string, and
+the deep interface accepts a typed identity.
 
 ---
 
 ## Example 4 — Cache failure semantics in the interface
 
-The often-skipped question: what happens when the cache itself is down?
+Designs often skip one question, which is what happens when the cache itself is down.
 
 ```ts
 async function getProduct(id: string): Promise<Product | null> {
@@ -230,8 +230,8 @@ async function getProduct(id: string): Promise<Product | null> {
 If `cache.getOrLoad` throws when Redis is unreachable, the caller now
 must handle "Redis is down" as a failure mode for what looks like a
 product fetch. If `cache.getOrLoad` silently falls back to calling
-`load` directly, the caller doesn't know the cache is failing. A
-flood of cache misses hitting the database is a different kind of bad day.
+`load` directly, the caller doesn't know the cache is failing. The
+database then receives a flood of cache misses, which is a different failure.
 
 The choice is part of the interface. Document it:
 
@@ -239,7 +239,7 @@ The choice is part of the interface. Document it:
 interface Cache {
     /**
      * Returns the cached value or loads it via the supplied function.
-     * If the cache itself is unavailable, falls through to load() and
+     * If the cache itself is unavailable, calls load() directly and
      * does not cache the result. Cache outages are surfaced via metrics
      * and the optional onCacheError callback, never as exceptions to
      * callers. The cache never returns stale data; if it cannot serve a
@@ -249,12 +249,12 @@ interface Cache {
 }
 ```
 
-Three sentences. Cache failure semantics fall through silently as part
-of the contract, so callers don't write defensive code, and the cache
-layer commits to handling its own outages. This is the kind of
-caller-facing information the guardrail (step 7 of the procedure)
-explicitly preserves. Graceful degradation in the face of cache outage
-is what `getOrLoad` promises, and that promise has to be visible.
+The comment runs three sentences. Silent handling of cache failures is part
+of the contract, so callers do not write defensive code, and the cache layer
+commits to handling its own outages. This failure behavior is the kind of
+caller-facing information the guardrail (step 7 of the procedure) keeps in
+the interface. `getOrLoad` promises graceful degradation during a cache
+outage, and that promise has to be visible.
 
 The alternative interface, which surfaces outages explicitly, is also
 valid for systems where degraded reads need to be a deliberate decision
@@ -266,12 +266,12 @@ interface CacheStrict {
 }
 ```
 
-Same comment-test discipline applies. Whichever choice you make, name
+The same comment test applies. Whichever choice you make, name
 it in the contract. Stale-while-revalidate is a third documented choice.
 It serves a bounded-age value while a background load refreshes it, so the
-"never stale" line above flips. The staleness window becomes part of the
-contract exactly like the fall-through rule. The freshness guarantee is a
-decision the comment states, and a cache has it only when the contract says so.
+"never stale" line above no longer holds. The staleness window becomes part
+of the contract, the same way the rule about calling `load()` directly does.
+A cache has a freshness guarantee only when the comment states it.
 
 ---
 

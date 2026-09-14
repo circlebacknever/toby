@@ -1,14 +1,14 @@
 # Worked Examples — Databases and Data Access
 
-The data layer is one of the highest-yield places to get module boundaries
-right. Schema decisions outlive everything else in the codebase, and ORM
+The data layer is one of the places where correct module boundaries matter
+most. Schema decisions outlive everything else in the codebase, and ORM
 patterns either contain or leak that knowledge.
 
 ---
 
 ## Example 1 — Repository as a deep module versus ORM exposed everywhere
 
-A young codebase wires the ORM into business logic:
+A new codebase wires the ORM into business logic:
 
 ```python
 # orders/service.py
@@ -29,7 +29,7 @@ Multiplied across thirty services and fifty endpoints, this pattern leaks:
 - Lazy-loading rules (every caller knows to touch `line_items` before commit).
 - Query construction syntax (every caller writes SQLAlchemy filters).
 - Detachment semantics (returned `Order` is bound to a session that just
-  closed, and using it later blows up).
+  closed, and using it later raises an error).
 
 When the team moves from SQLAlchemy to SQLModel, or splits writes off to a
 separate DB, every service is touched.
@@ -58,14 +58,14 @@ def confirm_order(order_id: str) -> Order:
     return orders.confirm(order_id)
 ```
 
-The ORM, the session, the eager/lazy loading strategy, the transaction
-boundary — all hidden. Switching ORMs is one module's problem. Adding a read
+The repository hides the ORM, the session, the eager/lazy loading strategy, and
+the transaction boundary. Switching ORMs is one module's problem. Adding a read
 replica is the repository's choice. Domain `Order` is a plain class. The old one
-was a session-bound proxy that explodes if you touch it after commit.
+was a session-bound proxy that raises an error if you use it after commit.
 
-This is the canonical example of pulling complexity downward at the
-data layer. The repository is more callers than authors, so let it absorb the
-hard part.
+`OrdersRepository` is the canonical example of pulling complexity downward at
+the data layer. The repository has more callers than authors, so let it handle
+the hard part.
 
 ---
 
@@ -86,14 +86,14 @@ public interface UserRepository {
 }
 ```
 
-Separate general from special, remove special cases. Each new
+The separate-general-from-special check applies here. Each new
 caller's filter combination becomes a new method. The interface grows
 unbounded. Two finders that differ in argument order do almost the same query,
 and some are unused but no one will delete them. The meaning of
 "active" is encoded in every caller. The day "active" gets redefined (excludes
 suspended? excludes pending verification?) is the day every site needs review.
 
-A general-purpose interface compresses the cluster:
+A general-purpose interface replaces the finder methods:
 
 ```java
 public interface UserRepository {
@@ -118,8 +118,8 @@ Either `active` is a real database column with a clear definition, or the
 repository computes it from other fields. Either way, it's one decision in
 one place.
 
-The questions to check before doing this (the somewhat-general-purpose
-framing): does the query object's interface make the common case easy?
+Before doing this, check the somewhat-general-purpose questions. Does the query
+object's interface make the common case easy?
 (`UserRepository.find(new UserQuery(orgId=org))` should be simple to write.)
 Does it avoid becoming a god interface? (`UserQuery` is for users, so don't
 extend it to orders.) Both pass.
@@ -168,14 +168,14 @@ type User struct {                            // domain entity, narrow
 type UserDTO struct { ... }                   // JSON shape, owned by the API layer
 ```
 
-Each type lives in the module that owns the decision it represents. The
+Each type is defined in the module that owns the decision it represents. The
 storage row format can be changed without touching anything outside
 `internal/store`. The JSON format can evolve without coupled migrations. The
-domain `User` only carries what the rest of the system needs to know about
-users — a much smaller surface than every row column. Schema secrets stay
+domain `User` only contains what the rest of the system needs to know about
+users, which is far less than every row column. Schema secrets stay
 secret.
 
-This is information leakage at the data layer. One type bound to
+The three-role `User` is information leakage at the data layer. One type bound to
 three concerns is the same defect as one module owning three pieces of
 knowledge.
 
@@ -183,7 +183,7 @@ knowledge.
 
 ## Example 4 — Transaction boundary as a pass-through obligation
 
-A pattern that grew up because someone wanted "control":
+Someone who wanted "control" built this pattern:
 
 ```typescript
 // service.ts
@@ -201,11 +201,11 @@ const order = await db.transaction(async (tx) => {
 ```
 
 Every method along the chain takes a `tx` argument it doesn't use directly
-except to pass to the next call. This is a pass-through variable (the
+except to pass to the next call. `tx` is a pass-through variable (the
 different-layer check), and it is an unusually costly one. Adding the next
 repository method means adding `tx` to every call site that ever touches it.
 
-Two fixes depending on where the responsibility belongs:
+The fix depends on where the responsibility belongs:
 
 If the *service* owns the unit of work, hide the parameter behind a context
 the repos read internally:
@@ -222,14 +222,14 @@ async function placeOrder(input: NewOrder): Promise<Order> {
 ```
 
 If the *controller* owns transaction scoping (less common), the service still
-shouldn't accept `tx`. It should be transparent. Either way, `tx` does not
+shouldn't accept `tx`. The transaction should be invisible to the service. Either way, `tx` does not
 appear in the signatures of `placeOrder` or repository methods.
 
 ---
 
 ## Example 5 — ORM lazy loading as a hidden interface
 
-A subtle case that hurts at scale. Service code:
+This case is hard to spot and gets expensive at scale. Consider this service code:
 
 ```python
 orders = order_repo.recent_for_customer(customer_id, limit=50)
@@ -241,8 +241,8 @@ for o in orders:
 
 The "interface" of `Order` looks like a normal object. The actual contract
 includes which relations the ORM happens to lazy-load and how many queries
-that produces — a hidden, per-call performance interface. This is the depth
-check failing. Callers must know what's expensive, and the cost is
+those loads produce. That hidden contract is a per-call performance interface,
+and it fails the depth check. Callers must know what's expensive, and the cost is
 not visible in any signature.
 
 Two ways to make the interface's cost visible:
@@ -267,13 +267,13 @@ precondition documented nowhere.
 
 ## Cross-cutting notes
 
-- **Migration knowledge** belongs in one module. A column rename gets touched in
-  twelve services when each constructs raw SQL or hardcodes a column alias.
-  That is the same leakage pattern as Example 3.
-- **Caching the repository** is properly Example 1 from `caching.md`. The
-  service never owns it. The repository is the natural home for read-through
+- **Migration knowledge** belongs in one module. When each service constructs raw
+  SQL or hardcodes a column alias, a column rename touches twelve services.
+  That spread is the same leakage pattern as Example 3.
+- **Caching the repository** is covered in Example 1 of `caching.md`. The
+  service never owns it. The repository is the right place for read-through
   caching because it already owns the data-access contract.
 - **Read models versus write models** become natural splits when one query
   type is wildly different from the entity (reporting, dashboards).
-  That's a deliberate split per the split/merge check, and most apps don't need
+  That split is deliberate under the split/merge check, and most apps don't need
   it.

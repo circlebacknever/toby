@@ -2,7 +2,7 @@
 
 Eleven prompts. Each names the skills that should load and the skills that must
 not. A skill that fires when it should not costs 100 percent of its tokens, so
-the four probes at the end carry as much weight as the four positives.
+the four probes at the end count as much as the four positives.
 
 The runner shows an agent the nine `toby-swd-*` descriptions plus
 `toby-feature-dev`, `toby-code-review`, and `toby-simplify-code`, then asks

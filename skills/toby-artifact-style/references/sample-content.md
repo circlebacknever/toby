@@ -1,12 +1,12 @@
 # Toby Artifact sample content vocabulary
 
-Load this file when you need fake content — placeholder data, demo copy, slide examples, dummy KV values, sample status messages.
+Load this file when you need fake content, such as placeholder data, demo copy, slide examples, dummy KV values, or sample status messages.
 
-Toby Artifact's visual system pairs with a specific voice. Generic "Q4 Revenue / Sales Pipeline / Customer Success" copy makes the visuals look like a misfit. Draw from the mission-ops domain instead.
+Toby Artifact's visual system is designed for a specific voice. Generic "Q4 Revenue / Sales Pipeline / Customer Success" copy does not match the visuals, so draw from the mission-ops domain.
 
 ## Why mission-ops
 
-The system was tuned for evidence-led reference work. Mission ops gives natural reasons to use the components Toby Artifact ships: status pills (stable / watch / consequence), worked examples (premise → derivation → result), decision rows (approve / hold / reject), stat grids with units (°C, ms, dBm). Reach for this vocabulary by default, and deviate only when the actual content is from a different domain.
+The system was tuned for evidence-led reference work. Mission ops gives natural reasons to use the components Toby Artifact ships. Those components include status pills (stable / watch / consequence), worked examples (premise → derivation → result), and decision rows (approve / hold / reject). They also include stat grids with units (°C, ms, dBm). Use this vocabulary by default, and deviate only when the actual content is from a different domain.
 
 ---
 
@@ -29,13 +29,13 @@ The system was tuned for evidence-led reference work. Mission ops gives natural 
 
 ## Decision verbs
 
-Three live verbs in the system:
+The system has three live decision verbs:
 
 - **Approve** — proceed with the action.
 - **Hold** — defer the action and gather more evidence.
 - **Reject** — block the action.
 
-Archival actions: `Defer`, `File`, `Review`, `Snapshot`, `Block`.
+The archival actions are `Defer`, `File`, `Review`, `Snapshot`, and `Block`.
 
 Never use marketing verbs in Toby Artifact artifacts: `Submit`, `Get Started`, `Continue`, `Learn More`.
 
@@ -50,13 +50,13 @@ Never use marketing verbs in Toby Artifact artifacts: `Submit`, `Get Started`, `
 - `Cadence · two-sample rule`
 - `Cadence · two-sample rule + named rollback`
 
-Placeholder name: `Sayo`. Use it across artifacts to maintain coherence.
+Use `Sayo` as the placeholder name in every artifact, so the same name appears across artifacts.
 
 ---
 
 ## Evidence framing
 
-Sample claim formats with units and intervals:
+These sample claims show the format for units and intervals:
 
 - `drift posterior 0.73`
 - `coverage 94%`
@@ -94,30 +94,30 @@ viability score · build pass rate · caveat freshness · rollback rehearsed · 
 
 ## Example placeholder sentences
 
-Copy and adapt these when you need a quick demo paragraph or callout body.
+Copy and adapt these sentences when you need a quick demo paragraph or callout body.
 
-- "Drift posterior trending high; defer decision until two-sample rule passes."
-- "Retry volume sits 18% above baseline. Two-sample rule not yet tripped."
+- "Drift posterior is trending high, so defer the decision until the two-sample rule passes."
+- "Retry volume is 18% above baseline, and the two-sample rule has not tripped yet."
 - "Crossing 900 km enters the LEO debris-flux watch band. Defer the next decision until the debris model is updated."
 - "Approve controlled release with named rollback owner on record (Sayo · mission ops)."
 - "Pass length is shrinking by 0.2 min per day."
-- "Residual is no longer random — extend the model with a non-linear panel-angle term."
-- "Both meters above their watch threshold for two consecutive samples (T+04:08, T+04:12)."
+- "The residual is no longer random, so extend the model with a non-linear panel-angle term."
+- "Both meters are above their watch threshold for two consecutive samples (T+04:08, T+04:12)."
 
 ---
 
 ## Caveats to attach
 
-Standard caveats that fit Toby Artifact's "caveat next to the claim" rule:
+These standard caveats follow Toby Artifact's "caveat next to the claim" rule:
 
-- "assumes circular orbit; J2 perturbations not included"
+- "assumes a circular orbit and excludes J2 perturbations"
 - "debris flux excluded above 900 km"
-- "drag coefficient for this body shape is not measured here; estimate ±25%"
-- "watch threshold breached at sample 8; two-sample rule satisfied at sample 9"
-- "rollback rehearsed 21 May 09:18; owner on record"
+- "drag coefficient for this body shape is not measured here, and the estimate is ±25%"
+- "watch threshold breached at sample 8, and two-sample rule satisfied at sample 9"
+- "rollback rehearsed 21 May 09:18, with owner on record"
 
 ---
 
 ## When to deviate from mission-ops
 
-When the artifact's actual subject is from another domain, use that domain's real vocabulary. Mission-ops is the default for fake or placeholder content. Artifacts with a real subject use that subject's own vocabulary. A deck on DNS doesn't need to be reframed as mission ops, but a placeholder dashboard with no real subject does benefit from it.
+When the artifact's actual subject is from another domain, use that domain's real vocabulary. Mission-ops is the default for fake or placeholder content. A deck on DNS doesn't need to be reframed as mission ops, but a placeholder dashboard with no real subject does benefit from it.

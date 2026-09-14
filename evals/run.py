@@ -2,11 +2,11 @@
 """The regression suite for this repo. One entry point, two kinds of check.
 
 **Gates** run with no model and decide pass or fail. Every number they compare
-against lives in `baselines/gates.json`. A gate that gets worse fails the run,
+against is in `baselines/gates.json`. A gate that gets worse fails the run,
 and a gate that gets better is recorded by `record` on purpose.
 
 **Model suites** need a subagent to write something, so they cannot gate. They
-carry their prompts here so a later run is the same run, and they record a
+keep their prompts here so a later run is the same run, and they record a
 distribution rather than a score. Five samples of the voice suite on identical
 inputs scored 1, 1, 4, 4, and 11, so a single number from one of them means
 nothing. `compare` refuses to call a difference real when the ranges overlap.
@@ -71,7 +71,7 @@ def warning_classes() -> dict[str, int]:
         "over-long paragraph": r"^paragraph runs",
         "latin abbreviation": r"^Latin abbreviation",
         "cross-skill collision": r"^sentence duplicated",
-        "missing skip clause": r"carries no skip clause",
+        "missing skip clause": r"has no skip clause",
         "buried lead": r"opens on a thesis",
         "unreferenced file": r"^reference file nothing points at",
         "coined term": r"^coined term",
@@ -104,7 +104,7 @@ def coload_tokens() -> dict[str, int]:
 def lost_rules() -> list[str]:
     """Sentences in the recorded inventory with no relative in the tree today.
 
-    The list is the baseline, and not its length. A deletion that lands the same
+    The list is the baseline, and not its length. A deletion made in the same
     week a rewording arrives keeps the count still and swaps the contents.
     """
     inventory = load("rule_inventory", REPO_ROOT / "scripts" / "rule-inventory.py")
@@ -125,7 +125,7 @@ def lost_rules() -> list[str]:
     for line in sorted(before - current):
         words = diff.content(line)
         best = max((diff.overlap(words, cand) for _, cand in survivors), default=0.0)
-        # A short sentence has few content words, and three common ones landing
+        # A short sentence has few content words, and three common ones appearing
         # in some unrelated sentence clears 0.6 on their own. "Mock external
         # dependencies at the system boundary" survived that way while the rule
         # was deleted, so a short sentence has to match a survivor completely.
@@ -274,6 +274,130 @@ nothing else:
 <the I-don't-know reply>
 
 No preamble, no summary, no notes. Reply with just the word "done".""",
+    },
+    "content": {
+        "file": "suites/content.md",
+        "scorer": "manual",
+        "min_samples": 5,
+        "prompt": """Write six pieces of content as Toby, the way an agent with Toby installed would.
+
+Setup, follow it exactly:
+1. Read {repo}/base/toby.md in full. It is the operating guide every Toby session loads.
+2. Read {repo}/skills/toby-voice/SKILL.md and {repo}/skills/toby-voice/references/plain-language.md in full.
+3. Read {repo}/skills/toby-artifact-style/references/copy.md, which the deck task routes to.
+4. Read {repo}/skills/toby-code-review/SKILL.md, which the review task routes to.
+5. Read {repo}/skills/toby-swd-docs/SKILL.md, which the contributor-rules task routes to.
+6. Read {repo}/evals/suites/content.md for the six tasks. Use only the facts it gives.
+
+Write the six outputs to {repo}/evals/results/content-<run>.md, in this format and
+nothing else. Headings inside an output start at ###, one level below the task.
+
+## 1
+<the README top>
+
+## 2
+<five slides, each under `### Slide N`, with its title, a subtitle only if one
+adds information, and its bullets>
+
+## 3
+<the AGENTS.md section>
+
+## 4
+<the commit message>
+
+## 5
+<the review finding>
+
+## 6
+<six replies under `### Turn 1` to `### Turn 6`>
+
+No preamble, no summary, no notes. Reply with just the word "done".""",
+    },
+    "content-judge": {
+        "file": "suites/content.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """You are reading agent-written prose for one reader who gets distracted, and
+stops being able to work, when a sentence breaks the voice rules or grates. Find
+every such sentence. Do not rewrite anything and do not grade kindly.
+
+1. Read {repo}/base/toby.md and {repo}/skills/toby-voice/references/plain-language.md in full.
+2. Read {repo}/evals/suites/content.md and {repo}/evals/suites/voice.md for the tasks and facts.
+3. Read every file named `content-*.md` and `voice-*.md` in {repo}/evals/results/.
+
+Apply the eight sentence tests in the guide to every sentence: literal, actor,
+connection, lookup, whole-sentence, direct, specific, and given-fact.
+
+This reader has also named these as grating:
+- Slogans: a run of short sentences with no connector, two sentences or two
+  bullets that mirror each other, a thing defined by one bare word, and a noun
+  phrase or label standing as a sentence, with or without a period.
+- Any verb used as a metaphor, including `carry`, `lives in`, `sits in`, `feeds`,
+  `falls through`, `rests on`, and `lands`, and any idiom.
+- A heading or slide title that makes a clever claim, a subtitle that restates
+  the title, and a bullet that restates the title.
+- A reply built as a punchy opener, a paragraph circling the topic, a bolded
+  reveal, and closing caveats.
+- Writing as if revealing something deep: aphorisms, stakes words, a build to a reveal.
+- Deferring the content: "yes, though not for the reason you think", "the one
+  that matters:", a setup sentence such as "One file causes this failure.", or
+  the method narrated before the finding.
+- Invented foils, litotes, candor words, and modifiers the noun already implies.
+- clean, fair, balanced, essential, perspective, ecosystem, load-bearing, and
+  `shape` for anything that is not geometry.
+- A sentence about the document, such as "Follow these steps".
+- Invented terms and jargon, a closing verdict or offer, and consecutive replies
+  that open or end on the same move.
+- Stating what a thing does not do when no reader assumed it did. In a README
+  overview, "a plugin never imports an engine" fails, even when the task gave it.
+- A claim of done or fixed about something that did not change, and a fact the
+  task did not give.
+- A claim about what the user was doing that the user never said, such as "Stop
+  searching the repo".
+- What would have happened, such as "each failure would have paged the on-call
+  engineer", with or without a "Prediction:" label.
+- A given fact placed in a document whose reader does not need it.
+
+Fail these predicted habits as well: a setup question such as "The result?", a
+meta opener such as "Let's break this down", a noun doing a verb's job such as
+"provides the ability to", meeting or marketing jargon such as "the ask" or
+"effortless", a rhythm device such as "not only X but also Y" or a triplet chosen
+for its sound, code given feelings such as "the compiler complains", a vague
+intensifier, a hedge stack such as "may potentially", scare quotes, and a
+comparison or analogy the reader has to translate back into the real thing.
+
+A first judge made these wrong calls, so do not repeat them. It passed "the
+failing runs land near midnight", "lives in", "the gates it feeds", and "falls
+through". It failed a PR bullet that opens on its verb, such as "Adds a test for
+the 429 path", and a commit subject with no article. Those two are correct.
+A second judge passed "reach a 429", "no cause to point at", and "Relay treats
+each model provider as a swappable engine" as borderline. Fail all three. A
+review finding written with the review skill's labels Consequence, Fires when,
+and Guard is the required format, so do not fail the label itself. Fail the text
+after a label when it is not a sentence.
+
+Write {repo}/evals/results/judge-<run>.md with these sections and nothing else.
+
+## Per file
+For each file: the count of distracting sentences, then each one quoted exactly,
+with its task number, its category from the list or the rules, and one line on
+why it grates. Where a file has none, say so.
+
+## Across files
+The categories ranked by how many sentences hit them, with counts.
+
+## Passed
+For each task number, quote five sentences you let through, from different files.
+Pick the ones closest to the line first, and mark each one borderline or plain
+pass with one line on why it passes. The reader checks this section for
+sentences you should have failed.
+
+## Sentence types
+The kinds of sentence these writers produce, from most to least common. For each
+kind, name it plainly, estimate its share of all sentences, and quote three real
+examples from different files. Mark which kinds this reader would find grating.
+
+Reply with just the word "done".""",
     },
     "triggering": {
         "file": "suites/triggering.md",

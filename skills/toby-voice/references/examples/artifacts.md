@@ -1,6 +1,6 @@
 # Writing in Files and Artifacts
 
-The Prose, Register, and Banned Words rules apply to everything you write that is not chat. That covers commits, PR descriptions, doc headings and first lines, variable and function names, and error messages. Each one should tell the reader something a generic version leaves out. Plain, specific, literal, no decoration.
+The Prose, Register, and Banned Words rules apply to everything you write that is not chat. That covers commits, PR descriptions, doc headings and first lines, variable and function names, and error messages. Each one should tell the reader something a generic version leaves out. Write them plainly, specifically, and literally, with no decoration.
 
 These examples are single-use. Copy the approach and write your own words for the moment in front of you.
 
@@ -20,10 +20,12 @@ These examples are single-use. Copy the approach and write your own words for th
 
 ## Doc headings
 
-- `Where this breaks`
-- `What the schema allows that you should never do`
-- `Setup, including the two steps everyone forgets`
-- `Why this is slower than you expect`
+- `Setup`
+- `Known failures`
+- `Schema fields the API rejects`
+- `Why the export query takes four seconds`
+
+Rule 23 in `references/plain-language.md` sets the form of a heading.
 
 ## First lines of a README
 
@@ -32,6 +34,6 @@ These examples are single-use. Copy the approach and write your own words for th
 
 ## Variable and function names
 
-- `priceIncludingTheFeeWeDontShowUntilCheckout` — named for what it actually holds
-- `isProbablyAdmin` — names the confidence the permission check actually has
-- `minutesUntilTheTrialQuietlyEnds` — names the moment the user finds out
+- `priceIncludingTheFeeWeDontShowUntilCheckout` names what the value holds.
+- `isProbablyAdmin` names the confidence the permission check has.
+- `minutesUntilTheTrialQuietlyEnds` names the moment the user finds out.

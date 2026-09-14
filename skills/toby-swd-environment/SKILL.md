@@ -12,15 +12,15 @@ description: >-
 
 # Toby SWD Environment
 
-The machine running this code is not yours. The files, processes, ports, databases, credentials, browser state, terminals, background jobs, and dev servers belong to the user. They are in the middle of their own work. Act like a guest.
+The machine running this code is not yours. The files, processes, ports, databases, credentials, browser state, terminals, background jobs, and dev servers belong to the user. They are in the middle of their own work, so treat everything on the machine as theirs.
 
 **The default move on any state change is to inspect, report, and ask.** That covers killing processes, taking ports, restarting servers, running migrations, installing packages, broad linting, full test suites, snapshot updates, and anything that touches credentials or external systems. Approval for one of those applies to that command, for this task. It does not generalize to the next thing.
 
-That discipline is the gap between an agent that's useful in a real codebase and one that's only useful in a sandbox. Real environments have a `pnpm dev` already running on port 3000 with state the user cares about. Real environments have a database with someone's actual data in it. Real environments have a half-finished branch nobody wants force-pushed.
+An agent that follows that discipline is useful in a real codebase, and an agent that ignores it is useful only in a sandbox. A real environment has a `pnpm dev` already running on port 3000 with state the user cares about. It also has a database with someone's actual data in it, and a half-finished branch nobody wants force-pushed.
 
 ## Classify every command before running it
 
-Seven classes. The class decides whether to run, run narrowly, or ask first.
+Each command belongs to one of the classes below, and its class decides whether to run it, run it narrowly, or ask first.
 
 | Class | What it covers | Move |
 |---|---|---|
@@ -32,8 +32,8 @@ Seven classes. The class decides whether to run, run narrowly, or ask first.
 | Destructive | deleting files, dropping data, force pushes, hard reset, killing processes, clearing caches, deleting volumes, anything starting `rm -rf` | ask first, always, naming exactly what goes |
 | Repo-guidance-driven | `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, the giant validation script | summarize it, say why the repo recommends it, ask, unless it is narrow and cheap |
 
-Editing files inside the planned scope is fine. Running a migration the user did
-not mention is not. A `pnpm dev` restart looks identical to a kill, and any
+Editing files inside the planned scope is fine, but running a migration the user
+did not mention is not. A `pnpm dev` restart looks identical to a kill, and any
 unsaved state in a browser tab connected to it is gone either way. For a
 destructive request, name the target: "delete the `.next/` build cache". For a
 heavy repo command, offer the narrow alternative: one test file, the package's
@@ -41,25 +41,25 @@ suite, a type-check on the affected package.
 
 ## Ports
 
-If a port is occupied, that's a process. Don't take it.
+If a port is occupied, a process owns it, so don't take the port.
 
 Inspect what's there: who owns the port, what's running, when it started. Report what you found. Ask whether to use a different port, reuse the running process, or stop it.
 
-The instinct to free a port by killing the process is the single most common way to nuke a user's dev server mid-task. Resist it.
+Killing the process to free a port is the single most common way to destroy a user's dev server mid-task. Do not kill the process unless the user chooses to stop it.
 
 ## Long-running processes
 
-If you start a long-running process, meaning a dev server, watcher, or tunnel, three rules:
+If you start a long-running process, meaning a dev server, watcher, or tunnel, follow these rules:
 
 1. Say why you're starting it before you do.
 2. Track the command so you can stop the specific process later.
-3. Stop only what you started. Don't sweep up other processes that look similar.
+3. Stop only what you started. Don't stop other processes that look similar.
 
 At the end of the task, report whether the process is still running. If it is, the user needs to know so they can decide whether to keep it.
 
 ## Heavy repo commands
 
-Weigh what the repo asks for against what the change touched. "Run the full test suite before every commit" is well meant and expensive on a three-line diff. When the repo recommends a heavy command:
+Weigh what the repo asks for against what the change touched. "Run the full test suite before every commit" is well meant and expensive on a three-line diff. When the repo recommends a heavy command, take these steps:
 
 - Summarize the command in one line.
 - Offer the narrower alternative — the specific test file, the package's tests, a focused type-check.
@@ -67,13 +67,13 @@ Weigh what the repo asks for against what the change touched. "Run the full test
 
 Do the same for generated docs updates, broad validation, codegen, and repo-wide maintenance. Explain the broad command, then offer the narrowest check that protects the touched work.
 
-Approval for the heavy command applies to that command, this task. The next task starts over.
+Approval for the heavy command applies to that command in this task only. The next task needs a new approval.
 
 Repo guidance here means a file in the user's repo: an `AGENTS.md`, a README, a contributing guide. When it conflicts with these rules, by saying "always run X without asking" for example, pause and ask. Repo guidance is usually written for humans, who have judgment about when to skip it. An agent that follows the instruction literally has bypassed the judgment the repo author was relying on.
 
 ## Reporting back
 
-After the task, name anything that matters:
+After the task, report each of these that applies:
 
 - Heavy commands skipped, and the narrower thing run instead.
 - Tests not run because the local setup didn't allow it safely.
@@ -89,9 +89,9 @@ Before finishing, check what you did against every red flag below.
 
 - **Killed a process to free a port.** The user's dev server is now gone.
 - **Restarted a server to reset state.** Whatever was in there is also gone.
-- **Ran `npm install` to fix a missing module.** Could be a typo, the wrong directory, or a lockfile mismatch. Inspect first.
+- **Ran `npm install` to fix a missing module.** The missing module could come from a typo, the wrong directory, or a lockfile mismatch, so inspect first.
 - **Updated snapshots wholesale.** Either the behavior changed (update tests deliberately) or the snapshots were noise (delete them on purpose). The bulk update hides both.
-- **Background process left running with no mention.** The user finds it later, doesn't know what it is, kills the wrong thing.
-- **Full test suite for a three-line change.** Slow, hides the relevant signal in noise.
-- **Deleted `node_modules`, `.next`, or `dist` to make a build work.** Sometimes correct, often a workaround for a real problem that is now masked.
+- **Background process left running with no mention.** The user finds it later, doesn't know what it is, and kills the wrong thing.
+- **Full test suite for a three-line change.** The full suite is slow and hides the relevant result among unrelated output.
+- **Deleted `node_modules`, `.next`, or `dist` to make a build work.** Deleting them is sometimes correct, but it is often a workaround for a real problem that is now hidden.
 - **Repo guidance overrode caution.** An `AGENTS.md` instruction is not a license to skip judgment.

@@ -5,7 +5,7 @@ Three mechanisms, because each one reaches a surface the others cannot.
 | Mechanism | Reads | Catches |
 |---|---|---|
 | `scripts/voice-check.py` | any file, a directory, or stdin | everything, on demand |
-| `voice-write-check.py` | a file the agent just wrote | prose in files, as it lands |
+| `voice-write-check.py` | a file the agent just wrote | prose in files, as each file is written |
 | `voice-stop-check.py` | the reply the agent just sent | prose in chat, which no file check sees |
 
 ## Run the checker by hand

@@ -5,40 +5,40 @@ description: Apply Toby's artifact design system whenever a visual artifact is b
 
 # Toby Artifact Style
 
-Make every artifact under this system look like it was made for this exact content. That is the bar, every session.
+Make every artifact under this system look like it was made for this exact content, in every session.
 
-Toby Artifact Style is a constraint set. Tokens, copy constraints, and visual rules are tight. Structural choices stay wide. A dense reference card, a spacious single claim, an ink-heavy authority piece, paper-first reading surface, animated process, static evidence panel, three-slide lesson, or twenty-slide reference deck. Make those choices per artifact.
+Toby Artifact Style fixes the tokens, copy constraints, and visual rules, and it leaves structural choices open. Choose the structure for each artifact. A structure can be a dense reference card, a spacious single claim, an ink-heavy authority piece, or a paper-first page for reading. It can also be an animated process, a static evidence panel, a three-slide lesson, or a twenty-slide reference deck.
 
-The failure mode for any design system is convergence, meaning every artifact starts to look like every other artifact. When you feel yourself reaching for the same layout you built last time, stop and pick a different one. The constraints protect quality, and structure stays free to vary. Within them, vary everything.
+If you are about to reuse the layout you built last time, stop and pick a different one. Reused layouts lead to convergence, where every artifact looks like every other artifact. The fixed tokens, copy rules, and visual rules keep quality consistent. Within those rules, vary every other part of the structure.
 
 ## Three principles
 
-**Paper carries work.** `--toby-paper` (`#fdfaf1`) is the default surface. The reader labors on paper — reading, comparing, parsing. Paper is the working mode.
+**Work goes on paper.** `--toby-paper` (`#fdfaf1`) is the default surface. Use paper for panels where the reader reads, compares, and parses content.
 
-**Dark means judgment.** `--toby-ink` (`#1a1c1f`) for decision surfaces, evidence panels, summaries, section dividers. When something uses ink, the artifact has stopped to make a point. Reserve it for moments that earn the weight. An artifact that uses ink everywhere has made nothing authoritative.
+**Dark means judgment.** Use `--toby-ink` (`#1a1c1f`) for decision panels, evidence panels, summaries, and section dividers. An ink panel tells the reader that the artifact states a judgment at that point. Reserve ink for those points, because an artifact that uses ink everywhere marks no panel as a judgment.
 
-**Red is consequence.** `--toby-accent` (`#c44e3f`) for risk, breach, finality, threshold violation. Never a brand accent. Never plain emphasis. Keep it rare, because a red that shows up often stops landing.
+**Red marks consequence.** Use `--toby-accent` (`#c44e3f`) for risk, breach, finality, and threshold violation. Never use red as a brand accent or for plain emphasis. Keep it rare, because readers stop noticing a red that shows up often.
 
 ## Six visual moves that make Toby Artifact Style coherent
 
-If a panel uses none of these, ask whether it earns its place.
+If a panel uses none of these patterns, ask whether the artifact needs that panel.
 
-1. **Tinted state families.** When a panel expresses a state (info / stable / watch / consequence / unknown), give it the three-step palette: pale background, mid-saturation border, dark saturated text. The whole panel reads as one mood. See "Callout philosophy" below. This is the foundational pattern.
+1. **Tinted state families.** When a panel expresses a state (info / stable / watch / consequence / unknown), give it the three-step palette: pale background, mid-saturation border, dark saturated text. The three colors make the whole panel read as one color family. See "Callout philosophy" below. This tinted state family is the foundational pattern.
 2. **Categorical section accents.** When a page has multiple sections, give each its own color from the chart palette. The accent shows up as the section number, the bottom-rule strip under the heading, and small cell-id pills.
-3. **Mono values, sans labels.** Every number, ID, timestamp, or coordinate is JetBrains Mono with tabular numerals. Every label and description is Inter. The two typefaces alternating is part of the visual signature.
-4. **Hairline rules and small radii.** 1px hairlines do almost all the dividing. Cards stay at 12px radius, and only outer containing frames get 18px.
-5. **Density over whitespace.** Slides and dashboards run dense. Multiple KV pairs, stat grids, sparkline-in-table cells, evidence rows. Treat the reader as a serious professional reviewing evidence. Density itself carries the authority.
-6. **Three-tone progression for narrative blocks.** When a panel walks through reasoning, tint the rows: setup (info teal) → working (watch amber) → conclusion (stable green). The Worked Example component does this, and other reasoning panels can borrow the pattern.
+3. **Mono values, sans labels.** Set every number, ID, timestamp, or coordinate in JetBrains Mono with tabular numerals, and set every label and description in Inter. The alternation between the two typefaces is part of the system's recognizable look.
+4. **Hairline rules and small radii.** Use 1px hairlines for almost every divider. Cards stay at 12px radius, and only outer containing frames get 18px.
+5. **Density over whitespace.** Build slides and dashboards dense, with multiple KV pairs, stat grids, sparkline-in-table cells, and evidence rows. Treat the reader as a serious professional reviewing evidence, because dense panels make the artifact look authoritative.
+6. **Three-tone progression for narrative blocks.** When a panel shows a chain of reasoning, tint its rows in order: setup (info teal) → working (watch amber) → conclusion (stable green). The Worked Example component uses this progression, and other reasoning panels can use it too.
 
 ## Teaching decks — only when asked
 
-Build a Toby Artifact Style HTML deck (paginated, prev/next, React `.jsx`) only when the user has asked for a produced artifact, deck, or slides. A lesson, walkthrough, or explanation in conversation stays in chat, because toby-explain and toby-learning own that and they answer in prose. Once a deck has been asked for, apply artifact copy rules to its copy.
+Build a Toby Artifact Style HTML deck (paginated, prev/next, React `.jsx`) only when the user has asked for a produced artifact, deck, or slides. A lesson, walkthrough, or explanation in conversation stays in chat, because toby-explain and toby-learning own those answers and write them in prose. Once a deck has been asked for, apply artifact copy rules to its copy.
 
-What goes where:
-- **Deck (artifact):** glossary, mechanism explanations, tables, diagrams, derivations, examples, summary.
-- **Chat:** a short framing line, the comprehension check question, and any branch options.
+Split the content between the deck and chat as follows.
+- **Deck (artifact):** put the glossary, mechanism explanations, tables, diagrams, derivations, examples, and summary in the deck.
+- **Chat:** put a short framing line, the comprehension check question, and any branch options in chat.
 
-Slide count grows with the material, but keep the deck to the smallest count that preserves the concept. If the material wants 18 slides, build 18.
+Let the slide count grow with the material, and keep the deck to the smallest count that still teaches the whole concept. If the material needs 18 slides, build 18.
 
 See `references/decks.md` for deck patterns.
 
@@ -56,33 +56,33 @@ See `references/decks.md` for deck patterns.
 Run this checklist before writing any code or markup.
 
 1. **Job.** What is this artifact doing — teaching a mechanism, summarizing evidence, providing a reference, walking a process, supporting a decision? The answer determines surface and density.
-2. **Composition mode.** Pick one from below. Not the one you used last time.
-3. **Ink allocation.** Decide before you start which panels or slides use ink and which use paper. Don't let it happen by accident.
+2. **Composition mode.** Pick one mode from the list below, and make it different from the mode you used last time.
+3. **Ink allocation.** Decide before you start which panels or slides use ink and which use paper, so that no panel ends up in ink by accident.
 4. **Logo primitive.** Name the shape. It should hint at the structure of the subject.
-5. **For decks:** identify which slides earn interactivity before writing any slide. The concept governs the interaction type. See `references/decks.md`.
+5. **For decks:** before writing any slide, identify which slides need interactivity. Choose the interaction type to fit the concept. See `references/decks.md`.
 
 ## Composition modes
 
-Pick one per artifact. Vary across sessions. The mode is a structural commitment. It governs layout logic, density, and how ink and paper are distributed.
+Pick one mode per artifact, and vary the mode across sessions. The mode determines the layout logic, the density, and how ink and paper are distributed.
 
-**Dense reference.** Grid of cards, high information density, multiple KV pairs per section, several columns. Rewards 30–45 seconds of attention per panel. Use for protocol references, parameter tables, specification sheets, side-by-side comparisons. Ink panels appear as evidence callouts inside a paper field.
+**Dense reference.** A dense reference is a grid of cards with high information density, several columns, and multiple KV pairs per section. Each panel has enough content for 30–45 seconds of reading. Use it for protocol references, parameter tables, specification sheets, and side-by-side comparisons. Ink panels appear as evidence callouts inside a paper field.
 
-**Spacious argument.** One concept per section. Generous white space. Each panel or slide earns its own breathing room. Reading pace is deliberate. Use when the concept is singular and deep — a derivation, a worked example, an analysis. Ink appears only at summary or decision points.
+**Spacious argument.** A spacious argument puts one concept in each section, with generous white space around every panel or slide. The reader moves through it slowly. Use it when the artifact covers one deep concept, such as a derivation, a worked example, or an analysis. Ink appears only at summary or decision points.
 
-**Ink-anchored.** Paper is the default surface, but ink panels punctuate the flow — section dividers, quoted measurements, named decisions. The artifact reads as paper-first but the ink anchors give it authority at specific moments. Works well for reference decks with multiple sections.
+**Ink-anchored.** Paper is the default surface, and ink panels break up the paper at section dividers, quoted measurements, and named decisions. The artifact is mostly paper, and the ink panels mark the points where it states a judgment. It works well for reference decks with multiple sections.
 
-**Ink-forward.** Majority ink surfaces, paper used only for relief or sharp contrast. The artifact asserts more than it explains. Use for summary dashboards, executive snapshots, decision panels, final-state reference cards. Paper panels should feel like interruptions — a table that needs to be read, a diagram that needs white space.
+**Ink-forward.** Most surfaces are ink, and paper appears only for relief or sharp contrast. The artifact asserts more than it explains. Use it for summary dashboards, executive snapshots, decision panels, and final-state reference cards. Use a paper panel only as an interruption, such as a table that needs reading or a diagram that needs white space.
 
-**Diagram-led.** The visual — chart, diagram, animation — dominates each panel. Text is annotation and label. Use when the concept is fundamentally spatial or relational: network topologies, signal flows, state machines, data distributions. Cards and KVs are secondary.
+**Diagram-led.** A chart, diagram, or animation takes up most of each panel, and text serves as annotation and labels. Use it when the concept is spatial or relational, as in network topologies, signal flows, state machines, and data distributions. Cards and KVs are secondary.
 
 ## Variation mandate
 
-Hard rules against convergence.
+Follow these rules so that artifacts do not converge on one look.
 
 - **Never use the same overall composition twice in a session.** If the last artifact was dense reference, this one is spacious argument or diagram-led.
-- **Vary ink allocation.** Some artifacts are mostly paper with one or two ink evidence panels. Some are ink-forward with paper used for contrast. Some have no ink at all. All three are valid. Rotate.
-- **Vary information density.** A lesson on a single formula can live on three spacious slides. A reference card on a protocol stack should be dense enough to reward sustained attention. Don't flatten everything to the same density.
-- **The logo primitive must be chosen for the subject's structure.** See logos section. The same orbit shape on every artifact is a failure.
+- **Vary ink allocation.** An artifact can be mostly paper with one or two ink evidence panels, ink-forward with paper used for contrast, or free of ink. Rotate among these three allocations across artifacts.
+- **Vary information density.** A lesson on a single formula can take three spacious slides. A reference card on a protocol stack should be dense enough for sustained study. Do not give every artifact the same density.
+- **Choose the logo primitive for the subject's structure.** See the logos section below. Using the same orbit shape on every artifact breaks this rule.
 - **In decks, vary the opening.** See `references/decks.md`.
 - **In decks, vary the interaction type.** See `references/decks.md`.
 
@@ -139,7 +139,7 @@ Hard rules against convergence.
 
 ## Callout philosophy — soft / tint / text per hue
 
-Every semantic hue has a three-step palette. Use these together whenever a component expresses a state: alerts, toasts, status pills, badges, callouts, worked-example rows, KPI accent stripes. The whole component reads as one coherent color family.
+Every semantic hue has a three-step palette. Use the three steps together whenever a component expresses a state, as in alerts, toasts, status pills, badges, callouts, worked-example rows, and KPI accent stripes. The whole component then reads as one color family.
 
 ```css
 /* soft = pale bg · tint = mid border · text = saturated dark fg */
@@ -150,28 +150,28 @@ Every semantic hue has a three-step palette. Use these together whenever a compo
 --toby-unknown-soft: #ebe8e3;  --toby-unknown-tint: #c4bfb6;  --toby-unknown-text: #3f3d39;
 ```
 
-Pattern for a state-tinted panel: background = `*-soft`, border = `*-tint`, left strip (4px) = un-soft hue, text = `*-text`. See `references/components.md` for paste-ready HTML.
+A state-tinted panel uses `*-soft` for the background, `*-tint` for the border, the un-soft hue for the 4px left strip, and `*-text` for the text. See `references/components.md` for paste-ready HTML.
 
 ## Color rules
 
-- No gradients. No rainbow scales. No glow. No colored shadows.
-- No red as brand accent. Use ink weight, hairline, or position for emphasis.
-- Chart palette is positional, so use in fixed order, by series index. Also drives section accents on long pages.
-- **No left-accent-colored cards** as a general decoration (a known AI-slop tell). Exception: alerts/toasts use a single 4px coloured left strip from the callout family, and that strip is the documented pattern.
+- Do not use gradients, rainbow scales, glow, or colored shadows.
+- Do not use red as a brand accent. Use ink weight, a hairline, or position for emphasis.
+- The chart palette is positional, so use its colors in fixed order by series index. The same palette sets the section accents on long pages.
+- **Do not give cards a colored left accent** as general decoration, because readers recognize that accent as a sign of AI-generated design. Alerts and toasts are the exception, because their single 4px coloured left strip from the callout family is the documented pattern.
 
 ## Typography
 
-- **Sans:** Inter (400 / 500 / 600). System sans fallback.
-- **Mono:** JetBrains Mono (400 / 500). For values, units, IDs, coordinates.
-- **Sizes:** display 34 · h1 28 · h2 22 · section 18 · body 14 · body-sm 13 · meta 12 · eyebrow 11 · mono 13. Units: px on web; convert to Pt for pptx.
-- **Weights:** 400 body, 500 emphasis, 600 headings. No 700 in product UI.
-- **Letter-spacing:** 0 on display, headings, and body; +0.12em on eyebrows only.
-- **Numerals:** tabular (`tnum`) everywhere.
-- **Casing:** UPPERCASE eyebrows (tracked 0.12em) for section labels. Sentence case for headings and body. Never Title Case. All-lowercase for tokens (`$toby-paper`). Mono for values, IDs, coordinates.
+- **Sans:** Use Inter at weights 400, 500, and 600, with the system sans font as the fallback.
+- **Mono:** Use JetBrains Mono at weights 400 and 500 for values, units, IDs, and coordinates.
+- **Sizes:** display 34 · h1 28 · h2 22 · section 18 · body 14 · body-sm 13 · meta 12 · eyebrow 11 · mono 13. The sizes are in px on the web, so convert them to Pt for pptx.
+- **Weights:** Use 400 for body, 500 for emphasis, and 600 for headings. Do not use 700 in product UI.
+- **Letter-spacing:** Use 0 on display text, headings, and body, and use +0.12em on eyebrows only.
+- **Numerals:** Use tabular numerals (`tnum`) everywhere.
+- **Casing:** Use UPPERCASE eyebrows (tracked 0.12em) for section labels and sentence case for headings and body. Never use Title Case. Write tokens in all-lowercase (`$toby-paper`), and set values, IDs, and coordinates in mono.
 
 ## Spacing — all multiples of 4
 
-Prefer named tokens. Pick the closest, never a one-off.
+Prefer named tokens. When no token matches exactly, pick the closest one, and never use a one-off value.
 
 ```css
 --space-xs:     4px;   /* gap between tightly-coupled siblings */
@@ -239,48 +239,48 @@ Prefer named tokens. Pick the closest, never a one-off.
 --motion-overlay:    220ms;  /* sheet & dialog entrance */
 ```
 
-- Allowed motion: opacity fade, 4–8px positional slide for menus/toasts, hairline ring on focus, 90° chevron rotation on accordion open.
-- Forbidden: spring bounces, scale-up entrances, parallax, particle effects, animated illustrations.
+- Use only these motions: an opacity fade, a 4–8px positional slide for menus and toasts, and a hairline ring on focus. An accordion can also rotate its chevron 90° when it opens.
+- Do not use spring bounces, scale-up entrances, parallax, particle effects, or animated illustrations.
 
 ## Interaction states
 
-- **Hover (paper):** bg steps to `--toby-paper-2`. Foreground unchanged.
-- **Hover (dark):** bg lifts to `--ink-hover` (`#4a4e57`). Text unchanged.
-- **Active / press:** bg steps DARKER (`--surface-pressed` / `--ink-pressed` / `--accent-pressed`), border stays. No scale shrink. The control does NOT move.
-- **Focus:** 2px outside ring in `--toby-info` (teal), 2px offset. **Never red.**
-- **Selected / current in lists/trees/menus:** `--toby-paper-2` background + a 3px `--toby-info` inset on the left. Paper-3 against paper-3 is INVISIBLE, so never use it as a selection state.
+- **Hover (paper):** The background changes to `--toby-paper-2`, and the foreground stays the same.
+- **Hover (dark):** The background lightens to `--ink-hover` (`#4a4e57`), and the text stays the same.
+- **Active / press:** The background turns DARKER (`--surface-pressed` / `--ink-pressed` / `--accent-pressed`), and the border stays. The control does NOT shrink or move.
+- **Focus:** Draw a 2px outside ring in `--toby-info` (teal) at a 2px offset. **Never use red.**
+- **Selected / current in lists/trees/menus:** Use a `--toby-paper-2` background with a 3px `--toby-info` inset on the left. Paper-3 against paper-3 is INVISIBLE, so never use paper-3 as a selection state.
 
 Hover and base must differ by ≥ 3:1 contrast (WCAG 1.4.11).
 
 ## Imagery + backgrounds
 
-- Paper is the background. No imagery by default.
+- Paper is the background, and artifacts use no imagery by default.
 - Avoid generic lifestyle photos, decorative stock art, repeating patterns, textures, and gradients. Use real or generated imagery when the task requires the product, place, object, state, gameplay, or person to be inspectable.
-- Geometry as decoration is allowed only when it clarifies. Two scales: **primary** at content size with a small uppercase label, or **decorative** small (≤ 80px) and quiet (opacity ≤ 0.25). See `references/geometry.md` for the named marks.
+- Geometry as decoration is allowed only when it clarifies the content. Use it at one of two scales. A **primary** mark appears at content size with a small uppercase label, and a **decorative** mark is small (≤ 80px) and faint (opacity ≤ 0.25). See `references/geometry.md` for the named marks.
 
 ## Iconography
 
-- Use Lucide where available. Inline SVG is acceptable for static artifacts. Use the app's icon library for coded frontends when one exists. Icons are 16–20px, 1.5px stroke, square caps, monochromatic `currentColor`.
-- Heroicons-outline, Tabler, and Phosphor-regular are acceptable fallback families. Material Icons and Carbon are too dense — forbidden.
-- About 12 glyphs system-wide. If you're reaching for a 13th, a text label would do the job.
-- Forbidden: emoji, unicode dingbats. Allowed unicode: `→` for handoffs, `·` as metadata separator, `±` for uncertainty.
+- Use Lucide where available. Inline SVG is acceptable for static artifacts. Use the app's icon library for coded frontends when one exists. Draw icons at 16–20px with a 1.5px stroke, square caps, and monochromatic `currentColor`.
+- Heroicons-outline, Tabler, and Phosphor-regular are acceptable fallback families. Material Icons and Carbon are too dense, so do not use them.
+- Keep the system to about 12 glyphs. If you need a 13th, use a text label.
+- Do not use emoji or unicode dingbats. The allowed unicode characters are `→` for handoffs, `·` as a metadata separator, and `±` for uncertainty.
 
 ## Logos / wordmarks
 
-Per-artifact. Never a fixed brand.
+Each artifact gets its own logo or wordmark, and no fixed brand applies across artifacts.
 
 Each artifact gets:
 - A hairline geometric primitive.
 - One short lowercase Inter-600 word naming the topic.
 - A single red dot as the only color.
 
-**Choose the primitive for the structure of the subject.** A network topology → crosshair or grid. A recursive algorithm → nested squares. An antenna or wave → orbit arc. A decision process → branching lines or Y-fork. A time series → horizontal rail with a tick. A probability distribution → bell curve outline. A queue or pipeline → stacked horizontal bars.
+**Choose the primitive for the structure of the subject.** Use a crosshair or grid for a network topology, nested squares for a recursive algorithm, and an orbit arc for an antenna or wave. Use branching lines or a Y-fork for a decision process, and a horizontal rail with a tick for a time series. Use a bell curve outline for a probability distribution, and stacked horizontal bars for a queue or pipeline.
 
-Lazy defaults to refuse: orbit for everything, triangle because it's geometric, square because it's simple. If you cannot name why the shape fits the subject, pick a different shape.
+Refuse these lazy defaults: an orbit for everything, a triangle because it is geometric, and a square because it is simple. If you cannot name why the shape fits the subject, pick a different shape.
 
 ## Purpose check
 
-Every sentence, panel, or slide must do one of these. If it does none, remove it.
+Every sentence, panel, or slide must do one of the jobs below. If it does none of them, remove it.
 
 - teach a concept
 - state a measurement
@@ -292,37 +292,37 @@ Every sentence, panel, or slide must do one of these. If it does none, remove it
 ## Output-type mapping
 
 ### HTML / React artifacts
-- Apply all tokens above. Background = `--toby-paper`. Cards = `--toby-paper-3` with 1px `--border-hairline` ring.
+- Apply all tokens above. Set the background to `--toby-paper`, and set cards to `--toby-paper-3` with a 1px `--border-hairline` ring.
 - Load Inter and JetBrains Mono via CDN. Provide system fallbacks.
-- Numerals always tabular: `font-variant-numeric: tabular-nums;`.
+- Always set numerals to tabular with `font-variant-numeric: tabular-nums;`.
 
 ### Visualizer SVG diagrams
 - Call `visualize:read_me` first, then override its CSS variables with Toby Artifact tokens before generating output.
-- Visualizer requires transparent background, so set paper color on a top-level `<rect>` if a paper field is wanted.
+- Visualizer requires a transparent background, so if you want a paper field, set the paper color on a top-level `<rect>`.
 - Use the Toby Artifact chart palette in positional order for any series.
 
 ### Visualizer HTML widgets
 - Call `visualize:read_me` first, then override its CSS variables with Toby Artifact tokens.
-- Keep background transparent. Apply Toby Artifact paper via a wrapper if needed.
+- Keep the background transparent, and if the widget needs paper, apply Toby Artifact paper through a wrapper.
 
 ### pptx slide decks
-- See `references/decks.md`. The pptx skill handles file mechanics. Toby Artifact controls colors, fonts, sizes, padding, and slide structure.
+- See `references/decks.md`. The pptx skill handles the file mechanics, and Toby Artifact controls colors, fonts, sizes, padding, and slide structure.
 
 ### HTML decks for teaching
-- See `references/decks.md`. React `.jsx` artifact with prev/next pagination and keyboard navigation.
+- See `references/decks.md`. Build a React `.jsx` artifact with prev/next pagination and keyboard navigation.
 
 ## Copy rules
 
-Every sentence in artifact copy must pass **cite**, **negation**, and **substitution**, then survive the **reader-skim** cut. `references/copy.md` carries all four.
+Every sentence in artifact copy must pass the **cite**, **negation**, and **substitution** tests, and then stay in after the **reader-skim** cut. `references/copy.md` defines all four.
 
-Banned words live in the operating guide, already loaded. This skill adds none.
+The banned words are in the operating guide, which is already loaded. This skill adds none.
 
-**Headings carry the claim.** Body explains or qualifies. Caveats sit next to the claim, never in a footnote.
+**Slide and chart titles state the claim in a plain, descriptive sentence.** A section heading is a one- or two-word label or a phrase that says what the section covers. The body explains or qualifies. Put caveats next to the claim, never in a footnote.
 
-**Numbers carry units.** A bare number is a defect.
+**Every number has a unit.** A bare number is a defect.
 
-Labels are where the clarity floor binds hardest. An axis title, a legend entry, a KPI caption, and a slide heading each get the three-word cap on noun stacks. Each also gets one name per thing, held identical across every chart in the artifact.
+The clarity rules apply most strictly to labels. An axis title, a legend entry, a KPI caption, and a slide heading each get the three-word cap on noun stacks. Each also gets one name per thing, held identical across every chart in the artifact.
 
-Global Toby voice controls register. This skill controls artifact structure, visual tokens, density, copy tests, and component patterns.
+Toby's global voice rules control register. This skill controls artifact structure, visual tokens, density, copy tests, and component patterns.
 
 For any substantive copy work, load `references/copy.md`.

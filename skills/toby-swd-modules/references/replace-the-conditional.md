@@ -1,10 +1,10 @@
 # Replace the Growing Conditional
 
-A `switch` or `if` chain is a design smell in two forms. The first takes a new arm every time the domain gains a case. The second is the same branch decision copied across call sites. Both are a module that is not closed to modification: the next case edits shared code, or several files at once.
+A `switch` or `if` chain is a design smell in two forms. The first takes a new arm every time the domain gains a case. The second is the same branch decision copied across call sites. In both forms the module is not closed to modification, so adding the next case means editing shared code or several files at once.
 
-A conditional that has not changed in a year is not this smell. This file is for the ones that keep growing.
+A conditional that has not changed in a year is not this smell. The rungs below apply to conditionals that keep growing.
 
-The ladder runs lightest first. Stop at the first rung that fits. The code is illustrative and the reasoning transfers.
+The ladder lists the lightest rung first. Stop at the first rung that fits. The code is illustrative and the reasoning transfers.
 
 ---
 
@@ -19,7 +19,7 @@ def display_name(user):
     return f"{user.first} {user.last}"
 ```
 
-Every caller that formats a name now depends on this branch. The next user state — banned, system, unverified — adds another arm here or a second copy elsewhere. The concept "deleted" has leaked into name formatting.
+Every caller that formats a name now depends on this branch. Each new user state, such as banned, system, or unverified, needs another arm here or a second copy elsewhere. The concept "deleted" has leaked into name formatting.
 
 Move the answer onto the type:
 
@@ -34,7 +34,7 @@ class User:
         return f"{self.first} {self.last}"
 ```
 
-The branch still exists. It lives once, next to the data it reads, and callers do not see it. New states change one method.
+The branch still exists, but only once, next to the data it reads, and callers do not see it. Adding a state changes one method.
 
 The same move removes null checks. A null object that responds to every call the real one does lets the common path run with no `if x is None`.
 
@@ -68,15 +68,15 @@ function renderPreview(file: FileMeta): ReactNode {
 }
 ```
 
-Adding a kind is one entry. `Record<FileKind, …>` makes a missing entry a compile error, so the set stays complete. No pattern, no class.
+Adding a kind is one entry. `Record<FileKind, …>` makes a missing entry a compile error, so the set stays complete. The map needs no design pattern and no class.
 
-Keep it to one map. Two maps that switch on the same tag is the leak this rung removes.
+Keep it to one map. Two maps that switch on the same tag are the leak this rung removes.
 
 ---
 
 ## Rung 3 — Discriminated union with an exhaustive switch
 
-When the branches read different fields, the map does not fit. Keep the switch and let the type close it.
+When the branches read different fields, the map does not fit. Keep the switch and let the type make it exhaustive.
 
 ```ts
 type DomainEvent =
@@ -98,7 +98,7 @@ function reduce(state: State, e: DomainEvent): State {
 }
 ```
 
-Add a variant to `DomainEvent` and the `default` arm stops compiling until the new `case` is written. The switch is a single dispatch point, and the compiler holds it complete. No one can forget to extend it.
+Add a variant to `DomainEvent` and the `default` arm stops compiling until the new `case` is written. The switch is a single dispatch point, and the compiler keeps it complete. No one can forget to extend it.
 
 Use this over rung 2 when each branch reads different fields. Use rung 2 when the branches differ only in which function runs.
 
@@ -125,9 +125,9 @@ class LegacyBankGateway implements Gateway {
 const gateway: Gateway = GATEWAYS[config.gatewayName];
 ```
 
-Each implementation is a module. Its state and dependencies stay inside it. `strategy/references/examples.md` reaches this same design for the two-gateway task.
+Each implementation is its own module, with its state and dependencies inside it. `strategy/references/examples.md` reaches this same design for the two-gateway task.
 
-The cost is real: one interface to keep stable, one class per case, a selection site. It earns that cost when the case set is open and each case holds state the others do not share. Three one-line branches over a closed set do not qualify. That is rung 2.
+The cost is one interface to keep stable, one class per case, and a selection site. Polymorphism is worth that cost when the case set is open and each case holds state the others do not share. Three one-line branches over a closed set do not qualify, because they belong on rung 2.
 
 ---
 
@@ -149,15 +149,15 @@ export function dispatch(message: InboundMessage): Promise<void> {
 }
 ```
 
-Each handler module calls `registerHandler` at load. The dispatcher never names them. This fits a plugin API, or a set of adapters loaded by config at boot.
+Each handler module calls `registerHandler` at load, so the dispatcher never names them. This fits a plugin API, or a set of adapters loaded by config at boot.
 
-It is the heaviest rung. The registration is indirection a reader has to trace, and load order becomes something you can get wrong. Reserve it for a surface that is open to code you do not control.
+It is the heaviest rung. The registration is indirection a reader has to trace, and load order becomes something you can get wrong. Reserve it for an interface that is open to code you do not control.
 
 ---
 
 ## React and React Native forms
 
-- **Status to component.** `Record<Status, FC>` over a `switch (status)` in render. The map sits above the component or in a sibling module.
+- **Status to component.** Replace a `switch (status)` in render with a `Record<Status, FC>`. Put the map above the component or in a sibling module.
 - **Variant prop that grew.** A `<Button variant="…">` whose `variant` gains values every quarter is rung 2, with the tag passed as a prop. Move to compound components with `children`, or a map from variant to a style object.
 - **Field type to input.** A form that renders from a schema maps `field.type` to a component. A `switch (field.type)` inside JSX is the smell.
 - **Behavior split from presentation.** A headless hook owns the state machine and each screen composes it. `references/web.md` Example 4 shows it in full.
@@ -165,8 +165,8 @@ It is the heaviest rung. The registration is indirection a reader has to trace, 
 
 ## Backend forms
 
-- **Adapter interface.** `Gateway`, `StorageDriver`, `Notifier`: one interface, one implementation per provider, selection from config at the composition root.
-- **Handler map by message type.** Rung 2 for a closed set of message types. Rung 5 when handlers ship independently.
+- **Adapter interface.** `Gateway`, `StorageDriver`, and `Notifier` each have one interface and one implementation per provider, and the composition root selects the implementation from config.
+- **Handler map by message type.** Use rung 2 for a closed set of message types, and rung 5 when handlers ship independently.
 - **Wire discriminated union.** A payload with a `type` tag is validated once at the edge, then dispatched with rung 3 so the compiler tracks every case.
 
 ---

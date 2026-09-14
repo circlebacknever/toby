@@ -11,7 +11,7 @@ Three layers:
   opened     a reference file the skill was told to open
 
 A skill that fires when it should not costs its whole body, which is why
-evals/suites/triggering.md carries as much weight as anything here.
+evals/suites/triggering.md counts as much as anything here.
 """
 from __future__ import annotations
 

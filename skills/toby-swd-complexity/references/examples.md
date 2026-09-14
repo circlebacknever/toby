@@ -1,6 +1,6 @@
 # Worked Examples
 
-Original code. The moves are what transfer.
+The code below is original, and the moves are the part that transfers to other code.
 
 ---
 
@@ -35,17 +35,18 @@ path exception-free.
 
 A web server's per-URL handlers each call `get_param(name)`, which throws when a
 required parameter is missing. The tactical version wraps every `get_param` call
-in its own try/except that returns a 400 — dozens of identical handlers.
+in its own try/except that returns a 400, which produces dozens of identical
+handlers.
 
 Aggregate: let the exception propagate to the single dispatch loop at the top,
 which catches it once and produces the 400. One handler replaces dozens.
 
 Separately, the same server calls `malloc`-equivalent allocation deep in request
 parsing. Out-of-memory is rare and there is nothing useful to do, so checking it
-at every allocation is pure complexity. This is the just-crash case: one checked
-allocation wrapper that aborts with a diagnostic. A corrupt
-request body is expected and per-request, so it rides the aggregation path to
-the 400, well clear of the crash path.
+at every allocation is pure complexity. Out-of-memory is the just-crash case, so
+use one checked allocation wrapper that aborts with a diagnostic. A corrupt
+request body is expected and per-request, so it takes the aggregation path to
+the 400 and never reaches the crash path.
 
 ---
 
@@ -53,15 +54,15 @@ the 400, well clear of the crash path.
 
 A list view re-fetches the full dataset on every keystroke of a filter box, and
 each row component re-derives a sorted copy of the list. No single line is
-"slow". Together the view is sluggish.
+"slow", but together they make the view sluggish.
 
-The design-time move lands before any measurement. Typing into a filter is
+The design-time move comes before any measurement. Typing into a filter is
 a known-expensive trigger if it crosses the network, so debounce the fetch and
 filter client-side when the set is small. Both are as simple as the slow
 version and cost no extra complexity. The per-row re-sort is redundant work on a
-known-hot path. Lift the sorted derivation to the parent so it runs once. These
-are naturally-efficient simple choices, the everyday layer that lands before any
-profiler session.
+known-hot path. Lift the sorted derivation to the parent so it runs once. The
+debounce and the lifted sort are naturally efficient and simple, and they come
+before any profiler session.
 
 If after this the view is still slow, then measure: baseline the render, change
 one thing, re-measure, and revert anything with no measurable effect unless it
@@ -81,7 +82,7 @@ catch { return []; }   // caller cannot distinguish "no orders" from "failed"
 This masks information the caller needs, because an empty list and a failed
 request look identical. The UI cannot show a retry state and silently lies to
 the user. Masking is correct only when the information is not needed outside the
-module. Here it is needed. Surface it as part of the contract instead — a result
-that distinguishes loaded-empty from failed — even though that adds to the
-hook's interface. The interface cost is the point. Callers need this, so it must
-be exposed.
+module. Here the caller needs it. Surface the failure as part of the contract,
+with a result that distinguishes loaded-empty from failed. That result adds to
+the hook's interface, and the hook pays that cost on purpose, because callers
+need the distinction.

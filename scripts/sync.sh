@@ -39,15 +39,16 @@ body = (root / "base" / "toby.md").read_text()
 body_stripped = body.strip()
 
 # The output style is generated from the writing sections of base/toby.md. It
-# sits in Claude Code's system prompt, one level above CLAUDE.md, and the tool
+# goes into Claude Code's system prompt, one level above CLAUDE.md, and the tool
 # re-states it during the conversation. That is the strongest position the
 # voice rules can hold, and it is the only one that survives turn ten.
 #
-# It carries the writing sections only. The operating floor, skill routing, and
+# It contains the writing sections only. The operating floor, skill routing, and
 # machine safety stay in the instruction files, which every tool already loads.
 OUTPUT_STYLE_SECTIONS = [
     "No Performance Around the Answer",
     "Role",
+    "Sentence Tests",
     "Prose",
     "Register",
     "Reply Architecture",
@@ -94,14 +95,14 @@ def output_style(text: str) -> str:
 
 # Raw copies hold the body verbatim; marker copies hold it between the markers.
 raw_targets = [root / "skills" / "toby-voice" / "references" / "toby.md"]
-# The operating floor: everything the output style does not carry. Installing
+# The operating floor: everything the output style does not contain. Installing
 # the style and the full guide together pays for the writing sections twice, at
-# about 4,900 tokens a turn, so this is the half to pair with the style.
+# about 6,400 tokens a turn, so this is the half to pair with the style.
 def operating_floor(text: str) -> str:
     found = sections_of(text)
     keep = [n for n in found if n not in OUTPUT_STYLE_SECTIONS]
     head = (
-        "This file carries Toby's operating floor. The writing rules live in the "
+        "This file contains Toby's operating floor. The writing rules are in the "
         "Toby output style, which Claude Code loads into the system prompt.\n\n"
         "If the Toby output style is not selected, the voice rules are not loaded "
         "at all. Turn it on with /config, then Output style, then Toby. Say so "

@@ -3,7 +3,7 @@
 The web stack has its own complexity patterns. Errors arrive from three
 sources at once (network, render, user input) and performance pressure
 arrives from a fourth (re-renders, large lists, memoization decisions).
-The ladders apply, and the framework idioms decide the move.
+The ladders apply, and the right move follows each framework's idioms.
 
 ---
 
@@ -21,11 +21,11 @@ A common reflex when adding error boundaries to a React app:
 A single boundary around the entire app catches everything. The fallback
 renders an "Application Error" screen. Every render error, anywhere,
 unmounts the whole tree. The user loses their form data, their scroll
-position, their open dialog. This is aggregation at the wrong level. The
+position, their open dialog. The single root boundary is aggregation at the wrong level. The
 boundary aggregates more than it should because no smaller boundary was
 designed.
 
-Better: place boundaries at recoverable units.
+A better design places boundaries at recoverable units.
 
 ```tsx
 // App.tsx
@@ -52,26 +52,26 @@ Better: place boundaries at recoverable units.
 </ErrorBoundary>
 ```
 
-Three levels: an outer last-resort boundary (rare, full reset), per-route
+The design has three levels: an outer last-resort boundary (rare, full reset), per-route
 boundaries (the user keeps their nav state, just this route is broken),
 and per-widget boundaries around known-risky children (a chart library
-that occasionally throws on bad data shouldn't take out the page).
+that occasionally throws on bad data shouldn't unmount the page).
 
-This is the error ladder applied at the render layer. Defining-out doesn't
-apply (a child throwing during render is a real error). Masking at lowest
-level: the widget-level boundary is the masking layer. Aggregation: the
-route-level boundary aggregates everything that bubbled past per-widget.
-Just-crash: the app-level fallback is the just-crash equivalent.
+The three levels apply the error ladder at the render layer. Defining the error
+out doesn't apply (a child throwing during render is a real error). The
+widget-level boundary masks at the lowest level. The route-level boundary
+aggregates everything that bubbled past the per-widget boundaries. The
+app-level fallback is the just-crash equivalent.
 
-Same treatment in Solid (`ErrorBoundary` is built in) and Svelte (boundary
+Solid (`ErrorBoundary` is built in) and Svelte (boundary
 components in libraries like `svelte-error-boundary` or the framework's
-own error pages in SvelteKit).
+own error pages in SvelteKit) get the same treatment.
 
 ---
 
 ## Example 2 — Async errors: a typed Result discriminator
 
-The pattern that grows:
+A pattern that grows as each page repeats it:
 
 ```tsx
 function OrderPage({ id }: { id: string }) {
@@ -93,18 +93,19 @@ function OrderPage({ id }: { id: string }) {
 }
 ```
 
-Repeated in every page that loads data, each slightly different about
-which errors get which treatment. Common errors handled at every call site
-when one handler would do. The error ladder failing at rung 3 (aggregation).
+Every page that loads data repeats this pattern, and each copy differs slightly
+about which errors get which treatment. Each call site handles common errors
+when one handler would do, so the error ladder fails at rung 3 (aggregation).
 
 The right move depends on which errors matter where:
 
 - **NetworkError** is usually transient. Retry inside the API client (rung
-  2 — masking at low level). With a sensible retry-with-backoff, a network
+  2, masking at low level). With a sensible retry-with-backoff, a network
   blip never reaches the component.
-- **AuthError** has one global handler — navigate to login, clear session.
-  This is aggregation (rung 3) at the API client or response interceptor
-  level, which is where the one handler belongs.
+
+- **AuthError** has one global handler, which navigates to login and clears
+  the session. That handler is aggregation (rung 3) at the API client or
+  response interceptor level, which is where the one handler belongs.
 - **NotFoundError** is usually a real "this resource doesn't exist for
   this user" case. Surface it as a typed Result so the component can
   render a "not found" view, which is the accurate state for this case.
@@ -132,11 +133,12 @@ The page handles only the cases that are its concern. The other
 three handler buckets disappear from this file and from every other page
 that used the same pattern.
 
-`useOrder` returns a discriminated query result — a `status` plus the data
-for that state — and this page renders only the states it owns. The `error`
-and `stale` arms are absent by design. The error cases collapse into the
-rungs above — the client's retry, the interceptor, the boundary — and never
-reach the component. Same treatment, fewer arms because the handling moved.
+`useOrder` returns a discriminated query result, which is a `status` plus the
+data for that state. This page renders only the states it owns. The `error`
+and `stale` arms are absent by design. The rungs above handle the error cases
+through the client's retry, the interceptor, and the boundary, so those cases
+never reach the component. The treatment is the same, and the result has fewer
+arms because the handling moved.
 
 ---
 
@@ -155,38 +157,39 @@ function ProductCard({ product, onSelect }: { product: Product; onSelect: (p: Pr
 }
 ```
 
-The author's mental model: `useMemo` prevents the re-render. In actual
+The author believes that `useMemo` prevents the re-render. In actual
 behavior, every `useMemo` adds a closure allocation, a comparison of
 dependencies, and a tiny bit of work on every render. For values that are
 cheap to compute, the memoization itself costs more than what it saves.
-Density of `useMemo` doesn't track render frequency. It tracks the
-author's anxiety.
+The number of `useMemo` calls follows the author's worry about
+performance, and has no link to how often the component renders.
 
-This is speculative performance complexity added without measurement. It
-also hides the design problems it pretends to solve. When a component
+Blanket memoization is speculative performance complexity added without
+measurement. It also hides the design problems it appears to solve. When a component
 re-renders too often, the right fix is usually higher up the tree (a stable
 parent reference, a context that doesn't change every render, list keys
 that are stable).
 
 The rule the team wants:
 
-- **Default: no memoization.** Components re-render. That's their job. The
+- **Default: no memoization.** Components are designed to re-render. The
   React Compiler (v1.0, opt-in) memoizes at build time, so where it runs the
   hand-written `useMemo`/`useCallback` is redundant. Plain React 19 without
-  the compiler re-renders as it always has. Solid and Svelte sidestep the
+  the compiler re-renders as it always has. Solid and Svelte avoid the
   question, because fine-grained reactivity updates only what changed.
+
 - **`useMemo`** is for expensive computations whose dependencies are stable
-  enough that the memo will hit. "Expensive" means measurable —
-  parsing a large blob, computing a derived structure over many items.
+  enough that the memo will hit. "Expensive" means measurably expensive, such as
+  parsing a large blob or computing a derived structure over many items.
 - **`useCallback`** is for callbacks passed to memoized children that
   compare by referential equality, or to the dependency arrays of other
   hooks. A callback used only as a JSX DOM event prop (`onClick`) doesn't
   need it.
 - **Object-prop memoization** is for stabilizing references passed to
-  memoized children. Almost never useful when the consumer isn't itself
-  memoized.
+  memoized children. It is almost never useful when the consumer isn't
+  itself memoized.
 
-The version that earns its complexity:
+The version that is worth its complexity:
 
 ```tsx
 function ProductList({ products, filter }: { products: Product[]; filter: string }) {
@@ -196,8 +199,8 @@ function ProductList({ products, filter }: { products: Product[]; filter: string
 }
 ```
 
-One `useMemo`, on the one expensive computation. Everything else
-re-evaluates and nobody notices.
+Keep one `useMemo`, on the one expensive computation, and let everything
+else re-evaluate, because nobody notices the cost.
 
 In Solid, this whole class of problem largely disappears, because
 `createSignal` and `createMemo` are fine-grained and unnecessary
@@ -212,18 +215,18 @@ right answer for most components, so resist the urge to add a layer.
 A team is about to render 200 items in a list. Someone says "we should
 virtualize this."
 
-The cheap-design move first: no special case. Render 200 list items.
-Each is a small component. The browser handles this without breaking a
-sweat. No virtualization library needed.
+Try the cheap design first, with no special case. Render the 200 list items
+as small components, which the browser handles easily, so no virtualization
+library is needed.
 
 The team renders 2000 items. Things get slower on low-end devices but the
-P95 is still acceptable. Probably no virtualization yet, so measure the
-specific bottleneck. The item count is rarely the cause. The usual culprit
+P95 is still acceptable. The team probably needs no virtualization yet, so
+measure the specific bottleneck. The item count is rarely the cause. The usual culprit
 is a single expensive per-row computation, or a giant image being rendered
 without sizing constraints.
 
-The team renders 50,000 items. Now it's a measured problem. Virtualization
-earns its complexity:
+When the team renders 50,000 items, the slowdown is measured, and
+virtualization is worth its complexity:
 
 ```tsx
 // react-virtual or TanStack Virtual
@@ -248,19 +251,20 @@ The "is this worth the complexity" answer for each step:
 
 Adding virtualization to a 100-item list because "lists should be
 virtualized" is exactly the speculative-complexity anti-pattern. The
-library adds a real cost: scroll-position bugs, focus management, sticky
-items become harder, snapshot tests get noisy, you lose ctrl-F to find
-text in the list. Each cost is real, so pay it when it's earned.
+library adds costs. Scroll-position bugs appear, focus management and sticky
+items become harder, snapshot tests get noisy, and ctrl-F no longer finds
+text in the list. Each cost is real, so accept it only when a measurement
+justifies it.
 
-Same call applies for Solid (`solid-virtual`) and Svelte (`svelte-virtual`
+The same decision applies to Solid (`solid-virtual`) and Svelte (`svelte-virtual`
 or framework-specific patterns).
 
 ---
 
 ## Example 5 — Render performance: design-time choices come first
 
-A common slow render the team blames on React, then tries to memo their
-way out of:
+A common slow render, which the team blames on React and then tries to fix
+with memoization:
 
 ```tsx
 function Dashboard() {
@@ -280,12 +284,12 @@ function Dashboard() {
 }
 ```
 
-The filter + sort runs on every keystroke. 500 items, two passes (filter,
-sort), one allocation per pass. The team's first instinct is `useMemo` on
+The filter + sort runs on every keystroke. Each run makes two passes (filter,
+sort) over 500 items, with one allocation per pass. The team's first instinct is `useMemo` on
 the result. That helps. But the design-time move is cheaper *and* better:
 
 - Pre-lowercase the customer name once when orders are loaded, so each
-  comparison reuses it. (500 string lowercases * keystrokes * keystrokes...)
+  comparison reuses it, which removes 500 string lowercases per keystroke.
 - Sort once when orders are loaded, so every render reads the sorted list.
 - Debounce the filter input. Users don't see results between keystrokes
   anyway, so running the filter at 60fps when they're typing is wasted work.
@@ -310,13 +314,13 @@ function Dashboard() {
 
 The `useMemo` is now real, because the filter is the only expensive thing left.
 The pre-sort and pre-lowercase happen once at load and every render reads
-the result. The debounce eliminates work the user can't perceive. Three design-time moves,
-each almost free, and the slow render disappears without any memoization
-heroics.
+the result. The debounce eliminates work the user can't perceive. The three design-time
+moves are each almost free, and the slow render disappears without any
+memoization heroics.
 
-This is the same point as `examples.md` Example 3. Design-time moves are
-the cheap layer, and they prevent the death-by-a-thousand-cuts case. The
-profiler session is for after.
+The `Dashboard` fix makes the same point as `examples.md` Example 3. Design-time
+moves are the cheap layer, and they prevent the death-by-a-thousand-cuts case.
+The profiler session comes after them.
 
 ---
 

@@ -143,7 +143,7 @@ JSON
 }
 
 install_output_style() {
-  # Claude Code only. The style lands in the system prompt, which is why the
+  # Claude Code only. The style goes into the system prompt, which is why the
   # voice rules go here as well as in CLAUDE.md.
   local target="$HOME/.claude/output-styles/toby.md"
   run mkdir -p "$(dirname "$target")"
@@ -234,8 +234,8 @@ install_codex() {
 install_claude() {
   install_skills "$HOME/.claude/skills"
   if [[ "$OUTPUT_STYLE" -eq 1 ]]; then
-    # The style carries the writing rules, so CLAUDE.md leaves them out. Both
-    # together would put the same 4,900 tokens in front of every turn twice.
+    # The style contains the writing rules, so CLAUDE.md leaves them out. Both
+    # together would put the same 6,400 tokens in front of every turn twice.
     install_instruction_file "$ROOT/instructions/claude/CLAUDE-floor.md" "$HOME/.claude/CLAUDE.md" merge
     install_output_style
   else

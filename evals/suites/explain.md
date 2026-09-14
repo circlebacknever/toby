@@ -34,4 +34,4 @@ The length numbers below are measured, and everything else is read.
 
 Q3 asks for the answer in a clear and concise form. That phrasing used to pull in
 `toby-swd-clarity`, whose job is naming and comments inside code. Both
-descriptions now name the boundary, and the `triggering` suite carries the probe.
+descriptions now name the boundary, and the `triggering` suite includes the probe.

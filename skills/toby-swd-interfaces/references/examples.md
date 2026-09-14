@@ -1,7 +1,7 @@
 # Worked Examples
 
-Original code, illustrating the procedure. The reasoning transfers. The
-languages do not matter.
+The code below is original and illustrates the procedure. The reasoning
+transfers to any language.
 
 ---
 
@@ -19,12 +19,12 @@ class RateLimiter:
     def consume(self, bucket, n) -> bool: ...
 ```
 
-Write the interface comment in full and it gets long. The caller must fetch a
-bucket, refill it with the current time, check tokens, then consume. Those
-calls must happen in that order or it breaks. The comment has to describe the
-bucket mechanism to be usable. That is the test failing on three counts at
-once: long, order-dependent, leaks internals. This is temporal decomposition
-with a class around it.
+The full interface comment is long. The caller must fetch a bucket, refill
+it with the current time, check tokens, and then consume. If those calls
+happen out of order, the rate limiter breaks. The comment has to describe the
+bucket mechanism before a caller can use it. The comment fails the test three
+ways at once, because it is long, order-dependent, and leaks internals. The
+design is temporal decomposition with a class around it.
 
 **Redesigned interface (designed by knowledge: "whether this client may proceed
 right now"):**
@@ -40,8 +40,8 @@ class RateLimiter:
 
 The complete contract is two sentences and names none of its internals. Tokens,
 refill cadence, and the clock moved inside. The interface shrank while the
-module got deeper. The guardrail check: is anything the caller needs
-now hidden? If callers must show a retry-after hint, expose that one value
+module got deeper. The guardrail check asks whether anything the caller
+needs is now hidden. If callers must show a retry-after hint, expose that one value
 (`allow` returns `RetryAfter | None`) and keep the bucket internal.
 
 ---
@@ -60,12 +60,12 @@ Task: a `UserCard` used in a list, a profile header, and a search result.
 ```
 
 The interface comment for this is a paragraph, and a caller rendering the common
-case still has to make eight decisions. That is overexposure. Rare knobs are in
-the way of the common use. `theme` threaded through here only to reach a child
+case still has to make eight decisions. Those eight decisions are overexposure,
+because rare knobs get in the way of the common use. `theme` threaded through here only to reach a child
 is information leakage, because `UserCard` does not use it.
 
-**Design it twice.** Option A: keep one component, push the knobs to sensible
-defaults. Option B: a small core plus thin presets. Option B wins because the
+**Design it twice.** Option A keeps one component and moves the knobs to
+sensible defaults. Option B uses a small core plus thin presets. Option B wins because the
 three real call sites are three named intents:
 
 ```tsx
@@ -77,8 +77,8 @@ three real call sites are three named intents:
 ```
 
 Callers make one decision (which intent), down from eight. Theme is read from context
-inside the core, so it stops being leaked through props. The core is deep. The
-presets are thin wrappers. Each encodes a real, distinct intent.
+inside the core, so it stops being leaked through props. The core is deep, and the
+presets are thin wrappers that each encode one distinct intent.
 
 ---
 
@@ -92,10 +92,10 @@ Task: an interface for a client to upload a file to storage.
 | B: `upload(bytes, key)` | One call | Medium | Chunking, retries, multipart threshold | Deep, but assumes all-in-memory |
 | C: `upload(source, key)` where source is bytes or a stream | One call | High | Same as B, plus large-file streaming | Deepest; covers current and near needs |
 
-C is a different decomposition, driven by B's flaw (memory blowup on large
-files). It is the kind
+C is a different decomposition, and B's flaw (high memory use on large
+files) drove it. It is the kind
 of synthesis the design-it-twice step is supposed to produce. The interface
 comment for C is short and mentions no internals, so it passes the test.
-Guardrail: if a caller must know whether the upload was durably committed before
-returning, that is a real need. `upload` returns once durably stored, and
-that guarantee goes in the comment.
+Guardrail: if a caller must know whether the upload was durably committed
+before `upload` returns, that need is real. `upload` returns once the data is
+durably stored, and the comment states that guarantee.

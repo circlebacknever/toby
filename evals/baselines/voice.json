@@ -38,6 +38,20 @@
     "extract plus Self Review": [
       5,
       4
+    ],
+    "after the slogan pass, scorer": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "after the slogan pass, judge": [
+      3,
+      5,
+      5,
+      2,
+      1
     ]
   },
   "note": "Ranges overlap across nearly their whole length. Two samples an arm read as a clean win and five took it back. Treat any single score as uninformative."
