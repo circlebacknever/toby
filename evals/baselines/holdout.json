@@ -1,0 +1,53 @@
+{
+  "label": "job-and-source procedure against the pre-change snapshot",
+  "recorded": "2026-09-14",
+  "git_rev": "working tree, uncommitted",
+  "scorer": "blind holdout-judge run, distracting sentences per file",
+  "arms": {
+    "snapshot rules": [
+      5,
+      9,
+      4,
+      5,
+      7
+    ],
+    "job-and-source procedure": [
+      2,
+      4,
+      4,
+      5,
+      4
+    ]
+  },
+  "checker_findings": {
+    "snapshot rules": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "job-and-source procedure": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "verdict": "Means 6.0 and 3.8, ranges 4-9 and 2-5 overlap, so the difference is a direction and not a proven result.",
+  "samples": [
+    "runs/2026-09-14-holdout-01.md",
+    "runs/2026-09-14-holdout-02.md",
+    "runs/2026-09-14-holdout-03.md",
+    "runs/2026-09-14-holdout-04.md",
+    "runs/2026-09-14-holdout-05.md",
+    "runs/2026-09-14-holdout-06.md",
+    "runs/2026-09-14-holdout-07.md",
+    "runs/2026-09-14-holdout-08.md",
+    "runs/2026-09-14-holdout-09.md",
+    "runs/2026-09-14-holdout-10.md"
+  ],
+  "key": "runs/2026-09-14-holdout-key.json",
+  "judge": "runs/2026-09-14-holdout-judge-r1.md"
+}

@@ -43,7 +43,7 @@ Give changed arithmetic and changed predicates the inputs a quick read misses: n
 
 A design smell finding has three different lines: the entry name from `references/smells.md`, the file:line, and the code there that meets the entry's Fires-when criterion. A smell costs future readers and future changes. Demanding a runtime consequence of it would therefore drop every real one or invent a consequence for it. The drop rule above still applies, so fill all three lines from the file or drop the finding.
 
-Add one line of fix direction when the fix isn't plain. Don't restate the code, because the author has the diff. Order findings by how much harm each one causes.
+When the fix isn't plain, add one sentence that says how to fix it. Don't restate the code, because the author has the diff. Order findings by how much harm each one causes.
 
 Leave off P1/P2 labels, because a severity label is a claim about impact. The reviewer has the diff, without the roadmap, the incident history, or what ships Thursday. A consequence sentence claims only what the traced path shows, but a severity label depends on information the reviewer never had.
 

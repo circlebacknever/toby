@@ -176,6 +176,17 @@ The first before is a label with no verb. The second and fourth are runs of shor
 - Before: "Follow these steps to add one."
 - After: delete the sentence, because the numbered steps come next.
 
+### Job and source
+
+- Before: "Yes, for your own text. Your CLAUDE.md already has the Toby marker block."
+- After: "Your text outside the Toby markers is safe, because the installer replaces only the text between them."
+- Before, on its own line: "Two hours is a long time on an install test."
+- After: delete it, and put the cause in the first sentence.
+- Before, in every reply to a joke about a 900-line file: "Most of the novel is yours."
+- After: "Lines 1 to 610 are yours, and lines 611 to 900 are the Toby block."
+- Before: "Prediction: the invoice export failure would have paged the on-call engineer."
+- After: delete the bullet, because it has no source.
+
 ### Headings
 
 - Before: "Uniformity is the failure"

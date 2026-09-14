@@ -399,6 +399,128 @@ examples from different files. Mark which kinds this reader would find grating.
 
 Reply with just the word "done".""",
     },
+    "holdout": {
+        "file": "suites/holdout.md",
+        "scorer": "manual",
+        "min_samples": 5,
+        "prompt": """Write six pieces of content as Toby, the way an agent with Toby installed would.
+
+Setup, follow it exactly:
+1. Read {repo}/base/toby.md in full. It is the operating guide every Toby session loads.
+2. Read {repo}/skills/toby-voice/SKILL.md and {repo}/skills/toby-voice/references/plain-language.md in full.
+3. Read {repo}/skills/toby-code-review/SKILL.md, which the review task routes to.
+4. Read {repo}/skills/toby-swd-docs/SKILL.md, which the README task routes to.
+5. Read {repo}/evals/suites/holdout.md for the six tasks. Use only the facts it gives.
+
+Write the six outputs to {repo}/evals/results/holdout-<run>.md, in this format and nothing else.
+Headings inside an output start at ###, one level below the task.
+
+## 1
+<the README top>
+
+## 2
+<the incident summary>
+
+## 3
+<the options section>
+
+## 4
+<the review finding>
+
+## 5
+<the changelog entry>
+
+## 6
+<five replies under `### Turn 1` to `### Turn 5`>
+
+No preamble, no summary, no notes. Reply with just the word "done".""",
+    },
+    "holdout-judge": {
+        "file": "suites/holdout.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """You are reading agent-written prose for one reader who gets distracted, and
+stops being able to work, when a sentence breaks the voice rules or grates. Find
+every such sentence. Do not rewrite anything and do not grade kindly.
+
+1. Read {repo}/base/toby.md and {repo}/skills/toby-voice/references/plain-language.md in full.
+2. Read {repo}/evals/suites/holdout.md for the tasks and facts.
+3. Read every file named `holdout-*.md` in {repo}/evals/results/. The file names say nothing about how each one was written.
+
+Apply the eight sentence tests in the guide to every sentence: literal, actor,
+connection, lookup, whole-sentence, direct, specific, and given-fact.
+
+This reader has also named these as grating:
+- Slogans: a run of short sentences with no connector, two sentences or two
+  bullets that mirror each other, a thing defined by one bare word, and a noun
+  phrase or label standing as a sentence, with or without a period.
+- Any verb used as a metaphor, including `carry`, `lives in`, `sits in`, `feeds`,
+  `falls through`, `rests on`, and `lands`, and any idiom.
+- A heading or slide title that makes a clever claim, a subtitle that restates
+  the title, and a bullet that restates the title.
+- A reply built as a punchy opener, a paragraph circling the topic, a bolded
+  reveal, and closing caveats.
+- Writing as if revealing something deep: aphorisms, stakes words, a build to a reveal.
+- Deferring the content: "yes, though not for the reason you think", "the one
+  that matters:", a setup sentence such as "One file causes this failure.", or
+  the method narrated before the finding.
+- Invented foils, litotes, candor words, and modifiers the noun already implies.
+- clean, fair, balanced, essential, perspective, ecosystem, load-bearing, and
+  `shape` for anything that is not geometry.
+- A sentence about the document, such as "Follow these steps".
+- Invented terms and jargon, a closing verdict or offer, and consecutive replies
+  that open or end on the same move.
+- Stating what a thing does not do when no reader assumed it did. In a README
+  overview, "a plugin never imports an engine" fails, even when the task gave it.
+- A claim of done or fixed about something that did not change, and a fact the
+  task did not give.
+- A claim about what the user was doing that the user never said, such as "Stop
+  searching the repo".
+- What would have happened, such as "each failure would have paged the on-call
+  engineer", with or without a "Prediction:" label.
+- A given fact placed in a document whose reader does not need it.
+
+Fail these predicted habits as well: a setup question such as "The result?", a
+meta opener such as "Let's break this down", a noun doing a verb's job such as
+"provides the ability to", meeting or marketing jargon such as "the ask" or
+"effortless", a rhythm device such as "not only X but also Y" or a triplet chosen
+for its sound, code given feelings such as "the compiler complains", a vague
+intensifier, a hedge stack such as "may potentially", scare quotes, and a
+comparison or analogy the reader has to translate back into the real thing.
+
+A first judge made these wrong calls, so do not repeat them. It passed "the
+failing runs land near midnight", "lives in", "the gates it feeds", and "falls
+through". It failed a PR bullet that opens on its verb, such as "Adds a test for
+the 429 path", and a commit subject with no article. Those two are correct.
+A second judge passed "reach a 429", "no cause to point at", and "Relay treats
+each model provider as a swappable engine" as borderline. Fail all three. A
+review finding written with the review skill's labels Consequence, Fires when,
+and Guard is the required format, so do not fail the label itself. Fail the text
+after a label when it is not a sentence.
+
+Write {repo}/evals/results/holdout-judge-<run>.md with these sections and nothing else.
+
+## Per file
+For each file: the count of distracting sentences, then each one quoted exactly,
+with its task number, its category from the list or the rules, and one line on
+why it grates. Where a file has none, say so.
+
+## Across files
+The categories ranked by how many sentences hit them, with counts.
+
+## Passed
+For each task number, quote five sentences you let through, from different files.
+Pick the ones closest to the line first, and mark each one borderline or plain
+pass with one line on why it passes. The reader checks this section for
+sentences you should have failed.
+
+## Sentence types
+The kinds of sentence these writers produce, from most to least common. For each
+kind, name it plainly, estimate its share of all sentences, and quote three real
+examples from different files. Mark which kinds this reader would find grating.
+
+Reply with just the word "done".""",
+    },
     "triggering": {
         "file": "suites/triggering.md",
         "scorer": "triggering",

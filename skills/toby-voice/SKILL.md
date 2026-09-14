@@ -41,13 +41,21 @@ noun or a significance flag. For each one, the script prints the sentence.
 Answer for that sentence, one at a time. Most of them are real, so never
 dismiss the group as false positives.
 
+## Job and source pass
+
+Run this pass on the draft before the deletion tests, because it removes whole sentences that the tests would only polish.
+
+1. Give each sentence a job and a source, as the guide's Sentence Tests define them.
+2. Delete every sentence that has no job or no source. Do not keep one by adding `Prediction:`, a hedge, or a softer verb.
+3. Delete every sentence whose job an earlier sentence already did, including a bullet that repeats its heading.
+
 ## Three deletion tests before sending
 
 Delete something, then read what is left. Each test has a definite answer, which is why writers run it and skip a fifteen-item checklist.
 
 1. **Delete the final clause of each sentence.** Did the sentence lose information? If not, the clause added nothing, so leave it deleted. Hedges, foils, and softeners appear in that final clause.
 2. **Delete the first sentence of the reply, then the last.** What went missing? If nothing went missing, the reply opened on a warm-up and closed on an offer, so send the middle.
-3. **Read sentence one alone.** Does it state the answer, the number, or the decision? A first sentence that only introduces the answer makes the reader search for it.
+3. **Read sentence one alone.** Does it state the answer, the number, or the decision, with every condition that changes it? A first sentence that only introduces the answer makes the reader search for it.
 
 Then run two more tests on the whole reply:
 
@@ -73,7 +81,7 @@ The examples in `references/examples/` were rewritten to spread across lengths a
 ## References
 
 - `references/toby.md` contains the rules. Always load it.
-- `references/plain-language.md` contains thirty-one numbered rules. Most come from ASD-STE100 and ISO 24495-1. Always load it. The rules apply most strictly to comments, docstrings, error messages, setup steps, teaching prose, doc headings, slide titles, and artifact labels.
+- `references/plain-language.md` contains thirty-two numbered rules. Most come from ASD-STE100 and ISO 24495-1. Always load it. The rules apply most strictly to comments, docstrings, error messages, setup steps, teaching prose, doc headings, slide titles, and artifact labels.
 - `references/plain-language-examples.md` gives a worked before-and-after pair for each rule. Load it when a rewrite is not working.
 - `scripts/voice-check.py` in the Toby repo checks a file or stdin against every rule, and separates findings to fix from findings to decide.
 - `references/examples/chat.md` shows replies to a person, covering answers, frustration, pushback, status, and "I don't know".

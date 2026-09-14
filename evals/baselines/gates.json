@@ -106,6 +106,7 @@
     "accretion becoming a grab bag",
     "across components all owned inside one library that s deep by design",
     "act like a guest",
+    "add one line of fix direction when it isn t plain",
     "add placeholders left in a production path at file line and what you found and left alone one line each handed to the skill that owns it",
     "adding an optional parameter with a default to an exported function is contact",
     "adding any of them here would put this skill at odds with the skills that wrote the code in the first place",
@@ -1104,11 +1105,11 @@
   "coload_tokens": {
     "feature-change": 18789,
     "feature-dev": 10169,
-    "review": 4850
+    "review": 4853
   },
   "skill_tokens": {
     "toby-artifact-style": 5289,
-    "toby-code-review": 2961,
+    "toby-code-review": 2964,
     "toby-explain": 1468,
     "toby-feature-dev": 5786,
     "toby-game": 1053,
@@ -1124,7 +1125,7 @@
     "toby-swd-modules": 3703,
     "toby-swd-strategy": 1846,
     "toby-swd-testing": 2537,
-    "toby-voice": 1506
+    "toby-voice": 1633
   },
   "warning_classes": {
     "banned word": 0,

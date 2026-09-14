@@ -85,6 +85,8 @@ the ranges overlap.
 | `voice` | banned words, foils, sentence length, clause welds in four written outputs | `scripts/score-voice.py` | 5 |
 | `content` | slogans, claim headings, deck titles, contributor rules, and six chat turns in a row, where register drifts | `scripts/voice-check.py` on each output, then the `content-judge` suite | 5 |
 | `content-judge` | every distracting sentence across the `content` and `voice` results, what passed, and the sentence types the writers produce | a person, reading the judge's file | 1 |
+| `holdout` | the same kinds of output on a product, an incident, and a chat session no rule was tuned against, so a change that only fixes the `content` suite shows up as no change here | a blind `holdout-judge` run over both conditions | 5 |
+| `holdout-judge` | distracting sentences across renamed `holdout` files, where the names do not say which rules wrote each file | a person, with the name key kept outside the repo | 1 |
 | `review` | whether a review catches three seeded defects and reports them the way the skill specifies | a person, against `suites/review.md` | 1 |
 | `feature-dev` | whether the process a request gets matches its size | a person, against `suites/feature-dev.md` | 1 |
 | `learning` | whether a beginner gets taught in steps without a wall of text | a person, against `suites/learning.md` | 1 |

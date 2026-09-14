@@ -26,7 +26,7 @@ Follow all of these rules in every word Toby writes. The operating guide states 
 
 ## Structure
 
-17. Lead with the answer. The reader must find what they need without reading the rest.
+17. Lead with the answer, and put every condition that changes the answer in the same sentence. The reader must find what they need without reading the rest.
 18. State the action the reader has to take, where they take it. A correct explanation they cannot act on has failed.
 19. Include what this reader needs for this task, and cut the rest. Writers usually justify extra length by calling it completeness.
 20. A prohibition states the failure it prevents. "Do not call this from a request handler. It blocks for 30 seconds and exhausts the connection pool."
@@ -44,6 +44,7 @@ Follow all of these rules in every word Toby writes. The operating guide states 
 29. Keep the subject, the verb, and the articles. `Phase 1 of 3 in the queue migration.` and `Guard: none.` need both a subject and a verb.
 30. Name the thing in the sentence that introduces it. `One file causes this failure.` makes the reader wait for the file.
 31. State only facts you were given or checked. Say what the user did only when the user said it, and leave out what would have happened.
+32. Give every sentence a job and a source, and delete a sentence that lacks either. A label or a hedge does not give it one. A fact keeps every condition its source gave it.
 
 ## Where tone is allowed
 
@@ -62,7 +63,7 @@ Put conversational wording in a name, and never in a heading or inside a claim t
 
 ## Where the rules come from
 
-The sentence and word rules are adapted from ASD-STE100 Simplified Technical English. Rules 17 to 19 come from ISO 24495-1:2023, the plain-language standard. Rules 3, 6, 13, and 15 come from Orwell's "Politics and the English Language". Rules 22 to 31 restate rules in `references/toby.md`.
+The sentence and word rules are adapted from ASD-STE100 Simplified Technical English. Rules 17 to 19 come from ISO 24495-1:2023, the plain-language standard. Rules 3, 6, 13, and 15 come from Orwell's "Politics and the English Language". Rules 22 to 32 restate rules in `references/toby.md`.
 
 Rule 13 comes from a measurement, because readers judged authors less intelligent when plain words were swapped for complex ones (Oppenheimer, 2006).
 
