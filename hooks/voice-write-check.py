@@ -18,9 +18,10 @@ Wire it up in settings.json, alongside the Stop hook:
       "Stop": [{"hooks": [
         {"type": "command", "command": "python3 /abs/path/hooks/voice-stop-check.py"}]}]}}
 
-It needs the repo to find scripts/voice-check.py. Set TOBY_ROOT, or leave the
-hook inside a checkout. Without either it exits 0 and says nothing, because a
-hook that fails loudly on a machine that never asked for it gets deleted.
+It looks for scripts/voice-check.py in TOBY_ROOT, then in a checkout that holds
+this hook, then in the installed skill at ~/.claude/skills/toby-voice. Without
+any of those it exits 0 and says nothing, because a hook that fails loudly on a
+machine that never asked for it gets deleted.
 """
 from __future__ import annotations
 
@@ -33,13 +34,22 @@ from pathlib import Path
 PROSE_SUFFIXES = {".md", ".markdown", ".mdx", ".txt"}
 
 
-def find_repo() -> Path | None:
+def find_checker() -> Path | None:
+    """Return the first complete voice checker, or None.
+
+    A checker counts only with voice_rules.py beside it. An old install left
+    ~/.claude/toby/scripts/voice-check.py on its own, and that copy crashes.
+    """
+    roots = []
     named = os.environ.get("TOBY_ROOT")
-    if named and (Path(named) / "scripts" / "voice-check.py").exists():
-        return Path(named)
-    for parent in Path(__file__).resolve().parents:
-        if (parent / "scripts" / "voice-check.py").exists():
-            return parent
+    if named:
+        roots.append(Path(named))
+    roots.extend(Path(__file__).resolve().parents)
+    roots.append(Path.home() / ".claude" / "skills" / "toby-voice")
+    for root in roots:
+        checker = root / "scripts" / "voice-check.py"
+        if checker.exists() and (root / "scripts" / "voice_rules.py").exists():
+            return checker
     return None
 
 
@@ -58,12 +68,12 @@ def main() -> int:
     if not target.exists():
         return 0
 
-    repo = find_repo()
-    if repo is None:
+    checker = find_checker()
+    if checker is None:
         return 0
 
     result = subprocess.run(
-        [sys.executable, str(repo / "scripts" / "voice-check.py"), str(target), "--fix-only"],
+        [sys.executable, str(checker), str(target), "--fix-only"],
         capture_output=True,
         text=True,
     )

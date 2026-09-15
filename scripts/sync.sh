@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Propagate base/toby.md — the source of truth — into the five in-repo copies:
-# the toby-voice reference and the four tool instruction files. Editors that
-# fuzzy-find "toby.md" happily open the wrong one, so edit base and run this to
-# make base win everywhere. install.sh ships these copies to $HOME; this only
-# touches the repo.
+# Propagate base/toby.md, the source of truth, into its in-repo copies. These are
+# the toby-voice reference, the output style, and the tool instruction files.
+# It also copies scripts/voice-check.py and scripts/voice_rules.py into the
+# toby-voice skill, so every installed copy of that skill includes the checker.
+# Editors that fuzzy-find "toby.md" open the wrong one, so edit base and run
+# this to make base win everywhere. install.sh ships these copies to $HOME, and
+# this script only touches the repo.
 #
 # Usage:
 #   scripts/sync.sh            write the copies from base
@@ -143,6 +145,19 @@ def apply(target: Path, new_text: str) -> None:
 
 for target in raw_targets:
     apply(target, body)
+
+# Every tool installs a skill by copying its folder, so each tool gets the
+# checker at <skills dir>/toby-voice/scripts/voice-check.py. The copy of
+# voice_rules.py there reads the guide from references/toby.md.
+for name in ("voice-check.py", "voice_rules.py"):
+    source = root / "scripts" / name
+    target = root / "skills" / "toby-voice" / "scripts" / name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if not target.exists():
+        target.write_text("")
+    apply(target, source.read_text())
+    if mode == "write":
+        target.chmod(source.stat().st_mode & 0o777)
 
 for target, text in generated_targets:
     target.parent.mkdir(parents=True, exist_ok=True)

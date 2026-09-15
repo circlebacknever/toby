@@ -35,6 +35,10 @@ scripts/install.sh --tool all                    # install for every tool
 scripts/install.sh --tool all --force            # replace Toby files already there
 ```
 
+The installer checks every target before it writes anything. If a Toby skill
+folder already exists, or an instruction file has no Toby marker block, it lists
+each one and stops with nothing changed. A dry run lists the same files.
+
 One tool at a time:
 
 ```sh
@@ -46,23 +50,24 @@ scripts/install.sh --tool kiro
 
 ### The voice checker and the hooks
 
-The skills and instructions install on their own. The checker and the two hooks
-are a separate flag, because they need files the skills do not.
+The voice checker installs with the `toby-voice` skill, for every tool. It runs
+from any directory:
+
+```sh
+python3 ~/.codex/skills/toby-voice/scripts/voice-check.py draft.md
+python3 ~/.claude/skills/toby-voice/scripts/voice-check.py draft.md
+python3 ~/.copilot/skills/toby-voice/scripts/voice-check.py draft.md
+```
+
+The two hooks are Claude Code only, so they have their own flag:
 
 ```sh
 scripts/install.sh --hooks --tool claude
 ```
 
-That copies the checker, both hooks, and `base/toby.md` to `~/.claude/toby`, then
-prints the `settings.json` block to paste, with the paths already filled in. It
-does not edit `settings.json` itself. Merge the block with any hooks already
-there.
-
-Once installed, the checker runs from anywhere:
-
-```sh
-~/.claude/toby/scripts/voice-check.py draft.md
-```
+That copies both hooks to `~/.claude/toby/hooks`, then prints the `settings.json`
+block to paste, with the paths already filled in. It does not edit
+`settings.json` itself. Merge the block with any hooks already there.
 
 The agent runs it on its own. The operating guide's Self Review says to run it on
 every prose file a turn wrote, fix everything under FIX, and answer every line

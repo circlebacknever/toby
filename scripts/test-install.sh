@@ -6,6 +6,13 @@
 # Counting files only proves something arrived. These checks compare content, so
 # a truncated copy or a stale instruction block fails here instead of on a user's
 # machine.
+
+# `sh scripts/test-install.sh` runs this file under a shell that lacks [[ and
+# process substitution, so start again under bash.
+# On macOS, sh is bash in POSIX mode, which sets BASH_VERSION too.
+case "${BASH_VERSION:-}:${SHELLOPTS:-}" in
+  :*|*posix*) exec bash "$0" "$@" ;;
+esac
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -77,7 +84,7 @@ while IFS='|' read -r label skills_rel instr_rel; do
 
   # Every installed skill must be byte-identical to the repo copy.
   # The installer strips .DS_Store, so a Finder copy in the repo is not a difference.
-  if [[ -d "$dir" ]] && diff -r -x .DS_Store "$ROOT/skills" "$dir" >/dev/null 2>&1; then
+  if [[ -d "$dir" ]] && diff -r -x .DS_Store -x __pycache__ "$ROOT/skills" "$dir" >/dev/null 2>&1; then
     pass "$label" "skill contents match the repo"
   else
     flunk "$label" "installed skills differ from $ROOT/skills"
@@ -109,6 +116,35 @@ else
   pass total "$EXPECTED_TOTAL skill files across $TOOL_COUNT tools"
 fi
 
+# Each tool runs the checker from its own installed toby-voice skill, from a
+# directory outside the repo, with no TOBY_ROOT. A skill that tells the agent to
+# run scripts/voice-check.py fails when the skill folder has no such file.
+PROBE="$TMP_ROOT/probe.md"
+CLEAN="$TMP_ROOT/clean.md"
+printf 'This uses a robust approach.\n' > "$PROBE"
+printf 'The job retries twice.\n' > "$CLEAN"
+
+while IFS='|' read -r label skills_rel instr_rel; do
+  checker="$FRESH/$skills_rel/toby-voice/scripts/voice-check.py"
+  if [[ ! -f "$checker" ]]; then
+    flunk "$label" "the toby-voice skill has no scripts/voice-check.py"
+  elif ! (cd "$TMP_ROOT" && env -u TOBY_ROOT python3 "$checker" "$CLEAN" --fix-only >/dev/null 2>&1); then
+    flunk "$label" "the installed checker fails on a clean file"
+  # The checker exits 1 when it finds a problem, and pipefail would carry that
+  # exit through a pipe into grep, so read the output first.
+  elif checker_out="$(cd "$TMP_ROOT" && env -u TOBY_ROOT python3 "$checker" "$PROBE" --fix-only 2>&1)"; [[ "$checker_out" == *"banned word 'robust'"* ]]; then
+    pass "$label" "checker runs from the skill folder and catches a banned word"
+  else
+    flunk "$label" "the installed checker missed a banned word"
+  fi
+done < <(tool_rows)
+
+if find "$FRESH" -name __pycache__ | grep -q .; then
+  flunk total "running the checker left __pycache__ in an installed skill"
+else
+  pass total "running the checker left the skill folders unchanged"
+fi
+
 # --- 2. re-install without --force must refuse -------------------------------
 # README promises an existing toby-* stays put unless forced. Untested, that
 # promise is the one that quietly overwrites someone's work.
@@ -117,6 +153,37 @@ if install_into "$FRESH" --tool claude >/dev/null 2>&1; then
   flunk safety "re-install without --force overwrote existing skills"
 else
   pass safety "re-install without --force refuses"
+fi
+
+# A conflict in one tool must stop the install for every tool before anything is
+# written, and the message must list every conflicting file.
+PARTIAL="$TMP_ROOT/partial"
+mkdir -p "$PARTIAL/.claude/skills/toby-voice" "$PARTIAL/.codex"
+printf 'hand edit\n' > "$PARTIAL/.claude/skills/toby-voice/SKILL.md"
+printf 'user notes, no toby marker\n' > "$PARTIAL/.codex/AGENTS.md"
+
+status=0
+out="$(install_into "$PARTIAL" --tool all 2>&1)" || status=$?
+if [[ "$status" -eq 0 ]]; then
+  flunk safety "install with conflicts exited 0"
+elif [[ -e "$PARTIAL/.codex/skills" || -e "$PARTIAL/.copilot" || -e "$PARTIAL/.kiro" ]]; then
+  flunk safety "install with conflicts wrote files before it stopped"
+elif [[ "$(cat "$PARTIAL/.claude/skills/toby-voice/SKILL.md")" != "hand edit" ]]; then
+  flunk safety "install with conflicts replaced an existing skill"
+elif ! grep -q "skills/toby-voice" <<<"$out" || ! grep -q ".codex/AGENTS.md" <<<"$out"; then
+  flunk safety "the refusal did not list every conflicting file"
+else
+  pass safety "conflicts stop every tool, are all listed, and nothing is written"
+fi
+
+status=0
+out="$(install_into "$PARTIAL" --tool all --dry-run 2>&1)" || status=$?
+if [[ "$status" -ne 0 ]]; then
+  flunk dry-run "exits $status when there are conflicts, want 0"
+elif ! grep -q "skill directory already exists: .*skills/toby-voice" <<<"$out"; then
+  flunk dry-run "does not list the conflicting files"
+else
+  pass dry-run "lists the conflicting files and exits 0"
 fi
 
 # --- 3. surrounding text in an instruction file survives ----------------------
@@ -202,28 +269,26 @@ else
   pass claude "output style matches the repo"
 fi
 
-# --hooks ships the checker and both hooks, and they must run from there with no
-# checkout present and no environment variable set.
+# --hooks ships both hooks. The write hook must find the checker in the installed
+# toby-voice skill with no checkout and no TOBY_ROOT. An old install left a lone
+# voice-check.py in ~/.claude/toby/scripts, and the hook must skip that copy.
 HOOK_HOME="$TMP_ROOT/hooks"
+mkdir -p "$HOOK_HOME/.claude/toby/scripts"
+printf 'import validate_skills\n' > "$HOOK_HOME/.claude/toby/scripts/voice-check.py"
 install_into "$HOOK_HOME" --tool claude --hooks >/dev/null 2>&1
 KIT="$HOOK_HOME/.claude/toby"
-PROBE="$TMP_ROOT/probe.md"
-printf 'This uses a robust approach.\n' > "$PROBE"
-if [[ ! -f "$KIT/scripts/voice-check.py" || ! -f "$KIT/hooks/voice-write-check.py" ]]; then
-  flunk hooks "--hooks did not install the checker and the hooks"
-elif [[ ! -f "$KIT/base/toby.md" ]]; then
-  flunk hooks "--hooks did not install base/toby.md, so the banned list is missing"
-elif python3 "$KIT/scripts/voice-check.py" "$PROBE" --fix-only >/dev/null 2>&1; then
-  flunk hooks "the installed checker missed a banned word"
+if [[ -f "$KIT/hooks/voice-write-check.py" && -f "$KIT/hooks/voice-stop-check.py" ]]; then
+  pass hooks "--hooks installed both hooks"
 else
-  pass hooks "installed checker runs standalone and catches a banned word"
+  flunk hooks "--hooks did not install both hooks"
 fi
 
 PAYLOAD="{\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$PROBE\"}}"
-if printf '%s' "$PAYLOAD" | python3 "$KIT/hooks/voice-write-check.py" >/dev/null 2>&1; then
-  flunk hooks "the installed write hook did not flag a banned word"
+hook_out="$(cd "$TMP_ROOT" && printf '%s' "$PAYLOAD" | HOME="$HOOK_HOME" env -u TOBY_ROOT python3 "$KIT/hooks/voice-write-check.py" 2>&1)" || true
+if grep -q "banned word 'robust'" <<<"$hook_out"; then
+  pass hooks "write hook runs the skill's checker and skips the old lone copy"
 else
-  pass hooks "installed write hook runs with no checkout and no TOBY_ROOT"
+  flunk hooks "the installed write hook did not flag a banned word"
 fi
 
 if [[ "$fail" -ne 0 ]]; then

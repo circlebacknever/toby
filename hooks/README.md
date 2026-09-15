@@ -54,11 +54,12 @@ Both exit 2 on a break, which puts the findings in front of the agent. Neither
 blocks: `PostToolUse` fires after the write, and `Stop` fires after the reply.
 Feedback while the work is still in hand is what they buy.
 
-The write hook needs to find `scripts/voice-check.py`. Installed by `--hooks` it
-finds it next door in `~/.claude/toby`, so nothing needs setting. Running from a
-checkout works the same way. Anywhere else, set `TOBY_ROOT`. With none of those
-it exits 0 and says nothing, because a hook that fails loudly on a machine that
-never asked for it gets deleted.
+The write hook needs `scripts/voice-check.py`. It looks in `TOBY_ROOT`, then in
+a checkout that holds the hook, then in the installed skill at
+`~/.claude/skills/toby-voice`. Installing with `--tool claude` puts the checker
+there, so nothing needs setting. With none of those it exits 0 and says nothing,
+because a hook that fails loudly on a machine that never asked for it gets
+deleted.
 
 ## What each one costs you
 

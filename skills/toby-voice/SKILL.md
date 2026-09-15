@@ -24,14 +24,16 @@ Keep following this skill for the rest of the session once it loads. It applies 
 
 ## Run the voice checker
 
-`scripts/voice-check.py` checks a file, a directory, or stdin against every
-rule this repo has. Do not write your own grep for voice rules. A grep written
-fresh each time finds a different subset of problems each time, so run the
-script.
+This skill's folder holds `scripts/voice-check.py`, which checks a file, a
+directory, or stdin against every voice rule. The folder is the one that holds
+this SKILL.md, such as `~/.codex/skills/toby-voice`,
+`~/.claude/skills/toby-voice`, or `~/.copilot/skills/toby-voice`. Do not write
+your own grep for voice rules. A grep written fresh each time finds a different
+subset of problems each time, so run the script.
 
 ```sh
-scripts/voice-check.py draft.md
-some-command | scripts/voice-check.py -
+python3 <skill folder>/scripts/voice-check.py draft.md
+some-command | python3 <skill folder>/scripts/voice-check.py -
 ```
 
 It sorts its findings into two groups. **FIX** lists findings from rules that
@@ -83,7 +85,7 @@ The examples in `references/examples/` were rewritten to spread across lengths a
 - `references/toby.md` contains the rules. Always load it.
 - `references/plain-language.md` contains thirty-two numbered rules. Most come from ASD-STE100 and ISO 24495-1. Always load it. The rules apply most strictly to comments, docstrings, error messages, setup steps, teaching prose, doc headings, slide titles, and artifact labels.
 - `references/plain-language-examples.md` gives a worked before-and-after pair for each rule. Load it when a rewrite is not working.
-- `scripts/voice-check.py` in the Toby repo checks a file or stdin against every rule, and separates findings to fix from findings to decide.
+- `scripts/voice-check.py` in this skill's folder checks a file or stdin against every rule, and separates findings to fix from findings to decide.
 - `references/examples/chat.md` shows replies to a person, covering answers, frustration, pushback, status, and "I don't know".
 - `references/examples/code.md` shows findings on code, architecture, naming, tests, and performance.
 - `references/examples/artifacts.md` shows commits, PR descriptions, doc headings, identifiers, and error messages.

@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# `sh scripts/install.sh` runs this file under a shell that lacks [[ and
+# pipefail, so start again under bash.
+# On macOS, sh is bash in POSIX mode, which sets BASH_VERSION too.
+case "${BASH_VERSION:-}:${SHELLOPTS:-}" in
+  :*|*posix*) exec bash "$0" "$@" ;;
+esac
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -12,9 +18,11 @@ usage() {
   printf 'Usage: %s [--tool codex|claude|copilot|github|kiro|all] [--output-style] [--dry-run] [--force]\n' "$0"
   printf '       github is an alias for copilot (GitHub Copilot CLI, ~/.copilot).\n'
   printf '\n'
-  printf '  --hooks         Install the voice checker and the two hooks to\n'
-  printf '                  ~/.claude/toby, then print the settings.json block to\n'
-  printf '                  paste. Does not edit settings.json itself.\n'
+  printf '  --hooks         Claude Code only. Install the two voice hooks to\n'
+  printf '                  ~/.claude/toby/hooks, then print the settings.json block\n'
+  printf '                  to paste. Does not edit settings.json itself.\n'
+  printf '  --force         Replace Toby skill directories that already exist, and\n'
+  printf '                  add the Toby block to instruction files that have none.\n'
   printf '  --output-style  Claude Code only. Install the writing rules as an output\n'
   printf '                  style, and install the shorter CLAUDE.md that leaves them\n'
   printf '                  out. Costs about 200 tokens more than the default, and\n'
@@ -91,38 +99,35 @@ install_skills() {
     name="$(basename "$skill")"
     local target="$dest/$name"
 
-    if [[ -e "$target" && "$FORCE" -ne 1 ]]; then
-      printf 'Refusing to replace existing skill directory: %s\n' "$target" >&2
-      printf 'Pass --force to replace Toby skill directories.\n' >&2
-      exit 1
-    fi
-
     if [[ -e "$target" ]]; then
       run rm -rf "$target"
     fi
     run cp -R "$skill" "$target"
-    # Finder drops .DS_Store into any folder it opens. Keep it out of the install.
-    run find "$target" -name .DS_Store -delete
+    # Finder drops .DS_Store into any folder it opens, and Python can leave
+    # __pycache__ behind. Keep both out of the install.
+    run find "$target" \( -name .DS_Store -o -name __pycache__ \) -prune -exec rm -rf {} +
   done
 }
 
 install_hooks() {
-  # The checker, the two hooks, and the two files the checker reads: voice_rules.py
-  # and base/toby.md, which holds the banned-word list.
+  # The hooks only. The write hook runs the checker from the installed
+  # toby-voice skill, so the checker is not copied here.
   local kit="$HOME/.claude/toby"
-  run mkdir -p "$kit/scripts" "$kit/base" "$kit/hooks"
+  local checker="$HOME/.claude/skills/toby-voice/scripts/voice-check.py"
+  run mkdir -p "$kit/hooks"
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    printf '[dry-run] install the voice checker and hooks to %s\n' "$kit"
+    printf '[dry-run] install the voice hooks to %s/hooks\n' "$kit"
     return
   fi
-  run cp "$ROOT/scripts/voice_rules.py" "$kit/scripts/"
-  run cp "$ROOT/scripts/voice-check.py" "$kit/scripts/"
-  run cp "$ROOT/base/toby.md" "$kit/base/"
   run cp "$ROOT/hooks/voice-stop-check.py" "$kit/hooks/"
   run cp "$ROOT/hooks/voice-write-check.py" "$kit/hooks/"
 
-  printf '\nvoice checker installed:\n'
-  printf '  %s/scripts/voice-check.py\n\n' "$kit"
+  printf '\nvoice hooks installed to %s/hooks\n' "$kit"
+  if [[ ! -f "$checker" ]]; then
+    printf 'The write hook needs %s.\n' "$checker"
+    printf 'Run this installer with --tool claude to install it.\n'
+  fi
+  printf '\n'
   printf 'To run the hooks as well, add this to %s/.claude/settings.json:\n\n' "$HOME"
   cat <<JSON
 {
@@ -252,6 +257,61 @@ install_kiro() {
   install_skills "$HOME/.kiro/skills"
   install_instruction_file "$ROOT/instructions/kiro/toby-instructions.md" "$HOME/.kiro/steering/toby-instructions.md" dedicated
 }
+
+tool_selected() {
+  [[ "$TOOL" == "all" || "$TOOL" == "$1" ]]
+}
+
+# Check every target before writing anything. A refusal partway through an
+# install leaves some tools updated and others stale, so report every conflict
+# at once and stop while nothing has changed.
+CONFLICTS=""
+
+check_skills() {
+  local dest="$1" skill target
+  for skill in "$ROOT"/skills/toby-*; do
+    [[ -d "$skill" ]] || continue
+    target="$dest/$(basename "$skill")"
+    if [[ -e "$target" ]]; then
+      CONFLICTS+="  skill directory already exists: $target"$'\n'
+    fi
+  done
+}
+
+check_instructions() {
+  local target="$1"
+  if [[ -f "$target" ]] && ! grep -q '<!-- BEGIN TOBY INSTRUCTIONS -->' "$target"; then
+    CONFLICTS+="  instruction file has no Toby marker block: $target"$'\n'
+  fi
+}
+
+if tool_selected codex; then
+  check_skills "${CODEX_HOME:-$HOME/.codex}/skills"
+  check_instructions "${CODEX_HOME:-$HOME/.codex}/AGENTS.md"
+fi
+if tool_selected claude; then
+  check_skills "$HOME/.claude/skills"
+  check_instructions "$HOME/.claude/CLAUDE.md"
+fi
+if tool_selected copilot; then
+  check_skills "$HOME/.copilot/skills"
+  check_instructions "$HOME/.copilot/copilot-instructions.md"
+fi
+if tool_selected kiro; then
+  check_skills "$HOME/.kiro/skills"
+  check_instructions "$HOME/.kiro/steering/toby-instructions.md"
+fi
+
+if [[ -n "$CONFLICTS" && "$FORCE" -ne 1 ]]; then
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    printf '[dry-run] A real run would stop before writing anything, because of these files:\n%s' "$CONFLICTS"
+    printf '[dry-run] Pass --force to replace the skill directories and add the Toby block to those files.\n'
+    exit 0
+  fi
+  printf 'Nothing was installed, because of these files:\n%s' "$CONFLICTS" >&2
+  printf 'Pass --force to replace the skill directories and add the Toby block to those files.\n' >&2
+  exit 1
+fi
 
 if [[ "$TOOL" == "all" || "$TOOL" == "codex" ]]; then
   install_codex
