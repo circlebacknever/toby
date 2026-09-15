@@ -6,32 +6,31 @@ Reuse the structure and the scope decisions in your own modules. The examples co
 
 ## Example 1 — Backend: a payments service AGENTS.md
 
-Scope decision: `services/payments/` is a meaningful module that owns a real body of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` does not get its own, and its content moves up into this file.
+Scope decision: `services/payments/` is a meaningful module with its own body of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` does not get its own, so its content moves up into this file.
 
 ```markdown
 # Payments
 
 ## What this is
-Turns an authorized cart into a settled charge and a ledger entry. Owns the
-money path; nothing else in the system is allowed to move funds.
+This module turns an authorized cart into a settled charge and a ledger entry. It is the only
+part of the system that is allowed to move funds.
 
 ## Files
-- gateway.py — the Gateway interface and its provider implementations. Owns
-  "how we talk to an external processor."
-- ledger.py — append-only double-entry ledger. Owns "what we believe we are
-  owed and have collected."
-- reconcile.py — matches processor settlement reports against the ledger.
+- `gateway.py` defines the Gateway interface and its provider implementations.
+- `ledger.py` stores the append-only double-entry ledger of what the business is owed and
+  has collected.
+- `reconcile.py` matches processor settlement reports against the ledger.
 
-## Constraints that force non-obvious design
-- Charges must be idempotent per (order_id, attempt). The retry key threading
-  through gateway.py looks redundant; it is required because the processor may
+## Constraints
+- Charges must be idempotent per (order_id, attempt). The retry key passed
+  through gateway.py looks redundant, but it is required because the processor may
   succeed and then time out our connection. Removing it reintroduces double
   charges.
 - We may not store PAN data (PCI). That is why card data is exchanged for a
   token at the edge and only the token reaches this module.
 
 ## Cross-module decisions
-- "Settlement ordering": the ledger is the source of truth; the processor
+- "Settlement ordering": the ledger is the source of truth. The processor
   webhook is advisory and may arrive out of order. Billing and
   analytics consume the ledger. Affected sites contain
   `// see "Settlement ordering" in AGENTS.md`.
@@ -39,7 +38,7 @@ money path; nothing else in the system is allowed to move funds.
 ## Extension rules
 - A new processor is a new Gateway implementation plus a config entry.
   Existing gateway code stays untouched.
-- The ledger is append-only. Corrections are compensating entries. Code that
+- The ledger is append-only, so corrections are compensating entries. Code that
   mutates a posted entry is a bug.
 ```
 
@@ -54,9 +53,9 @@ This README.md covers the same payments module for a developer who calls the ser
 ```markdown
 # Payments Service
 
-Processes charges and maintains the ledger of what has been collected. You
+This service processes charges and maintains the ledger of what has been collected. You
 interact with this service to authorize a cart, capture a payment, and issue
-refunds. It owns the money path; other services do not move funds directly.
+refunds. It is the only service that moves funds directly.
 
 ## Quick start
 
@@ -67,28 +66,28 @@ gateway = Gateway.from_config()
 result = gateway.charge(PaymentRequest(
     order_id="ord_123",
     amount_cents=4999,
-    token="tok_abc",         # card token from the payments edge
+    token="tok_abc",         # The card token comes from the payments edge.
     idempotency_key="ord_123_attempt_1"
 ))
 if result.settled:
-    # proceed
+    # The charge settled, so proceed here.
 ```
 
 ## Concepts
 
 - **Token**: card data is exchanged for a token at the edge before it
   reaches this service. Raw card numbers are never handled here.
-- **Idempotency key**: the same (order_id, attempt) combination will return the
-  same result even if the call is retried. Always supply one; the service will
+- **Idempotency key**: a call with the same (order_id, attempt) combination will return the
+  same result even if the call is retried. Always supply one, because the service will
   reject requests without it.
-- **Ledger as source of truth**: the ledger reflects settled charges; webhooks
+- **Ledger as source of truth**: the ledger records settled charges. Webhooks
   from the processor are advisory and arrive out of order. Query the ledger
   for settlement status.
 
 ## Public API
 
 `Gateway.charge(req)` — authorize and capture a single payment.
-`Gateway.refund(charge_id, amount_cents)` — partial or full refund.
+`Gateway.refund(charge_id, amount_cents)` — issue a partial or full refund.
 `Ledger.entries_for_order(order_id)` — returns all ledger entries for an order.
 
 Full signatures and behavior are in the interface comments in `gateway.py`.
@@ -102,8 +101,8 @@ Full signatures and behavior are in the interface comments in `gateway.py`.
   attempt will return the original failure.
 ```
 
-The README references the interface comments in `gateway.py` and lets the
-single copy there stay authoritative. AGENTS.md explains the implementation
+The README references the interface comments in `gateway.py`, so the
+single copy there stays authoritative. AGENTS.md explains the implementation
 details, such as why idempotency is required and how the ledger works. The
 README covers only what a caller needs.
 
@@ -117,15 +116,16 @@ Scope decision: `features/checkout/` is a feature module, so it gets one AGENTS.
 # Checkout (feature)
 
 ## What this is
-The multi-step checkout flow. Owns flow state and the order of steps; delegates
+This module is the multi-step checkout flow. It manages flow state and the order of steps, and it delegates
 payment to the payments service and address validation to the address package.
 
 ## Files
-- machine.ts — the step state machine. Owns "what step the user is on and what
-  transitions are legal."
-- CheckoutProvider.tsx — supplies flow state via context. Owns the shared
-  contract between steps.
-- steps/ — one component per step; each renders, none owns flow control.
+- `machine.ts` defines the step state machine, which tracks the current step and the legal
+  transitions.
+- `CheckoutProvider.tsx` supplies flow state through context and defines the contract that
+  steps share.
+- `steps/` contains one component per step. A step component renders its step, and
+  `machine.ts` handles flow control.
 
 ## Constraints
 - Tax cannot be shown until an address is validated (legal requirement in two
@@ -134,9 +134,9 @@ payment to the payments service and address validation to the address package.
 
 ## Cross-module decisions
 - "Checkout context shape": steps read flow state only from CheckoutProvider.
-  Nothing in this feature reads it via props drilled from the page. The shape
+  Code in this feature does not read it via props drilled from the page. The context type
   is defined and commented at
-  CheckoutProvider; this is the central note. Step files contain
+  CheckoutProvider. This section is the central note. Step files contain
   `// see "Checkout context shape" in AGENTS.md`.
 
 ## Extension rules
@@ -154,7 +154,7 @@ This module's README.md is minimal because its readers already work in the codeb
 ```markdown
 # Checkout Feature
 
-The multi-step checkout flow: cart → address → payment → review → confirmation.
+This feature is the multi-step checkout flow: cart → address → payment → review → confirmation.
 
 ## How it works
 
@@ -176,16 +176,16 @@ export function CheckoutPage() {
 ## Concept: step isolation
 
 Each step component renders its own content and fires transitions via
-`useCheckoutMachine()`. Steps do not know about each other. Adding a new step
+`useCheckoutMachine()`. Steps do not depend on each other. Adding a new step
 means a new component in `steps/` and a new transition in `machine.ts`.
 Existing steps stay unchanged.
 
 ## Known constraints
 
 - Tax display is blocked until address validation completes. This is a legal
-  requirement. Don't try to work around it.
+  requirement, so don't try to work around it.
 - Flow state is in `CheckoutProvider`. Do not lift it to a parent or store
-  it externally — the machine enforces valid transitions and bypassing it
+  it externally. The machine enforces valid transitions, so bypassing it
   produces inconsistent UI state.
 ```
 

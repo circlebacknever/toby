@@ -1,6 +1,6 @@
 # Worked Examples — Mobile (React Native, with notes for native)
 
-Mobile apps face complexity that web apps don't see. The network drops,
+Mobile apps have sources of complexity that web apps do not have. The network drops,
 the device backgrounds, and the user has 8MB of RAM left and a 6-year-old
 phone. The ladders still apply.
 
@@ -8,7 +8,7 @@ phone. The ladders still apply.
 
 ## Example 1 — Offline state: mask at the network layer
 
-A common growth pattern:
+Many apps repeat this pattern on each screen:
 
 ```tsx
 // FeedScreen.tsx
@@ -34,7 +34,7 @@ Every screen reimplements the same offline/timeout/unknown-error handling.
 Worse, the user experience is inconsistent. One screen says "appear to be
 offline," another says "no connection," and a third just shows "Error."
 
-Move the network error handling down to the API layer where it belongs.
+Move the network error handling down to the API layer.
 
 ```ts
 // api/client.ts
@@ -64,14 +64,14 @@ function isTransient(e: unknown): boolean {
 }
 ```
 
-Now a real-world momentary network drop never reaches the screen, because
+Now the screen does not get an error for a momentary network drop, because
 it gets retried and the second attempt succeeds. The error ladder rung 2
-(mask at lowest level) absorbs the transient cases. The screen only sees
-real failures (after 3 retries, still failing).
+(mask at lowest level) handles the transient cases. The screen only sees
+real failures, which happen when all 3 attempts fail.
 
 The loop is safe here because `get` is idempotent, so repeating it changes
 nothing. A mutating `post` can't reuse it as-is. A retry after a lost
-response can submit the same write twice, so a write needs an idempotency
+response can submit the same write twice. So a write needs an idempotency
 key the server dedupes on before the same retry logic applies.
 
 For sustained offline state, surface it once globally via the platform's
@@ -91,20 +91,20 @@ return (
 );
 ```
 
-The banner is the one place that knows about offline state, so screens don't
+The banner is the one place that handles offline state, so screens don't
 implement it. The banner is aggregated handling (rung 3) in the UI chrome,
 which is where offline state matters.
 
-What screens *do* handle: the real "I couldn't load this thing"
+Screens *do* handle the real "I couldn't load this thing"
 result, after retries failed and offline isn't the reason. That's a real
-case the user needs to see, and it shows up as a typed result discriminator
+case the user needs to see. It appears as a typed result discriminator
 on the data hook (same pattern as `web.md` Example 2).
 
 ---
 
 ## Example 2 — Native module errors: a discriminated result
 
-A direct wrapper around a native module:
+This code wraps a native module directly:
 
 ```tsx
 try {
@@ -122,7 +122,7 @@ try {
 }
 ```
 
-The native module throws strings-as-codes that callers translate by hand.
+The native module throws string error codes that callers translate by hand.
 The set of codes is documented in the README. iOS and Android may use
 different codes for the same condition. Every screen that uses this module
 repeats this switch.
@@ -138,7 +138,7 @@ type PaymentResult =
 export const Payments = {
   /**
    * Presents the payment sheet and waits for the user. Returns a typed
-   * result; never throws under normal use. Network failures during the
+   * result. It does not throw under normal use. Network failures during the
    * payment are retried internally (up to 3 attempts) and surface as
    * 'network_unavailable' only if all attempts fail.
    */
@@ -147,7 +147,7 @@ export const Payments = {
       const native = await NativeModules.PaymentSheet.present(opts);
       return { status: 'completed', transactionId: native.transactionId };
     } catch (e) {
-      return classifyPaymentError(e);   // owns the iOS/Android difference, retries network
+      return classifyPaymentError(e);   // handles the iOS/Android difference and retries network failures
     }
   },
 };
@@ -159,25 +159,25 @@ Caller code:
 const result = await Payments.present({...});
 switch (result.status) {
   case 'completed':  navigateToConfirmation(result.transactionId); break;
-  case 'cancelled':  return;        // do nothing, user closed the sheet
+  case 'cancelled':  return;        // do nothing because the user closed the sheet
   case 'failed':     showFailure(result.reason); break;
 }
 ```
 
-The wrapper names all three cases and owns these jobs:
+The wrapper names all three cases and handles these jobs:
 - Translating native error codes (iOS-vs-Android) into the typed reasons.
 - Retrying network failures during payment.
 - The "USER_CANCELLED is not really an error" convention.
 
 The wrapper applies the error ladder at the bridge layer. It masks transient
-errors (retry), defines out non-errors (cancellation becomes a status and
-never enters the failure path), and aggregates the rest into a small typed set.
+errors (retry), removes non-errors by making cancellation a status that
+the failure path never handles, and aggregates the rest into a small typed set.
 
 ---
 
-## Example 3 — Large lists: FlatList by default, virtualization earned
+## Example 3 — Large lists: FlatList by default, FlashList only when measured
 
-A common mistake on a phone:
+This code is a common mistake on a phone:
 
 ```tsx
 <ScrollView>
@@ -187,7 +187,7 @@ A common mistake on a phone:
 
 ScrollView renders every child upfront, which works with 50 items. With 500, the
 initial render is slow, scroll is janky, and memory grows linearly. The
-team finds the bug at 1,000 items and panics.
+team finds the bug at 1,000 items.
 
 The right default for any list of unknown growth potential is `FlatList`
 or `FlashList` (Shopify's higher-performance alternative):
@@ -207,20 +207,20 @@ ScrollView and much better performance. Use it for every list that might grow.
 
 Escalate to `FlashList` for large or image-heavy lists where measured
 `FlatList` scrolling drops frames. FlashList v2 is a New-Architecture-only
-rewrite that sizes cells automatically, and the v1 chore of estimating item
+rewrite that sizes cells automatically, so the v1 chore of estimating item
 heights is gone. On a New-Architecture app it's a reasonable default for
 big lists. `FlatList` is still built in, needs no extra dependency, and
 handles small-to-medium lists.
 
 Stay with `ScrollView` for known-small, known-bounded lists with
-heterogeneous content where virtualization breaks layout (for example, a
-settings screen with 8 sections, each built differently). The
+heterogeneous content where virtualization breaks layout. One example is a
+settings screen with 8 sections, each built differently. The
 virtualization here adds complexity for zero perf benefit.
 
 Know these performance pitfalls without measuring:
 
 - **Unstable keys** (the array index as key) mean that on reorder, insert,
-  or delete, the wrong row gets recycled and component state attaches to the
+  or delete, the wrong row gets recycled. Component state then attaches to the
   wrong item. Use a stable id. FlatList falls back to the index only when no
   `keyExtractor` and no `item.key`/`item.id` is present.
 - **`renderItem` defined inline** as a new function each render makes child
@@ -234,19 +234,19 @@ Know these performance pitfalls without measuring:
 
 These are known patterns where the naturally-efficient version is no more
 complex than the slow version, so they are outside the speculative-
-optimization ban. Take them on every list you write.
+optimization ban. Apply them on every list you write.
 
 ---
 
 ## Example 4 — Image memory: lazy, sized, and the right resolution
 
-A profile screen with 50 avatars, each a 4MB camera-roll image:
+A profile screen shows 50 avatars, and each one is a 4MB camera-roll image:
 
 ```tsx
 <Image source={{ uri: user.profilePictureUrl }} style={styles.avatar} />
 ```
 
-The phone fetches 50 × 4MB = 200MB over the wire, then decodes each JPEG to
+The phone fetches 50 × 4MB = 200MB over the network, then decodes each JPEG to
 a full bitmap to draw a 40×40 thumbnail. A 4MB JPEG expands to tens of
 MB of RGBA once decoded. The decoded bitmaps are what exhaust memory. After
 two screens, the app crashes with an OOM.
@@ -256,7 +256,7 @@ skip the 4MB version when the screen needs a 40px thumbnail.
 
 ```tsx
 <Image
-  source={{ uri: thumbnailUrl(user.profilePictureUrl, 80) }}    // 80px thumbnail
+  source={{ uri: thumbnailUrl(user.profilePictureUrl, 80) }}    // request an 80px thumbnail
   style={styles.avatar}
   resizeMode="cover"
 />
@@ -274,24 +274,24 @@ react-native-fast-image (bare RN).
 
 For a very large user-uploaded image, such as a full-screen photo, load
 progressively. Show the thumbnail first, and swap in the full resolution
-when it's ready. The user sees something immediately and
-doesn't wait staring at a blank screen.
+when it's ready. The user sees the thumbnail immediately.
 
-The avatar screen makes the same point as `examples.md` Example 3, where death
-by thousand cuts is the failure mode. Each image is "just an image," but
+
+The avatar screen makes the same point as `examples.md` Example 3, where
+many small costs add up to the failure. Each image is "just an image," but
 together, with no resizing strategy, the images OOM the device.
 
 The naturally-efficient choice (use thumbnails) costs no more complexity
 than the slow choice (use originals) when the API supports it. When the
-API doesn't, the right move is at the server / CDN layer, where the
+API doesn't, make the change at the server / CDN layer, where the
 resize belongs.
 
 ---
 
-## Example 5 — Bridge call cost: batch the back-and-forth
+## Example 5 — Bridge call cost: batch repeated bridge calls
 
 The JS-to-native bridge in React Native is asynchronous and serialized, so
-each call costs at least a few milliseconds. This pattern adds up bridge calls quickly:
+each call costs at least a few milliseconds. This pattern makes many bridge calls:
 
 ```tsx
 // loading a contact list
@@ -313,17 +313,17 @@ The fix is a batch API at the bridge:
 const contacts = await ContactsBridge.getAllContacts();    // 1 bridge call
 ```
 
-If the native side already has the data in memory (often the case with
-contacts, photos, calendar events), serializing the whole list once is
+The native side often already has the data in memory, as with
+contacts, photos, and calendar events. In that case, serializing the whole list once is
 much cheaper than serializing one record 500 times. The bridge call
 goes from ~2 seconds to ~50ms.
 
 If the native module doesn't already offer a batched call, write one.
-Native bridges are not usually the place where someone wrote the API
-thinking about JS performance, so the JS side often needs to ask for it.
+Native bridge APIs are not usually written
+with JS performance in mind, so the JS side often needs to request a batched call.
 
 For New Architecture / Fabric / TurboModules, the bridge is faster, but
-the same principle holds, and you should still cut the number of crossings. Synchronous
+you should still cut the number of crossings. Synchronous
 TurboModule calls help for the per-call cost, and batching helps for the
 total work.
 
@@ -333,10 +333,10 @@ total work.
 
 | Symptom | Move |
 |---|---|
-| Per-screen network error handling | Retry transient at API layer; offline banner global |
-| Native module throws string codes | Typed result discriminator; wrapper classifies |
-| ScrollView with many children | FlatList for small lists; FlashList v2 for large or image-heavy ones |
-| 4MB images for 40px avatars | Thumbnails at the right resolution; lazy where possible |
-| Loop of bridge calls (N+1 over the bridge) | Batched native API; one crossing |
-| Foreground/background transitions losing state | AppState listener; restore on resume |
-| Memory pressure on large lists | Bound rendered window; recycle aggressively |
+| Per-screen network error handling | Retry transient errors at the API layer, and show one global offline banner |
+| Native module throws string codes | Return a typed result discriminator that the wrapper classifies |
+| ScrollView with many children | Use FlatList for small lists and FlashList v2 for large or image-heavy ones |
+| 4MB images for 40px avatars | Load thumbnails at the right resolution, and lazy-load where possible |
+| Loop of bridge calls (N+1 over the bridge) | Use a batched native API that makes one crossing |
+| Foreground/background transitions losing state | Add an AppState listener, and restore state on resume |
+| Memory pressure on large lists | Bound the rendered window, and recycle rows aggressively |

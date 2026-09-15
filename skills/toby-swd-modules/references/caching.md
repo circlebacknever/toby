@@ -1,7 +1,7 @@
 # Worked Examples — Caching
 
-Caches are among the most common small additions that spread across a codebase,
-and they easily leak knowledge into call sites. Three things determine whether
+Caches are among the most common small additions that spread across a codebase.
+They easily leak knowledge into call sites. Three things determine whether
 a cache is a deep module or a maintenance liability: where the cache calls are,
 who owns invalidation, and whether the cache or the
 caller handles concurrent misses.
@@ -39,14 +39,14 @@ cache key schema (`"product:..."`), the TTL (600 seconds), the serialization
 format, and the invalidation rules are duplicated wherever code touches them,
 which is leakage. The service should hold product logic, but half the code
 here is Redis bookkeeping, which fails the different-layer check. When the team introduces a second category-listing endpoint, the
-new author either duplicates the cache machinery or, much worse, forgets to
+new author either duplicates the cache code or, much worse, forgets to
 invalidate. Stale listings then appear in production.
 
 Treat the cache as a layer below the repository:
 
 ```python
 class ProductsRepository:
-    """Owns product persistence. Reads may be served from cache.
+    """Handles product persistence. Reads may be served from cache.
     Invalidation is internal: every mutation method evicts whatever it
     needs to keep reads consistent."""
 
@@ -54,7 +54,7 @@ class ProductsRepository:
     def listing(self, category: str) -> list[Product]: ...
     def update(self, product_id: str, changes: dict) -> Product:
         product = self._update(product_id, changes)
-        self._evict_for(product)              # one place that knows what to drop
+        self._evict_for(product)              # this is the one place that lists which keys to evict
         return product
 ```
 
@@ -62,11 +62,11 @@ The service code returns to one-line operations. The cache key schema, TTL,
 serialization, and invalidation policy are inside `ProductsRepository` (or in
 a thin caching decorator around an underlying `ProductsStore` it composes).
 Adding a new derived listing means adding a method and an entry to
-`_evict_for`, and none of the fifteen services needs an edit.
+`_evict_for`. The fifteen services need no edits.
 
 A cache is the canonical place to pull complexity down. The cache
-serves many callers, and the right author for the hard parts is the module
-that already owns the data.
+serves many callers, so the right author for the hard parts is the module
+that already handles the data.
 
 ---
 
@@ -107,18 +107,18 @@ const products: ProductsStore = new CachedProductsStore(
 );
 ```
 
-`CachedProductsStore` is worth a module of its own. It owns
+`CachedProductsStore` is worth a module of its own. It handles
 cache-key construction, TTL policy, eviction rules, and load-through semantics
 behind `getOrLoad`. The interface (`ProductsStore`) is identical to the
 underlying store. The identical interface is correct here, because
 `CachedProductsStore` is the decorator case that the different-layer check
-calls legitimate. Each implementation adds
+lists as legitimate. Each implementation adds
 distinct functionality. The cache version adds memoization and invalidation that
 callers cannot see and do not manage.
 
-If `CachedProductsStore` ever shrinks to forwarding without adding behavior
+If `CachedProductsStore` is ever reduced to forwarding calls without adding behavior
 (no TTL choices, no eviction logic, and no stampede protection, only a `get`
-and `set`), it has degraded into a pass-through wrapper. Delete it and use `cache`
+and `set`), it has become a pass-through wrapper. Delete it and use `cache`
 directly inside `PostgresProductsStore`.
 
 ---
@@ -151,7 +151,7 @@ The call-site fix has three problems:
 - The same locking code now has to be repeated at every cache call site that risks
   a stampede.
 - The "what to do while another caller is loading" decision is made at the
-  call site, where the author has the least context, and has to choose between
+  call site, where the author has the least context. That author has to choose between
   waiting, returning stale data, and returning null.
 - A bug in the lock release path disables the cache for thirty seconds for
   every key that uses this pattern.
@@ -165,8 +165,8 @@ class Cache {
         ttlSeconds: number,
         load: () => Promise<T>,
     ): Promise<T> {
-        // single-flight: at most one in-flight load per key per process,
-        // plus a distributed lock for cross-process coordination
+        // single-flight allows at most one in-flight load per key per process,
+        // and a distributed lock handles cross-process coordination
         // returns stale-while-revalidate if a fresh load is already in
         // progress and the previous value is still in the cache
         // ...
@@ -205,10 +205,10 @@ func (s *EventsService) Record(ev Event) error {
 }
 ```
 
-The list looks like a precondition that every writer must remember. It is one,
-and the same list will need to be replicated in every batch importer, every
+The list is a precondition that every writer must remember,
+so the same list will need to be replicated in every batch importer, every
 admin tool that injects events, every migration that backfills. Six caches
-deriving from one table is a deliberate design decision, and the decision is
+deriving from one table is a deliberate design decision. That decision is
 currently encoded nowhere callers can trust.
 
 Move the decision into the events module:
@@ -228,14 +228,14 @@ func (r *EventsRepository) Insert(ev Event) error {
 func (r *EventsRepository) evictDerivedFrom(ev Event) { ... }
 ```
 
-Now there is one place that knows what derivations exist. Adding a new
+Now one place lists the derivations that exist. Adding a new
 derived view adds an entry there. The old form forced an edit in every writer.
 The batch importer and the admin tool call `Insert` and get correct
 invalidation automatically.
 
 For higher-volume systems this same logic moves to an event/CDC stream and a
 worker that invalidates based on database changes. The principle is the same,
-because invalidation is a decision that one module owns, and callers don't keep
+because one module handles invalidation, so callers don't keep
 the list.
 
 ---
@@ -244,11 +244,11 @@ the list.
 
 | Layer | Use the cache here? |
 |---|---|
-| HTTP/edge (CDN, reverse proxy) | Yes — for cacheable responses. Owned by infra. |
+| HTTP/edge (CDN, reverse proxy) | Yes, for cacheable responses. Infra manages this layer. |
 | Controller/handler | Almost never. Cache logic in handlers is the scattered antipattern of Example 1. |
-| Service | Rarely. Use it here only if the cached value is a service-specific composition that no repository would own. |
-| Repository / data store | The default home. The repository already owns the data contract; caching is part of that contract. |
-| Inside a domain method | Only for derived/computed values, and behind a clear function (`memoize` style). Not for I/O. |
+| Service | Rarely. Use it here only if the cached value is a service-specific composition that would not belong in any repository. |
+| Repository / data store | Yes, by default. The repository already defines the data contract, so caching is part of that contract. |
+| Inside a domain method | Only for derived or computed values behind a clear function (`memoize` style). Do not use it for I/O. |
 
 The phrase "we should cache this" usually means "the repository serving this
 should have a caching implementation." Try the lower layer first.

@@ -6,7 +6,7 @@ Load this file when you produce a slide deck. Build it as HTML for an inline art
 
 | Format | Use when |
 |---|---|
-| HTML deck (React `.jsx` artifact) | Teaching artifacts, reference modules, anything paired with personalized-teaching skill. Default. |
+| HTML deck (React `.jsx` artifact) | Teaching artifacts, reference modules, anything paired with personalized-teaching skill. This is the default format. |
 | pptx | the user explicitly asks for a `.pptx` file, asks to download a deck, or asks for a deck for offline use. |
 
 If unsure, build the HTML deck.
@@ -17,17 +17,17 @@ If unsure, build the HTML deck.
 
 Answer these questions before writing any slide.
 
-1. **What is the deck doing?** Is it teaching a mechanism, summarizing evidence, building a reference, or walking a process? The answer determines density and opening structure.
+1. **What is the deck doing?** Is it teaching a mechanism, summarizing evidence, building a reference, or stepping through a process? The answer determines density and opening structure.
 2. **Composition mode.** Pick one from SKILL.md, different from the one used last time.
-3. **Ink allocation.** Decide which slides use ink before you start. Section dividers, summaries, glossaries, formula slides, and decision slides are the slides that can use ink. Most slides are paper. Ink-forward decks (majority dark) are valid when the deck asserts more than it explains, but choose that mode on purpose.
+3. **Ink allocation.** Decide which slides use ink before you start. Section dividers, summaries, glossaries, formula slides, and decision slides are the slides that can use ink. Most slides are paper. Decks where most slides are ink are valid when the content makes more claims than it explains, but choose that mode on purpose.
 4. **Opening pattern.** Pick from the options below. Not every deck starts with title → glossary.
 5. **Interactivity plan.** Go through the planned slides one at a time, and for each one, ask whether a parameter governs the concept. If yes, pick an interaction type from the catalog below. Sliders are one option among many.
 
 ---
 
-## Deck structure — title and end bookends
+## Deck structure — title and end slides
 
-Every Toby Artifact deck opens with a **title slide** and closes with an **end slide**. Both are deliberately sparse, because they bracket the dense reference content. Between them come the cover/index, then the content, then the references.
+Every Toby Artifact deck opens with a **title slide** and closes with an **end slide**. Both are sparse on purpose, because they come before and after the dense reference content. Between them come the cover/index, then the content, then the references.
 
 ```
 01  Title           (paper, sparse, mark + giant topic)
@@ -55,11 +55,11 @@ Each slide uses one of the two tones below, chosen slide by slide.
 
 **Paper (default)** — `#fdfaf1` background. Use paper for reading content such as tables, diagrams, definitions, worked steps, lists, and walkthroughs.
 
-**Ink** — `#1a1c1f` background. Use ink for authority on section dividers, glossaries, formula slides, summaries, and decision points. Body text on ink uses `#fdfaf1` for primary text and `#a8a39a` for muted text.
+**Ink** — `#1a1c1f` background. Use ink to give authority to section dividers, glossaries, formula slides, summaries, and decision points. Body text on ink uses `#fdfaf1` for primary text and `#a8a39a` for muted text.
 
 ### Information density
 
-Decks follow the reference-deck system and read like a manual.
+Decks use the reference-deck system, so they are written like a manual.
 
 A dense slide has multiple cards, several key-value pairs, and tables. It should have enough content for 30–45 seconds of reading.
 
@@ -85,9 +85,9 @@ On ink slides, color the footer text with `--text-on-dark-muted` (`#a8a39a`).
 
 Vary the opening structure across decks, and pick one of the patterns below for each deck.
 
-**Title slide → cover/index (default for reference decks).** A sparse title slide with the toby mark and a giant topic comes first, followed by a dense TOC grid. It works for multi-section reference decks.
+**Title slide → cover/index (default for reference decks).** A sparse title slide with the toby mark and the topic in giant type comes first, followed by a dense TOC grid. It works for multi-section reference decks.
 
-**Title → glossary.** A title slide with the logo primitive comes first, then a glossary slide that defines the terms before the mechanism. It works for concept-heavy topics where undefined terms would block comprehension.
+**Title → glossary.** A title slide with the logo primitive comes first, then a glossary slide that defines the terms before the mechanism. It works for concept-heavy topics where a reader cannot understand the content while its terms are undefined.
 
 **Title → problem statement.** The title slide comes first, then an ink slide that states the problem or question the deck answers. It works for analysis, diagnosis, or decision-support decks.
 
@@ -101,11 +101,11 @@ Vary the opening structure across decks, and pick one of the patterns below for 
 
 ## Title slide pattern — sparse, paper-toned
 
-The title slide opens the deck and identifies it. It shows a big topic, the toby wordmark and mark, and a faint decorative orbit lattice. It has no TOC, because the cover/index slide holds the TOC.
+The title slide opens the deck and identifies it. It shows the topic in big type, the toby wordmark and mark, and a faint decorative orbit lattice. It has no TOC, because the TOC goes on the cover/index slide.
 
 ```html
 <section data-screen-label="01 Title">
-  <!-- Toby Artifact mark + wordmark, top-left -->
+  <!-- The Toby Artifact mark and wordmark go in the top-left. -->
   <div style="position: absolute; top: 64px; left: 80px; display: flex; align-items: center; gap: 16px;">
     <svg width="44" height="44" viewBox="0 0 64 64" fill="none">
       <circle cx="32" cy="32" r="28" stroke="var(--toby-ink)" stroke-width="1.4"/>
@@ -116,23 +116,23 @@ The title slide opens the deck and identifies it. It shows a big topic, the toby
     <span style="font-family: var(--font-sans); font-size: 24px; font-weight: 600; letter-spacing: -0.012em;">toby</span>
   </div>
 
-  <!-- Decorative orbit lattice, large + quiet, far right -->
+  <!-- A large, faint decorative orbit lattice goes on the far right. -->
   <div style="position: absolute; right: -120px; top: 50%; transform: translateY(-50%); opacity: 0.16;">
-    <!-- nested ellipses + a small center dot -->
+    <!-- Draw nested ellipses and a small center dot here. -->
   </div>
 
-  <!-- Title block, anchored left -->
+  <!-- The title block is aligned to the left. -->
   <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 80px;">
     <div class="ds-eyebrow" style="margin-bottom: 36px;">REFERENCE DECK · R-04.2</div>
     <h1 style="font-size: 128px; font-weight: 600; letter-spacing: -0.024em; line-height: 0.95; margin: 0; max-width: 1200px;">
       Orbital<br>mechanics.
     </h1>
     <p style="font-size: 22px; color: var(--text-secondary); max-width: 720px; margin: 48px 0 0; line-height: 1.55;">
-      A working reference for orbits in classical Newtonian gravity. Thirteen reading slides, with a unit on every value and each caveat beside the figure it qualifies.
+      This deck is a working reference for orbits in classical Newtonian gravity. It has thirteen reading slides, with a unit on every value and each caveat beside the figure it qualifies.
     </p>
   </div>
 
-  <!-- Bottom mono stripe — three captions -->
+  <!-- The bottom mono stripe has three captions. -->
   <div style="position: absolute; bottom: 80px; left: 80px; right: 80px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px;">
     <div>
       <div class="ds-eyebrow ds-eyebrow--quiet">CONTENTS</div>
@@ -155,7 +155,7 @@ The title slide opens the deck and identifies it. It shows a big topic, the toby
 Build the title slide from these parts:
 - **Toby Artifact mark + wordmark:** place them in the top-left. The mark consists of a hairline circle, two tilted ellipses, a single red dot, and a small centre dot. The wordmark is lowercase `toby` in Inter 600.
 - **Big topic:** set it in 96–128px Inter 600 with tight negative letter-spacing, end it with a period, and align it left.
-- **Quiet decorative shape:** place it on the right at opacity ≤ 0.16, and pick it from `references/geometry.md`.
+- **Faint decorative shape:** place it on the right at opacity ≤ 0.16, and pick it from `references/geometry.md`.
 - **Bottom mono stripe:** show 2–3 captioned facts (contents, convention, owner) with small uppercase eyebrows and mono values.
 
 ---
@@ -179,16 +179,16 @@ These slide types all go between the cover and the end slide. Compose them freel
 
 | Slide type | Pattern |
 |---|---|
-| **Glossary / definition** | Ink-toned. 3-column dense grid of definition blocks. Eyebrow per column naming the term cluster. |
-| **Three-card / three-laws** | 3 cards side-by-side, each with eyebrow + section heading + diagram (SVG) + body + formula block. |
-| **Comparison table** | Full-width table with mono cells; group cells with subhead rows or coloured family stripes. |
-| **Formula slide** | Ink-toned. Two formula cards side-by-side, plus a worked-examples table beneath. |
-| **Worked example** | Use the **Worked Example** component (three rows, info/watch/stable tinted). Pair with a dark **Code Block** in a side column. Cross-check table below. |
-| **Annotated diagram** | A card with `position: relative`, an SVG illustration inside, **Annotation Pins** numbered 1..n overlaid, and a side legend mapping numbers to terms. |
-| **KPI / stat snapshot** | Ink-toned. 4-column **Stat Grid** with cycling accent stripes. Pair with rejected-alternative **Alerts** in a side column. |
-| **Decision** | Ink-toned. Stat Grid up top. Authority decision card (dark, red top hairline, pill in the corner). Rejected alternatives stack as state-tinted Alerts. |
-| **Section / quote / summary** | Ink-toned. Sparse. A single claim centered, with a small eyebrow. Optional KV block beneath. |
-| **References** | Ink-toned. Reading list table with each entry: cite block, type, one-line description. Plus an "up next" rail at the side. |
+| **Glossary / definition** | Use an ink tone and a dense 3-column grid of definition blocks. Each column has an eyebrow naming the term cluster. |
+| **Three-card / three-laws** | Place 3 cards side by side, and give each one an eyebrow, a section heading, an SVG diagram, a body, and a formula block. |
+| **Comparison table** | Use a full-width table with mono cells. Group the cells with subhead rows or coloured family stripes. |
+| **Formula slide** | Use an ink tone, with two formula cards side by side and a worked-examples table beneath them. |
+| **Worked example** | Use the **Worked Example** component (three rows, info/watch/stable tinted). Pair it with a dark **Code Block** in a side column, and put a cross-check table below. |
+| **Annotated diagram** | Use a card with `position: relative` and an SVG illustration inside. Overlay **Annotation Pins** numbered 1..n, and add a side legend that maps numbers to terms. |
+| **KPI / stat snapshot** | Use an ink tone and a 4-column **Stat Grid** with cycling accent stripes. Pair it with rejected-alternative **Alerts** in a side column. |
+| **Decision** | Use an ink tone with a Stat Grid at the top. Add an authority decision card that is dark, with a red top hairline and a pill in the corner. Show rejected alternatives as a stack of state-tinted Alerts. |
+| **Section / quote / summary** | Use a sparse ink-toned slide with a single centered claim and a small eyebrow. A KV block beneath the claim is optional. |
+| **References** | Use an ink tone and a reading list table where each entry has a cite block, a type, and a one-line description. Add an "up next" rail at the side. |
 
 See `references/components.md` for the components referenced above.
 
@@ -201,14 +201,14 @@ The end slide closes the deck. It shows a single centred claim that states the m
 Build the end slide from these parts:
 - **Ink-toned:** the background is `#1a1c1f`.
 - **Toby Artifact mark + wordmark:** place them in the top-left, with `--text-on-dark` for the strokes and the red dot kept accent red.
-- **One centred claim:** set it in 64–80px Inter 500 and end it with a period. The claim states the most fundamental fact the deck taught, and a reader who remembers only that sentence still has something useful.
+- **One centred claim:** set it in 64–80px Inter 500 and end it with a period. A reader who remembers only the claim still has something useful.
 - **Small eyebrow:** place it above the claim in `--toby-accent`. The end slide is one of the few places where consequence red appears without indicating risk, because the red marks the deck's close.
 - **One-paragraph context:** place it beneath the claim at 16–17px in `--text-on-dark-muted`, and cite the source or historical origin of the claim.
 - **Faint geometric backdrop:** place it behind the claim at opacity ≤ 0.12.
 - **Bottom mono stripe:** show two captions, with the source line on the left and a "begin again at § 02" pointer on the right.
-- **No content cards:** leave out KPIs, tables, and callouts, so the closing slide holds only one sentence and a frame.
+- **No content cards:** leave out KPIs, tables, and callouts, so the closing slide has only one sentence and a frame.
 
-Example claim line: `Bound orbits are ellipses. The rest is detail.`
+Example claim line: `Bound orbits are ellipses, and everything else about them is detail.`
 
 ---
 
@@ -234,7 +234,7 @@ See `references/geometry.md` for the 20 named geometric marks and their purposes
 
 ## Interactivity catalog
 
-Choose the interaction type to fit the concept. Identify what the learner needs to falsify or explore, then pick the mechanism. Sliders are one option among many.
+Choose the interaction type to fit the concept. Identify what the learner needs to falsify or explore, then pick the mechanism. 
 
 **Make a slide interactive** when its concept has a trade-off between two effects or a parameter that governs a visual outcome. Interactivity also fits a process that the learner should be able to step through. If moving a control would let the learner falsify an intuition, build the control. Decorative motion does not meet this condition, so leave it out.
 
@@ -246,11 +246,11 @@ Choose the interaction type to fit the concept. Identify what the learner needs 
 
 **Toggle / mode switch.** A binary or small-N switch changes the view. Use when the concept has two distinct states or representations that benefit from direct comparison: time domain vs frequency domain, serial vs parallel execution, raw data vs normalized data. The learner sees the difference by switching.
 
-**Direct manipulation.** The learner drags, rotates, or repositions an element in a diagram. Use for spatial or geometric concepts: moving a threshold line to see false-positive/negative tradeoff, rotating a beam to show angle vs gain, repositioning a node to show path length change. It takes more work to build, and it gives the learner the strongest intuition for spatial concepts.
+**Direct manipulation.** The learner drags, rotates, or repositions an element in a diagram. Use for spatial or geometric concepts: moving a threshold line to see false-positive/negative tradeoff, rotating a beam to show angle vs gain, repositioning a node to show path length change. It takes more work to build, but it gives the learner the strongest intuition for spatial concepts.
 
 **Input → computed output.** The learner types a value, and the slide computes and displays a result. Use for formulas where plugging in numbers is the lesson: Friis equation, Shannon capacity, Nyquist rate. Show the formula, the inputs, and the computed output updating live. Validate input range, and show a boundary error when the value falls outside it.
 
-**Clickable taxonomy.** Clicking a term or node expands its definition or sub-structure inline. Use for hierarchical reference material: protocol layers, taxonomy trees, component breakdowns. The learner explores at their own depth.
+**Clickable taxonomy.** Clicking a term or node expands its definition or sub-structure inline. Use for hierarchical reference material: protocol layers, taxonomy trees, component breakdowns. The learner chooses how deep to explore.
 
 **Comparative panels.** Two side-by-side panels update from a shared control. Use when the lesson is a trade-off or comparison that must be perceived simultaneously: two algorithms on the same data, two antenna configurations in the same environment.
 
@@ -260,7 +260,7 @@ Choose the interaction type to fit the concept. Identify what the learner needs 
 
 ## HTML deck pattern (React artifact)
 
-The HTML deck is the default format.
+
 
 ### Structure
 
@@ -272,13 +272,13 @@ const SLIDES = [
   { id: "title", section: "TITLE", render: () => (...) },
   { id: "cover", section: "INDEX", render: () => (...) },
   { id: "concept", section: "MECHANISM", render: () => (...) },
-  // one entry per claim
+  // Add one entry per claim.
   { id: "fin", section: "FIN", render: () => (...) },
 ];
 
 export default function Deck() {
   const [i, setI] = useState(0);
-  // keyboard nav, prev/next handlers
+  // Add keyboard navigation and the prev/next handlers.
   return (
     <div style={{...}}>
       <div className="slide">{SLIDES[i].render()}</div>
@@ -330,15 +330,15 @@ const T = {
   textOnDarkMuted: "#a8a39a",
   hairline: "#c8c3b2",
   borderStrong: "#7d7967",
-  // callout family — info
+  // These tokens are the info callout family.
   infoSoft: "#e2e9ea", infoTint: "#bfcdce", infoText: "#2c3a3a",
-  // callout family — stable
+  // These tokens are the stable callout family.
   stableSoft: "#e3ecd5", stableTint: "#bcc89e", stableText: "#2d4818",
-  // callout family — watch
+  // These tokens are the watch callout family.
   watchSoft: "#f1e6d2", watchTint: "#d6c19a", watchText: "#5a431d",
-  // callout family — cons
+  // These tokens are the cons callout family.
   consSoft: "#f6e2dc", consTint: "#e9b7ad", consText: "#7a2d22",
-  // callout family — unknown
+  // These tokens are the unknown callout family.
   unknownSoft: "#ebe8e3", unknownTint: "#c4bfb6", unknownText: "#3f3d39",
 };
 ```
@@ -355,13 +355,13 @@ const T = {
 Every slide has, in order:
 
 1. **Eyebrow** — UPPERCASE +0.12em, 11px, muted, section name and slide id, for example `05 / 17 · NUMEROLOGY`.
-2. **Title** — claim-led, sentence case, Inter 600. Sized via `clamp(24px, 3vw, 38px)`.
+2. **Title** — claim-led, sentence case, Inter 600. Size it with `clamp(24px, 3vw, 38px)`.
 3. **Body** — paragraphs, tables, cards, diagrams, interactive controls.
 4. **(Optional) Caption** — meta or caveat, mono 12px, muted, pinned bottom.
 
 ### Card patterns inside slides
 
-The full paste-ready HTML is in `references/components.md`, and a quick reference follows:
+The cards below are a quick reference, but the full paste-ready HTML is in `references/components.md`.
 
 **KV card (paper)**
 ```jsx
@@ -391,7 +391,7 @@ The full paste-ready HTML is in `references/components.md`, and a quick referenc
 
 ## pptx deck pattern
 
-Use this pattern when the user asks for a `.pptx` file. The pptx skill handles the file mechanics with python-pptx, and Toby Artifact controls the visuals.
+Use this pattern when the user asks for a `.pptx` file. The pptx skill is for the file mechanics with python-pptx, while Toby Artifact covers the visuals.
 
 ### Format
 - Use a 16:9 slide at 1920 × 1080 px native size.

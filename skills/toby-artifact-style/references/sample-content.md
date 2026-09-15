@@ -6,7 +6,7 @@ Toby Artifact's visual system is designed for a specific voice. Generic "Q4 Reve
 
 ## Why mission-ops
 
-The system was tuned for evidence-led reference work. Mission ops gives natural reasons to use the components Toby Artifact ships. Those components include status pills (stable / watch / consequence), worked examples (premise → derivation → result), and decision rows (approve / hold / reject). They also include stat grids with units (°C, ms, dBm). Use this vocabulary by default, and deviate only when the actual content is from a different domain.
+The system was tuned for evidence-led reference work. Mission-ops content has natural uses for the components that Toby Artifact ships. Those components include status pills (stable / watch / consequence), worked examples (premise → derivation → result), and decision rows (approve / hold / reject). They also include stat grids with units (°C, ms, dBm). Use this vocabulary by default, and deviate only when the actual content is from a different domain.
 
 ---
 
@@ -97,7 +97,7 @@ viability score · build pass rate · caveat freshness · rollback rehearsed · 
 Copy and adapt these sentences when you need a quick demo paragraph or callout body.
 
 - "Drift posterior is trending high, so defer the decision until the two-sample rule passes."
-- "Retry volume is 18% above baseline, and the two-sample rule has not tripped yet."
+- "Retry volume is 18% above baseline, but the two-sample rule has not tripped yet."
 - "Crossing 900 km enters the LEO debris-flux watch band. Defer the next decision until the debris model is updated."
 - "Approve controlled release with named rollback owner on record (Sayo · mission ops)."
 - "Pass length is shrinking by 0.2 min per day."
@@ -111,10 +111,10 @@ Copy and adapt these sentences when you need a quick demo paragraph or callout b
 These standard caveats follow Toby Artifact's "caveat next to the claim" rule:
 
 - "assumes a circular orbit and excludes J2 perturbations"
-- "debris flux excluded above 900 km"
-- "drag coefficient for this body shape is not measured here, and the estimate is ±25%"
-- "watch threshold breached at sample 8, and two-sample rule satisfied at sample 9"
-- "rollback rehearsed 21 May 09:18, with owner on record"
+- "debris flux is excluded above 900 km"
+- "drag coefficient for this body shape is not measured here, so the estimate is ±25%"
+- "the watch threshold was breached at sample 8, then the two-sample rule was satisfied at sample 9"
+- "rollback was rehearsed 21 May 09:18, with the owner on record"
 
 ---
 

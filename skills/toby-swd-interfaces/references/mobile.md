@@ -1,17 +1,17 @@
 # Worked Examples — Mobile (React Native, with notes for native)
 
-In mobile code, the comment test quickly exposes problems in navigation
+In mobile code, the comment test quickly finds problems in navigation
 params, native bridges, and persistent storage. Navigation params get
-serialized, so the interface to a screen is literally a string contract.
-Native bridges have an asymmetric cost profile that makes thin wrappers
-tempting. Persistent storage interfaces hold stale data when the contract is
+serialized, so the interface to a screen is a string contract.
+Native bridges cost more on one side than the other, which makes thin wrappers
+tempting. Persistent storage holds stale data when the interface contract is
 unclear.
 
 ---
 
 ## Example 1 — Native bridge interface: passthrough wrapper vs deep state machine
 
-Candidate A, the literal mirror of the native module:
+Candidate A is a literal copy of the native module:
 
 ```ts
 export const Biometrics = {
@@ -25,7 +25,7 @@ export const Biometrics = {
 };
 ```
 
-The interface comment, complete:
+Here is the complete interface comment:
 
 > Wraps the native biometrics module. Call isAvailable first to check whether
 > the device supports biometric auth. Then call biometricKeysExist to see
@@ -40,12 +40,12 @@ The interface comment, complete:
 > authenticate in try/catch and handle BiometryNotAvailable,
 > BiometryNotEnrolled, and BiometryLockoutPermanent separately.
 
-The comment runs twelve sentences and describes ordering ("Call X first, then
+The comment has twelve sentences. It describes ordering ("Call X first, then
 Y") and platform-specific protocol. The "interface" is seven separate APIs
-the caller must compose, with platform quirks layered on top. The comment
-test names that failure.
+the caller must compose, plus platform quirks. The comment
+test detects that failure.
 
-Candidate B, the deep module:
+Candidate B is the deep module:
 
 ```ts
 type BiometricsState =
@@ -66,25 +66,25 @@ interface Biometrics {
 Comment:
 
 > Reports whether biometric auth can be used on this device and prompts
-> the user when needed. status returns the current capability; prompt
+> the user when needed. status returns the current capability. prompt
 > displays the system biometric UI and returns a typed result. If a
 > payload is supplied, the result includes a signature bound to a
 > per-device key (created lazily on first use).
 
-The comment runs four sentences. iOS/Android differences are gone from the
+The comment has four sentences. iOS/Android differences are gone from the
 caller's view, because status's discriminator covers them. Key lifecycle,
-Info.plist errors, and lockout handling are all inside. Common callers call
+Info.plist errors, and lockout handling are all inside the module. Common callers call
 `prompt({ reason: 'Confirm payment' })` and switch on the result.
 
-The guardrail check asks whether anything caller-facing got hidden. The
-caller still needs to know that a payload signature is per-device (so
+The guardrail check is whether anything caller-facing got hidden. The
+caller still needs to know that a payload signature is per-device. So
 sending the signature to the server is meaningful only if the server
-trusts that device). One sentence in the comment states that fact, and the
+trusts that device. One sentence in the comment states that fact. The
 comment leaves out the fingerprint sensor's internal protocol.
 
 ---
 
-## Example 2 — Navigation param contract: serializable identity vs object soup
+## Example 2 — Navigation param contract: serializable identity vs full objects
 
 In React Navigation, route params are part of a screen's public interface.
 They're persisted across reloads, used by deep links, and read by
@@ -103,7 +103,7 @@ type RootStackParamList = {
 navigation.navigate('ProductDetail', { product, recommendations, user });
 ```
 
-The interface comment for `ProductDetail`:
+Here is the interface comment for `ProductDetail`:
 
 > Screen for a single product. product is the product to display.
 > recommendations is the related-products list to render below the main
@@ -115,13 +115,13 @@ The interface comment for `ProductDetail`:
 > recommendations will be empty and user will be the deep-link guest user;
 > in that case the screen shows a "log in to see recommendations" CTA.
 
-The comment runs seven sentences and describes the data flow into the screen
+The comment has seven sentences. It describes the data flow into the screen
 and what happens when each field is missing. The "interface" is leaking the structure of the
 navigating screen's state and the staleness model. The deep-link case has
 to be specially described because the contract was designed for the
 in-app-navigation path.
 
-The named failure is that route params contain runtime state when they should contain only identity.
+The failure is that route params contain runtime state when they should contain only identity.
 
 Candidate B:
 
@@ -137,13 +137,13 @@ navigation.navigate('ProductDetail', { productId: product.id });
 
 Comment:
 
-> Detail screen for the product with this id. Loads the product and
-> recommendations on mount via the products repository; renders a guest
+> Shows the detail screen for the product with this id. Loads the product and
+> recommendations on mount via the products repository. Renders a guest
 > view if the user is not signed in.
 
-The comment runs two sentences. The route now contains only identity, which
+The comment has two sentences. The route now contains only identity, which
 is what to show. Loading,
-staleness, and signed-in-vs-guest are owned by the screen itself, which
+staleness, and signed-in-vs-guest are handled by the screen itself, which
 reads `useAuth()` and a `useProduct(productId)` query. Deep links work
 because the route is serializable and small.
 
@@ -166,7 +166,7 @@ interface Storage {
 }
 ```
 
-Comment, complete:
+Here is the complete comment:
 
 > Wraps AsyncStorage. Values must be strings; serialize JSON yourself. Keys
 > are conventionally namespaced with a colon (e.g., 'user:theme',
@@ -178,13 +178,13 @@ Comment, complete:
 > and the database has a configurable total cap. iOS has no comparable
 > per-key limit.
 
-The comment runs six sentences. The "interface" is `get/set/delete/clear`,
+The comment has six sentences. The "interface" is `get/set/delete/clear`,
 but a caller must still learn the operational contract. That contract covers
 JSON serialization, key namespacing, versioning, not clearing auth on logout,
-and the iOS size limit. Every screen that uses Storage gets a copy of
+and the Android size limit. Every screen that uses Storage must repeat
 this knowledge.
 
-The named failure is that `Storage` is a wrapper around AsyncStorage with a
+The failure is that `Storage` is a wrapper around AsyncStorage with a
 module's name. The domain knowledge (what's stored, in what layout, what
 versions exist) belongs inside the module.
 
@@ -215,10 +215,10 @@ interface Session {
 ```
 
 Each module's interface comment is now two or three sentences. `UserPrefs`
-owns its key schema and migration. `FeedCache` owns its versioning and the
+handles its key schema and migration. `FeedCache` handles its versioning and the
 Android size limits (it batches writes or drops oldest items if needed).
-`Session` owns the secure-storage detail (`Session.save` writes to
-Keychain/Keystore, not AsyncStorage). The screens that use these modules
+`Session` handles the secure-storage detail (`Session.save` writes to
+Keychain/Keystore, because AsyncStorage is not encrypted). The screens that use these modules
 don't know any of that.
 
 Logout code now names each store to clear:
@@ -226,10 +226,10 @@ Logout code now names each store to clear:
 ```ts
 await Session.clear();
 await FeedCache.clear();
-// UserPrefs and onboarding deliberately survive logout
+// Logout deliberately keeps UserPrefs and onboarding
 ```
 
-What to clear on logout is a decision the orchestrating code now makes
+The orchestrating code now sets what to clear on logout
 once, in one place. With `Storage.clear()` it was a side effect that could
 include or exclude auth depending on whether some caller remembered to
 multiRemove.
@@ -239,7 +239,7 @@ multiRemove.
 ## Example 4 — Cross-cutting: screen-level data hook interface
 
 The interface a screen consumes for its data is a recurring case where the
-comment test catches problems early.
+comment test finds problems early.
 
 Candidate A:
 
@@ -275,9 +275,9 @@ Comment:
 > on first mount before the user context resolves; treat undefined as
 > "not allowed."
 
-The comment runs six sentences, describes invariants about combinations of
-fields, and gives "treat X as Y" instructions. The hook returns five named fields and
-expects the caller to coordinate them.
+The comment has six sentences, describes invariants about combinations of
+fields, and gives "treat X as Y" instructions. The hook returns five fields and
+requires the caller to coordinate them.
 
 Candidate B has a smaller interface and typed state:
 
@@ -299,33 +299,33 @@ function useOrderScreen(orderId: string): OrderScreenState;
 Comment:
 
 > Loads the order with this id and returns its current screen state. The
-> status discriminator names the three legal states; in the loaded state,
-> actions reflects the operations the current user is allowed to perform
+> status discriminator names the three legal states. In the loaded state,
+> actions holds the operations the current user is allowed to perform
 > (an action absent from actions is not permitted). Action methods return
 > Result so callers can surface failures without try/catch.
 
-The comment runs three sentences, and the contract improves in two places:
+The comment has three sentences, and the contract improves in two places:
 
 - The discriminator eliminates the "what does undefined mean" problem.
 - Permissions move from "boolean per action" to "presence of the action in
   the actions object." A button that exists when permitted is impossible
   to render in the wrong state. A button that checks `permissions.canRefund`
-  before calling `actions.refund` is one if-statement away from a bug.
+  before calling `actions.refund` breaks if one if-statement is wrong.
 
 The second change encodes "allowed" as presence of the action, so a parallel
 boolean never exists. It is the kind of contract redesign the comment test
-reveals, because writing "permissions may be undefined for an instant" is the
+leads to. Writing "permissions may be undefined for an instant" is the
 signal that the design is wrong.
 
 ---
 
 ## Platform notes
 
-- **iOS/Swift, Android/Kotlin**: same checks. A `ViewController` or
+- **iOS/Swift, Android/Kotlin**: the same checks apply. A `ViewController` or
   `Fragment` accepting twelve init parameters costs a caller as much as the
   RN screen passing a `user` object through route params. Pass identity in,
   and get state through composition.
-- **Flutter**: route params are arguments, and the same
+- **Flutter**: route params are arguments. The same
   identity-in/data-via-providers principle applies, with Riverpod or Provider as the context.
 - **Native modules**: the bridge interface should hide the platform's
   protocol the way Example 1 does, regardless of which side you're writing

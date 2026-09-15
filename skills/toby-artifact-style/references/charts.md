@@ -14,9 +14,9 @@ Load this file when you build a chart, plot, or data visualization for a Toby Ar
 - **X-axis label with unit.** `time (UTC)`, `requests (n)`, `weight (kg)`.
 - **Y-axis label with unit.** `latency (ms)`, `pressure (kPa)`, `accuracy (proportion)`.
 - **Numeric ticks or direct annotations.** Use tabular numerals (`tnum`).
-- **Legend** when the chart has ≥ 2 encodings. Skip the legend for a single series.
+- **Legend.** Add a legend when the chart has ≥ 2 encodings. Skip the legend for a single series.
 - **Source / model note.** Place it below the chart at meta size (12 px) in `--text-muted`. "Source: prod traces, 2026-04-12 to 2026-05-10."
-- **Caveat next to the figure**, never in a footnote. "Sampled at 1 Hz. Spikes < 1 s may be lost."
+- **Caveat.** Put the caveat next to the figure. Do not move it into a footnote. "The data was sampled once per second, so spikes shorter than 1 s may be missing."
 
 ## Chart palette — positional order
 

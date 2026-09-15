@@ -22,7 +22,7 @@ class UserRepository:
     def expunge(self, user: User) -> None: ...
 ```
 
-The interface comment:
+The interface has this comment:
 
 > Provides access to users. session() returns the current SQLAlchemy session;
 > use this for operations not covered by other methods. query() returns a
@@ -35,17 +35,17 @@ The interface comment:
 > session's lifetime, otherwise accessing relationships afterwards will
 > raise DetachedInstanceError.
 
-The comment runs eight sentences. SQLAlchemy concepts (Session, Query, expunge,
+The comment has eight sentences. SQLAlchemy concepts (Session, Query, expunge,
 DetachedInstanceError) are part of the contract. Callers must know how
 sessions work, how to write SQLAlchemy filters, and how to manage commit
-and detachment. The named failure is that this class is a SQLAlchemy bindings
+and detachment. The failure is that this class is a SQLAlchemy bindings
 layer with a domain repository's name.
 
 Redesign with intent methods:
 
 ```python
 class UsersRepository:
-    """Owns how users are stored and queried. All methods return plain
+    """Handles how users are stored and queried. All methods return plain
     domain User objects with all relations populated as needed. Operations
     that modify state are atomic and return after durable commit."""
 
@@ -57,13 +57,13 @@ class UsersRepository:
     def deactivate(self, user_id: UserId, reason: str) -> User: ...
 ```
 
-Comment for `update_profile`:
+The comment for `update_profile` reads:
 
 > Applies the profile changes to the user with this id and returns the
-> updated user. Atomic. Returns NotFound if no such user exists; returns
+> updated user. The update is atomic. Returns NotFound if no such user exists. Returns
 > ValidationFailed with field-level reasons if any change is invalid.
 
-The comment runs three sentences. The session, ORM, query syntax, commit policy, and
+The comment has three sentences. The session, ORM, query syntax, commit policy, and
 detachment problem are all internal. The caller writes
 `users.update_profile(id, ProfileChanges(name="new"))` and gets a typed
 result back.
@@ -88,7 +88,7 @@ public interface UserRepository {
 }
 ```
 
-Comment:
+Candidate A has this comment:
 
 > Returns users matching the filters. Accepted keys are "orgId" (UUID),
 > "active" (Boolean), "createdAfter" (Instant), "createdBefore" (Instant),
@@ -98,7 +98,7 @@ Comment:
 
 Candidate A fails because the untyped map pushes type errors to runtime that
 a typed interface would catch at compile time. The accepted keys are part of
-the contract but appear only in prose, and "silently capped" leaks a detail
+the contract but appear only in prose. "Silently capped" leaks a detail
 about the implementation.
 
 Candidate B is too rigid:
@@ -110,14 +110,14 @@ public interface UserRepository {
 }
 ```
 
-Comment:
+Candidate B has this comment:
 
 > Returns users matching all filters. Pass null for orgId, createdAfter,
 > or createdBefore to skip that filter. Pass an empty set for roles to
 > skip role filtering. The active flag cannot be skipped; pass true or
 > false explicitly. limit must be 1..1000.
 
-Candidate B fails because null-as-skip is the same problem as the untyped map, and the
+Candidate B fails because null-as-skip is the same problem as the untyped map. The
 "active" filter is awkward because a primitive boolean can't be optional.
 Adding the next filter changes every call site.
 
@@ -140,29 +140,29 @@ public record UserQuery(
     public UserQuery() { this(empty(), empty(), empty(), empty(), empty(), 50, empty()); }
     public UserQuery withOrgId(UUID id) { ... }
     public UserQuery withActive(boolean a) { ... }
-    // ...builder-style with* methods
+    // ...more builder-style with* methods follow
 }
 ```
 
-Comment for `find`:
+The comment for `find` reads:
 
-> Returns users matching the query. Filters are AND'd; unset filters are
-> ignored. Results are paginated; the response includes the next page
+> Returns users matching the query. Filters are AND'd. Unset filters are
+> ignored. Results are paginated. The response includes the next page
 > token if there are more results.
 
-The comment runs three sentences. `UserQuery` has its own comment describing each filter,
-but it's a value object. Its contract is "what each field means", and a
+The comment has three sentences. `UserQuery` has its own comment describing each filter,
+but it's a value object. Its contract is "what each field means", so a
 reader who needs `orgId` only reads that one comment.
 
-Offset/limit pagination drifts when rows are inserted or deleted
+Offset/limit pagination becomes inconsistent when rows are inserted or deleted
 mid-iteration, so a page can repeat a row or skip one.
 The opaque `pageToken` encodes a stable cursor, so paging stays correct under
 concurrent writes. A token and a page size add a little more to the interface
-than a bare row limit, and in return paging stays correct under concurrent load.
+than a bare row limit.
 
 The default constructor and the builder methods make the common case easy:
 `users.find(new UserQuery().withOrgId(org).withActive(true))`. The
-somewhat-general-purpose bias applies, because `UserQuery` covers today's
+somewhat-general-purpose bias applies here. `UserQuery` covers today's
 known queries and a reasonable set of near-future ones without becoming a god
 interface for arbitrary searches.
 
@@ -195,7 +195,7 @@ async function placeOrder(req: NewOrder) {
 }
 ```
 
-The comment on `OrdersRepository.insert`:
+`OrdersRepository.insert` has this comment:
 
 > Inserts the order. If a transaction is provided, the insert runs in that
 > transaction; otherwise it runs in its own transaction and commits
@@ -206,7 +206,7 @@ The comment requires a sentence about transaction threading. Every
 repository method has the same `tx?` argument and the same caveat. The
 "interface" leaks the transaction protocol into every signature.
 
-The named failure is that `tx` is a pass-through variable that every method must
+The failure is that `tx` is a pass-through variable that every method must
 accept "in case" the caller is composing.
 
 Redesign with ambient transaction context:
@@ -227,7 +227,7 @@ interface UnitOfWork {
     run<T>(work: () => Promise<T>): Promise<T>;
 }
 
-// caller:
+// This is the caller:
 async function placeOrder(req: NewOrder, uow: UnitOfWork) {
     return uow.run(async () => {
         const order = await orders.insert(req.toOrder());
@@ -244,14 +244,14 @@ dependency-injected scoped connection) is invisible. Every repository
 method runs inside whatever transaction the caller established with
 `uow.run`, or in its own if not.
 
-Comment for `OrdersRepository.insert`:
+The comment for `OrdersRepository.insert` now reads:
 
 > Inserts the order and returns it with its assigned id.
 
 The comment is one sentence, because the `UnitOfWork.run` contract handles
 the transactional guarantee separately.
 
-The guardrail asks whether the redesign hid anything callers need, and it
+The guardrail question is whether the redesign hid anything callers need, and it
 did. Sometimes the caller needs to know whether they are inside a transaction (for example, to avoid
 firing an out-of-process event that would commit independently). For that
 case, expose `UnitOfWork.isActive()` as a one-method check and keep the `tx`
@@ -261,7 +261,7 @@ parameter off every method.
 
 ## Example 4 — Migration as an interface
 
-Migrations are an interface between code versions, and what a migration
+Migrations are an interface between code versions, so what a migration
 exposes determines what is possible between those versions.
 
 Candidate A is the schema-mutation script:
@@ -290,28 +290,28 @@ The migration's contract is more complex than the script suggests. The script le
 the difference between "schema migration" and "data migration". It handles
 the schema migration and offers no plan for the data migration.
 
-Redesigning the *interface to migrations*, past this one migration, helps:
+This redesign covers the *interface to migrations*, beyond this one migration:
 
 ```python
 class Migration:
     """A migration has three parts: a schema change, an idempotent data
     backfill, and a reverse schema step. Migrations run in deployment order,
-    and the application must understand every intermediate schema. backfill
-    is safe to re-run; schema_down is reverse-only and may be destructive —
+    so the application must work with every intermediate schema. backfill
+    is safe to re-run. schema_down is reverse-only and may be destructive, because
     dropping a column added on the way up loses whatever was written to it.
     A zero-downtime cutover needs more: a dual-write, dual-read window held
     across two deploys, which is a larger interface this one doesn't express."""
 
     def schema_up(self): ...
-    def backfill(self): ...     # idempotent
-    def schema_down(self): ...  # reverse-only; may lose data
+    def backfill(self): ...     # This step is idempotent.
+    def schema_down(self): ...  # This step is reverse-only and may lose data.
 ```
 
-The `Migration` class is heavier than what most teams need on day one. Most teams ship
-`upgrade()` / `downgrade()` and accept the gaps. When the comment test exposes
-the real interface (schema, data, code coordination across deploys), the
+The `Migration` class is more than most teams need when they start. Most teams ship
+`upgrade()` / `downgrade()` and accept the gaps. The comment test exposes
+the real interface (schema, data, code coordination across deploys). After that, the
 team can decide whether to invest in the deeper abstraction or accept the
-limits of the shallow one. The choice is now informed.
+limits of the shallow one. The team then makes that choice knowing the full contract.
 
 ---
 
@@ -319,12 +319,12 @@ limits of the shallow one. The choice is now informed.
 
 | Smell | Redesign |
 |---|---|
-| Repository method that returns ORM-managed objects | Return plain domain objects; commit before return |
+| Repository method that returns ORM-managed objects | Return plain domain objects and commit before return |
 | `find_*` method per filter combination | One `find(Query)` with a value object |
-| `tx?` parameter on every method | Ambient unit-of-work; `UnitOfWork.run(work)` |
-| Update method that takes `Partial<Entity>` | Named operations (`changeEmail`, `deactivate`); preserve invariants |
+| `tx?` parameter on every method | Ambient unit-of-work through `UnitOfWork.run(work)` |
+| Update method that takes `Partial<Entity>` | Intent operations (`changeEmail`, `deactivate`) that preserve invariants |
 | Query method that returns "all matching rows" | Paginated result with opaque page token |
-| Comment mentions "session", "connection", "cursor" | The underlying driver is leaking; hide it |
+| Comment mentions "session", "connection", "cursor" | The underlying driver is leaking, so hide it |
 
 When the comment refers to mechanism (sessions, queries, transactions, cursors),
-the repository is organized around mechanism, when it should be organized around the knowledge it owns, so redraw its boundaries around that knowledge.
+the repository is organized around mechanism. It should be organized around the knowledge it contains, so redesign its boundaries around that knowledge.

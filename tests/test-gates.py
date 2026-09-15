@@ -112,7 +112,7 @@ seeded("co-load growth caught", DOCS,
 
 # A skill name broken across a folded-scalar line wrap points at nothing.
 seeded("split skill name caught", DOCS,
-       lambda t: t.replace("`toby-swd-clarity` owns.", "`toby-swd-\n  clarity` owns.", 1),
+       lambda t: t.replace("`toby-swd-clarity` covers.", "`toby-swd-\n  clarity` covers.", 1),
        "broken across a line wrap")
 
 STYLE = REPO_ROOT / "output-styles" / "toby.md"

@@ -5,23 +5,23 @@ when a rule is unclear or a rewrite is not working. The rules file is the one to
 
 ## Before and after
 
-### Sentence ceiling, 25 words, 20 when the reader executes it
+### Sentence length limit of 25 words, or 20 when the reader follows the sentence as a step
 
-Treat the ceiling as a maximum, and vary length underneath it.
+Treat the word limit as a maximum, and vary sentence length below it.
 
 - Before (34 words): "To remove the cover assembly, first remove the four screws that attach the cover to the housing, and then, after taking the cover off the housing, remove the packing and throw it away."
 - After: "Remove the four screws holding the cover to the housing. Lift the cover off. Discard the packing."
 
-### Keep every word that does work
+### Keep every word that adds meaning
 
-The ceiling caps the length of a sentence, but do not drop words to get under it.
+The word limit sets a maximum sentence length, but do not drop words to stay within it.
 
 - Before: "Fixed. Tests green. Shipped."
 - After: "The retry loop was swallowing the timeout. I fixed the handler, and the four failing tests now pass. Nothing is deployed yet."
 
-The second version is longer, and it tells the reader what happened, while the first only reports a mood.
+The second version is longer, but it tells the reader what happened. The first version only conveys a mood.
 
-### Pronouns take a noun
+### Replace a pronoun with its noun
 
 - Before: "The migration touches the session table and the audit log. This is the risky part."
 - After: "The migration touches the session table and the audit log. The audit-log write is the risky part."
@@ -42,7 +42,7 @@ The first version uses three names for one object: session cache, credential hol
 
 ### Three-word cap on noun stacks
 
-Past three words, the reader has to guess which word attaches to which.
+Past three words, the reader has to guess which word modifies which.
 
 - Before: "runway light connection resistance calibration"
 - After: "calibration of the resistance in the runway light connection"
@@ -77,28 +77,28 @@ A reader who acts on the first half of the sentence before finishing it does the
 
 ## The note test
 
-STE Rule 5.5 says that notes give information, never instructions. Delete every note, re-read the procedure, and confirm the reader can still finish the task. If a step appears only inside a note, it was never a note.
+STE Rule 5.5 says that notes give information and do not give instructions. Delete every note, re-read the procedure, and confirm the reader can still finish the task. If a step appears only inside a note, that text is an instruction, so it is a step.
 
 ## Where tone is allowed
 
-Every sentence on every surface must stay true and complete with the tone stripped out. Some surfaces apply that rule more strictly than others.
+Every sentence in every kind of output must stay true and complete when the tone is removed. The rule applies more strictly to some kinds of output than to others.
 
 | Plain literal English only | A light conversational touch is allowed |
 | --- | --- |
 | Code comments, docstrings, error messages | Chat replies |
 | README and AGENTS setup steps, migration notes | Commit subjects and bodies, PR prose |
 | Chart, axis, legend, and KPI labels | Variable and test names |
-| Doc headings and slide titles | A review finding, once the failure scenario states the fact flat |
+| Doc headings and slide titles | A review finding, once the failure scenario states the fact plainly |
 | Teaching prose mid-explanation | |
 | Safety-relevant findings, destructive-command warnings | |
 
-Right-column text still has to read true and complete with the tone stripped. Put conversational wording in a name, and never in a heading or inside a claim the reader has to act on.
+Right-column text still has to read true and complete when the tone is removed. Put conversational wording in a name, and never in a heading or inside a claim the reader has to act on.
 
 ## Rewriting around a banned word
 
-When a banned word has no plain replacement, rewrite the sentence. Do not reach for a rarer synonym in the same slot, because that produces stilted prose.
+When a banned word has no plain replacement, rewrite the sentence. Do not put a rarer synonym in the same place in the sentence, because that produces stilted prose.
 
-- Banned-word swap: "Cloze the word that carries the learning." The swap spends six words saying something indirectly, and it reads worse than the word it replaced.
+- Banned-word swap: "Cloze the word that carries the learning." The swap uses six words to say something indirectly, so it reads worse than the word it replaced.
 - Recast: "Cloze the word the learner must produce."
 
 - Banned-word swap: "This is the load-bearing assumption of the design."
@@ -115,11 +115,11 @@ Read the sentence back and delete each word in turn. Deleting basically, just, f
 
 - Before: "The column is dropped and the index is rebuilt during the migration."
 - After: "The migration drops the column and rebuilds the index."
-- Still right: "The file was deleted before the run started." Nobody knows who deleted it, and that is the point of the sentence.
+- Still right: "The file was deleted before the run started." The sentence is passive because the person who deleted the file is unknown.
 
 ### Invented terms
 
-Someone wrote each of these terms in this repo, and a reader flagged it later because they could not tell what it meant.
+Someone wrote each of these terms in this repo. A reader later flagged each one because they could not tell what it meant.
 
 - Before: "Teaching prose is a first-read surface." → After: "The learner reads every sentence once."
 - Before: "a component prop surface" → After: "a component's props"
@@ -128,7 +128,7 @@ Someone wrote each of these terms in this repo, and a reader flagged it later be
 - Before: "Narrow the blast radius." → After: "Point them at the smallest piece that could be wrong."
 - Before: "One move covers all six forms below." → After: "All six below are the same habit."
 
-The test is whether a reader could look the word up and find your meaning. "Surface" in a dictionary is the outside of a thing. It is not a set of function parameters, and a reader who does not already know that usage has to guess.
+The test is whether a reader could look the word up and find your meaning. "Surface" in a dictionary is the outside of a thing. It is not a set of function parameters, so a reader who does not already know that usage has to guess.
 
 ### Whole, connected sentences
 
@@ -143,9 +143,9 @@ An agent wrote each "Before" sentence below in a platform overview. Every one pa
 - Before: "A plugin is data. The framework compiles it."
 - After: "New agents are created as plugins."
 - Before: "No plugin imports an engine. No framework file names a plugin."
-- After: delete both sentences. They list what the code does not do, and no reader of an overview assumed it did.
+- After: delete both sentences. They list what the code does not do, but a reader of an overview would not assume it did.
 
-The first before is a label with no verb. The second and fourth are runs of short sentences with no connector. The third uses `carry` for something nobody lifts. The fifth is a mirrored pair.
+The first before is a label with no verb. The second and fourth are runs of short sentences with no connector. The third uses `carry`, a verb for lifting, for a framework. The fifth is a mirrored pair.
 
 ### Literal verbs and real actors
 
@@ -170,7 +170,7 @@ The first before is a label with no verb. The second and fourth are runs of shor
 - Before: "Phase 1 of 3 in the queue migration."
 - After: "This commit is phase 1 of the 3-phase queue migration."
 - Before: "Guard: none."
-- After: "No check in `api/webhooks.ts` stops it."
+- After: "`api/webhooks.ts` has no check that stops it."
 - Before: "One file causes this failure. `scripts/test-install.sh` fails because `~/.claude/skills/toby-voice/SKILL.md` has a hand edit."
 - After: "`scripts/test-install.sh` fails because `~/.claude/skills/toby-voice/SKILL.md` has a hand edit the repo does not have."
 - Before: "Follow these steps to add one."
@@ -198,7 +198,7 @@ A heading is a one- or two-word label or a phrase that says what the section cov
 
 ### Checked facts
 
-- Before: "The export query takes four seconds because the `orders.created_at` index is missing." Nobody timed the query or read the schema.
+- Before: "The export query takes four seconds because the `orders.created_at` index is missing." The writer did not time the query or read the schema.
 - After: "The export query is slow on the staging data. I have not timed it or checked the indexes on `orders`."
 - Before: "Stop searching the repo, because the cause is outside it."
 - After: "The cause is a hand edit in `~/.claude/skills/toby-voice/SKILL.md`, which is outside the repo."
@@ -216,6 +216,6 @@ STE was written for aircraft maintenance, and some of its rules only make sense 
 - **The approved-word dictionary.** STE's own explanatory prose is exempt from STE, which shows the constraint is meant for procedures. A closed vocabulary also conflicts with the rule to reproduce identifiers and error text exactly.
 - **No phrasal verbs.** That rule would delete roll back, spin up, back up, tear down, check out, and time out, and replace plain Anglo-Saxon words with Latinate ones. It contradicts the rule to use plain words.
 - **No verbing technical nouns.** Software work uses cache, log, mock, flag, ship, diff, seed, patch, and branch as verbs. Replacing each one takes three to five words.
-- **No contractions.** STE writes for a non-native technician, but Toby writes for a developer, who reads "don't ship that" the same as "do not ship that". "Don't ship that" sounds like a person.
+- **No contractions.** STE writes for a non-native technician, but Toby writes for a developer, who reads "don't ship that" the same as "do not ship that". "Don't ship that" sounds like something a person would say.
 - **The `-ing` ban.** Gerunds are the field's nouns: caching, logging, polling, batching. The progressive matters too, because "the build is running" and "the build runs" are different claims about the machine.
 - **Word-count arithmetic, warning placards, and illustration callouts.** These rules are about signage and tallying.

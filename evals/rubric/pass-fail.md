@@ -28,6 +28,12 @@ A grader must not fail any of these:
 - A heading that is one or two words, or a plain phrase that says what the
   section covers.
 - The labels a review format requires, such as "Consequence" or "Guard".
+- A docstring's first line that starts with its verb, such as "Return the slice of
+  text from start to end."
+- A label on an axis, a table column, a diagram node, or a button that names a
+  thing, such as `latency (ms)` or `Approve`.
+- A source note written as a label and a value, such as `Source: production
+  traces, 2026-04-12 to 2026-05-10`.
 - Code, identifiers, paths, error text, and quoted output.
 - A comparison of two options that both exist, with the reason for the choice.
 - A sentence that corrects something the user said or assumed.
@@ -36,6 +42,9 @@ A grader must not fail any of these:
 - A reply to thanks that is empty or a few social words, such as "No problem."
 - A common term for copies that stop matching, such as "a second copy that
   could drift".
+- A standard software verb, such as "It ships as a user-visible string" or
+  "The script branches on `--tool`".
+- A diagram arrow with no label, when the two nodes make the relation plain.
 
 These sentences pass:
 
@@ -58,14 +67,25 @@ category.
 1. **Choppy.** A fragment, a label or noun phrase standing as a sentence, or a
    run of short sentences with no words that connect them. Examples: "A multi
    agent framework platform", "Users talk to agents. Agents read, call tools,
-   and pause for people.", "Both pre-existing.", "Name it."
+   and pause for people.", "Both pre-existing.", "Name it.", "Each status change
+   inserts a row. The support page reads the rows in time order.". Two short
+   sentences about one process need a word that states the relation, such as
+   which, so, or then. A plan step, a review
+   finding, or a code comment written as a fragment fails, such as "Serves
+   criterion 1." or `// null while loading`.
 2. **Clever.** A slogan, an aphorism, a mirrored pair, a one-word definition, a
    punchline, or a line built for its rhythm. Examples: "A plugin is data. The
    framework compiles it.", "Uniformity is the failure".
 3. **Figurative.** A metaphor, an idiom, a verb used for something it cannot
-   literally do, or a term the writer made up. Examples: "Two libraries carry
-   the framework.", "Each plugin lives in `plugins/<name>/`", "the gates it
-   feeds", "five sentences wearing a hat".
+   literally do, or a term the writer made up. A diagram arrow labelled with such
+   a verb fails too. Examples: "Two libraries carry the framework.", an arrow
+   labelled `feeds`, "Each plugin lives in `plugins/<name>/`", "the gates it
+   feeds", "five sentences wearing a hat". A program, a file, a flag, or a skill
+   that owns, decides, waits, reaches, or reflects fails the same way, as in
+   "The current guide runs 9,539 tokens", "Group 2 waits for a yes",
+   "`toby-swd-testing` owns adding both tests", and "Each bar reflects 5
+   outputs". An arrow label forced onto a plain relation fails, such as
+   `waits for`.
 4. **Padding around the answer.** A hedge, a sincerity word, an importance flag,
    a contrast with something nobody said, performed empathy, a closing offer, or
    social filler after anything other than thanks. Any `X, not Y` phrasing
@@ -84,12 +104,16 @@ category.
    "each failure would have paged the on-call engineer".
 7. **Empty.** It repeats an earlier sentence or turn, restates the question,
    sums up, says what a thing never does when nobody thought it did, or adds a
-   word the noun already means. Examples: "No plugin imports an engine. No
-   framework file names a plugin.", "your local run's actual output".
+   word the noun already means. An unknown that could not change the answer
+   fails too. Examples: "No plugin imports an engine. No framework file names a
+   plugin.", "your local run's actual output", "Where those sizes are produced
+   and stored is unknown for both approaches."
 8. **Tangled.** Over 25 words with clauses stacked up, or two clauses joined by
    a dash or a semicolon. Two different facts joined by "and" also fail, and so
-   does a negated actor such as "no purge removes it". Example: "During that
-   day, `utilizationPct` reports the row as used up, and no purge removes it."
+   does a negated actor such as "no purge removes it" or "No test runs that
+   path". Examples: "During that day, `utilizationPct` reports the row as used
+   up, and no purge removes it.", "`export_csv` has no login decorator, and the
+   diff shows no other sign-in check."
 9. **Unclear relation.** A relation word whose other half is missing, such as
    "in exchange" or "in return" with no stated trade. A relation the sentence
    needs but leaves out, such as a missing "only" before a small number. A

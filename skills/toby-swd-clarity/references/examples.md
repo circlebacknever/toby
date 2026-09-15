@@ -1,6 +1,6 @@
 # Worked Examples
 
-The code below is original, and the reasoning applies to other code.
+The code below is original. The reasoning applies to other code too.
 
 ---
 
@@ -19,27 +19,29 @@ cannot be expressed in code, so it goes in the interface comment:
 
 ```python
 def trim(text, start, end):
-    """Return text[start:end] as characters (not bytes). end is exclusive.
-    If start >= end the result is empty; both are clamped to [0, len(text)].
-    Does not mutate text."""
+    """Return the slice of text from start to end.
+
+    Offsets count characters, so a multi-byte character counts as one.
+    The end offset is exclusive. Both offsets are clamped to [0, len(text)].
+    The result is empty when start >= end. The function does not change text."""
 ```
 
-The comment has four sentences and no internals, and it answers every caller
-question. It is a precision (lower-level) comment, the half most often skipped.
+The comment has six sentences and no internals. It answers every question a
+caller has. It is a precision (lower-level) comment, the half most often skipped.
 
 ---
 
 ## Example 2 — Backend: the name-reuse bug, and the fix
 
 A file-system module uses `block` for both a physical disk block and a logical
-block within a file. The names look "reasonably close," so nobody questions
+block within a file. The names look "reasonably close," so readers do not question
 them. A logical block number is eventually used where a physical one was
-required, and the result is silent data corruption that took months to find.
+required. The result is silent data corruption that took months to find.
 
 The consistency rule gives each name one purpose. Rename to `fileBlock` and `diskBlock`
-so the two cannot be confused at a glance, and better still give them distinct
+so the two cannot be confused at a glance. Better still, give them distinct
 types so they cannot be interchanged at all. The clarity fix here is also a
-correctness fix. Treat a name that can be confused as a value that can be
+correctness fix. Treat a confusable name as seriously as a value that can be
 confused.
 
 ---
@@ -53,15 +55,15 @@ useEffect(() => {
 ```
 
 A reader scanning the component linearly never sees what triggers
-`reconcileCart` or why it has those three dependencies. Event-driven invocation
-is the hidden-control-flow case, and React effects are its modern form.
+`reconcileCart` or why it has those three dependencies. React effects are the modern form of
+event-driven invocation, which is the hidden-control-flow case.
 Document at the point of surprise:
 
 ```tsx
-// Runs whenever the cart contents, the applied coupon, or the user's tier
-// changes. userTier is included because tier-based discounts must be
-// recomputed on tier change even if items did not change — omitting it was
-// the cause of BUG-2293.
+// This effect runs when the cart contents, the applied coupon, or the
+// user's tier changes. userTier is in the list because a tier change
+// changes the discount even when the items stay the same. Leaving it out
+// caused BUG-2293.
 useEffect(() => {
   reconcileCart();
 }, [items, coupon, userTier]);
@@ -87,16 +89,16 @@ the category most often missed on frontend state):
 
 ```ts
 interface UserQuery {
-  user: User | null;   // null while loading or after a failed fetch
-  error: ApiError | null;  // set only on transport/HTTP failure, never on 404
-  loading: boolean;    // true from mount until the first response settles
+  user: User | null;   // This is null while loading and after a failed fetch.
+  error: ApiError | null;  // This is set only when the request fails. A 404 leaves it null.
+  loading: boolean;    // This is true from mount until the first response arrives.
 }
 return result;
 ```
 
-The `error is never set on 404` and `null while loading or failed` facts cannot
-be expressed in the types. Without the field comments a caller cannot use `UserQuery`
-correctly, and no amount of good naming supplies them.
+The types cannot say that a 404 leaves `error` null, or that `user` is null while
+loading. Without the field comments a caller cannot use `UserQuery`
+correctly. Good naming cannot supply that information.
 
 ---
 
@@ -105,7 +107,9 @@ correctly, and no amount of good naming supplies them.
 The codebase names handlers `handleSubmit`, `handleChange`, `handleRowClick`.
 A new component is added with `onSaveClicked` and `submitHandler`. Each is
 defensible in isolation. Together they break the pattern that lets a reader
-predict the next handler's name. Inspect the file, see the established
+predict the next handler's name.
+
+Inspect the file, see the established
 `handleX` form, and match it. Introducing a new handler-naming scheme is
 worth it only with significant new information and a commit that converts every
-existing handler. Otherwise the half-and-half state is worse than either.
+existing handler. Otherwise the half-and-half state is worse than either naming scheme alone.

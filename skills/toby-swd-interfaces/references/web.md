@@ -1,10 +1,10 @@
 # Worked Examples — Web SPAs (React, Solid, Svelte)
 
-Interfaces in web SPAs are mostly invisible at compile time and fail at
+Interfaces in web SPAs are mostly unchecked at compile time, so they fail at
 runtime. Every consumer reads a hook's return type, a component's prop
 contract, and a store slice's methods. Getting them wrong costs the same as a
-bad backend API. A public API breaks callers across company lines, while a
-mistake in these interfaces stays inside your own team.
+bad backend API. A public API breaks callers in other companies, while a
+mistake in these interfaces affects only your own team.
 
 The examples below run the comment test on the contracts you change most often.
 
@@ -23,7 +23,7 @@ function useProduct(id: string): [Product | null, Error | null, boolean, () => P
 const [product, error, loading, refetch, mutate] = useProduct(id);
 ```
 
-The interface comment, in full:
+Here is the full interface comment:
 
 > Returns a 5-tuple. Position 0 is the loaded product, or null when loading
 > or after a failed fetch. Position 1 is the last error, or null. Position 2
@@ -36,13 +36,13 @@ The interface comment, in full:
 
 That comment is six sentences. It describes the data structure (positions
 0-4) and the ordering (which is non-null when). It is hard to read and
-impossible to use correctly from the destructuring site, because the names
+impossible to use correctly from the destructuring site. The reason is that the names
 `product`, `error`, `loading`, `refetch`, `mutate` are the caller's choice,
-invisible to the contract. Two callers will read the positions
+and the contract does not include them. Two callers can read the positions
 differently.
 
-The named failure is that the contract leaks positional layout the caller must memorize,
-and the discriminator state (loaded? failed? stale?) is encoded in null
+The failure is that the contract leaks positional layout the caller must memorize.
+The discriminator state (loaded? failed? stale?) is also encoded in null
 combinations the caller has to decode.
 
 Redesign with a typed result:
@@ -65,14 +65,14 @@ if (q.status === 'error')   return <Error err={q.error} />;
 return <View product={q.product} />;
 ```
 
-The interface comment now:
+Here is the interface comment now:
 
 > Returns the current query state for the product with this id. The status
 > discriminator names the four legal combinations (loading, success, error,
-> stale). refetch triggers a fresh load; mutate updates locally and reconciles
+> stale). refetch triggers a fresh load. mutate updates locally and reconciles
 > with the server.
 
-The comment runs four sentences and names no positions. The discriminator removes the "what does null
+The comment has four sentences and names no positions. The discriminator removes the "what does null
 mean here" question from every caller. A discriminated union expresses the
 contract in the type system, so the caller no longer needs to remember
 invariants.
@@ -84,10 +84,10 @@ discriminator).
 
 ## Example 2 — Component prop contract: design-it-twice on a Dialog
 
-Task: a `Dialog` component used in form confirmations, destructive-action
+The task is a `Dialog` component used in form confirmations, destructive-action
 warnings, and informational alerts.
 
-**Candidate A, the one big component:**
+**Candidate A is one big component:**
 
 ```tsx
 <Dialog
@@ -106,7 +106,7 @@ warnings, and informational alerts.
 />
 ```
 
-Interface comment, complete:
+Here is the complete interface comment:
 
 > Renders a modal dialog when isOpen is true. title and description appear at
 > the top; primaryAction and secondaryAction render as buttons in the footer
@@ -119,16 +119,16 @@ Interface comment, complete:
 > dialogs to prevent data loss. The dialog traps focus and restores it to
 > the previously focused element on close.
 
-The comment runs seven sentences, references internal behavior ("controls the
+The comment has seven sentences, references internal behavior ("controls the
 icon color"), and prescribes call order ("pass 'primary' for confirmations").
 The component has eleven props, so the caller makes eleven decisions for what
 is conceptually one action.
 
-The named failure is that one component bundles three distinct intents (confirm,
-destructive-confirm, info), and exposes the differences between them as
+The failure is that one component bundles three distinct intents (confirm,
+destructive-confirm, info). It exposes the differences between them as
 prop combinations the caller must assemble correctly each time.
 
-**Candidate B, three named intents over one core:**
+**Candidate B puts three named intents over one core:**
 
 ```tsx
 <ConfirmDialog
@@ -151,17 +151,17 @@ prop combinations the caller must assemble correctly each time.
 Interface comment for `DestructiveConfirmDialog`:
 
 > Renders a destructive-action confirmation when open is true. Calls
-> onConfirm if the user proceeds; calls onClose in all other paths
-> (cancel, esc, overlay click). Focus defaults to the cancel button;
+> onConfirm if the user proceeds. Calls onClose in all other paths
+> (cancel, esc, overlay click). Focus defaults to the cancel button.
 > esc and overlay-click are enabled and treated as cancel.
 
-The comment runs three sentences, with no prop combinations to memorize. The destructive-confirm
-intent owns the safe defaults (focus on cancel, confirm button styled red), so
+The comment has three sentences and lists no prop combinations to memorize. The destructive-confirm
+intent defines the safe defaults (focus on cancel, confirm button styled red), so
 callers can't accidentally produce an unsafe variant. Common-case caller
 burden drops from eleven decisions to four.
 
 Each named dialog composes one deep core internally. The presets are
-thin in caller-facing code (a few decisions) and add real value by encoding
+thin in caller-facing code (a few decisions) and add value by encoding
 the intent's invariants.
 
 The dialog redesign follows the same design-it-twice pattern as the `UserCard` case in
@@ -173,7 +173,7 @@ intents. Three sets of prop combinations that happen to recur do not qualify.
 
 ## Example 3 — Store slice interface: setState exposed vs intent methods
 
-This Zustand slice grew without a design:
+This Zustand slice was extended without a design:
 
 ```tsx
 interface CartStore {
@@ -200,18 +200,18 @@ Comment attempt:
 
 The comment is long because the "interface" is `setX` for each field. The
 real operations the cart supports (add an item, apply a coupon, pick
-shipping) have invariants the store does not enforce, so every caller now owns
+shipping) have invariants the store does not enforce, so every caller now has to enforce
 those invariants. The store's interface and its implementation have the
 same names, which makes it the canonical shallow module.
 
-The named failure is that the slice exposes the state layout and leaves the
+The failure is that the slice exposes the state layout and leaves the
 operations, and the invariants they need, to callers.
 
 Redesign so the interface expresses intent and the slice enforces invariants:
 
 ```tsx
 interface CartStore {
-  // state, read-only
+  // State fields are read-only
   readonly items: CartItem[];
   readonly coupon: Coupon | null;
   readonly shipping: ShippingOption | null;
@@ -229,15 +229,15 @@ interface CartStore {
 
 Comment:
 
-> Owns the cart. items, coupon, shipping, and total reflect the current
+> Stores the cart. items, coupon, shipping, and total hold the current
 > state. The mutation methods enforce invariants (no duplicate variants,
 > qty >= 1, coupon valid for the current items) and recompute total. Errors
-> from applyCoupon are returned as Result; the cart state is unchanged on
+> from applyCoupon are returned as Result. The cart state is unchanged on
 > failure.
 
-The comment runs three sentences and never says "callers must". The invariants
-are in one place, where they can be tested once, and the store is now deep. The interface has
-six operations that express intent. The implementation owns dedup,
+The comment has three sentences and never says "callers must". The invariants
+are in one place, where they can be tested once. The store is now deep. The interface has
+six operations that express intent. The implementation handles dedup,
 validation, total computation, coupon validity, async network calls during
 `applyCoupon`, and rollback semantics.
 
@@ -250,7 +250,7 @@ because the intent-method interface works the same way in any framework.
 
 A team is building their own combobox. They start by drafting the hook:
 
-**Candidate A, which exposes the implementation:**
+**Candidate A exposes the implementation:**
 
 ```tsx
 function useCombobox<T>(opts: {
@@ -275,55 +275,55 @@ Comment:
 > Esc closes; Tab closes and confirms). The hook does not own the state;
 > callers must store and pass it back on every render.
 
-The named failure is that the hook exposes internal state-management decisions as
+The failure is that the hook exposes internal state-management decisions as
 caller obligations. "Callers must" is in the comment four times. Every
 combobox usage now reimplements the same sequence of useState calls.
 
-**Candidate B, where the hook owns the state machine:**
+**In Candidate B, the hook handles the state machine:**
 
 ```tsx
 function useCombobox<T>(opts: {
-  items: T[];                                  // current item set
+  items: T[];                                  // items is the current item set
   getId: (item: T) => string;
   filter?: (item: T, query: string) => boolean;  // default: substring match on getLabel
   getLabel?: (item: T) => string;                // default: String(item)
   onSelect?: (item: T) => void;
 }): {
-  // ARIA-correct prop bundles
+  // These are ARIA-correct prop bundles
   rootProps: HTMLAttributes<HTMLDivElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement>;
   listProps: HTMLAttributes<HTMLUListElement>;
   itemProps(index: number): LiHTMLAttributes<HTMLLIElement>;
 
-  // observable state for rendering
+  // This state is observable for rendering
   isOpen: boolean;
   filteredItems: T[];
   highlightedIndex: number;
   selectedItem: T | null;
 
-  // imperative controls
+  // These are imperative controls
   open(): void; close(): void; reset(): void;
 } { ... }
 ```
 
 Comment:
 
-> A headless combobox state machine. Pass the current items and an id
-> function; receive prop bundles that wire ARIA attributes and keyboard
-> handlers to the input, list, and items. filteredItems reflects the current
-> input value through filter; highlightedIndex tracks keyboard navigation;
+> Implements a headless combobox state machine. Pass the current items and an id
+> function. Receive prop bundles that wire ARIA attributes and keyboard
+> handlers to the input, list, and items. filteredItems is computed from the current
+> input value through filter. highlightedIndex tracks keyboard navigation.
 > onSelect fires when the user confirms a choice via Enter or click.
 
-The comment runs four sentences. The caller spreads the prop bundles onto
+The comment has four sentences. The caller spreads the prop bundles onto
 their elements and renders against `filteredItems`. Keyboard, ARIA,
 open/close, filter, and focus management are all internal. The comment never
-says "callers must", because the hook owns the state and exposes it read-only
+says "callers must", because the hook holds the state and exposes it read-only
 for rendering.
 
-Candidate B is much deeper. The implementation runs to a few hundred
+Candidate B is much deeper. The implementation has a few hundred
 lines (handling Tab vs Enter, IME composition events, screen
-reader announcements, Home/End navigation, and so on), and none of that
-complexity appears in the caller's interface comment.
+reader announcements, Home/End navigation, and so on). The caller's interface comment omits all of that
+complexity.
 
 ---
 
@@ -334,10 +334,10 @@ complexity appears in the caller's interface comment.
 | Destructure a positional tuple and remember what each position means | A typed object or discriminated union as the return type |
 | Combine 8+ props to express a single intent | Named preset components over a deep core |
 | Call `setX` after computing what `X` should be | A method that takes the operation and computes the new state internally |
-| Maintain state and pass it back into a hook every render | Hook owns the state; caller reads it for rendering |
+| Maintain state and pass it back into a hook every render | The hook holds the state, and the caller reads it for rendering |
 | Wrap effect-based logic the same way in every component | A custom hook/composable/rune for that effect |
 | Pass children-via-props with rigid slots | `children` plus a small subcomponent API (compound components) |
 
 When the comment has to describe what the caller will do with the return
-values, the interface is too low-level, and the module should do more of the
+values, the interface is too low-level. The module should do more of the
 work.

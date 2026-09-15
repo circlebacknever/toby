@@ -3,10 +3,10 @@ name: toby-swd-experiment
 description: >-
   Run a discovery loop when the behavior is not decided yet. Use it for a
   spike, a proof of concept, a parameter sweep, a throwaway debug surface, a
-  manual test, or an iteration driven by user feedback. It owns small
+  manual test, or an iteration driven by user feedback. It covers small
   reversible changes, exposing state for inspection, deferring durable tests
-  during discovery, and deleting or folding in the experiment once the user
-  chooses. The word throwaway outranks every noun after it, so this owns the
+  during discovery, and deleting or merging the experiment into the project once the user
+  chooses. The word throwaway takes priority over every noun after it, so this skill covers the
   retry, timeout, and test questions raised inside a spike. Skip it for work
   the user intends to keep.
 ---
@@ -41,7 +41,7 @@ Use experiment mode for prompts like:
 
 Make the experiment easy to run and read. Prefer a small surface that shows the values under test and the result they produce.
 
-Useful surfaces:
+These surfaces are useful:
 
 - A visible state panel.
 - A debug route.
@@ -62,7 +62,7 @@ If a change touches production behavior during discovery, keep the diff as small
 
 ## Iteration Loop
 
-For each pass:
+Follow these steps for each pass:
 
 1. Name the candidate.
 2. Change one behavior, parameter, path, or surface.
@@ -71,17 +71,17 @@ For each pass:
 5. Record the result in the chat.
 6. Repeat only after feedback.
 
-Batching candidates hides which change caused which result, so run the loop so that each result traces to one change.
+Batching candidates hides which change caused which result, so run the loop with one change per result.
 
 ## Finish Phase
 
-When the user chooses a behavior, retire the experiment:
+When the user chooses a behavior, end the experiment with these steps:
 
 - Delete the throwaway surface.
-- Fold the chosen behavior into the normal project path.
-- Remove temp names, flags, debug routes, scratch files, and notes that no longer serve the final behavior.
+- Move the chosen behavior into the normal project path.
+- Remove temp names, flags, debug routes, scratch files, and notes that are no longer needed for the final behavior.
 - Keep only artifacts that now belong to the product, module, docs, or tests.
-- When exploratory work becomes durable code, state the inputs, seeds, and versions the exploratory surface left implicit, so the result reproduces outside the original session.
+- When exploratory work becomes durable code, state the inputs, seeds, and versions that the exploratory surface did not state. Then the result can be reproduced outside the original session.
 
 If the experiment changed production code, review the diff before the finish phase ends.
 
@@ -89,9 +89,9 @@ If the selected behavior becomes durable inside a meaningful module, check wheth
 
 ## Testing Boundary
 
-During discovery, user feedback and manual observation may be the validation source. Automated tests, browser automation, screenshots, and broad checks wait unless the user asks for them or they are required to run the experiment surface.
+During discovery, user feedback and manual observation may be the validation source. Run automated tests, browser automation, screenshots, or broad checks only when the user asks or the experiment surface needs them.
 
-After the behavior settles, decide what durable tests should protect the contract and write them for the selected behavior. Discarded candidates can stay in the experiment notes.
+After the behavior settles, decide which durable tests should cover the contract, then write them for the selected behavior. Discarded candidates can stay in the experiment notes.
 
 ## Environment Boundary
 
@@ -99,7 +99,7 @@ Use toby-swd-environment before commands, ports, processes, browsers, broad chec
 
 During a user-led loop, automated checks that add latency need approval. The user is part of the measurement in this loop, so leave the settings where the user put them.
 
-Reversibility here means software reversibility. When the experiment drives something physical, costly, or externally observable, a reverted change does not undo what already happened. Run the candidate first in the cheapest faithful proxy available, and treat acting on the real system as a state change that needs approval.
+Reversibility here means software reversibility. When the experiment drives something physical, costly, or externally observable, a reverted change does not undo what already happened. Run the candidate first in the cheapest proxy that behaves like the real system. Treat acting on the real system as a state change that needs approval.
 
 ## Failure Modes
 
@@ -110,5 +110,5 @@ Reversibility here means software reversibility. When the experiment drives some
 - Experiment code left behind after selection.
 
 Check the loop against this list before handing the result back, and name any
-entry that fired. The last one is the expensive one, so search the diff for the
+entry that occurred. The last entry costs the most, so search the diff for the
 markings before saying the experiment is finished.

@@ -3,24 +3,24 @@
 The data layer is where both "naturally efficient design" and "death by a
 thousand cuts" happen. Get the structural choices right (where the
 joins happen, how transactions retry, what the indexes are) and the
-system runs fast without per-query heroics. If those choices are wrong,
+system runs fast without per-query tuning. If those choices are wrong,
 caller-side tuning cannot make the system fast.
 
 ---
 
 ## Example 1 — N+1: a design-time problem
 
-A common growth pattern:
+Here is a common growth pattern:
 
 ```python
 orders = order_repo.recent_for_customer(customer_id, limit=50)
 for o in orders:
-    print(o.shipping_address.city)        # one query per order — N+1
-    for li in o.line_items:                # another N+1
-        print(li.product.name)              # another N+1
+    print(o.shipping_address.city)        # this runs one query per order, which is N+1
+    for li in o.line_items:                # this is another N+1
+        print(li.product.name)              # this is another N+1
 ```
 
-For 50 orders with 5 line items each: 1 query to load orders, 50 queries
+For 50 orders with 5 line items each, the code runs 1 query to load orders, 50 queries
 for addresses, 50 queries for line items, 250 queries for products. That is 351
 queries to render a list. P99 latency is bad even though no single query
 is "slow."
@@ -46,10 +46,10 @@ orders = (
 )
 ```
 
-One query for orders + addresses (joinedload), one query for all
+The code runs one query for orders + addresses (joinedload), one query for all
 line_items (selectinload by order ids), one query for all products
 (selectinload by product ids). The query count drops from 351 to 3. The code is
-the same as before, and the eager-load hint is the only change.
+the same as before, except for the eager-load hint.
 
 **Purpose-built read model.** If the list view always needs the same
 fields, build a query that returns them directly:
@@ -57,7 +57,7 @@ fields, build a query that returns them directly:
 ```python
 def list_orders_for_display(customer_id):
     """Returns a flat OrderDisplay row per order, with all fields needed
-    for the list view. One query."""
+    for the list view. It runs one query."""
     # SELECT order fields + address.city + line items aggregated as a JSON column
 ```
 
@@ -67,7 +67,7 @@ the fields aren't relations.
 
 **CQRS-style read store** (most complex, so reserve it for measured need). Keep
 a separate denormalized table, update it on writes, and query it directly. A read
-store is useful at scale when even the joined query is too slow, and it is almost
+store is useful at scale when even the joined query is too slow, but it is almost
 never the right first move.
 
 The design-time choice of eager-load hints or purpose-built read models
@@ -82,7 +82,7 @@ eager-loading is the naturally-efficient simple choice.
 Concurrent updates in any RDBMS will produce occasional deadlocks. The
 database aborts one transaction, and the application is expected to retry.
 
-Tactical code:
+Here is the tactical code:
 
 ```go
 err := db.Transaction(func(tx *gorm.DB) error {
@@ -92,7 +92,7 @@ err := db.Transaction(func(tx *gorm.DB) error {
 })
 if err != nil {
     if isDeadlock(err) {
-        // copy of the whole transaction repeated below
+        // this repeats a copy of the whole transaction
         err = db.Transaction(func(tx *gorm.DB) error { ... })
     }
     return err
@@ -135,9 +135,9 @@ err := WithRetry(ctx, db, func(tx *gorm.DB) error {
 })
 ```
 
-The wrapper gives one retry policy, one place that knows what's transient, and
+The wrapper gives one retry policy, one place that defines what's transient, and
 jittered backoff so retries don't synchronize. Callers only see deadlocks that
-persist through 5 attempts, and the wrapper masks routine ones.
+persist through 5 attempts, because the wrapper masks routine ones.
 
 Guardrail: the transaction body must be idempotent or fully transactional
 with no side effects outside the database (no email sends, no API calls
@@ -158,7 +158,7 @@ starts from what the database currently holds.
 
 ## Example 3 — Bulk operations: one round trip vs N
 
-A common growth pattern:
+Here is a common growth pattern:
 
 ```python
 for user_id in user_ids:
@@ -169,7 +169,7 @@ for user_id in user_ids:
 milliseconds. The whole operation is several seconds for what should be
 a single statement.
 
-The naturally-efficient version:
+Here is the naturally-efficient version:
 
 ```python
 db.execute(
@@ -179,10 +179,10 @@ db.execute(
 ```
 
 The bulk version runs one statement in one round trip and takes milliseconds.
-It is no more complex than the loop version, and in most languages and ORMs it's
+It is no more complex than the loop version. In most languages and ORMs it's
 shorter.
 
-For inserts:
+The same fix applies to inserts:
 
 ```python
 # Tactical
@@ -194,7 +194,7 @@ db.execute_many(
     "INSERT INTO orders (...) VALUES (...)",
     [order.as_row() for order in orders],
 )
-# or in Postgres specifically
+# or use this form in Postgres specifically
 db.execute(
     "INSERT INTO orders (...) VALUES " + ",".join("(...)" for _ in orders),
     flatten_params(orders),
@@ -202,7 +202,7 @@ db.execute(
 ```
 
 For very large batches (10k+ rows in a single insert), insert in chunks
-of 1000 or so to avoid blocking the database with a single huge
+of 1000 or so. Chunking avoids blocking the database with a single huge
 statement. The chunking logic is inside the bulk method, which keeps
 every caller free of it.
 
@@ -218,9 +218,9 @@ bottleneck.
 Indexes are the canonical case of "naturally efficient costs no more
 complexity than slow." The decision is made when the table or the query
 pattern is designed. The cost of getting it wrong shows up months later
-as a slow query that requires a panicked production fix.
+as a slow query that requires an urgent production fix.
 
-The three index decisions below consistently pay back their cost:
+The three index decisions below are consistently worth their cost:
 
 **Index foreign keys you query by.** A `line_items` table with
 `order_id` foreign key should have an index on `order_id` if you ever
@@ -269,24 +269,24 @@ schema-design stage.
 In this case, the added complexity is hard to see:
 
 ```python
-# in a Flask handler
+# this code is in a Flask handler
 def handler():
     user = session.query(User).filter_by(id=current_user_id).one()
     orders = session.query(Order).filter_by(user_id=user.id).all()
-    # ...30 more lines, lots of lazy-load triggers
+    # ...30 more lines follow, with lots of lazy-load triggers
     return render(...)
 ```
 
-The implicit transaction held by `session` lives for the entire request.
+The implicit transaction held by `session` stays open for the entire request.
 If the request takes 500ms because of N+1 queries and a slow renderer,
 that connection is held for 500ms. Under high load, the connection pool
 exhausts. Every request now waits for a free connection. The system
-appears to deadlock, and new requests get rejected.
+appears to deadlock, and then new requests get rejected.
 
 Two design-time choices prevent this pool exhaustion:
 
 **Short, scoped transactions.** Don't hold a database connection for
-the full request. Open a transaction when you need it, commit/release
+the full request. Open a transaction when you need it, and commit/release
 as soon as possible:
 
 ```python
@@ -296,7 +296,7 @@ def handler():
         orders = s.query(Order).options(joinedload(Order.line_items)).filter_by(user_id=user.id).all()
         user_data = build_user_view(user)
         orders_data = build_orders_view(orders)
-    # session is now closed; rendering doesn't hold a connection
+    # session is now closed, so rendering doesn't hold a connection
     return render(user_data, orders_data)
 ```
 
@@ -308,7 +308,7 @@ engine = create_engine(
     DATABASE_URL,
     pool_size=20,
     max_overflow=10,
-    pool_timeout=2,        # fail fast if no connection available within 2s
+    pool_timeout=2,        # fail fast if no connection is available within 2s
 )
 ```
 
@@ -316,7 +316,7 @@ A request that can't get a connection in 2 seconds fails, and the caller sees
 "service unavailable," which is recoverable. The unbounded version waits
 forever in the pool queue, which appears as a hang.
 
-These are the moves to make at design time, and the move driven by
+These are the moves to make at design time, but the move driven by
 measurement comes later.
 If a specific endpoint holds connections too long even after scoping,
 profile what it is doing. Usually it's lazy-loading (Example 1
@@ -326,22 +326,22 @@ above) or an unexpected slow query.
 
 ## Example 6 — Concurrency control: where the conflict gets caught
 
-Two transactions read an inventory row, both see one unit left, both sell it.
-Example 2 retries a conflict once the database raises one. This example answers
+Two transactions read an inventory row, both see one unit left, and both sell it.
+Example 2 shows how to retry a conflict once the database raises one. This example answers
 the earlier question of how to guard the row so the database detects the conflict
-at all. Each of the two strategies below keeps the discipline in one place.
+at all. Each of the two strategies below keeps the concurrency control in one place.
 
 **Optimistic — a version column.** The row has a `version`, and the update
-asserts it hasn't moved since the read:
+asserts it hasn't changed since the read:
 
 ```sql
 UPDATE inventory SET qty = qty - 1, version = version + 1
 WHERE id = $1 AND version = $2;
--- 0 rows updated → another writer won; reload and decide
+-- if 0 rows were updated, another writer won, so reload and decide
 ```
 
 The check is in the WHERE clause, so every writer enforces it identically.
-No lock is held and nobody waits, which is cheap when conflicts are rare. The
+This approach holds no lock, so writers do not wait. Optimistic locking is cheap when conflicts are rare. The
 caller handles the 0-row case (reload, maybe retry).
 
 **Pessimistic — lock the row.** Take the row's write lock for the rest of the
@@ -349,20 +349,20 @@ transaction:
 
 ```sql
 SELECT qty FROM inventory WHERE id = $1 FOR UPDATE;  -- concurrent writers block here
--- decide, then UPDATE; the lock releases at commit
+-- decide, then UPDATE. The lock releases at commit
 ```
 
 Locking is correct under heavy contention, where optimistic retries would
 thrash. Its cost is a held lock, so keep the transaction short and touch rows
-in a consistent order, or it trades the lost-update race for a deadlock.
+in a consistent order. Otherwise, locking replaces the lost-update race with a deadlock.
 
-Isolation level is the backstop under both. `READ COMMITTED`, the common
+Isolation level is a further safeguard under both strategies. `READ COMMITTED`, the common
 default, permits the read-then-write race above, which is why one of the two
 guards is needed. `SERIALIZABLE` makes the database detect the interleaving
-and abort one transaction. It is the strictest model, and it costs more aborts
+and abort one transaction. It is the strictest model, but it causes more aborts
 to retry (back to Example 2). Pick one strategy per contended resource and hold
-to it. Mixing optimistic and pessimistic access to the same row reopens the
-race each was meant to close.
+to it. Mixing optimistic and pessimistic access to the same row allows the
+race each was meant to prevent.
 
 ---
 

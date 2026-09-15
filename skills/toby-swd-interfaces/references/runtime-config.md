@@ -10,17 +10,17 @@ The wrong answer is `process.env.THING` scattered through the code. Each read is
 
 1. **One module reads the environment.** `process.env` and `import.meta.env` appear in exactly one file. Everything else receives values from it.
 2. **Parse and validate at startup.** That module turns raw strings into a typed, frozen object with `zod`, `envalid`, or a hand-written parser. A missing or malformed variable stops boot with a message that names it. Without this check, a bare `undefined` appears three layers down under load.
-3. **Inject the typed values.** A module receives `config.databaseUrl`, or a client already built from it, passed in where the app is wired together. It does not import the config module and read fields from it. That import is the hidden dependency rule 1 removes, and it makes the module hard to test.
+3. **Inject the typed values.** A module receives `config.databaseUrl`, or a client already built from it, passed in where the app is wired together. It does not import the config module and read fields from it. That import is the hidden dependency rule 1 removes. It also makes the module hard to test.
 4. **The config module is deep.** The interface is a handful of typed fields. The module hides the variable names, the parsing, the coercion, the defaults, the validation, and the work of keeping secrets out of log lines.
 
 ---
 
 ## The composition root
 
-The composition root is the one place that knows both the config values and the concrete classes. It is the entry point: `main`, `server.ts`, the top of `App`. It reads config, constructs the real implementations, and passes them down. Nothing below it names an environment variable or picks an implementation.
+The composition root is the one place that uses both the config values and the concrete classes. It is the entry point: `main`, `server.ts`, the top of `App`. It reads config, constructs the real implementations, and passes them down. Code below it does not name an environment variable or pick an implementation.
 
 ```ts
-// config.ts — the only file that touches the environment
+// config.ts is the only file that reads the environment
 import { z } from "zod";
 
 const schema = z.object({
@@ -45,18 +45,18 @@ export const config = Object.freeze({
 ```
 
 ```ts
-// main.ts — the composition root
+// main.ts is the composition root
 import { config } from "./config";
 
 const db = new Database(config.databaseUrl);
 const logger = new Logger(config.logLevel);
-const gateway = GATEWAYS[config.gatewayName];   // the rung-2 map from the conditional ladder
+const gateway = GATEWAYS[config.gatewayName];   // GATEWAYS is the rung-2 map from the conditional ladder
 
 const app = new App({ db, logger, gateway });
 app.listen();
 ```
 
-Every module below `main.ts` takes `db`, `logger`, and `gateway` as constructor arguments, so a test passes fakes and no module reads `process.env`.
+Every module below `main.ts` takes `db`, `logger`, and `gateway` as constructor arguments, so a test passes fakes. Those modules do not read `process.env`.
 
 ---
 
@@ -69,5 +69,5 @@ Choosing behavior by environment, such as which gateway, storage driver, or log 
 ## React and React Native
 
 - Build-time env (`EXPO_PUBLIC_*`, `VITE_*`, `app.config.ts`) follows the same rule: one typed config module, imported values, no raw `process.env` or `import.meta.env` reads in components.
-- Config that changes without a redeploy, such as remote flags and remote config, is its own deep module. The interface is `flags.someFeature`, and the module hides a fetch, a cache, a default for the offline case, and a refresh policy.
-- A provider at the tree root is the injection mechanism. `ConfigProvider` holds the typed object, and components read it through a `useConfig` hook. The provider is the frontend form of passing `config` down from the composition root.
+- Config that changes without a redeploy, such as remote flags and remote config, is its own deep module. The interface is `flags.someFeature`. The module hides a fetch, a cache, a default for the offline case, and a refresh policy.
+- A provider at the tree root is the injection mechanism. `ConfigProvider` holds the typed object. Components read it through a `useConfig` hook. The provider is the frontend form of passing `config` down from the composition root.

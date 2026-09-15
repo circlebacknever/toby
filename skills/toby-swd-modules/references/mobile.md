@@ -1,6 +1,6 @@
 # Worked Examples — Mobile (React Native, with notes for native iOS/Android)
 
-Mobile shares most of the frontend principles but adds three native concerns
+Most frontend principles apply to mobile, which also adds three native concerns
 that web React doesn't have: navigation state across screens, persistent
 storage, and bridges to platform APIs. Each is a common source of leakage and
 shallow modules.
@@ -52,7 +52,7 @@ const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
-  // owns: load from secure storage on mount, refresh, sign-in, sign-out
+  // handles loading from secure storage on mount, refresh, sign-in, and sign-out
   return <AuthContext.Provider value={{ user, signIn, signOut }}>{children}</AuthContext.Provider>;
 }
 
@@ -67,13 +67,13 @@ export const useAuth = () => {
   <NavigationContainer>...</NavigationContainer>
 </AuthProvider>
 
-// Any screen that needs it:
+// Any screen that needs the user calls useAuth:
 const { user } = useAuth();
 ```
 
 Routes contain only what identifies the destination (an `orderId`, a `tab`).
-Identity is a separate concern owned by one module. The intermediate screens
-lose the prop entirely, and deep linking works because routes are now
+Identity is a separate concern handled by one module. The intermediate screens
+no longer take the prop. Deep linking works because routes are now
 serializable without extra object handling.
 
 Do not put everything in the context. Auth is one well-defined body of
@@ -105,12 +105,12 @@ await AsyncStorage.multiRemove(['authToken', 'refreshToken', 'feed:cache:v2', 'u
 ```
 
 This code fails the information-leakage check. The decision "what key holds the feed
-cache, what format it's stored in, what version it is" is reflected in two
+cache, what format it's stored in, what version it is" is repeated in two
 modules (`FeedScreen` and `LogoutFlow`). The same applies to theme prefs, auth
 tokens, onboarding flags. Changing a key requires editing every site that
-touched it, and `LogoutFlow` will go out of date with every new key.
+touched it. `LogoutFlow` will go out of date with every new key.
 
-A typed storage module owns these decisions:
+A typed storage module handles these decisions:
 
 ```tsx
 // storage/userPrefs.ts
@@ -138,14 +138,14 @@ export const Session = {
 // LogoutFlow.ts
 await Session.clear();
 await FeedCache.clear();
-// theme prefs and onboarding deliberately survive logout
+// logout deliberately keeps theme prefs and onboarding
 ```
 
 Keys, versions, JSON schemas, and migration concerns are inside each module.
-Screens call `FeedCache.load()` and don't know what key was used. Logout asks
-each owning module to clear its data and the question "what should be cleared
-on logout" becomes a deliberate policy. Today it's an accident of which screens
-remembered to call `multiRemove`.
+Screens call `FeedCache.load()` without knowing what key was used. Logout calls
+`clear()` on each module that stores data, so the question "what should be cleared
+on logout" becomes a deliberate policy. Today the result depends on which screens'
+authors remembered to call `multiRemove`.
 
 ---
 
@@ -185,12 +185,12 @@ useEffect(() => {
 ```
 
 `BarcodeNative` is a pass-through wrapper (the different-layer and depth checks). It does almost nothing except
-expose the platform API verbatim. The screen now owns the protocol of requesting
+expose the platform API verbatim. The screen now handles the protocol of requesting
 permission, setting the camera, subscribing, starting, and stopping on unmount.
 Every screen that scans repeats that protocol. iOS and Android differences in permission semantics
 leak through to every caller.
 
-A deep barcode module owns the protocol:
+A deep barcode module handles the protocol:
 
 ```tsx
 // scanning/useBarcodeScanner.ts
@@ -201,17 +201,17 @@ export function useBarcodeScanner(opts: { onCode: (c: string) => void }) {
     let cancelled = false;
     let teardown = () => {};
     (async () => {
-      const granted = await ensurePermission();           // owns iOS/Android nuance
+      const granted = await ensurePermission();           // handles iOS and Android permission differences
       if (cancelled) return;
       if (!granted) { setState('denied'); return; }
       const sub = subscribe(opts.onCode);
       await startNative({ camera: 'rear' });
       teardown = () => { sub.remove(); stopNative(); };
-      if (cancelled) { teardown(); return; }              // unmounted mid-start
+      if (cancelled) { teardown(); return; }              // the component unmounted while the scanner was starting
       setState('scanning');
     })();
-    // Cleanup belongs to the effect. A teardown returned from the async function
-    // resolves the promise instead; React never runs it, and the camera leaks.
+    // The effect must return the cleanup. A teardown returned from the async function
+    // resolves the promise instead. React never runs it, so the camera leaks.
     return () => { cancelled = true; teardown(); };
   }, []);
 
@@ -222,7 +222,7 @@ export function useBarcodeScanner(opts: { onCode: (c: string) => void }) {
 const { state } = useBarcodeScanner({ onCode: handleCode });
 ```
 
-The screen calls one hook, starts one operation, and renders against one piece of state. The protocol
+The screen calls a single hook to start the operation and renders from the state it returns. The protocol
 is inside the module, where iOS-vs-Android permission flow, camera index
 defaults, and torch-availability checks can all be handled without callers
 knowing. Adding a second scanning screen takes one line.
@@ -248,7 +248,7 @@ useEffect(() => {
     .then(j => { setItems(j.items); setLoading(false); });
 }, []);
 
-// SearchScreen.tsx (different shape, same call, different error handling)
+// SearchScreen.tsx makes the same call with a different state type and different error handling
 const [results, setResults] = useState([]);
 useEffect(() => {
   fetch(`${API}/feed?q=${query}`, { headers: { Authorization: `Bearer ${token}` }})
@@ -262,7 +262,7 @@ The same decisions (base URL, auth header, error semantics, retry, offline
 behavior) are repeated in every screen that touches the feed. The two files
 contain five forms of information leakage.
 
-A feed repository owns the contract:
+A feed repository defines the contract:
 
 ```tsx
 // feed/repository.ts
@@ -273,12 +273,12 @@ export const FeedRepo = {
 };
 
 // FeedScreen.tsx
-const { data, loading, error, refresh } = useFeed();   // a hook over FeedRepo
+const { data, loading, error, refresh } = useFeed();   // useFeed is a hook that calls FeedRepo
 ```
 
-`Result<T>` is one type that every caller handles, and it covers success, failure, and offline. Auth
+Every caller handles one type, `Result<T>`, which covers success, failure, and offline. Auth
 header, base URL, retry policy, and offline cache are inside `FeedRepo`. The
-two screens shrink to rendering code.
+two screens now contain only rendering code.
 
 For larger apps this is what React Query / SWR / RTK Query are designed for.
 They provide the deep module so you don't have to build it from scratch. Use
@@ -293,10 +293,10 @@ it doesn't. The wrong move is to keep `fetch` calls scattered through screens.
   shared store. Threading it through `Intent` extras or `UINavigationController`
   segues repeats the same defect. Native modules wrap the platform's protocol.
   ViewControllers and Activities are thin and stateful only about their own UI.
-- **Flutter/Dart**: provider/riverpod plays the role of context here.
-  `InheritedWidget` directly is the low-level primitive most apps shouldn't use
-  except through one of those wrappers.
+- **Flutter/Dart**: provider/riverpod is the equivalent of context here.
+  `InheritedWidget` is a low-level primitive that most apps should use only
+  through one of those wrappers.
 - **Implementation inheritance in mobile native code** (extending
-  `UIViewController`, `Activity`, `Fragment`) gets the same caution as the composition-over-inheritance check. The
-  framework demands one or two override points, so do not build a deep class
+  `UIViewController`, `Activity`, `Fragment`) needs the same caution as the composition-over-inheritance check. The
+  framework requires one or two override points, so do not build a deep class
   hierarchy on top of them for "shared behavior."

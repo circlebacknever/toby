@@ -1,7 +1,7 @@
 # Worked Examples — Backend APIs (Java/Kotlin, Go, TypeScript)
 
 The same checks apply across different stacks. Each example shows a real pattern you'll meet in
-a Spring/Nest/Go codebase and the modular structure that beats it.
+a Spring/Nest/Go codebase and the modular structure that works better than it.
 
 ---
 
@@ -35,11 +35,13 @@ public class OrderController extends BaseController {
 
 The composition-over-inheritance check applies here, because `BaseController` and every
 `*Controller` share a two-way coupling. A new field added to the base is visible
-everywhere. A base method's behavior is overridable from any subclass, and
-`currentUser` and `lastValidation` are instance variables that both sides mutate. The base class
-accumulates a grab-bag of helpers because adding one is easier than designing a
+everywhere. A base method's behavior is overridable from any subclass.
+`currentUser` and `lastValidation` are instance variables that both sides mutate.
+
+The base class
+accumulates many unrelated helpers because adding one is easier than designing a
 real boundary. After two years no one knows which controllers depend on which
-base behavior, and changing `BaseController` requires reading thirty files.
+base behavior. Changing `BaseController` requires reading thirty files.
 
 Fix it with composition, which turns the base class into several focused
 collaborators that each controller injects:
@@ -63,14 +65,14 @@ public class OrderController {
 }
 ```
 
-`AuthzGuard` is one module owning authorization decisions, and `ResponseBuilder`
-owns the response type. Each is deep behind a small interface. `OrderController`
-composes them as injected fields, narrow and named for
+`AuthzGuard` is one module that handles authorization decisions. `ResponseBuilder`
+defines the response type. Each is deep behind a small interface. `OrderController`
+composes them as injected fields that are narrow and named for
 what they do. The old `currentUser` was reachable from anywhere.
 
 Logging access, which `BaseController` did via a helper, moves to a Spring
 interceptor or AOP advice. The cross-cutting concern is in one place where
-the dispatcher applies it. The old form made every handler remember to call
+the dispatcher applies it. The old form required every handler to call
 it.
 
 ---
@@ -96,7 +98,7 @@ public class Order {
 
 The "interface" is a list of fields with extra syntax. Callers must know to set
 `paidAt` whenever they set `status` to `PAID`, must validate `amount > 0`
-themselves, must enforce the legal status transitions. The knowledge of what an
+themselves, and must enforce the legal status transitions. The knowledge of what an
 `Order` means has leaked into every caller.
 
 The deeper interface expresses intent:
@@ -115,7 +117,7 @@ public class Order {
     }
     public void cancel(String reason) { ... }
     public boolean isSettled() { return status == OrderStatus.PAID; }
-    public BigDecimal amount() { return amount; }           // a named query method
+    public BigDecimal amount() { return amount; }           // this query method's name says what the caller wants
 }
 ```
 
@@ -140,7 +142,7 @@ Developers often bring this mistake from Java/C# into Go:
 // pkg/users/user.go
 package users
 
-type UserService interface {           // declared next to implementation
+type UserService interface {           // this interface is declared next to the implementation
     GetUser(id string) (User, error)
     CreateUser(u User) error
     UpdateUser(u User) error
@@ -155,22 +157,22 @@ func (s *userServiceImpl) GetUser(...) ... { ... }
 // ...
 ```
 
-The code has two problems. First, the interface is colocated with the
+The first problem is that the interface is colocated with the
 implementation. Every consumer imports the whole `users` package and the whole interface even
 when they only need one method. Second, the interface enumerates every method
-the implementation exposes. Every method appears, so the interface only
-mirrors the struct. That's a shallow interface, because it has no asymmetry
+the implementation exposes, so the interface only
+repeats the struct's method list. That's a shallow interface, because it has no asymmetry
 between cost and benefit.
 
 In idiomatic Go, each consumer declares the narrow interface it needs and nothing
 more, right where it uses it. The implementation in `users` is a concrete struct
-with public methods, and no one declares it implements anything explicitly.
+with public methods. The code does not explicitly declare that it implements any interface.
 
 ```go
 // pkg/orders/checkout.go
 package orders
 
-type userLookup interface {              // 1 method, defined by the consumer
+type userLookup interface {              // the consumer defines this 1-method interface
     GetUser(id string) (users.User, error)
 }
 
@@ -179,7 +181,7 @@ func Checkout(u userLookup, orderID string) error { ... }
 
 The `orders` package depends on a one-method interface it defined for its own
 purposes. Tests inject a fake implementing only that method. When `users` adds
-methods, `orders` is unaffected because it never asked for them. Depth comes
+methods, `orders` is unaffected because its interface does not include them. Depth comes
 from the cost-to-benefit asymmetry. The consumer pays for one method's worth
 of interface and gets whatever the implementation does behind it.
 
@@ -191,7 +193,7 @@ it mechanical to enforce.
 
 ## Example 4 — TypeScript/Nest middleware as temporal decomposition
 
-A growing Nest app threads request handling through a stack of middlewares:
+A growing Nest app passes request handling through a stack of middlewares:
 
 ```ts
 app.use(parseBody());
@@ -206,14 +208,14 @@ app.use(audit());                    // reads everything written above
 The middleware stack is temporal decomposition (the decompose-by-knowledge check). The reason there are seven
 middlewares is "first do this, then that, then the next thing." The thing
 being passed between them is `req`, one large object that each step reads from
-and writes to. Every middleware knows about fields the previous ones produced.
+and writes to. Every middleware depends on fields the previous ones produced.
 Information about who the user is, what their permissions are, and which tenant
 they belong to is leaked across all seven modules.
 
 Adding the next concern means another middleware that reads `req.user`,
 `req.tenant`, `req.allowed`, and writes a new field. The interface to "handle a
-request" is whatever the union of all those fields adds up to, and no module
-owns the contract.
+request" is the union of all those fields. That contract is not defined in any one
+module.
 
 Divide the code again by knowledge. The middleware bodies belong to distinct
 bodies of knowledge: authentication, authorization, multitenancy, and audit.
@@ -239,15 +241,15 @@ async getOrder(@Req() req: Request) {
 }
 ```
 
-The handler now invokes three named operations, each owning its knowledge.
-`req.user` is gone, and `session` is a value with a real type. Audit,
+The handler now invokes three named operations, each handling one body of knowledge.
+`session` replaces `req.user` and is a value with a real type. Audit,
 rate-limit, and tenant context become explicit dependencies of the operations
 that need them.
 
-Cross-cutting interceptors (logging, metrics) can still exist, and they're the
+Cross-cutting interceptors (logging, metrics) can still exist. They are the
 narrow category Nest interceptors and Express middleware fit. The
 seven-middleware pipeline shrinks to two or three middlewares when each one
-represents a real cross-cut and the rest move into named modules.
+represents a real cross-cutting concern and the rest move into named modules.
 
 ---
 
@@ -255,9 +257,9 @@ represents a real cross-cut and the rest move into named modules.
 
 | Symptom | Java/Spring fix | Go fix | TypeScript/Nest fix |
 |---|---|---|---|
-| Shared behavior across many handlers | Inject collaborators; avoid base classes | Helper packages, accept interfaces, return structs | Provider classes with `@Injectable` |
-| Anemic data class | Methods that enforce invariants; private fields | Methods on the struct that own the invariant | Methods on the class; readonly fields |
+| Shared behavior across many handlers | Inject collaborators and avoid base classes | Helper packages, accept interfaces, return structs | Provider classes with `@Injectable` |
+| Anemic data class | Methods that enforce invariants; private fields | Methods on the struct that enforce the invariant | Methods on the class; readonly fields |
 | Cross-cutting concern | AOP advice or `HandlerInterceptor` | Wrapping middleware at the router | Nest interceptors/guards |
 | Wide interface near implementation | One narrow interface per consumer | One narrow interface per consumer (idiomatic) | One narrow interface per consumer |
 
-The principles are the same in all three stacks, and only the idiom changes.
+
