@@ -26,7 +26,7 @@ This skill prevents feedback notes that you would otherwise have to give more th
 
 ## Opening move
 
-Do not ask "what genre?" First ask what system we are modeling, and what one surprising thing it should do when it runs. Then ask whether there is a target, meaning an institution, a ceremony, or a process. If there is, ask who the underdog subject to it is. A premise can have no target and be a pure toy, so do not force a bureaucracy onto that toy. When there is a target, name the specific mechanism and copy its real details before writing a single joke.
+Do not ask "what genre?" First ask what system we are modeling, and what one surprising thing it should do when it runs. Then ask whether there is a target, meaning an institution, a ceremony, or a process. If there is, ask who the underdog subject to it is. A premise can have no target and be a pure toy, so do not force a bureaucracy onto that toy. When there is a target, pick the mechanism and copy its real details before writing a single joke.
 
 ## The dials
 

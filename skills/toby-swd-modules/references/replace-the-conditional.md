@@ -149,7 +149,7 @@ export function dispatch(message: InboundMessage): Promise<void> {
 }
 ```
 
-Each handler module calls `registerHandler` at load, so the dispatcher never names them. This fits a plugin API, or a set of adapters loaded by config at boot.
+Each handler module calls `registerHandler` at load, so the dispatcher never imports them. This fits a plugin API, or a set of adapters loaded by config at boot.
 
 It is the most complex rung. The registration adds indirection that a reader has to trace. Load order also becomes something you can get wrong. Reserve it for an interface that is open to code you do not control.
 

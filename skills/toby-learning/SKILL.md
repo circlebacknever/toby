@@ -26,7 +26,7 @@ The mode depends on how much the learner already knows, so work that out before 
 - Exposition — the learner is new to this and has nothing to reason from yet. Use it when they say they are new, when they say they are lost, or when their question shows no starting idea. Teach most of a self-taught subject in this mode. Teach the material in steps, with a guess before each step.
 - Concept — the learner has one decision or idea to think through and already knows enough to think about it. Reason through it once, then climb the contribution ladder.
 - Interpretation — the learner builds a defensible reading or argument with no single correct answer (literature, history, essay, usage and translation). The goal is a supported, precise claim, so you judge the claim's support and precision, and you do not mark it right or wrong. Load `references/interpretation.md`.
-- Volume or recall — the learner has many items to remember (vocabulary, terminology, a paradigm table), which takes repeated retrieval over time. Switch when the learner names a count, hands you a list, or says drill, memorize, quiz me, or review. Load `references/retention.md`.
+- Volume or recall — the learner has many items to remember (vocabulary, terminology, a paradigm table), which takes repeated retrieval over time. Switch when the learner gives a count, hands you a list, or says drill, memorize, quiz me, or review. Load `references/retention.md`.
 - Production — for language, the goal is using the language. Switch when the learner wants to say, write, or speak the target language. `references/retention.md` covers it.
 
 The method below applies in every mode. The reference files change the method for domains that call for it, so load the matching one as soon as the mode is clear.
@@ -51,7 +51,7 @@ Use these check forms for right-answer subjects.
 - Find the defect in a version you made wrong on purpose.
 - Defend the option that got rejected.
 - Say what breaks downstream if a condition changes.
-- Name the case left unhandled.
+- State the case left unhandled.
 
 Interpretation and recall subjects use their own check forms, which the references describe. Drop yes/no, multiple-choice, "does that make sense?", and anything answerable from the last three messages.
 
@@ -75,7 +75,7 @@ The teaching happens in how you respond to their answer, so choose your response
 - Wrong — work out which kind of wrong answer it is. A consistent wrong answer means they believe something wrong. Ask what they think is happening, then correct that belief. A wrong answer that contradicts something they said is a slip, so give a light "you mean X?" and move on. When a fact is missing, give the fact, then ask the question again.
 - "I don't know" — give a hint or a smaller sub-question. If they are still stuck, tell them the answer, then return to the same idea one step later in a different form.
 
-When their answer to a check is wrong or the contributed work is broken, don't paste the fix. Point them at the smallest piece that could be wrong and let them find the failure themselves. "Run it in your head with an empty list, and tell me what happens up to line three." If they are still stuck, name the category of the error. Only then show the correction, and close with "so the rule is?" so they state it.
+When their answer to a check is wrong or the contributed work is broken, don't paste the fix. Point them at the smallest piece that could be wrong and let them find the failure themselves. "Run it in your head with an empty list, and tell me what happens up to line three." If they are still stuck, tell them the category of the error. Only then show the correction, and close with "so the rule is?" so they state it.
 
 For broken code, run the narrowest test, show them the failing output, and ask them to read it first.
 
@@ -121,7 +121,7 @@ Renaming a concept mid-lesson is the error that costs the learner the most time.
 3. Answer it in five sentences, one step, and plain words. Say what the next step covers, then stop.
 4. Repeat for each step. Check the step with the narrowest useful run, and have them predict the result before it runs.
 5. Give one case they have not seen and ask them to apply the rule to it. That new case is the only way to find out whether they can use the rule anywhere else.
-6. Close by making them give the reason back in the form they would reuse: the one-line rule, the note, or the thesis and its strongest counter. An unclear answer shows an unclear spot in their understanding, so teach that part again. Name what stays unverified.
+6. Close by making them give the reason back in the form they would reuse: the one-line rule, the note, or the thesis and its strongest counter. An unclear answer shows an unclear spot in their understanding, so teach that part again. Say what stays unverified.
 
 ## References
 

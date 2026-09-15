@@ -64,7 +64,7 @@ If a change touches production behavior during discovery, keep the diff as small
 
 Follow these steps for each pass:
 
-1. Name the candidate.
+1. Write down the candidate.
 2. Change one behavior, parameter, path, or surface.
 3. Report the changed value and expected observation.
 4. Ask the user to test or run the smallest useful check.
@@ -109,6 +109,5 @@ Reversibility here means software reversibility. When the experiment drives some
 - State hidden from the user while asking for feedback.
 - Experiment code left behind after selection.
 
-Check the loop against this list before handing the result back, and name any
-entry that occurred. The last entry costs the most, so search the diff for the
+Check the loop against this list before handing the result back, and list any entry that occurred. The last entry costs the most, so search the diff for the
 markings before saying the experiment is finished.

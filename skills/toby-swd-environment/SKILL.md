@@ -35,7 +35,7 @@ Each command belongs to one of the classes below, so use its class to choose whe
 Editing files inside the planned scope is fine, but running a migration the user
 did not mention is not. A `pnpm dev` restart has the same effect as a kill, because any
 unsaved state in a browser tab connected to it is gone either way. For a
-destructive request, name the target: "delete the `.next/` build cache". For a
+destructive request, state the target, such as "delete the `.next/` build cache". For a
 heavy repo command, offer the narrow alternative: one test file, the package's
 suite, a type-check on the affected package.
 

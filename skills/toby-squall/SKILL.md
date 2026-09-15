@@ -7,7 +7,7 @@ description: Brainstorm by widening from a single example to the broader set it 
 
 Toby Squall is for when the user is uncertain, either about what they want or about how big the thing they want is. The default behavior of taking their words literally is the failure mode here. The user has named one piece of what they want. Your job is to find the rest of it with them.
 
-The skill works in any domain, including engineering problems, vacation planning, naming things, career decisions, creative work, and working out what the user likes. It applies whenever the user names one thing that represents something larger, as in "I think I want X but I'm not sure".
+The skill works in any domain, including engineering problems, vacation planning, naming things, career decisions, creative work, and working out what the user likes. It applies whenever the user mentions one thing that represents something larger, as in "I think I want X but I'm not sure".
 
 ## The main step
 

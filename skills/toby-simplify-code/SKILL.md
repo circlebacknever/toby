@@ -14,7 +14,7 @@ Make changed code simpler to read and keep behavior identical. A rewrite that on
 ## Disposition
 
 - Prefer precision over recall, because a missed cleanup costs less than a churning diff or a silent behavior change. When you are unsure, leave the code as it is.
-- Claim a win only when it's countable. Before you touch anything, say which number goes down: lines, branches, state variables, duplicated blocks, or named traps removed. "Clearer," "tidier," and "more idiomatic" name no number that went down, so a rewrite that only swaps style can claim them without simplifying anything.
+- Claim a win only when it's countable. Before you touch anything, say which number goes down: lines, branches, state variables, duplicated blocks, or named traps removed. "Clearer," "tidier," and "more idiomatic" state no number that went down, so a rewrite that only swaps style can claim them without simplifying anything.
 - Prove that behavior is preserved before you change the code. You must prove the edit is safe, so the default is to leave the code alone.
 - Returning the diff unchanged is a valid result, so "Nothing worth simplifying" is a complete answer. Say it plainly, and don't ship a rewrite to have something to show.
 
@@ -22,7 +22,7 @@ Make changed code simpler to read and keep behavior identical. A rewrite that on
 
 **Over-built code where simpler code does the same job.**
 
-- Repeated setup or branches with two or more real occurrences, where naming them once removes lines.
+- Repeated setup or branches with two or more real occurrences, where defining them once removes lines.
 - A long conditional where an early return or a named predicate shows intent.
 - A clever one-liner, nested ternary, or dense chain that packs several branches or side effects into one expression and makes debugging worse.
 - A shallow wrapper with a single caller that only renames another call and adds no type, name, or boundary value.
@@ -87,7 +87,7 @@ Check this edge for each class of change:
 
 Leave anything that moves code between modules, changes a signature, or alters a public return type. All of that is behavior-changing work.
 
-Leave any cleanup that is not small, local, and behavior-preserving. When the cleanup matches the "Flag, don't fix" half of `references/smells.md`, name the smell and the skill that handles it. Do the same for a red flag in toby-swd-modules, toby-swd-interfaces, or toby-swd-complexity. Otherwise, note it as a follow-up.
+Leave any cleanup that is not small, local, and behavior-preserving. When the cleanup matches the "Flag, don't fix" half of `references/smells.md`, report the smell and the skill that handles it. Do the same for a red flag in toby-swd-modules, toby-swd-interfaces, or toby-swd-complexity. Otherwise, note it as a follow-up.
 
 If you spot a real bug or a security issue while cleaning up, don't fix it here, because the fix is a behavior change. Flag it only when you can state the input that triggers it and why the existing guards do not catch it. Do not report a vague "this might be buggy." Then recommend a review pass.
 
@@ -101,4 +101,4 @@ If you spot a real bug or a security issue while cleaning up, don't fix it here,
 
 ## Final response
 
-Lead with what got simpler, ordered by how much reading effort each change saves. Give the number each change reduced. For every change, state in one clause the edge you checked and how you know it held. Name the covering test, or say why the edge case can't occur. If behavior couldn't be proven preserved, say what remains unknown. For a structural smell you spotted and left alone, write one line naming the smell and the skill that handles it, separate from the changes.
+Lead with what got simpler, ordered by how much reading effort each change saves. Give the number each change reduced. For every change, state in one clause the edge you checked and how you know it held. Cite the test that covers it, or say why the edge case can't occur. If behavior couldn't be proven preserved, say what remains unknown. Report each structural smell you left alone on its own line, with the skill that handles it.

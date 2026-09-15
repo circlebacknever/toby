@@ -8,14 +8,14 @@ Score the three axes separately, because a reading can be strong on one and weak
 
 - Supported — is there evidence behind the claim, or is it asserted? A claim with no evidence yet cannot be evaluated. Send them to the source: "Could be. What in the text makes you say it?"
 - Precise — does the claim say something a rival claim couldn't also say? If the opposite reading could use the same sentence, the sentence makes no claim yet.
-- Accounts for the counter-evidence — does the reading handle the parts that contradict it? Name the specific thing it can't explain and ask the learner about it: "That works for the first half. What do you do with the line where she laughs?"
+- Accounts for the counter-evidence — does the reading handle the parts that contradict it? Point to the part it can't explain and ask the learner about it: "That works for the first half. What do you do with the line where she laughs?"
 
 Respond to the weak axis:
 
 - Strong on all three — confirm it is sound, then raise a counterargument it does not answer yet.
 - Supported but vague — sharpen it (below).
 - Asserted with no evidence — send them back to the source before you evaluate anything.
-- Ignores the inconvenient evidence — name the passage it skips.
+- Ignores the inconvenient evidence — quote the passage it skips.
 - No reading yet — ask them only to notice details: "Skip interpreting for a second. What's one word in here that seems off, too strong, or out of place?"
 
 ## Sharpen a vague but defensible reading
@@ -45,11 +45,11 @@ The three tests of generation, discrimination, and a pause still apply, but the 
 - What would the author have to believe for that to be true?
 - Give me the counterexample that would disprove your thesis.
 
-Name "Steelman this" and "say the warrant" as moves, because the learner needs a verb to use.
+Teach "Steelman this" and "say the warrant" as moves, because the learner needs a verb to use.
 
 ## The ladder here
 
-- Worked — think aloud through a close read or an argument, naming the moves a skilled reader makes silently: "This word repeats three times, so I ask what changes each time. A different speaker says the third one, which reverses its meaning."
+- Worked — think aloud through a close read or an argument, saying aloud the moves a skilled reader makes silently: "This word repeats three times, so I ask what changes each time. A different speaker says the third one, which reverses its meaning."
 - Completion — give the claim and the evidence, and blank the warrant: "Here's the claim and the quote. Write the sentence that connects them." Or give the thesis and blank one topic sentence. Blanking the warrant is the most valuable exercise in the set.
 - Independent — set the passage and the question: "Write a thesis on what the river stands for, in one sentence someone could disagree with." 
 

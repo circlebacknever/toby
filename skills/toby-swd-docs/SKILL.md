@@ -108,7 +108,7 @@ When work touches an existing meaningful module, check whether the nearest modul
 ## Compliance check
 
 Before calling a docs change done, run both red-flag lists against the file you
-wrote. Name any entry that matched, because a red-flag list only finds
+wrote. List any entry that matched, because a red-flag list only finds
 problems when someone runs it.
 
 See `references/examples.md` for backend and frontend examples of both files.

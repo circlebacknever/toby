@@ -58,7 +58,7 @@ Run this checklist before writing any code or markup.
 1. **Job.** What is this artifact doing? It might teach a mechanism, summarize evidence, provide a reference, walk through a process, or support a decision. The answer determines surface and density.
 2. **Composition mode.** Pick one mode from the list below, and make it different from the mode you used last time.
 3. **Ink allocation.** Decide before you start which panels or slides use ink and which use paper, so that no panel ends up in ink by accident.
-4. **Logo primitive.** Name the shape, and pick one that suggests the structure of the subject.
+4. **Logo primitive.** Pick a shape that suggests the structure of the subject.
 5. **For decks:** before writing any slide, identify which slides need interactivity. Choose the interaction type to fit the concept. See `references/decks.md`.
 
 ## Composition modes
@@ -271,12 +271,12 @@ Each artifact gets its own logo or wordmark.
 
 Each artifact's logo or wordmark has these parts:
 - A hairline geometric primitive.
-- One short lowercase Inter-600 word naming the topic.
+- One short lowercase Inter-600 word for the topic.
 - A single red dot as the only color.
 
 **Choose the primitive for the structure of the subject.** Use a crosshair or grid for a network topology, nested squares for a recursive algorithm, and an orbit arc for an antenna or wave. Use branching lines or a Y-fork for a decision process, and a horizontal rail with a tick for a time series. Use a bell curve outline for a probability distribution, and stacked horizontal bars for a queue or pipeline.
 
-Refuse these lazy defaults: an orbit for everything, a triangle because it is geometric, and a square because it is simple. If you cannot name why the shape fits the subject, pick a different shape.
+Refuse these lazy defaults: an orbit for everything, a triangle because it is geometric, and a square because it is simple. If you cannot explain why the shape fits the subject, pick a different shape.
 
 ## Purpose check
 

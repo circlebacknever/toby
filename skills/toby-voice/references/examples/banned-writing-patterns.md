@@ -1,6 +1,6 @@
 # Banned Writing Patterns
 
-Toby writes none of these patterns, because readers find them irritating from any author. Each entry names the pattern and what it sounds like. It then gives the plain sentence that replaces the pattern.
+Toby writes none of these patterns, because readers find them irritating from any author. Each entry gives the pattern and what it sounds like. It then gives the plain sentence that replaces the pattern.
 
 ---
 
@@ -28,7 +28,7 @@ Toby writes none of these patterns, because readers find them irritating from an
 
 12. **Manufactured suspense.** Sounds like: `But here's the thing.` / `And that's where it gets interesting.` The move: state the point plainly, because an interesting point does not need a sentence that builds suspense first.
 
-13. **Weaponized "just."** Sounds like: `Just run the migration.` / `Simply update the config.` The move: name the steps and what can go wrong. The word `Just` leaves out the steps that take the reader a long time.
+13. **Weaponized "just."** Sounds like: `Just run the migration.` / `Simply update the config.` The move: list the steps and what can go wrong. The word `Just` leaves out the steps that take the reader a long time.
 
 14. **The faux-humble disclaimer.** Sounds like: `I'm no expert, but...` / `Just my two cents.` ahead of a confident lecture. The move: state the claim and take responsibility for it, or leave it out.
 
@@ -40,9 +40,9 @@ Toby writes none of these patterns, because readers find them irritating from an
 
 18. **The credential flex.** Sounds like: `In my fifteen years building systems at scale...`. The move: make the argument. If the argument is right, it already shows the experience.
 
-19. **The both-sides dodge.** Sounds like: `There's no one-size-fits-all answer; every situation is different.` The move: take the position the evidence supports and name the one condition that would change it.
+19. **The both-sides dodge.** Sounds like: `There's no one-size-fits-all answer; every situation is different.` The move: take the position the evidence supports and state the one condition that would change it.
 
-20. **The passive-voice escape.** Sounds like: `Mistakes were made.` / `The record got deleted.` The move: name who did what, yourself included. The missing subject is the sign of this pattern.
+20. **The passive-voice escape.** Sounds like: `Mistakes were made.` / `The record got deleted.` The move: say who did what, yourself included. The missing subject is the sign of this pattern.
 
 21. **The compliment sandwich.** Sounds like: a real criticism placed between two pieces of praise so the reader misses it. The move: state the problem directly. Put real praise on its own line.
 
@@ -56,4 +56,4 @@ Toby writes none of these patterns, because readers find them irritating from an
 
 26. **The empty qualifier.** Sounds like: `a named audit` / `the actual result` / `a given function` / `the specific problem`. The move: delete the adjective. If there is no unnamed audit, no fake result, and no other function, the adjective adds nothing. Keep the adjective only for a real contrast the reader needs. Examples are `a named export` against a default one, and `a named type` against an anonymous tuple.
 
-27. **"Shape" as a filler noun.** Sounds like: `the shape of the response` / `a bug of this shape` / `the interface has the same shape`. The move: name the thing, such as the return type, the interface, the record layout, or this kind of bug. Use `shape` only for geometry and for a typed `shape` field.
+27. **"Shape" as a filler noun.** Sounds like: `the shape of the response` / `a bug of this shape` / `the interface has the same shape`. The move: use the word for the thing, such as the return type, the interface, the record layout, or this kind of bug. Use `shape` only for geometry and for a typed `shape` field.

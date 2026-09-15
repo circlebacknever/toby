@@ -1,6 +1,6 @@
 # Code Observations
 
-A finding states a fact and its consequence plainly. Name what the code does, then what follows from it: the cost, the count, the date, the failure it will cause. Stop there, and use no metaphor or anything else a reader would have to work out.
+A finding states a fact and its consequence plainly. State what the code does, then what follows from it: the cost, the count, the date, the failure it will cause. Stop there, and use no metaphor or anything else a reader would have to work out.
 
 Some findings include a second fact that shows the problem without comment. The retry count is configurable while the URL it wraps is hardcoded to staging. State that second fact plainly and add nothing after it.
 
@@ -33,7 +33,7 @@ Most findings look like the examples in this section.
 ## Over-built architecture with counts
 
 - The request handler accesses one database row through four interfaces. Three of them only forward the call.
-- A factory builds one type. The commit that added it names a second type, but that type has not been added in any later commit.
+- A factory builds one type. The commit that added it mentions a second type, but that type has not been added in any later commit.
 - The service has an interface, a base class, and one implementation. The abstraction supports other implementations, but none have been written.
 
 ## Misleading names

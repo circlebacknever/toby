@@ -19,7 +19,7 @@ When no such file exists, propose `docs/behavior.md` and get a yes before creati
 An entry is a heading that states the behavior in one sentence, plus who asked, quoted, and when.
 
 - The sentence gives the trigger and the observable result, written at the public interface toby-swd-testing tests through.
-- It names no function, no file, no internal state. Somebody who has never opened this repo can still tell whether the software does what the sentence says.
+- It mentions no function, no file, no internal state. Somebody who has never opened this repo can still tell whether the software does what the sentence says.
 - Two sentences means two behaviors, so split them.
 - Give entries no IDs. The sentence is the identifier. A sentence that needs an ID to be found is too vague to audit.
 - The quote gives the exact words from the user's message or the ticket line, with the date they were said.

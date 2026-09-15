@@ -179,7 +179,7 @@ These slide types all go between the cover and the end slide. Compose them freel
 
 | Slide type | Pattern |
 |---|---|
-| **Glossary / definition** | Use an ink tone and a dense 3-column grid of definition blocks. Each column has an eyebrow naming the term cluster. |
+| **Glossary / definition** | Use an ink tone and a dense 3-column grid of definition blocks. Each column has an eyebrow that labels the term cluster. |
 | **Three-card / three-laws** | Place 3 cards side by side, and give each one an eyebrow, a section heading, an SVG diagram, a body, and a formula block. |
 | **Comparison table** | Use a full-width table with mono cells. Group the cells with subhead rows or coloured family stripes. |
 | **Formula slide** | Use an ink tone, with two formula cards side by side and a worked-examples table beneath them. |
@@ -214,7 +214,7 @@ Example claim line: `Bound orbits are ellipses, and everything else about them i
 
 ## Title slide logo primitive
 
-Each deck gets a per-artifact logo, which combines a hairline geometric primitive with one short lowercase Inter-600 word naming the topic. A single red dot is the logo's only color.
+Each deck gets a per-artifact logo, which combines a hairline geometric primitive with one short lowercase Inter-600 word for the topic. A single red dot is the logo's only color.
 
 **Pick the shape for the structure of the subject.** Examples:
 - Network topology, graph, mesh → crosshair or grid lattice
@@ -226,7 +226,7 @@ Each deck gets a per-artifact logo, which combines a hairline geometric primitiv
 - Rotation, orbit, cycle → partial orbit arc, because a closed circle reads as generic decoration.
 - Matrix, table, grid data → small grid of squares, 3×3
 
-Refuse these lazy defaults: an orbit for everything, a plain triangle, and a plain square. If you cannot name why the shape fits the subject's structure, pick a different shape.
+Refuse these lazy defaults: an orbit for everything, a plain triangle, and a plain square. If you cannot explain why the shape fits the subject's structure, pick a different shape.
 
 See `references/geometry.md` for the 20 named geometric marks and their purposes.
 

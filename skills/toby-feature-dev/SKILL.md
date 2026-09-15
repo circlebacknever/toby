@@ -31,7 +31,7 @@ Picking the wrong one of the two modes is expensive in both cases. Acceptance cr
 
 When the user picks a behavior at the end of an experiment, come back here and write the criteria from what they picked. The spike shows which behavior to build, but it does not settle the structure. toby-swd-experiment's finish phase deletes the throwaway code. Any code that is kept gets its own greenfield or brownfield read. When durable work needs a value that reading the code cannot settle, use toby-swd-experiment for that one question. Then bring the answer back here.
 
-Load `toby-swd-strategy` for every durable feature. Strategic and greenfield work gets a full design pass before any code. Tactical work gets its brownfield read and its reactive-investment pass. The operating guide's standing routes apply here under their own conditions. This file does not narrow them. The active-skills line names the skills that fired.
+Load `toby-swd-strategy` for every durable feature. Strategic and greenfield work gets a full design pass before any code. Tactical work gets its brownfield read and its reactive-investment pass. The operating guide's standing routes apply here under their own conditions. This file does not narrow them. The active-skills line lists the skills that loaded.
 
 ## Size the work before anything else
 
@@ -51,8 +51,8 @@ Before picking either size, check that this skill should be running at all. A on
 | Stop 1, the criteria | show them and keep moving | show them and wait |
 | Stop 2, the plan | none | a written file, approved before the first edit |
 | Stop 3, a slice boundary | none | only where the next slice depends on the answer |
-| The Check line | name the command | run it against today's code and quote the output |
-| Behavior record | only when the request names a behavior | every criterion |
+| The Check line | write the command | run it against today's code and quote the output |
+| Behavior record | only when the request describes a behavior | every criterion |
 
 Size up mid-run when a trigger you did not see fires, and say so in one line when you do. Never size down. A change that looked tactical and turned out to touch permissions was strategic the whole time.
 
@@ -63,15 +63,15 @@ The sections below describe each gate.
 **Nearly all work is brownfield work.** Most of these decisions are already made in the repo's existing code, so find where they are made. For strategic work, find all four items below before designing, and keep reading while any is missing. For tactical work, find the first and the third:
 
 - The file that implements this behavior today.
-- The nearest shipped feature built the same way, on the same layer and the same data path. Read it end to end: route, handler, model, test, doc. The new code follows its structure unless you name a reason to differ. Write one clause on what that feature got right, so the user knows which pattern the repo will soon have two copies of.
-- The test covering the behavior about to change, or one sentence that names where you searched, such as "No test in `tests/orders/` covers `cancelOrder`."
+- The nearest shipped feature built the same way, on the same layer and the same data path. Read it end to end: route, handler, model, test, doc. The new code follows its structure unless you state a reason to differ. Write one clause on what that feature got right, so the user knows which pattern the repo will soon have two copies of.
+- The test covering the behavior about to change, or one sentence that states where you searched, such as "No test in `tests/orders/` covers `cancelOrder`."
 - The call sites that the change would affect.
 
-**Greenfield** means the repo has no sibling feature, no convention to inherit, and nothing nearby that resembles the change. Whatever you pick here becomes the pattern that developers copy for the next five features, including the parts you picked because it was late. Before the second file exists, name the two conventions in the repo nearest to this work, even from another layer. Say which one you're extending. Write the module's boundary down once, per toby-swd-modules and toby-swd-interfaces. Ask the user to make the naming call, because product words you invent stay in use after the implementation is gone. The name stays in use even after a rewrite deletes this module. `references/examples.md` has a greenfield example that covers all three steps.
+**Greenfield** means the repo has no sibling feature, no convention to inherit, and nothing nearby that resembles the change. Whatever you pick here becomes the pattern that developers copy for the next five features, including the parts you picked because it was late. Before the second file exists, state the two conventions in the repo nearest to this work, even from another layer. Say which one you're extending. Write the module's boundary down once, per toby-swd-modules and toby-swd-interfaces. Ask the user to make the naming call, because product words you invent stay in use after the implementation is gone. The name stays in use even after a rewrite deletes this module. `references/examples.md` has a greenfield example that covers all three steps.
 
 In both brownfield and greenfield work:
 
-- `rg` finds the file, but you still have to open it, because a search hit only points to the code. Cite a path:line for every claim about how the code behaves, or add the claim to the criteria list as an assumption. That rule includes a summary from an explorer or a sub-agent. Before adding a helper, module, component, hook, or error type, search the repo for the operation. Name the closest thing you found, at path:line, and why it doesn't fit. When you find nothing, quote the search you ran, including the pattern.
+- `rg` finds the file, but you still have to open it, because a search hit only points to the code. Cite a path:line for every claim about how the code behaves, or add the claim to the criteria list as an assumption. That rule includes a summary from an explorer or a sub-agent. Before adding a helper, module, component, hook, or error type, search the repo for the operation. Cite the closest thing you found, at path:line, and why it doesn't fit. When you find nothing, quote the search you ran, including the pattern.
 - Read the behavior record for the area you're touching. Its entries are the standing claims about that area, so when an entry contradicts the request, ask the user before writing any code.
 
 ## Evidence for each criterion
@@ -80,8 +80,8 @@ Write each acceptance criterion as three short lines before any code. Add one mo
 
 - **Observable** — this line says what the user or caller sees at the entry point they touch, after an action from a starting state. For example: "an expired token gets a 401, and the retry after refresh returns the account." An entry point is where something outside the changed module arrives. Examples are an HTTP request, a CLI invocation, a screen someone opens, a queue message, and an exported symbol another module calls. If a reader can check a line only by reading the diff, the line adds nothing to the diff, so rewrite it or cut it.
 - **Source** — quote the user sentence or ticket line the criterion came from, or cite at path:line the repo fact that forces it. Treat a repo fact with no path:line as your own preference. Cite a repo fact as the source only when the request says nothing about that behavior.
-- **Check** — name the command that shows the criterion holding, before writing any code. For strategic work, run the command against today's code first and quote the output at stop 1. That starting run makes the criterion provable later. For tactical work, name the command and run it after the change. Either way, if a check cannot run at all, say so before anyone approves the criterion. Name the result that would mean the criterion is unmet, because a check with no failing result passed before you wrote it. Mark the criterion `unverified` when the run needs something you cannot get, such as an approval-gated command, a credential, an external service, or a device. Name the blocker on the same line. A check you could have run and skipped leaves the criterion unmet.
-- Reuse the vocabulary already in the schema, the routes, and the UI. Before giving a concept a second name, ask the user. When the request as worded and the problem as described disagree, name the gap first. A feature built to the exact words of the request can match them and still fail to solve the problem.
+- **Check** — write the command that shows the criterion holds, before writing any code. For strategic work, run the command against today's code first and quote the output at stop 1. That starting run makes the criterion provable later. For tactical work, write the command and run it after the change. Either way, if a check cannot run at all, say so before anyone approves the criterion. State the result that would mean the criterion is unmet, because a check with no failing result passed before you wrote it. Mark the criterion `unverified` when the run needs something you cannot get, such as an approval-gated command, a credential, an external service, or a device. State the blocker on the same line. A check you could have run and skipped leaves the criterion unmet.
+- Reuse the vocabulary already in the schema, the routes, and the UI. Before giving a concept a second name, ask the user. When the request as worded and the problem as described disagree, state the gap first. A feature built to the exact words of the request can match them and still fail to solve the problem.
 
 **Criteria are fixed text once coding starts.** If you widen a criterion, mention it in the next report. Dropping or narrowing a criterion changes what the user asked for, so give the reason and the new wording. Wait for a yes before the next edit.
 
@@ -107,8 +107,8 @@ A slice ships when all four hold:
 
 - It leaves the system working. Show that by running the command that covers the touched area after the slice, and quote the output. Where a criterion is a claim about what that command printed before the change, run it first too and quote both. Without that starting run the criterion is unprovable, so report it as unprovable.
 - The user can observe its result without reading the diff, for example through a request they can send, a screen they can open, or a command they can run.
-- It is correct on its own. Half-built behavior a user can reach is a defect, so a slice depending on a later one ships behind a flag defaulted off, or does not ship until the later slice does. Observe a flagged slice with the flag on. Name the flag, how to turn it on, and the slice that deletes it.
-- It's reachable from outside its own module. Name the wiring at path and line: the registered route, the render site, the caller of the exported symbol, the CLI subcommand, the event subscription.
+- It is correct on its own. Half-built behavior a user can reach is a defect, so a slice depending on a later one ships behind a flag defaulted off, or does not ship until the later slice does. Observe a flagged slice with the flag on. State the flag, how to turn it on, and the slice that deletes it.
+- It's reachable from outside its own module. Give the path and line of the wiring, such as the registered route, the render site, the caller of the exported symbol, the CLI subcommand, the event subscription.
 
 Cutting by layer is a wrong cut. `references/checks.md` lists it as **layer cut**. `references/examples.md` has four cuts worked end to end, brownfield and greenfield.
 
@@ -126,16 +126,16 @@ Never write "assuming yes, proceeding" past a stop, which leaves this skill with
 
 Write the plan as a file, and never agree on a plan in scrollback, because nobody can check off items in scrollback. The operating guide defines the format: `Toby's plan for [task]`, task groups, checkboxes, and a verification block ending each group. This file defines when the plan gets written and what a step must contain for someone to approve it.
 
-- The plan is **written when** the user asks. A yes at stop 1 counts as asking only when stop 1 named the plan.
+- The plan is **written when** the user asks. A yes at stop 1 counts as asking only when stop 1 mentioned the plan.
 - The plan goes **where** the repo already keeps plans. When there is no obvious place, propose a path and get a yes, which is the same gate the behavior record has.
 - The plan **opens with** the mode, the one-line problem, the criteria in their pre-code wording, and what's out of scope. One task group per slice follows, in the order the slices ship. Each group takes its slice's name as its title and ends in its verification block. An operator approving a plan is approving the boundary as much as the work.
 - **Anything on** the ask-list in the operating guide or toby-swd-environment appears as its own step with the exact command. That ask-list includes a migration, install, seed, snapshot, deletion, process, or port.
 - **The plan is the execution record.** Check items off as they are done. When execution diverges from an approved step, edit the plan and say what changed before continuing.
-- **A step an operator can approve** names the file it touches at path, and whether the step creates, edits, or deletes that file. It says what changes there, concretely enough for someone to disagree with. It names the criterion the step is for, by its wording, and what proves it, with the result that would mean it failed. Write each step as whole sentences. `references/examples.md` contains a task group written at that detail.
+- **A step an operator can approve** gives the path of the file it touches, and whether the step creates, edits, or deletes that file. It says what changes there, concretely enough for someone to disagree with. It quotes the criterion the step is for, and what proves it, with the result that would mean it failed. Write each step as whole sentences. `references/examples.md` contains a task group written at that detail.
 
 ## Build one slice at a time
 
-- Work on one criterion per cycle: write the test first, watch it fail, make it pass, and run it. toby-swd-testing covers when test-first is skipped. When you skip it, name the skip in toby-swd-testing's words, run the criterion by hand, and quote the output.
+- Work on one criterion per cycle: write the test first, watch it fail, make it pass, and run it. toby-swd-testing covers when test-first is skipped. When you skip it, give the skip reason in toby-swd-testing's words, run the criterion by hand, and quote the output.
 - Write what the design called for. If you find yourself writing less code than the design called for, the design was wrong, so fix the design and say you did.
 - Confirm every symbol this change didn't define against the installed source or the pinned manifest. A symbol can be a library function, config field, env var, CLI flag, component prop, or error type. Skip the check when this repo already calls the symbol somewhere you can cite at path:line. The lockfile version is the one that runs, so docs for a later version are a guess.
 - Re-read a file before editing it a second time when anything else happened in between. Your memory of a file you changed three steps ago may be wrong, even when you feel sure of it.
@@ -150,23 +150,23 @@ Write the plan as a file, and never agree on a plan in scrollback, because nobod
       before  test_cancel_rejects_shipped  FAIL  expected 409, got 200
       after   test_cancel_rejects_shipped  PASS
 
-  Use the same form for every criterion in every slice, with the command named beside it. The check has to execute the new code path, so an `after` run with no `before` run proves only that the harness runs. Report that criterion met-unproven and name the run that never happened.
+  Use the same form for every criterion in every slice, with the command written beside it. The check has to execute the new code path, so an `after` run with no `before` run proves only that the harness runs. Report that criterion met-unproven and state the run that never happened.
 - A green type-check, a lint pass, or an existing suite that never runs the changed lines proves only that the repo still builds. The repo also built before you started.
-- Run the change the way a user would and quote what came back. When that needs an approval-gated command, name the exact command and ask for it. Saying "this needed approval" with no command named is a skipped step. Hand manual steps to the user only for what you couldn't run, labelled run-by-me or for-you. Every for-you step says what blocked you. When a step is handed over with no reason, the user reads it as a chore you assigned.
+- Run the change the way a user would and quote what came back. When that needs an approval-gated command, write out the command and ask for approval. Saying "this needed approval" with no command given is a skipped step. Hand manual steps to the user only for what you couldn't run, labelled run-by-me or for-you. Every for-you step says what blocked you. When a step is handed over with no reason, the user reads it as a chore you assigned.
 
 ## Write the behavior down
 
 Write down what the request said the behavior should be. A year later, the code shows what it does but not what it was for. The next reader then checks the code against their own guess and files the difference as a bug.
 
-- **Fires** when the request contains words for a behavior, from the user or the ticket, and the record doesn't state that behavior yet. `references/behavior-record.md` lists the changes that write no entry and says where an inferred behavior goes. When a run writes no entry, name the reason from that list.
+- **Fires** when the request contains words for a behavior, from the user or the ticket, and the record doesn't state that behavior yet. `references/behavior-record.md` lists the changes that write no entry and says where an inferred behavior goes. When a run writes no entry, give the reason from that list.
 - **Home** is a prose file the repo already keeps for stated behavior. When no such file exists, propose `docs/behavior.md` and get a yes before creating it, which is the same gate the plan file has.
-- **Entry** is a heading that states the behavior in one sentence. The sentence gives the trigger and the observable result at the public interface `toby-swd-testing` tests through. It names no function, file, or internal state. Add who asked, quoted, and when. Two sentences means two behaviors, so split them. The test description quotes that sentence verbatim, character for character.
-- **Check**, before handoff: run the grep in `references/behavior-record.md` and report what it printed. Each line it prints is a stated behavior that has no test, so name each one in the handoff.
+- **Entry** is a heading that states the behavior in one sentence. The sentence gives the trigger and the observable result at the public interface `toby-swd-testing` tests through. It mentions no function, file, or internal state. Add who asked, quoted, and when. Two sentences means two behaviors, so split them. The test description quotes that sentence verbatim, character for character.
+- **Check**, before handoff: run the grep in `references/behavior-record.md` and report what it printed. Each line it prints is a stated behavior that has no test, so list each one in the handoff.
 - **Retire** an entry in the diff that deletes its test, and edit a falsified sentence in the diff that falsifies it. `references/behavior-record.md` covers both, the entry rules in full, and the two-branch case.
 
 ## Don't build
 
-`references/checks.md` lists the seven things that get built without anyone asking for them. Each stays out unless a criterion names it and that criterion's Source line quotes the user or the ticket. Read the seven before writing the plan's out-of-scope line, or before the first edit where there is no plan. Never write a criterion yourself to allow one of them, because the catalog is there to prevent that.
+`references/checks.md` lists the seven things that get built without anyone asking for them. Each stays out unless a criterion asks for it and that criterion's Source line quotes the user or the ticket. Read the seven before writing the plan's out-of-scope line, or before the first edit where there is no plan. Never write a criterion yourself to allow one of them, because the catalog is there to prevent that.
 
 ## Resuming half-built work
 
@@ -183,11 +183,11 @@ Lead with the behavior that now exists, stated the way the user would observe it
 This file adds two sections, and both always appear:
 
 1. List each criterion in its pre-code wording, marked met with the check that proved it, or unverified with the reason. For multi-slice work, list each slice by name, marked done or not-done, with its evidence.
-2. List the behavior record entries written, edited, or retired, and the result of the check. When no entry fired, say so and why. Say where the plan is, and name any step that ran differently from the approved wording.
+2. List the behavior record entries written, edited, or retired, and the result of the check. When no entry fired, say so and why. Say where the plan is, and list any step that ran differently from the approved wording.
 
 Then give the operating guide's list: anything incomplete or risky, tests deleted or weakened, heavy commands skipped, processes left running, and unsettled assumptions.
 
-Phrase each standing assumption so the user can settle it in a word. Name the questions this run could not resolve. List any placeholder left in a production path at file:line. List what you found and left alone, one line each, with the skill that covers each item. Dropping a section is a claim you checked it and found it empty.
+Phrase each standing assumption so the user can settle it in a word. List the questions this run could not resolve. List any placeholder left in a production path at file:line. List what you found and left alone, one line each, with the skill that covers each item. Dropping a section is a claim you checked it and found it empty.
 
 ## References
 

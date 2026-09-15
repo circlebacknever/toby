@@ -14,7 +14,7 @@ description: >-
 
 The interface is everything a caller must know to use a module correctly. It includes the signature and the informal contract that only comments can state, which covers behavior, side effects, ordering constraints, and errors. The interface is a cost the module imposes on the rest of the system, because callers must learn it. The implementation provides the module's benefit. Keep that cost much smaller than that benefit, so the module offers substantial functionality through a simple interface. For a message-channel boundary, the "signature" is the message contract: the request and response types, what is preserved through serialization, and the delivery guarantees.
 
-Design the interface first, so you find a good interface before the implementation commits you to a bad one. The interface is also the earliest signal that the design is wrong. If you cannot write a short comment that names no internals, treat that failure as a bug report. You get that report while the abstraction exists only as text.
+Design the interface first, so you find a good interface before the implementation commits you to a bad one. The interface is also the earliest signal that the design is wrong. If you cannot write a short comment that mentions no internals, treat that failure as a bug report. You get that report while the abstraction exists only as text.
 
 Everything below applies identically to every interface in the stack:
 
@@ -82,10 +82,10 @@ Escalate to the **design-it-twice loop** when the interface is consequential. Al
 
 1. Write one candidate as signatures plus interface comments with empty bodies, and describe what each one does without describing how.
 2. Run the comment test.
-3. If it fails, name the exact failure ("the comment had to describe the retry buffer"). Use that named flaw to build the next candidate, which is a structurally different decomposition that removes that problem. A rename does not count.
+3. If it fails, state what failed ("the comment had to describe the retry buffer"). Use that flaw to build the next candidate, which is a structurally different decomposition that removes that problem. A rename does not count.
 4. Stop as soon as one candidate passes for a routine interface, two pass for a consequential one, or you reach three candidates total. Never write more than three candidates.
 
-If you reach three candidates and none passes, give the strongest candidate to the human and name the exact blocker. Writing more than three candidates uses quota without reaching a passing candidate.
+If you reach three candidates and none passes, give the strongest candidate to the human and say what blocks it. Writing more than three candidates uses quota without reaching a passing candidate.
 
 ### 5. Resolve a real tie
 
@@ -93,7 +93,7 @@ Spend the one expensive step, a second independent call, only when the interface
 
 When both conditions hold and an independent review tool is available, use the tool as a critic. Send it the passing signatures and interface comments only, with no implementations and no hint of your preference. Send the comment-test predicate too, and this rubric in priority order: common-case caller burden, generality, efficiency, then depth without over-hiding (step 7). Ask for one verdict: the chosen candidate, a one-line reason per rubric item, and any over-hiding risk. Treat the verdict as evidence you weigh. Choose deliberately, and fix a real over-hiding risk before writing any body.
 
-If the human rejects all candidates, treat their stated reason as one new named flaw. Generate exactly one more candidate that fixes that flaw, then stop.
+If the human rejects all candidates, treat their stated reason as one new flaw. Generate exactly one more candidate that fixes that flaw, then stop.
 
 ### 6. When the comment test shows that a redesign is needed
 

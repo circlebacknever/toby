@@ -295,7 +295,7 @@ failure looks like to the caller.
 The return type states that contract. A
 typed outcome per input (created, or rejected with a reason) lets the caller
 act on a partial success. An all-or-nothing variant rejects the whole batch
-and names the row that broke it. A flat array of successes can express
+and reports the row that failed. A flat array of successes can express
 neither.
 
 The row-by-row import is the same N+1 problem over a network as the mobile

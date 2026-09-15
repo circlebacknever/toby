@@ -4,12 +4,12 @@ toby-feature-dev checks work against the don't-build catalog and the red-flag li
 
 ## Don't build — seven entries
 
-Each stays out unless a criterion names it and that criterion's Source line quotes the user or the ticket. Never write a criterion to allow one of these, because the catalog is there to prevent that. When one ships anyway, name the entry and the criterion that allowed it.
+Each stays out unless a criterion asks for it and that criterion's Source line quotes the user or the ticket. Never write a criterion to allow one of these, because the catalog is there to prevent that. When one ships anyway, state the entry and the criterion that allowed it.
 
 - **The one-caller config option** is a setting, hook, or extension point that exactly one call site reads. A slice flag ships with the slice that deletes it, but this option ships with a default. Its value is `true` today and stays `true` until the repo is archived.
 - **The wrapper over one instance** is a new module, layer, or adapter in front of a single implementation. Widen the interface you already have per toby-swd-interfaces and wait for a second instance, because a second instance shows you the pattern.
 - **Handling for a ruled-out condition** is error handling for a state that the types or an earlier check already exclude. A catch block that has never caught anything does no more than a comment would, but it still costs time at runtime.
-- **The adjacent feature, and the adjacent bug** are the thing the request implies and the defect you found on the way to it. Changes made "while I was in there" turn a two-file diff into a nine-file diff. Name each as a follow-up and stop. The one exception is toby-swd-strategy's reactive pass. It allows a small local cleanup inside a file a criterion already named, reported on its own line.
+- **The adjacent feature, and the adjacent bug** are the thing the request implies and the defect you found on the way to it. Changes made "while I was in there" turn a two-file diff into a nine-file diff. List each as a follow-up and stop. The one exception is toby-swd-strategy's reactive pass. It allows a small local cleanup inside a file a criterion already mentions, reported on its own line.
 - **The uninvited migration** is a migration, rename, or reorganization that no criterion asked for. It appears unrequested in somebody else's review, so the reviewer has to decide whether to trust it.
 - **Faster than nothing** is performance work with no measurement behind it. Without a starting measurement, a claim such as 40% faster has no recorded number to compare against.
 - **The dependency nobody approved** is a new dependency added without approval. Adding it makes a decision for the user about their lockfile, build, and security review.

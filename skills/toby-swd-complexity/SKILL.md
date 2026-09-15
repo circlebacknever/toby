@@ -57,7 +57,7 @@ The design-time steps are cheap and apply on every edit. Build a measurement har
 
 ## Brownfield Work
 
-In existing code, inspect the current error, validation, retry, cache, batching, and performance paths before adding another branch. If the same complexity is scattered across nearby call sites, name the local consolidation that would remove it. Offer that refactor when it fits the task. Preserve caller-visible errors, timing, logs, metrics, and status codes unless the user approves a behavior change. If the consolidation establishes a module rule, offer to record it in the nearest meaningful AGENTS.md.
+In existing code, inspect the current error, validation, retry, cache, batching, and performance paths before adding another branch. If the same complexity is scattered across nearby call sites, propose the local consolidation that would remove it. Offer that refactor when it fits the task. Preserve caller-visible errors, timing, logs, metrics, and status codes unless the user approves a behavior change. If the consolidation establishes a module rule, offer to record it in the nearest meaningful AGENTS.md.
 
 ## Red flags
 

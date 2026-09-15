@@ -4,7 +4,7 @@ The one-decision loop does not work for two cases: many items the learner must r
 
 ## Spot the mode
 
-- Retention — the learner names a count ("these 40 words"), hands you a list, table, or paradigm, or says "drill, memorize, quiz me, review." Success is recalling them later, after the session.
+- Retention — the learner gives a count ("these 40 words"), hands you a list, table, or paradigm, or says "drill, memorize, quiz me, review." Success is recalling them later, after the session.
 - Production (language) — the learner wants to say, write, or speak the target language, or hands you target-language text.
 
 ## The retrieval loop (retention)

@@ -38,7 +38,7 @@ class RateLimiter:
         buckets, tokens, or time."""
 ```
 
-The complete contract is two sentences and names none of its internals. Tokens,
+The complete contract is two sentences and mentions none of its internals. Tokens,
 refill cadence, and the clock moved inside. The interface got smaller, and at the same time the
 module got deeper. The guardrail check is whether anything the caller
 needs is now hidden. If callers must show a retry-after hint, expose that one value

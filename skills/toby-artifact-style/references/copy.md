@@ -33,7 +33,7 @@ Apply this cut after the first three tests pass. If a reader who already knows t
 
 Do not invent contrasts, because `It's not X, it's Y` is filler whenever nobody claimed X. Write the positive form.
 
-A comparison of two options that both exist counts as content. A comparison table, a rejected-alternative callout, and a "chose A over B because C" caption all name a real option, so they ship. The operating guide states the full rule.
+A comparison of two options that both exist counts as content. A comparison table, a rejected-alternative callout, and a "chose A over B because C" caption all refer to a real option, so they ship. The operating guide states the full rule.
 
 ---
 
@@ -96,11 +96,11 @@ Match the qualifier to what is known about the claim. Don't hedge a known claim 
 
 **State assumptions explicitly.** When a conclusion depends on an assumption, write the assumption as a sentence next to the conclusion, such as "This estimate assumes the traffic mix from May."
 
-**The clarity rules apply most strictly to labels.** An axis title, a legend entry, a KPI caption, a table header, and a slide heading are each subject to the three-word cap on noun stacks. `user session token refresh failures` stacks five words, so it becomes `failed token refreshes`. When the stack cannot be shortened, name the relation with a preposition: `resistance at the light connection`.
+**The clarity rules apply most strictly to labels.** An axis title, a legend entry, a KPI caption, a table header, and a slide heading are each subject to the three-word cap on noun stacks. `user session token refresh failures` stacks five words, so it becomes `failed token refreshes`. When the stack cannot be shortened, state the relation with a preposition: `resistance at the light connection`.
 
 **Use one name for each thing across the whole artifact.** A series called `p95 latency` in the chart is `p95 latency` in the legend, the caption, and the summary slide. A renamed series reads as a second series.
 
-**A decision is a whole sentence that names the action and its reason.** "Approve the controlled release, because both meters stayed inside the watch band." A button label can be the verb alone, such as Approve or Hold.
+**A decision is a whole sentence that states the action and its reason.** "Approve the controlled release, because both meters stayed inside the watch band." A button label can be the verb alone, such as Approve or Hold.
 
 **Do not use first person** (we, I, our). **Do not use second person** (you, your) in most reference contexts.
 
@@ -123,7 +123,7 @@ Layouts with a hero, feature cards, and a CTA are allowed, but the copy inside t
 
 - **Hero headline:** state what the thing does. "This tool models p95 latency under burst load." passes. "Built for performance you'll love" fails.
 - **Feature card:** give a concrete behavior and the measurement that backs it. "In a test at 10⁴ events per second, the monitor detected a threshold breach within 50 ms."
-- **CTA verb:** name the next step. "Read the derivation." "Open the worked example." "Run the benchmark." Never write `Get started.` or `Start your journey.`
+- **CTA verb:** state the next step. "Read the derivation." "Open the worked example." "Run the benchmark." Never write `Get started.` or `Start your journey.`
 - Testimonials, social-proof counts, and "as seen in" rows are not allowed unless the artifact exists to show those sources.
 
 ---
@@ -157,4 +157,4 @@ The paragraph fails all four tests, because it uses an adjective stack, inflated
 ### After
 > The dashboard shows an alert when p95 latency stays above 200 ms for 60 seconds. It samples latency once per second. The data comes from production traces for the last 30 days, about 2.6 million requests.
 
-The revision names the mechanism, threshold, sampling rate, source, and sample size. Every value has a unit. Its slide title would state the claim: "The dashboard alerts when p95 latency passes 200 ms."
+The revision states the mechanism, threshold, sampling rate, source, and sample size. Every value has a unit. Its slide title would state the claim: "The dashboard alerts when p95 latency passes 200 ms."

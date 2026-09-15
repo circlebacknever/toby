@@ -266,8 +266,7 @@ interface CacheStrict {
 }
 ```
 
-The same comment test applies. Whichever choice you make, name
-it in the contract. Stale-while-revalidate is a third documented choice.
+The same comment test applies. Whichever choice you make, state it in the contract. Stale-while-revalidate is a third documented choice.
 It serves a bounded-age value while a background load refreshes it, so the
 "never stale" line above no longer holds. The staleness window becomes part
 of the contract, the same way the rule about calling `load()` directly does.

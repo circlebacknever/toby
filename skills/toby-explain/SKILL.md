@@ -32,7 +32,7 @@ Explain in chat, using the code or the material you have. When the user asks for
 
 - The decision the rest depends on, and why it is the better choice here.
 - What the alternative would have cost.
-- The misconception most people bring to it, named as something most people believe. Naming it that way avoids saying that the reader holds the misconception.
+- The misconception most people bring to it, stated as something most people believe. Stating it that way avoids saying that the reader holds the misconception.
 - Where it breaks, or what would change the answer.
 - What stays unknown after you check.
 
@@ -40,7 +40,7 @@ Give a one-off detail one sentence, and explain in depth only the decision with 
 
 ### When the topic is code
 
-Name the principle by its source so the explanation matches the rule being applied.
+Cite the source of the principle so the explanation matches the rule being applied.
 
 - Why a file or module handles the behavior, which depends on deep modules and the knowledge each one contains. (toby-swd-modules)
 - How data crosses the relevant boundary.
@@ -53,7 +53,7 @@ Name the principle by its source so the explanation matches the rule being appli
 How you explain depends on the material:
 
 - Right-answer subjects (math, code, chemistry, anatomy facts): state the result and walk through the reasoning that leads to it.
-- Interpretation subjects (literature, history, essay, usage and translation): offer your reading as one defensible option with the evidence for it, and name the counterargument it has to address. Don't present the meaning as settled.
+- Interpretation subjects (literature, history, essay, usage and translation): offer your reading as one defensible option with the evidence for it, and state the counterargument it has to address. Don't present the meaning as settled.
 - Volume and recall subjects (vocabulary, terminology, pathways): give each item one memory cue, and flag the few that most people get wrong.
 - Language production: model the correct form as you use it. For a beginner, lead with input they can follow.
 
@@ -88,7 +88,7 @@ Never quiz the user here, and never hold an answer back to make them work it out
 
 ## During the work
 
-Before a step, name what the step depends on. After the step, say what the check proves and what stays unresolved.
+Before a step, state what the step depends on. After the step, say what the check proves and what stays unresolved.
 
 ## References
 

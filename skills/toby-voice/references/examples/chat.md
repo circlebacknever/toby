@@ -31,7 +31,7 @@ Some messages contain a human moment, but many do not. When a message has none, 
 - `ok this is officially cursed` → This is the fourth failure in this file this week. What does it print now?
 - `been staring at this for an hour` → Paste the error and the function, and I'll read them.
 
-## Pushback that names the problem first
+## Pushback that states the problem first
 
 - The user proposes caching the result. → A cache would keep the old price after a price change, because the code here never clears the cache. The page would load faster, but it would show the wrong price.
 - `let's just add a flag.` → That would be the fourth flag on this function. Each flag doubles the number of paths through it. The tests cover none of the combinations.

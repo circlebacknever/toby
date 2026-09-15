@@ -12,7 +12,7 @@ description: >-
 
 Validate the change, report the real risks, and stop. Six findings that look confident but turn out fake waste more time than the bug itself. Size the report to the change. A busy engineer should read it once and trust it.
 
-**Report problems and do not fix them.** This skill reports and edits nothing. A bug or a security finding does not name a skill for the fix, because the finding already states the fix. A design or coverage finding names the skill for the fix, so the next agent knows which skill to load. The skills for these fixes are `toby-swd-interfaces` for a contract, `toby-swd-modules` for placement, `toby-swd-complexity` for an error path or a cache, `toby-swd-testing` for coverage, `toby-swd-clarity` for a name or a comment, `toby-swd-strategy` for a design that got worse. `toby-simplify-code` is for behavior-preserving cleanup the user asked for.
+**Report problems and do not fix them.** This skill reports and edits nothing. A bug or a security finding does not cite a skill for the fix, because the finding already states the fix. A design or coverage finding cites the skill for the fix, so the next agent knows which skill to load. The skills for these fixes are `toby-swd-interfaces` for a contract, `toby-swd-modules` for placement, `toby-swd-complexity` for an error path or a cache, `toby-swd-testing` for coverage, `toby-swd-clarity` for a name or a comment, `toby-swd-strategy` for a design that got worse. `toby-simplify-code` is for behavior-preserving cleanup the user asked for.
 
 ## Disposition
 
@@ -34,10 +34,10 @@ Validate the change, report the real risks, and stop. Six findings that look con
 Write each finding as three labelled lines, and make each line a whole sentence. If you can't fill them from the file you are reviewing, there's no finding, so drop it.
 
 - **Consequence** — This line says in plain words what breaks and for whom, at file:line. An example is "The account page returns last month's balance to a logged-in user on first load (api/account.ts:42)." Claim only the effects that the trigger and path can cause. If the path ends at a failed request, the consequence ends there. Claim data loss only when the path includes the write.
-- **Fires when** — This line names the concrete input or state that triggers the failure, and the real caller, route, input, or test that supplies it. If you can't name where the value comes from, you're guessing it can happen, so move it to a question or drop it.
-- **Guard** — This line quotes the check that should stop the failure and says why the check misses. When no check exists, write one sentence that says so and names where you looked, such as "No check in the router or `api/middleware/` stops it." Before writing this line, assume the code is right and you are wrong. Search for the guard that would make your finding fake, and then say why that guard still fails. Most fake findings fail at this step.
+- **Fires when** — This line states the input or state that triggers the failure, and the real caller, route, input, or test that supplies it. If you can't show where the value comes from, you're guessing it can happen, so move it to a question or drop it.
+- **Guard** — This line quotes the check that should stop the failure and says why the check misses. When no check exists, write one sentence that says so and lists where you looked, such as "No check in the router or `api/middleware/` stops it." Before writing this line, assume the code is right and you are wrong. Search for the guard that would make your finding fake, and then say why that guard still fails. Most fake findings fail at this step.
 
-Run the changed code before writing findings, so you find what you have missed. Run unasked what `toby-swd-environment` calls safe inspection or narrow verification: the changed function in a REPL, a scratch script, the one test file covering it. Ask before anything on that skill's ask-list: the full suite, a migration, an install, a dev server. Name the command you want and why. In the report, say which findings depend on reading alone.
+Run the changed code before writing findings, so you find what you have missed. Run unasked what `toby-swd-environment` calls safe inspection or narrow verification: the changed function in a REPL, a scratch script, the one test file covering it. Ask before anything on that skill's ask-list: the full suite, a migration, an install, a dev server. State the command you want and why. In the report, say which findings depend on reading alone.
 
 Give changed arithmetic and changed predicates the inputs a quick read misses: negative, zero, empty, and the value either side of every boundary. Then paste what came back into the Consequence line. These inputs reveal sign errors, unit mismatches, and totals that disagree with what got stored. No catalog lists those bugs.
 
@@ -80,7 +80,7 @@ Ask whether the design is at least as good after the change as before it, which 
 - What hidden dependency did it create? Examples are a decision in two modules, an ordering a caller must respect, and a field layout two files share with nothing enforcing it.
 - Which of these was cheaper to fix in this diff than it will ever be again?
 
-Report at most one design finding, at file:line, and name `toby-swd-strategy` in it. The author already had to answer this question, so answering it is in scope. Reopening the design is out of scope.
+Report at most one design finding, at file:line, and cite `toby-swd-strategy` in it. The author already had to answer this question, so answering it is in scope. Reopening the design is out of scope.
 
 ## What to catch
 
@@ -108,12 +108,12 @@ Report at most one design finding, at file:line, and name `toby-swd-strategy` in
 Review a change to a `SKILL.md`, an operating guide, a hook, or an agent config for what it does to every later run. Reading it as prose misses those effects, so ask these three questions. Only this section asks them:
 
 - **Does this rule contradict another skill?** Quote both, at path:line. Two skills stating opposite rules is a finding whichever one is right.
-- **Does a description edit change what fires?** A widened trigger noun makes the agent load a skill on tasks it should skip. A narrowed trigger noun stops the agent from loading the skill on tasks that need it. Name the task that now routes somewhere else.
+- **Does a description edit change what fires?** A widened trigger noun makes the agent load a skill on tasks it should skip. A narrowed trigger noun stops the agent from loading the skill on tasks that need it. Give a task that now loads a different skill.
 - **Did a rule vanish while text moved?** A diff that moves text between files looks tidy. Run `scripts/rule-inventory.py` against both sides, or the repo's equivalent, and report any unmatched deletion at its old path:line.
 
 ## Final report
 
-Match length to the change. A diff with nothing wrong gets one line that says there are no findings and names any residual risk. Name that risk specifically, and say why it stayed unverified. A trivial diff gets at most one finding. For any report longer than one line, write these sections in order, and drop any section that's empty:
+Match length to the change. A diff with nothing wrong gets one line that says there are no findings, states any residual risk, and says why that risk stayed unverified. A trivial diff gets at most one finding. For any report longer than one line, write these sections in order, and drop any section that's empty:
 
 1. Findings.
 2. A question you'd ask the author, included only when the answer needs information the code can't give (runtime config, an external service, product intent). Drop a hunch you couldn't prove, because it doesn't belong here.

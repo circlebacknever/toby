@@ -55,7 +55,7 @@ Move the code toward that structure. Often the answer is "what's there now, plus
 
 ## Brownfield Work
 
-On existing code, read the current design before choosing a new one. Identify the smallest local refactor that would make the requested change fit naturally. If that refactor is small, scoped to touched code, and lowers future cost, offer it with its cost and benefit before doing it. If it would expand the task, name the tradeoff and let the user choose between the refactor and the smaller tactical change.
+On existing code, read the current design before choosing a new one. Identify the smallest local refactor that would make the requested change fit naturally. If that refactor is small, scoped to touched code, and lowers future cost, offer it with its cost and benefit before doing it. If it would expand the task, state the tradeoff and let the user choose between the refactor and the smaller tactical change.
 
 ## When the quick fix is the correct choice
 
@@ -65,13 +65,13 @@ Take the tactical path when:
 - The sound refactor would change an interface other teams or callers depend on, and coordinating that is out of scope.
 - The sound version requires information you don't have and can't get.
 
-"This is faster" alone is not on the list. When you take the quick path for a real reason, make the debt visible. Leave a comment naming what the sound design would be and why you skipped it. Never leave that debt unlabeled, because the next person cannot see it to fix it.
+"This is faster" alone is not on the list. When you take the quick path for a real reason, make the debt visible. Leave a comment that states what the sound design would be and why you skipped it. Never leave that debt unlabeled, because the next person cannot see it to fix it.
 
 ## Writing a design note
 
 - Put the recommendation and its main reason in the first sentence, such as "Use an `audit_log` table, because the monthly report reads events by date." Do not open with a sentence about the note or with a label.
 - Describe each approach once. Then compare the approaches on the facts you were given, one fact per sentence.
-- Do not add a column, an index, a volume, or a cost that the request and the code do not show. Name an unknown only when its answer could change the recommendation.
+- Do not add a column, an index, a volume, or a cost that the request and the code do not show. Specify an unknown only when its answer could change the recommendation.
 - End after the last comparison or unknown, with no summary of the reasons.
 - Terms in this skill, such as near-future variant, are for your reasoning. The note states the fact behind the term, such as "Finance asked for refund events in the same history."
 

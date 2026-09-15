@@ -9,7 +9,7 @@ The wrong answer is `process.env.THING` scattered through the code. Each read is
 ## Four rules
 
 1. **One module reads the environment.** `process.env` and `import.meta.env` appear in exactly one file. Everything else receives values from it.
-2. **Parse and validate at startup.** That module turns raw strings into a typed, frozen object with `zod`, `envalid`, or a hand-written parser. A missing or malformed variable stops boot with a message that names it. Without this check, a bare `undefined` appears three layers down under load.
+2. **Parse and validate at startup.** That module turns raw strings into a typed, frozen object with `zod`, `envalid`, or a hand-written parser. A missing or malformed variable stops boot with a message that includes the variable's name. Without this check, a bare `undefined` appears three layers down under load.
 3. **Inject the typed values.** A module receives `config.databaseUrl`, or a client already built from it, passed in where the app is wired together. It does not import the config module and read fields from it. That import is the hidden dependency rule 1 removes. It also makes the module hard to test.
 4. **The config module is deep.** The interface is a handful of typed fields. The module hides the variable names, the parsing, the coercion, the defaults, the validation, and the work of keeping secrets out of log lines.
 
@@ -17,7 +17,7 @@ The wrong answer is `process.env.THING` scattered through the code. Each read is
 
 ## The composition root
 
-The composition root is the one place that uses both the config values and the concrete classes. It is the entry point: `main`, `server.ts`, the top of `App`. It reads config, constructs the real implementations, and passes them down. Code below it does not name an environment variable or pick an implementation.
+The composition root is the one place that uses both the config values and the concrete classes. It is the entry point: `main`, `server.ts`, the top of `App`. It reads config, constructs the real implementations, and passes them down. Code below it does not reference an environment variable or pick an implementation.
 
 ```ts
 // config.ts is the only file that reads the environment

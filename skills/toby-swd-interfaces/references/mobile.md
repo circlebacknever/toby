@@ -221,7 +221,7 @@ Android size limits (it batches writes or drops oldest items if needed).
 Keychain/Keystore, because AsyncStorage is not encrypted). The screens that use these modules
 don't know any of that.
 
-Logout code now names each store to clear:
+Logout code now lists each store to clear:
 
 ```ts
 await Session.clear();
@@ -299,7 +299,7 @@ function useOrderScreen(orderId: string): OrderScreenState;
 Comment:
 
 > Loads the order with this id and returns its current screen state. The
-> status discriminator names the three legal states. In the loaded state,
+> status discriminator has one value for each of the three legal states. In the loaded state,
 > actions holds the operations the current user is allowed to perform
 > (an action absent from actions is not permitted). Action methods return
 > Result so callers can surface failures without try/catch.

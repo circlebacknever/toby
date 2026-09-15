@@ -16,7 +16,7 @@ Each game is one `.html` file with one `<style>` and one `<script>`. It has no b
 <body>
   <!-- The canvas, three.js mount, or DOM board goes here, followed by the floating paper UI. -->
 <script type="module">
-  // The top comment names what is faked, and the state, sim, render, and wiring sections follow it.
+  // The top comment states what is faked, and the state, sim, render, and wiring sections follow it.
 </script>
 </body>
 </html>

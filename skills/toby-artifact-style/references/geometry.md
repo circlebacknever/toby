@@ -62,7 +62,7 @@ Pick the mark for the structure of the subject. These defaults cover common subj
 
 Refuse these lazy defaults: `orbit-marker` for every artifact regardless of subject, `locator-reticle` as a decoration when no target needs locating, `calibration-grid` everywhere because it looks technical.
 
-If you cannot name why the mark fits the subject's structure, pick a different mark.
+If you cannot explain why the mark fits the subject's structure, pick a different mark.
 
 ---
 

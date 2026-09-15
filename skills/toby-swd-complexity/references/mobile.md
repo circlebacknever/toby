@@ -164,7 +164,7 @@ switch (result.status) {
 }
 ```
 
-The wrapper names all three cases and handles these jobs:
+The wrapper defines all three cases and handles these jobs:
 - Translating native error codes (iOS-vs-Android) into the typed reasons.
 - Retrying network failures during payment.
 - The "USER_CANCELLED is not really an error" convention.

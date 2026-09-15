@@ -111,14 +111,14 @@ In greenfield code, build the dispatch from the start. In brownfield code, fixin
 - Put the file and the place inside it in the first sentence, such as "The retry helper goes in `http/client.ts`, inside `request()`."
 - Give each reason as a fact from the code or the request, such as the files that call the code, a limit, a count, or how often a value changes.
 - Give a rejected placement its own sentence with its cost, such as "A helper in `billing/sync.ts` would leave `orders/sync.ts` without retries."
-- Say what the code or the request shows about each caller. Name an unknown only when its answer could change the placement.
+- Say what the code or the request shows about each caller. Specify an unknown only when its answer could change the placement.
 - Use verbs for what code does, such as calls, reads, writes, stores, and returns. Do not write that a module owns, knows, or decides, or that code lives, sits, or belongs somewhere.
 - Terms in this skill, such as deep module, leakage, and pulling complexity down, are for your reasoning. The note states the fact behind the term.
 - End after the last reason or unknown, with no restatement of the placement.
 
 ## Brownfield Work
 
-When placing code in an existing module, inspect where the surrounding code already puts that knowledge. If the new work fits awkwardly, name the current ownership problem and suggest the smallest local boundary cleanup that would make the change fit. Do not turn a local placement issue into a module-tree redesign. If a touched meaningful module has no AGENTS.md, offer to create one after the boundary is understood.
+When placing code in an existing module, inspect where the surrounding code already puts that knowledge. If the new work fits awkwardly, describe the current placement problem and suggest the smallest local boundary cleanup that would make the change fit. Do not turn a local placement issue into a module-tree redesign. If a touched meaningful module has no AGENTS.md, offer to create one after the boundary is understood.
 
 ## Red flags
 

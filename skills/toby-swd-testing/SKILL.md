@@ -115,7 +115,7 @@ In an existing codebase, inspect the tests that already cover the touched behavi
 Before calling test coverage done, check it against every red flag below.
 
 - **Test fails on a correct refactor.** The test is coupled to internals.
-- **Test name describes a call.** "calls X with Y" names a mock log. The reader still can't tell what the system is supposed to do.
+- **Test name describes a call.** "calls X with Y" describes a mock log. The reader still can't tell what the system is supposed to do.
 - **Snapshot blob.** The snapshot is a large auto-updated string that goes unreviewed when it changes.
 - **Flaky test.** It passes on retry and fails at random. It is a broken test, so fix the nondeterminism and never loop it until it goes green.
 - **Mock of an internal collaborator.** The mock verifies the call sequence, which says nothing about what the system produces.

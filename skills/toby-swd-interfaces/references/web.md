@@ -68,11 +68,11 @@ return <View product={q.product} />;
 Here is the interface comment now:
 
 > Returns the current query state for the product with this id. The status
-> discriminator names the four legal combinations (loading, success, error,
+> discriminator has one value for each of the four legal combinations (loading, success, error,
 > stale). refetch triggers a fresh load. mutate updates locally and reconciles
 > with the server.
 
-The comment has four sentences and names no positions. The discriminator removes the "what does null
+The comment has four sentences and mentions no positions. The discriminator removes the "what does null
 mean here" question from every caller. A discriminated union expresses the
 contract in the type system, so the caller no longer needs to remember
 invariants.

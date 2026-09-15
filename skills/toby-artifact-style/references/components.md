@@ -320,7 +320,7 @@ The same `--*-soft / --*-tint / --*-text` triple sets the colors for status pill
 .dec__btn--on.dec__btn--reject  { background: var(--toby-accent); color: var(--text-on-dark); }
 ```
 
-Use only the three named verbs. The chosen verb's button fills with its semantic color. Each decision needs a rationale field and a named rollback owner.
+Use only the three listed verbs. The chosen verb's button fills with its semantic color. Each decision needs a rationale field and a named rollback owner.
 
 ### Code block — dark theme
 

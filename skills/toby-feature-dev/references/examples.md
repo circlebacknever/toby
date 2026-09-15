@@ -58,7 +58,7 @@ Before the second file exists, greenfield work adds these steps:
 
 Slices: there are two, first `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI gives slice one an entry point a user can run, so slice one is not a layer cut.
 
-Stops: show the criteria, then run the design pass, then write the plan. A persisted format and money are both strategic triggers, so the design lines come before the plan names any file.
+Stops: show the criteria, then run the design pass, then write the plan. A persisted format and money are both strategic triggers, so the design lines come before the plan lists any file.
 
 ## 4. Changing behavior that already ships
 

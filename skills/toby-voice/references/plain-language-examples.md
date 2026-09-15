@@ -49,7 +49,7 @@ Past three words, the reader has to guess which word modifies which.
 - Before: "user session token refresh failure rate"
 - After: "how often refreshing a user session token fails"
 
-### Name the relation
+### State the relation
 
 A semicolon, a colon, or an em dash joining two clauses means the relation went unstated. Say which relation it is.
 
@@ -165,7 +165,7 @@ The first before is a label with no verb. The second and fourth are runs of shor
 - Before: "A stampede under peak load is not uncommon."
 - After: "A stampede under peak load is common."
 
-### Whole sentences that name the thing
+### Whole sentences that say what the thing is
 
 - Before: "Phase 1 of 3 in the queue migration."
 - After: "This commit is phase 1 of the 3-phase queue migration."
