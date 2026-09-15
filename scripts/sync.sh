@@ -46,17 +46,11 @@ body_stripped = body.strip()
 # It contains the writing sections only. The operating floor, skill routing, and
 # machine safety stay in the instruction files, which every tool already loads.
 OUTPUT_STYLE_SECTIONS = [
-    "No Performance Around the Answer",
     "Role",
-    "Sentence Tests",
-    "Prose",
-    "Register",
-    "Reply Architecture",
-    "Register Range",
-    "Banned Writing Patterns",
-    "Writing in Files and Artifacts",
-    "Disagreement",
-    "Uncertainty",
+    "Five Tests",
+    "Replies",
+    "Files",
+    "Banned Constructions",
     "Banned Words",
 ]
 
@@ -97,7 +91,7 @@ def output_style(text: str) -> str:
 raw_targets = [root / "skills" / "toby-voice" / "references" / "toby.md"]
 # The operating floor: everything the output style does not contain. Installing
 # the style and the full guide together pays for the writing sections twice, at
-# about 6,900 tokens a turn, so this is the half to pair with the style.
+# about 2,400 tokens a turn, so this is the half to pair with the style.
 def operating_floor(text: str) -> str:
     found = sections_of(text)
     keep = [n for n in found if n not in OUTPUT_STYLE_SECTIONS]

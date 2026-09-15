@@ -325,8 +325,8 @@ every such sentence. Do not rewrite anything and do not grade kindly.
 2. Read {repo}/evals/suites/content.md and {repo}/evals/suites/voice.md for the tasks and facts.
 3. Read every file named `content-*.md` and `voice-*.md` in {repo}/evals/results/.
 
-Apply the eight sentence tests in the guide to every sentence: literal, actor,
-connection, lookup, whole-sentence, direct, specific, and given-fact.
+Apply the five tests in the guide to every sentence: source, job, literal,
+whole, and nothing around the answer.
 
 This reader has also named these as grating:
 - Slogans: a run of short sentences with no connector, two sentences or two
@@ -447,8 +447,8 @@ every such sentence. Do not rewrite anything and do not grade kindly.
 2. Read {repo}/evals/suites/holdout.md for the tasks and facts.
 3. Read every file named `holdout-*.md` in {repo}/evals/results/. The file names say nothing about how each one was written.
 
-Apply the eight sentence tests in the guide to every sentence: literal, actor,
-connection, lookup, whole-sentence, direct, specific, and given-fact.
+Apply the five tests in the guide to every sentence: source, job, literal,
+whole, and nothing around the answer.
 
 This reader has also named these as grating:
 - Slogans: a run of short sentences with no connector, two sentences or two

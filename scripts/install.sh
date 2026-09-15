@@ -235,7 +235,7 @@ install_claude() {
   install_skills "$HOME/.claude/skills"
   if [[ "$OUTPUT_STYLE" -eq 1 ]]; then
     # The style contains the writing rules, so CLAUDE.md leaves them out. Both
-    # together would put the same 6,900 tokens in front of every turn twice.
+    # together would put the same 2,400 tokens in front of every turn twice.
     install_instruction_file "$ROOT/instructions/claude/CLAUDE-floor.md" "$HOME/.claude/CLAUDE.md" merge
     install_output_style
   else

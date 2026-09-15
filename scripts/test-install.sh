@@ -172,7 +172,7 @@ PLAIN_HOME="$TMP_ROOT/plain"
 install_into "$PLAIN_HOME" --tool claude >/dev/null 2>&1
 if [[ -f "$PLAIN_HOME/.claude/output-styles/toby.md" ]]; then
   flunk claude "default install shipped the output style, which duplicates the guide"
-elif ! grep -q '^## Prose$' "$PLAIN_HOME/.claude/CLAUDE.md"; then
+elif ! grep -q '^## Five Tests$' "$PLAIN_HOME/.claude/CLAUDE.md"; then
   flunk claude "default install left the writing rules out of CLAUDE.md"
 else
   pass claude "default install contains the whole guide, no style"
@@ -183,11 +183,11 @@ STYLE_HOME="$TMP_ROOT/style"
 install_into "$STYLE_HOME" --tool claude --output-style >/dev/null 2>&1
 STYLE="$STYLE_HOME/.claude/output-styles/toby.md"
 STYLE_MD="$STYLE_HOME/.claude/CLAUDE.md"
-if grep -q '^## Prose$' "$STYLE_MD"; then
+if grep -q '^## Five Tests$' "$STYLE_MD"; then
   flunk claude "--output-style left the writing rules in CLAUDE.md as well"
 elif ! grep -q '^## Skill Routing$' "$STYLE_MD"; then
   flunk claude "--output-style dropped the operating floor from CLAUDE.md"
-elif ! grep -q '^## Prose$' "$STYLE"; then
+elif ! grep -q '^## Five Tests$' "$STYLE"; then
   flunk claude "--output-style did not put the writing rules in the style"
 else
   pass claude "--output-style splits the guide, no section in both"

@@ -45,7 +45,7 @@ dismiss the group as false positives.
 
 Run this pass on the draft before the deletion tests, because it removes whole sentences that the tests would only polish.
 
-1. Give each sentence a job and a source, as the guide's Sentence Tests define them.
+1. Give each sentence a job and a source, as the Source and Job tests in the guide define them.
 2. Delete every sentence that has no job or no source. Do not keep one by adding `Prediction:`, a hedge, or a softer verb.
 3. Delete every sentence whose job an earlier sentence already did, including a bullet that repeats its heading.
 

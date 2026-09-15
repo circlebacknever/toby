@@ -163,16 +163,11 @@ OUTPUT_STYLE = REPO_ROOT / "output-styles" / "toby.md"
 # The writing sections scripts/sync.sh writes into the output style. Kept here so
 # a section dropped from sync.sh fails the build instead of going quiet.
 OUTPUT_STYLE_SECTIONS = [
-    "No Performance Around the Answer",
     "Role",
-    "Prose",
-    "Register",
-    "Reply Architecture",
-    "Register Range",
-    "Banned Writing Patterns",
-    "Writing in Files and Artifacts",
-    "Disagreement",
-    "Uncertainty",
+    "Five Tests",
+    "Replies",
+    "Files",
+    "Banned Constructions",
     "Banned Words",
 ]
 

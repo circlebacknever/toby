@@ -74,7 +74,7 @@ nothing depends on remembering.
 ### Claude Code: pick one of two layouts
 
 The writing rules go in `CLAUDE.md`, or in an output style. Never both: that
-puts the same 6,900 tokens in front of every turn twice, which is what the flag
+puts the same 2,400 tokens in front of every turn twice, which is what the flag
 below exists to prevent.
 
 **Default.** Everything in `CLAUDE.md`. Works as soon as it is installed, and needs no
@@ -110,7 +110,7 @@ write something before the style is on.
 
 | | Default | `--output-style` |
 |---|---|---|
-| Resident tokens per turn | 9,555 | 9,744 (6,963 style, 2,781 `CLAUDE.md`) |
+| Resident tokens per turn | 5,126 | 5,314 (2,543 style, 2,771 `CLAUDE.md`) |
 | Where the writing rules sit | a user message | the system prompt |
 | Restated late in a session | no | yes |
 | Setup after install | none | `/config`, Output style, Toby |

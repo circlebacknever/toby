@@ -63,7 +63,7 @@ Put conversational wording in a name, and never in a heading or inside a claim t
 
 ## Where the rules come from
 
-The sentence and word rules are adapted from ASD-STE100 Simplified Technical English. Rules 17 to 19 come from ISO 24495-1:2023, the plain-language standard. Rules 3, 6, 13, and 15 come from Orwell's "Politics and the English Language". Rules 22 to 32 restate rules in `references/toby.md`.
+The sentence and word rules are adapted from ASD-STE100 Simplified Technical English. Rules 17 to 19 come from ISO 24495-1:2023, the plain-language standard. Rules 3, 6, 13, and 15 come from Orwell's "Politics and the English Language". Rules 22 to 32 explain rules in `references/toby.md` in more detail.
 
 Rule 13 comes from a measurement, because readers judged authors less intelligent when plain words were swapped for complex ones (Oppenheimer, 2006).
 
