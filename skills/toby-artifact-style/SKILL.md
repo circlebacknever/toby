@@ -50,6 +50,7 @@ See `references/decks.md` for deck patterns.
 - Building any component (callout, badge, stat grid, worked example, decision row, sparkline table, code block, dialog) → `references/components.md`
 - Needing placeholder data or demo copy for a slide or artifact → `references/sample-content.md`
 - Putting a content-scale or decorative geometric mark on a slide or panel → `references/geometry.md`
+- Placing boxes, text, or arrows in a diagram, slide, or page → `references/layout.md`
 
 ## Before you build
 
@@ -59,7 +60,8 @@ Run this checklist before writing any code or markup.
 2. **Composition mode.** Pick one mode from the list below, and make it different from the mode you used last time.
 3. **Ink allocation.** Decide before you start which panels or slides use ink and which use paper, so that no panel ends up in ink by accident.
 4. **Logo primitive.** Pick a shape that suggests the structure of the subject.
-5. **For decks:** before writing any slide, identify which slides need interactivity. Choose the interaction type to fit the concept. See `references/decks.md`.
+5. **Layout.** For a diagram or slide, write the node and arrow lists from `references/layout.md` before any coordinates.
+6. **For decks:** before writing any slide, identify which slides need interactivity. Choose the interaction type to fit the concept. See `references/decks.md`.
 
 ## Composition modes
 
