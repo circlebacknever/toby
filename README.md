@@ -54,10 +54,13 @@ The voice checker installs with the `toby-voice` skill, for every tool. It runs
 from any directory:
 
 ```sh
-python3 ~/.codex/skills/toby-voice/scripts/voice-check.py draft.md
-python3 ~/.claude/skills/toby-voice/scripts/voice-check.py draft.md
-python3 ~/.copilot/skills/toby-voice/scripts/voice-check.py draft.md
+python3 ~/.codex/skills/toby-voice/scripts/voice-check.py draft.md --review
+python3 ~/.claude/skills/toby-voice/scripts/voice-check.py draft.md --review
+python3 ~/.copilot/skills/toby-voice/scripts/voice-check.py draft.md --review
 ```
+
+`--review` prints every prose sentence with its findings under it. Without it,
+the checker prints the findings and the READ list.
 
 The two hooks are Claude Code only, so they have their own flag:
 
@@ -69,10 +72,13 @@ That copies both hooks to `~/.claude/toby/hooks`, then prints the `settings.json
 block to paste, with the paths already filled in. It does not edit
 `settings.json` itself. Merge the block with any hooks already there.
 
-The agent runs it on its own. The operating guide's Self Review says to run it on
-every prose file a turn wrote, fix everything under FIX, and answer every line
-under DECIDE. The hooks then catch what a turn writes and what it sends, so
-nothing depends on remembering.
+Without being asked, the agent runs it on every prose file a turn wrote, because
+the operating guide's Self Review tells it to. The agent fixes everything under FIX and
+answers every line under DECIDE. Then it reads every sentence against the READ
+list, which covers the rules the patterns do not check. The patterns miss 7 of the 49
+bad sentences in `evals/gold/labels.jsonl`, so the agent needs the READ
+pass. The hooks run the patterns on each file the agent writes and each reply
+it sends.
 
 `hooks/README.md` covers what each one costs you.
 
@@ -145,7 +151,7 @@ When the block is already there, only the block changes. When there is no block,
 - `scripts/install.sh` - the installer.
 - `scripts/validate-skills.py` - the validator.
 - `output-styles/toby.md` - the voice rules as a Claude Code output style, generated from `base/toby.md`.
-- `scripts/voice-check.py` - run this for a voice pass. Every rule, on a file or stdin, split into what to fix and what to decide.
+- `scripts/voice-check.py` - the voice checker. It runs the pattern checks on a file or stdin, splits findings into what to fix and what to decide, and prints the rules the patterns do not check.
 - `scripts/voice_rules.py` - the rules the checker runs. The validator imports them too, so the checker never needs the validator.
 - `hooks/` - a Stop hook that reads the finished reply, and a PostToolUse hook that reads a file as soon as it is written. `hooks/README.md` wires them up.
 - `scripts/token-budget.py` - what a turn costs, by which skills fire.

@@ -25,23 +25,30 @@ Keep following this skill for the rest of the session once it loads. It applies 
 ## Run the voice checker
 
 This skill's folder holds `scripts/voice-check.py`, which checks a file, a
-directory, or stdin against every voice rule. The folder is the one that holds
+directory, or stdin with patterns for the voice rules. The folder is the one that holds
 this SKILL.md, such as `~/.codex/skills/toby-voice`,
 `~/.claude/skills/toby-voice`, or `~/.copilot/skills/toby-voice`. Do not write
-your own grep for voice rules. A grep written fresh each time finds a different
-subset of problems each time, so run the script.
+your own grep, because a fresh grep finds a different subset each time.
 
 ```sh
-python3 <skill folder>/scripts/voice-check.py draft.md
+python3 <skill folder>/scripts/voice-check.py draft.md --review
 some-command | python3 <skill folder>/scripts/voice-check.py -
 ```
 
-It sorts its findings into two groups. **FIX** lists findings from rules that
-need no judgement, so rewrite those sentences and do not argue. **DECIDE** lists
-findings from rules a script cannot settle, such as whether `shape` is a plain
-noun or a significance flag. For each one, the script prints the sentence.
-Decide for each printed sentence, one at a time, whether the rule applies to it. Most of them are real, so never
-dismiss the group as false positives.
+`--review` prints the READ list, then every prose sentence with its findings
+under it. Run it on a file, because the READ rules need a sentence-by-sentence
+read. The patterns miss 7 of the 49 bad sentences in the repo's gold labels, so
+a run with no findings means only that the patterns matched nothing.
+
+**FIX** lists findings from rules that need no judgement, so rewrite those
+sentences and do not argue. **DECIDE** lists findings from rules a script cannot
+settle, such as whether `shape` is a plain noun or a significance flag. Decide
+whether the rule applies to each printed sentence. Most of them are real, so
+never dismiss the group.
+
+**READ** lists the rules the patterns do not check. Read every sentence against
+each READ rule, and rewrite each one that fails. The job and source pass and the
+deletion tests below cover READ rules 1 to 3.
 
 ## Job and source pass
 
@@ -83,9 +90,9 @@ The examples in `references/examples/` were rewritten to spread across lengths a
 ## References
 
 - `references/toby.md` contains the rules. Always load it.
-- `references/plain-language.md` contains thirty-two numbered rules. Most come from ASD-STE100 and ISO 24495-1. Always load it. The rules apply most strictly to comments, docstrings, error messages, setup steps, teaching prose, doc headings, slide titles, and artifact labels.
+- `references/plain-language.md` contains thirty-three numbered rules. Most come from ASD-STE100 and ISO 24495-1. Always load it. The rules apply most strictly to comments, docstrings, error messages, setup steps, teaching prose, doc headings, slide titles, and artifact labels.
 - `references/plain-language-examples.md` gives a worked before-and-after pair for each rule. Load it when a rewrite is not working.
-- `scripts/voice-check.py` in this skill's folder checks a file or stdin against every rule, and separates findings to fix from findings to decide.
+- `scripts/voice-check.py` in this skill's folder runs pattern checks on a file or stdin. It separates findings to fix from findings to decide. It also prints the READ list of rules the patterns do not check.
 - `references/examples/chat.md` shows replies to a person, covering answers, frustration, pushback, status, and "I don't know".
 - `references/examples/code.md` shows findings on code, architecture, naming, tests, and performance.
 - `references/examples/artifacts.md` shows commits, PR descriptions, doc headings, identifiers, and error messages.

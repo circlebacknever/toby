@@ -32,6 +32,9 @@ BREAKS = [
     "This finding rests on reading the diff.",
     "When the cache is down, the request falls through to load().",
     "Every lever feeds a formula.",
+    "The fixture for that fix is built, not run.",
+    "That's not a slip in word choice, it's the failure the guide describes.",
+    "Checkpoints and caches sit in the stores.",
     "The retry wrapper is at line 88 and the two call sites that reach it are both "
     "in the same file, which means removing it changes nothing outside that "
     "module, though the test suite has not run yet so that is still open.",
@@ -62,6 +65,7 @@ CLEAN = [
     "I renamed the flag and updated its four call sites. Suite is green.",
     "The index does not match the query, so the planner reads the table instead.",
     "Two entry points changed: the export route and the CLI subcommand.",
+    'You flagged "The rule lives in AGENTS.md." I rewrote it as "The rule is in AGENTS.md."',
 ]
 
 
@@ -131,6 +135,8 @@ def expect(label: str, got: int, want: int) -> None:
 print()
 expect("write hook flags a banned word in a written file",
        run_write_hook("This uses a robust approach.\n"), 2)
+expect("write hook reports a DECIDE finding in a written file",
+       run_write_hook("The hook return shape is fine here.\n"), 2)
 expect("write hook stays quiet on ordinary prose",
        run_write_hook("The parser reads the header, then the body. Both are UTF-8.\n"), 0)
 expect("write hook ignores a non-prose file",
@@ -156,6 +162,23 @@ if "states the banned words" not in guide_out.stdout:
 if "DECIDE" not in out.stdout:
     print("FAIL the DECIDE group was not printed")
     notes.append("decide printed")
+
+# A run with no findings still prints the rules the patterns do not check, because an
+# agent that sees no findings stops reading.
+read_out = subprocess.run([sys.executable, str(CHECKER), "-"], input="The parser reads the header.\n",
+                          capture_output=True, text=True)
+if "READ  (" in read_out.stdout:
+    print("ok   a run with no findings prints the READ list")
+else:
+    print("FAIL a run with no findings left out the READ list")
+    notes.append("read list printed")
+no_read_out = subprocess.run([sys.executable, str(CHECKER), "-", "--no-read"],
+                             input="The parser reads the header.\n", capture_output=True, text=True)
+if "READ  (" in no_read_out.stdout:
+    print("FAIL --no-read printed the READ list")
+    notes.append("no-read flag")
+else:
+    print("ok   --no-read leaves out the READ list")
 
 # Slogans. The five sentences below each passed every check before the slogan
 # forms existed, and each is an agent's doc copy the user rewrote. The checker
@@ -197,6 +220,14 @@ Stop searching the repo, because the cause is outside it. That failure would hav
 
 A plugin never imports an engine directly, and Relay treats model providers as engines.
 
+## Toby is careful, Toby wants to live
+
+The bigger gap is elsewhere. The conformance suite tests exactly that surface.
+
+Five properties keep that true, and the runner checks the third.
+
+A failed demo has one trace to open, and that is the property that makes it checkable.
+
 ### The migration moves the highest-risk jobs first
 
 - Phase 1 moves the highest-risk jobs.
@@ -222,7 +253,8 @@ FORMS = ["noun phrase with no verb", "clipped run of short sentences", "mirrored
          "setup question", "noun doing a verb's job", "meeting jargon", "rhythm device",
          "vague intensifier", "code given feelings", "hedge stack", "would-have stated as fact",
          "claim about the user", "what a thing never does", "program given a judgment",
-         "bullet restates its heading"]
+         "bullet restates its heading", "bare `that` as an object", "rider after a complete claim",
+         "heading joins two clauses"]
 
 
 def check_text(body: str) -> subprocess.CompletedProcess:
@@ -255,6 +287,32 @@ verb_out = check_text("The rule lives in AGENTS.md.\n")
 expect("a figurative verb fails the run", verb_out.returncode, 1)
 plain_out = check_text("The rule is in AGENTS.md.\n")
 expect("the literal version passes", plain_out.returncode, 0)
+
+# A verb for a feeling, given to a system, is a metaphor, so it fails the run.
+feeling_out = check_text("Stream resume is the one most likely to embarrass a demo.\n")
+expect("a verb for a feeling fails the run", feeling_out.returncode, 1)
+
+# --review prints every sentence, so the reader can answer for each one.
+with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
+    handle.write("# A heading\n\nThe parser reads the header. The rule lives in AGENTS.md.\n")
+    review_file = handle.name
+review_out = subprocess.run([sys.executable, str(CHECKER), review_file, "--review"],
+                            capture_output=True, text=True)
+Path(review_file).unlink()
+expect("--review fails the run on a FIX finding", review_out.returncode, 1)
+for wanted in ("READ  (", "1. A heading", "2. The parser reads the header.",
+               "3. The rule lives in AGENTS.md.", "FIX  figurative frame"):
+    if wanted in review_out.stdout:
+        print(f"ok   --review prints {wanted!r}")
+    else:
+        print(f"FAIL --review left out {wanted!r}")
+        notes.append(f"review {wanted}")
+
+# A numbered step joins clauses with a semicolon as easily as a paragraph does.
+list_weld_out = check_text("1. An agent starting from a plugin edits; one starting from nothing guesses.\n")
+expect("a semicolon join inside a list item fails the run", list_weld_out.returncode, 1)
+label_out = check_text("- Supported but vague — sharpen it before you evaluate anything.\n")
+expect("a label and a dash in a list item pass", label_out.returncode, 0)
 
 print()
 if failures or notes:

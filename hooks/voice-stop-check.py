@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Claude Code Stop hook: read the finished reply, block on literal voice breaks.
 
-Every other check in this repo reads a file. This one reads a reply, which is
-the only surface the voice actually ships on. It greps for the forms the file
-checker misses: an invented foil written as `X, not Y`, and a trailing rider.
+Every other check in this repo reads a file. This one reads the reply the agent
+just sent. It runs REPLY_PATTERNS, FIGURATIVE_FRAMES, and COINED_TERMS from
+scripts/voice_rules.py, so this hook and voice-check.py both use a pattern
+added there.
 
 It fires on literal strings only. A heuristic here would fire on clean replies,
 and a hook that fires on clean replies gets disabled inside a week.
@@ -13,6 +14,10 @@ Wire it up in settings.json:
     {"hooks": {"Stop": [{"hooks": [{"type": "command",
       "command": "python3 /absolute/path/hooks/voice-stop-check.py"}]}]}}
 
+It looks for voice_rules.py in TOBY_ROOT/scripts, then in a checkout that holds
+this hook, then in the installed skill at ~/.claude/skills/toby-voice/scripts.
+Without any of those it exits 0 and says nothing.
+
 Input: the Stop hook payload on stdin, containing transcript_path.
 Output: exit 0 to allow. Exit 2 with a reason on stderr to block, which hands
 the reason back to the agent for one repair pass.
@@ -20,54 +25,38 @@ the reason back to the agent for one repair pass.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
-# Literal forms only. Each one is a break no wording rescues.
-PATTERNS = [
-    (re.compile(r",\s+not\s+(?:a|an|the|just|only|because|to|for|from|in|on|by|its|his|her|their|my|your)\b"),
-     "invented foil `X, not Y` — state the thing directly"),
-    (re.compile(r"—\s*not\s"), "invented foil after a dash — state the thing directly"),
-    (re.compile(r"\bit'?s not\s+[^.,\n]{0,40},\s*it'?s\b", re.I), "`it's not X, it's Y` — state the thing directly"),
-    (re.compile(r"\bnot just\b"), "`not just` — say what it is"),
-    (re.compile(r"\brather than\b"), "`rather than` — name the thing you chose"),
-    (re.compile(r",\s*though\.?\s*$", re.M), "trailing `though` — a rider on a sentence that was already complete"),
-    (re.compile(r"\bthat said,", re.I), "`that said` — a rider on a sentence that was already complete"),
-    # `carry` is legal only for moving an object or an arithmetic carry, and a
-    # reply about code almost never means either one.
-    (re.compile(r"\bcarr(?:y|ies|ied|ying)\b", re.I), "`carry` used as a metaphor, so write contains, has, includes, or states"),
-    (re.compile(r"\b(?:hope this helps|feel free|let me know if|don't hesitate)\b", re.I),
-     "relational performance — cut the closing offer"),
-]
+sys.dont_write_bytecode = True
 
-# Words used outside their everyday meaning. Kept in step with COINED_TERMS in
-# scripts/voice_rules.py, which checks the same rule against files. This one
-# checks it against the reply, which is the only surface no file check reaches.
-COINED = [
-    "first-read", "blast radius", "surface area", "load-bearing", "north star",
-    "forcing function", "cognitive surface", "affordance", "the shape of the work",
-]
 
-# Figurative frames, kept in step with FIGURATIVE_FRAMES in voice_rules.py.
-# A sentence cannot wear a hat, and the file checks never see a reply.
-FRAMES = [
-    "wearing a", "wears a", "dressed as", "in disguise", "masquerading as",
-    "with a new hat", "under the hood", "pretending to be",
-    "lives in", "lives at", "lives inside", "sits in", "sits on", "sits at",
-    "sits above", "sits outside", "land", "lands", "landed", "falls through", "rests on",
-    "feeds", "glides over", "earns its keep", "earns its place", "boils down to",
-    "low-hanging fruit", "silver bullet", "rabbit hole", "move the needle",
-    "heavy lifting", "sweet spot", "deep dive", "pain point",
-]
+def find_rules_dir() -> Path | None:
+    """Return the first scripts folder that holds voice_rules.py, or None."""
+    roots = []
+    named = os.environ.get("TOBY_ROOT")
+    if named:
+        roots.append(Path(named))
+    roots.extend(Path(__file__).resolve().parents)
+    roots.append(Path.home() / ".claude" / "skills" / "toby-voice")
+    for root in roots:
+        if (root / "scripts" / "voice_rules.py").exists():
+            return root / "scripts"
+    return None
+
 
 # The prose ceiling is 25 words. The hook fires at 40, well past it, because a
 # hook that argues about a 27-word sentence gets switched off.
 SENTENCE_LIMIT = 40
 
-# Fenced code, inline code, and quoted user text are not Toby's prose.
+# Fenced code, inline code, and quoted text are not Toby's prose. A reply quotes
+# a sentence to report on it, such as a sentence the user flagged, and the rules
+# exempt exact quotes.
 FENCE_RE = re.compile(r"```.*?```", re.S)
 INLINE_RE = re.compile(r"`[^`\n]*`")
+DOUBLE_QUOTE_RE = re.compile(r'"[^"\n]{1,300}"|\u201c[^\u201d\n]{1,300}\u201d')
 QUOTE_RE = re.compile(r"^>.*$", re.M)
 
 
@@ -93,7 +82,7 @@ def last_assistant_text(transcript: Path) -> str:
 
 
 def prose_only(text: str) -> str:
-    for pattern in (FENCE_RE, INLINE_RE, QUOTE_RE):
+    for pattern in (FENCE_RE, INLINE_RE, QUOTE_RE, DOUBLE_QUOTE_RE):
         text = pattern.sub(" ", text)
     return text
 
@@ -113,21 +102,27 @@ def main() -> int:
     if not reply.strip():
         return 0
 
+    rules_dir = find_rules_dir()
+    if rules_dir is None:
+        return 0
+    sys.path.insert(0, str(rules_dir))
+    import voice_rules as v
+
     hits = []
-    for pattern, reason in PATTERNS:
+    for pattern, reason in v.REPLY_PATTERNS:
         match = pattern.search(reply)
         if match:
             hits.append(f"{match.group(0).strip()!r}: {reason}")
 
-    for frame in FRAMES:
-        match = re.search(rf"(?<![A-Za-z]){re.escape(frame)}(?![A-Za-z])", reply, re.I)
+    for frame, pattern in v.FIGURATIVE_RE:
+        match = pattern.search(reply)
         if match:
             hits.append(f"{match.group(0)!r}: figurative frame, say what the thing is")
 
-    for term in COINED:
-        match = re.search(rf"(?<![A-Za-z]){re.escape(term)}(?![A-Za-z])", reply, re.I)
+    for term, pattern in v.COINED_RE:
+        match = pattern.search(reply)
         if match:
-            hits.append(f"{match.group(0)!r}: invented term, say it in everyday words")
+            hits.append(f"{match.group(0)!r}: invented term, {v.COINED_TERMS[term]}")
 
     for sentence in re.split(r"(?<=[.!?])\s+", reply):
         words = len(sentence.split())

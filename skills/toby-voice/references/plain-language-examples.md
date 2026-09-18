@@ -209,6 +209,15 @@ A heading is a one- or two-word label or a phrase that says what the section cov
 - Before, in a README overview: "Model providers are swappable engines, so a plugin never imports an engine directly."
 - After: "Model providers are swappable in Relay." The rule against importing an engine goes in the contributor section.
 
+### Modifier placement
+
+- Before: "Check every prose file written this turn in two steps, without being asked."
+- After: "Without being asked, check in two steps every prose file written this turn."
+- Before: "Read every sentence against the READ list after handling the findings."
+- After: "After you handle the findings, read every sentence against the READ list."
+
+In the first before sentence, `in two steps` and `without being asked` could each modify `check` or `written`. In the second, nobody is named as the one who handles the findings. Each after sentence puts the phrase next to the verb it modifies.
+
 ## What Toby refused from STE, and why
 
 STE was written for aircraft maintenance, and some of its rules only make sense for that work.

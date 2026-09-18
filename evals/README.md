@@ -53,9 +53,12 @@ was gone.
 
 ## Checking prose by hand
 
-`scripts/voice-check.py` runs every rule against a file, a directory, or stdin.
-It splits findings into FIX, which has no judgement in it and exits 1, and
-DECIDE, which prints the sentence and never fails the run.
+`scripts/voice-check.py` runs the pattern checks against a file, a directory,
+or stdin. It splits findings into FIX and DECIDE. A FIX finding needs no
+judgement and makes the run exit 1. The checker prints each DECIDE sentence,
+and a DECIDE finding never fails the run. The checker then prints READ, the
+rules the patterns do not check. `tests/test-voice-recall.py` counts how many
+gold sentences the patterns catch.
 
 The split exists because the two get handled differently, and because a single
 undifferentiated list trains a reader to wave the whole thing away. Most DECIDE

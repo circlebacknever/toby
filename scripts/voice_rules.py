@@ -72,6 +72,39 @@ CONTRAST_PATTERNS = [
 ]
 
 
+# FOIL_PATTERNS matches a contrast whose rejected half follows a comma or a dash.
+# It also matches "That's not X, it's Y" with any pronoun as the subject.
+# voice-check.py puts these matches in FIX, and hooks/voice-stop-check.py blocks
+# a reply on them, so both checks use a form added here.
+FOIL_PATTERNS = [
+    (re.compile(r",\s+not\s+(?:a|an|the|just|only|because|to|for|from|in|on|by|its|his|her|their|my|your)\b"),
+     "invented foil `X, not Y`"),
+    (re.compile(r"—\s*not\s"), "invented foil after a dash"),
+    # "The fixture is built, not run." The rejected half is one word before the
+    # end of the sentence.
+    (re.compile(r",\s+not\s+[\w-]+\s*(?=[.;]|$)", re.M), "invented foil `X, not Y`"),
+    (re.compile(r"\b(?:it|that|this|which|they|these|those)(?:'s|'re| is| was| are| were) not\s+[^.,\n]{1,60},"
+                r"\s*(?:it|that|this|they)(?:'s|'re| is| was| are| were)\b", re.I),
+     "`That's not X, it's Y`"),
+]
+
+
+# The reply check in hooks/voice-stop-check.py runs FOIL_PATTERNS, these forms,
+# FIGURATIVE_FRAMES, and COINED_TERMS. Each form here matches a fixed phrase,
+# because a user turns off a hook that blocks correct replies.
+REPLY_PATTERNS = FOIL_PATTERNS + [
+    (re.compile(r"\bnot just\b"), "`not just`, so say what it is"),
+    (re.compile(r"\brather than\b"), "`rather than`, so write only the thing you chose"),
+    (re.compile(r",\s*though\.?\s*$", re.M), "trailing `though` on a sentence that was already complete"),
+    (re.compile(r"\bthat said,", re.I), "`that said` on a sentence that was already complete"),
+    # `carry` is legal only for moving an object or an arithmetic carry, and a
+    # reply about code almost never means either one.
+    (re.compile(r"\bcarr(?:y|ies|ied|ying)\b", re.I), "`carry` used as a metaphor, so write contains, has, includes, or states"),
+    (re.compile(r"\b(?:hope this helps|feel free|let me know if|don't hesitate)\b", re.I),
+     "closing offer, so cut it"),
+]
+
+
 def line_for_offset(text: str, offset: int) -> int:
     return text.count("\n", 0, offset) + 1
 
@@ -177,9 +210,10 @@ FIGURATIVE_FRAMES = [
     "lives in", "lives at", "lives on", "lives inside", "lives next to", "living in",
     "live inside", "sits in", "sits on", "sits at", "sits above", "sits below",
     "sits outside", "sits inside", "sits next to", "sits beside", "sitting in",
+    "sit in", "sit on", "sit at", "sit inside", "sit outside", "sit next to",
     "sitting outside", "land", "lands", "landed", "landing in", "land on", "not land",
     "falls through", "fall through", "rests on", "rest on", "feeds", "fed into",
-    "glides over", "bites hardest", "racks up interest",
+    "glides over", "bites hardest", "racks up interest", "embarrass", "embarrasses", "embarrassed",
     # Idioms. Each asks the reader to translate before they can read on.
     "earns its keep", "earn their keep", "earns its place", "earn their place",
     "earns its complexity", "boils down to", "at the end of the day",
@@ -247,6 +281,9 @@ SETUP_SENTENCE_RES = [
     re.compile(r"^(?:One|Two|Three|A single|Only one)\s+[\w-]+\s+(?:causes?|changes?|matters?|remains?|explains?|breaks?|fails?)\b[^.?!]*\.$"),
     re.compile(r"^(?:This|That|The)\s+[\w-]+\s+(?:has|comes from|traces back to|traces to|comes down to)\s+(?:one|a single|two|three)\s+[\w-]+\.$"),
     re.compile(r"^There (?:is|are) (?:one|a single|two|three|only one) [\w-]+(?: left)?\.$"),
+    # "The bigger gap is elsewhere." The sentence names no gap.
+    re.compile(r"^The (?:bigger|main|real|other|larger|first|second|only) [\w-]+ (?:is|lies) "
+               r"(?:elsewhere|different|the opposite|simpler|somewhere else)\.$"),
 ]
 # "Guard: none." and "Wiring: none new." put a label where a sentence belongs.
 LABEL_NONE_RE = re.compile(r"^\s*(?:[-*]\s+)?\**[A-Z][\w -]{1,30}[:.]\**\s*\**(?:None|none)\b[^.]{0,20}\.")
@@ -274,6 +311,8 @@ PREDICTED_PATTERNS = [
      "meeting jargon"),
     (re.compile(r"\b(?:not only\b[^.]{0,60}\bbut also|less \w+, more \w+)\b", re.I), "rhythm device"),
     (re.compile(r"\b(?:super|incredibly|extremely|hugely|massively|insanely|ridiculously)\s+\w+", re.I), "vague intensifier"),
+    # "tests exactly that surface" says the same as "tests that surface".
+    (re.compile(r"\b(?:exactly|precisely)\s+(?:that|this|the|what)\b", re.I), "vague intensifier"),
     (re.compile(r"\b(?:compiler|linter|test|tests|build|code|function|type checker|CI)\s+(?:complains?|is (?:happy|unhappy|angry|sad|upset)|gets (?:angry|upset|confused)|yells|screams|hates|loves|is not a fan)\b", re.I),
      "code given feelings"),
     (re.compile(r"\b(?:may|might|could) (?:potentially|possibly|perhaps|conceivably)\b", re.I), "hedge stack"),
@@ -289,6 +328,42 @@ PREDICTED_PATTERNS = [
      "what a thing never does"),
     # "Relay treats model providers as swappable engines" gives a program a judgment.
     (re.compile(r"\b(?!Treat)\w+ treats \w+(?: \w+){0,3} as\b"), "program given a judgment"),
+    # "check that." and "keep that true" leave the reader to work out what `that` is.
+    (re.compile(r"\b(?:keeps?|makes?|leaves?|checks?|shows?|proves?|covers?|handles?|fixes?|says?|does)\s+that"
+                r"\s*(?:[.,;!?]|$|true\b|false\b|so\b|right\b|work\b|clear\b)", re.I | re.M),
+     "bare `that` as an object"),
+    # "A failed demo has one trace to open, and that is the property that makes it
+    # checkable." The clause after the comma restates the claim before it.
+    (re.compile(r",\s+and\s+(?:that|this|it)\s+is\s+(?:the|what|why|how|where)\b", re.I),
+     "rider after a complete claim"),
+    # "actual output" and "a named audit". The noun has no other kind, so the
+    # adjective adds nothing. `true` and `existing` are left out, because "true
+    # positive" and "the existing tests" each name a distinction.
+    # `real` and `specific` are left out too. "A real caller" beside a
+    # hypothetical caller draws a distinction, and a pattern cannot tell that use
+    # from an empty one.
+    (re.compile(r"\b(?:the|a|an|your|my|our|its|their|this|that|each|every|\w+'s)\s+(?:actual|named|given)\s+"
+                r"(?!time\b|number\b)[a-z][\w-]*", re.I),
+     "empty qualifier"),
+    # "With the code shown, this test fails." The phrase frames the evidence
+    # before the claim.
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:With the (?:code|context|information|files?|evidence|output) "
+                r"(?:shown|given|provided|available)|From what (?:is|I can see|I see|was) (?:here|shown)|"
+                r"Based on (?:the|what|this|my)|Looking at (?:the|this)|Given the (?:code|context|evidence|output))\b", re.M),
+     "opening phrase that frames the evidence"),
+    # "The index uses disk space in exchange." The sentence never says for what.
+    (re.compile(r"\bin (?:exchange|return)\b(?! for\b)", re.I), "relation word with its other half missing"),
+    # "no purge removes it" hides the thing that acts.
+    # The verb needs an object after it, because "no API calls" is a noun phrase.
+    (re.compile(r"\bno\s+(?!longer\b|matter\b|more\b|less\b)[a-z][\w-]*\s+(?:removes|deletes|reads|writes|calls|"
+                r"checks|catches|imports|uses|changes|touches|sees|runs|clears|updates|returns|names|"
+                r"fires|sets|stores|owns)\s+(?:it|them|the|a|an|this|that|these|those|any|its|their)\b", re.I),
+     "negated actor"),
+    # "Five outputs is a small sample, and Fable has two." A comma and `and`
+    # before a new subject and its verb join two facts in one sentence.
+    (re.compile(r",\s+and\s+(?:(?:the|a|an|this|that|these|those|no|each|every)\s+[\w-]+|it|they|[A-Z][\w.-]*)\s+"
+                r"(?:is|are|was|were|has|have|had|[a-z]+(?:s|ed))\b"),
+     "two facts joined by and"),
 ]
 # Words too common to show that a bullet repeats its heading.
 RESTATE_STOPWORDS = set(
@@ -420,6 +495,12 @@ def slogan_findings(text: str) -> list[tuple[int, str, str]]:
             title.endswith(".") or CLAIM_VERB_RE.search(title)
         ):
             found.append((number, "heading written as a claim", title))
+        # "Toby is careful, Toby wants to live" is two clauses in a heading, and
+        # both start on the same word. A heading is a label, so it holds one.
+        halves = [WORD_RE.findall(half) for half in title.split(",")]
+        if (len(halves) == 2 and all(len(half) >= 2 for half in halves)
+                and halves[0][0].lower() == halves[1][0].lower()):
+            found.append((number, "heading joins two clauses", title))
 
     for number, paragraph in prose_paragraphs(text):
         paragraph = " ".join(paragraph.split())

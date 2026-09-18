@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """Claude Code PostToolUse hook: check prose the agent just wrote.
 
-The Stop hook reads the reply. This one reads the file. Between them, every
-word Toby produces passes the same rules, which is what the operating guide
-claims and what nothing enforced before.
+The Stop hook reads the reply. This one reads the file.
 
-It fires after Write and Edit on a markdown file, runs the FIX group from
-scripts/voice-check.py, and exits 2 with the findings. The write already
-happened, so this is feedback rather than a block, and the agent gets it while
-the file is still the thing it is working on.
+It fires after Write and Edit on a markdown or text file, and it runs
+scripts/voice-check.py with --no-read. When the checker reports a FIX or a
+DECIDE finding, the hook exits 2 and prints the findings. The write has already
+happened when the hook runs, so the hook undoes nothing. The agent gets the
+findings while it is still working on the file.
+
+The patterns miss 7 of the 49 bad sentences in evals/gold/labels.jsonl.
+The hook leaves out the READ list, because the same 15 rules would print after
+every write. The Self Review step in base/toby.md tells the agent to read the
+file against that list before it finishes.
 
 Wire it up in settings.json, alongside the Stop hook:
 
@@ -73,16 +77,25 @@ def main() -> int:
         return 0
 
     result = subprocess.run(
-        [sys.executable, str(checker), str(target), "--fix-only"],
+        [sys.executable, str(checker), str(target), "--no-read"],
         capture_output=True,
         text=True,
     )
-    if result.returncode == 0:
+    # Exit 0 or 1 is a finished check. Any other code means the checker failed.
+    # An older installed checker fails this way, because it has no --no-read
+    # flag. A failed check says nothing about the file, so the hook stays silent.
+    if result.returncode not in (0, 1):
+        return 0
+    if result.returncode == 0 and "DECIDE  (" not in result.stdout:
         return 0
 
-    print(f"Voice rules broken in {target.name}. Fix these before moving on.", file=sys.stderr)
+    print(f"voice-check.py found voice breaks in {target.name}. Rewrite each FIX sentence, "
+          "and answer each DECIDE sentence.",
+          file=sys.stderr)
     print(result.stdout.strip(), file=sys.stderr)
-    print("Every one of these is a rule with no judgement in it.", file=sys.stderr)
+    print("These patterns miss 7 of the 49 bad sentences in the gold set. Before you finish the task, run "
+          "voice-check.py on the file and read every sentence against the READ list it prints.",
+          file=sys.stderr)
     return 2
 
 
