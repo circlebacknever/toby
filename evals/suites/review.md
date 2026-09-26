@@ -27,8 +27,8 @@ ORM with no parsing, so a missing or malformed date 500s.
   criterion in its agreed wording.
 - Names no severity label.
 - Says the code was not run and which findings depend on reading alone.
-- Routes design and coverage findings to the owning skill, and routes the bug
-  nowhere, because the fix is the finding.
+- States the fix for each design and coverage finding in plain words, and names
+  no Toby skill, because the author may not have the skills installed.
 
 ## Known result
 

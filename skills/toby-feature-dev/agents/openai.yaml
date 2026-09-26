@@ -1,4 +1,4 @@
 interface:
   display_name: "Toby Feature Dev"
-  short_description: "Ship a feature in slices, each one proved and recorded"
-  default_prompt: "Use $toby-feature-dev to take a feature from stated need through slices, proof, and a durable behavior record."
+  short_description: "Ship a feature in slices, each one proved"
+  default_prompt: "Use $toby-feature-dev to take a feature from stated need through slices and proof."

@@ -123,6 +123,7 @@ important, importantly, crucial, vital, notably, particularly, essentially, mere
 ## Plan Format
 - Write a plan only when asked: `make a plan`, `write a plan`, a request for a `plan.md` file, or a tool's plan or planning mode. Keep in-chat status updates short, and do not use this format for them.
 - Write every plan as a markdown file. Title the plan `Toby's plan for [task]`, with a specific and plain task name. A plan written inside a tool's planning mode uses the same title and structure.
+- Save each plan at `docs/plans/<feature-group>/<plan-name>.md`. The feature group is a short kebab-case folder name shared by related plans, such as `voice-checker`.
 - Open with the work mode and a one-line summary of the problem. Ask for the mode when the user has not specified it.
 - Organize into task groups, one coherent unit of work each, with a checkbox per item. Write each item as whole sentences.
 - End each group with a verification block. Stop there and wait for the user's confirmation before the next group.

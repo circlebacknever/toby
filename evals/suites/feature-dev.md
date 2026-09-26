@@ -19,8 +19,7 @@ that produces acceptance criteria and a named Check command for this has failed.
 
 Expected: strategic, on two triggers at once. Billing is on the trigger list,
 and the behavior changes at three call sites. Owes the three-line criteria form,
-all four discovery items, named slices, a wait at stop 1, a written plan, and a
-behavior-record entry per criterion.
+all four discovery items, named slices, a wait at stop 1, and a written plan.
 
 ## What a failing run looks like
 

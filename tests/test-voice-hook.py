@@ -60,7 +60,6 @@ CLEAN = [
     "The comment says the buffer is bounded. It is not. cache.go:41.",
     "Skipped the full suite and ran the two files the change touches instead.",
     "The plan is at docs/plans/export.md. Step 3 ran differently and the file says how.",
-    "Yes. The behavior record has no entry for this, so I wrote one.",
     "The parser reads the header, then the body. Both are UTF-8.",
     "I renamed the flag and updated its four call sites. Suite is green.",
     "The index does not match the query, so the planner reads the table instead.",

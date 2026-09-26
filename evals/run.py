@@ -604,7 +604,7 @@ and nothing else.""",
 1. Read {repo}/skills/toby-code-review/SKILL.md and its references/smells.md.
 2. The change under review is {repo}/evals/fixtures/export.diff.
 3. The agreed acceptance criteria are {repo}/evals/fixtures/criteria.md. No plan
-   file and no behavior record exist for this work.
+   file exists for this work.
 
 The code is not runnable here — there is only the diff and the criteria. Say so
 where the skill asks you to run something.

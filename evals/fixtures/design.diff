@@ -1,0 +1,142 @@
+diff --git a/app/reports/archive.py b/app/reports/archive.py
+new file mode 100644
+index 0000000..4b1c2d9
+--- /dev/null
++++ b/app/reports/archive.py
+@@ -0,0 +1,31 @@
++import os
++from datetime import timedelta
++
++from django.utils import timezone
++
++from app.reports.models import Report
++from app.storage.s3 import S3Client
++
++ARCHIVE_AFTER_DAYS = 90
++
++
++class ReportArchiver:
++    def archive(self, report):
++        client = S3Client(bucket=os.environ["ARCHIVE_BUCKET"])
++        key = f"reports/{report.account_id}/{report.id}.csv"
++        client.put(key, report.to_csv())
++        report.archived_at = timezone.now()
++        report.save()
++
++
++def archive_old_reports():
++    """Archive every report older than ARCHIVE_AFTER_DAYS. Runs nightly from cron."""
++    cutoff = timezone.now() - timedelta(days=ARCHIVE_AFTER_DAYS)
++    reports = Report.objects.filter(created__gt=cutoff, archived_at__isnull=True)
++    archiver = ReportArchiver()
++    for report in reports:
++        archiver.archive(report)
++    return len(reports)
++
++
+diff --git a/app/reports/service.py b/app/reports/service.py
+index 7a3e1f0..8b2c4d1 100644
+--- a/app/reports/service.py
++++ b/app/reports/service.py
+@@ -1,9 +1,14 @@
++from app.reports.archive import ReportArchiver
++
++
+ class ReportService:
+-    def __init__(self, repo):
++    def __init__(self, repo, archiver=None):
+         self.repo = repo
++        self.archiver = archiver or ReportArchiver()
+
+     def build(self, account, start, end):
+         rows = self.repo.rows_between(account, start, end)
+         return Report.from_rows(account, rows)
+
++    def archive(self, report):
++        return self.archiver.archive(report)
+diff --git a/app/exporters/base.py b/app/exporters/base.py
+index 1c2d3e4..5f6a7b8 100644
+--- a/app/exporters/base.py
++++ b/app/exporters/base.py
+@@ -1,10 +1,15 @@
+ from abc import ABC, abstractmethod
+
+
+ class Exporter(ABC):
+     @abstractmethod
+     def export(self, report):
+         """Return the report as bytes in this exporter's format."""
+
+     @abstractmethod
+     def preview(self, report):
+         """Return the first 20 rows as text for the export dialog."""
++
++    @abstractmethod
++    def archive_bytes(self, report):
++        """Return the report as bytes for long-term storage."""
+diff --git a/app/exporters/csv_exporter.py b/app/exporters/csv_exporter.py
+index 2a3b4c5..6d7e8f9 100644
+--- a/app/exporters/csv_exporter.py
++++ b/app/exporters/csv_exporter.py
+@@ -12,3 +12,6 @@ class CsvExporter(Exporter):
+
+     def preview(self, report):
+         return "\n".join(",".join(map(str, r)) for r in report.rows[:20])
++
++    def archive_bytes(self, report):
++        return self.export(report)
+diff --git a/app/exporters/pdf_exporter.py b/app/exporters/pdf_exporter.py
+index 3b4c5d6..7e8f9a0 100644
+--- a/app/exporters/pdf_exporter.py
++++ b/app/exporters/pdf_exporter.py
+@@ -20,3 +20,6 @@ class PdfExporter(Exporter):
+
+     def preview(self, report):
+         return render_preview_text(report)
++
++    def archive_bytes(self, report):
++        raise NotImplementedError("PDF reports are not archived")
+diff --git a/app/reports/formatting.py b/app/reports/formatting.py
+index 4c5d6e7..8f9a0b1 100644
+--- a/app/reports/formatting.py
++++ b/app/reports/formatting.py
+@@ -1,14 +1,18 @@
+ def row_label(report_type, row):
+     if report_type == "sales":
+         return f"{row.sku} sold {row.qty}"
+     elif report_type == "refunds":
+         return f"{row.sku} refunded {row.qty}"
+     elif report_type == "inventory":
+         return f"{row.sku} on hand {row.qty}"
++    elif report_type == "archive":
++        return f"{row.sku} archived {row.qty}"
+     raise ValueError(report_type)
+
+
+ def row_color(report_type):
+     if report_type == "sales":
+         return "green"
+     elif report_type == "refunds":
+         return "red"
+     elif report_type == "inventory":
+         return "gray"
++    elif report_type == "archive":
++        return "gray"
+     raise ValueError(report_type)
+diff --git a/tests/test_archive.py b/tests/test_archive.py
+new file mode 100644
+index 0000000..9a0b1c2
+--- /dev/null
++++ b/tests/test_archive.py
+@@ -0,0 +1,12 @@
++from unittest import mock
++
++from app.reports.archive import ReportArchiver
++
++
++def test_archive_sets_archived_at(report):
++    with mock.patch("app.reports.archive.S3Client") as client:
++        ReportArchiver().archive(report)
++    client.return_value.put.assert_called_once()
++    report.refresh_from_db()
++    assert report.archived_at is not None

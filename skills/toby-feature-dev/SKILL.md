@@ -1,8 +1,8 @@
 ---
 name: toby-feature-dev
 description: >-
-  Turn a feature request into the smallest change that satisfies it, with evidence it
-  works and the requirement written where a future reader can audit it. Skip it for a one-
+  Turn a feature request into the smallest change that satisfies it and leaves the
+  design at least as good as before, with evidence it works. Skip it for a one-
   file edit following a pattern already in that file, a review or cleanup pass over code
   that exists, read-only investigation or explanation, and anything the user framed as a
   spike, proof of concept, or throwaway, which toby-swd-experiment is for. Use it when
@@ -10,28 +10,31 @@ description: >-
   one file or one call site: a ticket, a product ask, a half-built feature, an endpoint,
   screen, job, or flag, or a bug fix whose repair is new behavior. Use it when the request
   does not define "done" and coding has to start anyway. It covers mode, acceptance criteria,
-  discovery, slicing, the plan the operator approves, approval stops, the behavior record,
-  and handoff. The toby-swd-* skills cover method.
+  discovery, slicing, the plan the operator approves, approval stops, and handoff. The toby-swd-* skills cover method.
 ---
 
 # Toby Feature Dev
 
 Build the thing that was asked for, in pieces someone can review one at a time. This skill is for preventing a nine-file diff that the user first sees when it is already finished. Every decision is already made inside it, so the user can only accept it or throw it away. A small answer is a valid result. "The repo already does this at file:line." is a small answer. So are "This is a four-line change." and "This needs one decision from you before any code." Telling the user the feature already exists is a good result.
 
+The smallest change is the smallest one that leaves the design at least as good as before. `toby-swd-strategy` defines that test.
+
 ## The running order
 
-Run the work in this order: mode, size, discovery, criteria, slices, stop 1, design, plan, and stop 2. Then build the slice, prove it, record it, stop 3, and hand off. This file defines that order and how much of it each change needs. The toby-swd-* skills cover what good engineering looks like at each step.
+Run the work in this order: mode, size, discovery, criteria, slices, stop 1, design, plan, and stop 2. Then build the slice, prove it, stop 3, and hand off. This file defines that order and how much of it each change needs. The toby-swd-* skills cover what good engineering looks like at each step.
 
 ## Pick the mode before anything else
 
 Picking the wrong one of the two modes is expensive in both cases. Acceptance criteria on a throwaway spike only add paperwork. A payments integration built as a throwaway spike ships with no criteria, no slices, and no record.
 
-- **Experiment** is the mode for the operating guide's experiment triggers, such as spike, proof of concept, throwaway, compare options, and tune it while I watch. Use toby-swd-experiment for the loop and stop running this skill. Write no criteria, no slices, and no record, and make no stops beyond that skill's own. Say in one line that this is experiment mode and what would change it to durable mode.
+- **Experiment** is the mode for the operating guide's experiment triggers, such as spike, proof of concept, throwaway, compare options, and tune it while I watch. Use toby-swd-experiment for the loop and stop running this skill. Write no criteria and no slices, and make no stops beyond that skill's own. Say in one line that this is experiment mode and what would change it to durable mode.
 - **Durable implementation** is the mode for everything else. The rest of this file covers it.
 
 When the user picks a behavior at the end of an experiment, come back here and write the criteria from what they picked. The spike shows which behavior to build, but it does not settle the structure. toby-swd-experiment's finish phase deletes the throwaway code. Any code that is kept gets its own greenfield or brownfield read. When durable work needs a value that reading the code cannot settle, use toby-swd-experiment for that one question. Then bring the answer back here.
 
-Load `toby-swd-strategy` for every durable feature. Strategic and greenfield work gets a full design pass before any code. Tactical work gets its brownfield read and its reactive-investment pass. The operating guide's standing routes apply here under their own conditions. This file does not narrow them. The active-skills line lists the skills that loaded.
+Load `toby-swd-strategy` for every durable feature. Every durable feature gets the design pass that the design section describes. Strategic and greenfield work writes it into the plan. Tactical work states it in chat in three lines.
+
+The operating guide's standing routes apply here under their own conditions. This file does not narrow them. The active-skills line lists the skills that loaded.
 
 ## Size the work before anything else
 
@@ -52,7 +55,6 @@ Before picking either size, check that this skill should be running at all. A on
 | Stop 2, the plan | none | a written file, approved before the first edit |
 | Stop 3, a slice boundary | none | only where the next slice depends on the answer |
 | The Check line | write the command | run it against today's code and quote the output |
-| Behavior record | only when the request describes a behavior | every criterion |
 
 Size up mid-run when a trigger you did not see fires, and say so in one line when you do. Never size down. A change that looked tactical and turned out to touch permissions was strategic the whole time.
 
@@ -63,7 +65,7 @@ The sections below describe each gate.
 **Nearly all work is brownfield work.** Most of these decisions are already made in the repo's existing code, so find where they are made. For strategic work, find all four items below before designing, and keep reading while any is missing. For tactical work, find the first and the third:
 
 - The file that implements this behavior today.
-- The nearest shipped feature built the same way, on the same layer and the same data path. Read it end to end: route, handler, model, test, doc. The new code follows its structure unless you state a reason to differ. Write one clause on what that feature got right, so the user knows which pattern the repo will soon have two copies of.
+- The nearest shipped feature built the same way, on the same layer and the same data path. Read it end to end: route, handler, model, test, doc. Check that feature against the red flags in `toby-swd-modules` before copying it. Follow its structure when it passes. When a flag fires, state the flag and design the new code without it, because a copied shallow module becomes two shallow modules. Write one clause on what that feature got right, so the user knows which pattern the repo will soon have two copies of.
 - The test covering the behavior about to change, or one sentence that states where you searched, such as "No test in `tests/orders/` covers `cancelOrder`."
 - The call sites that the change would affect.
 
@@ -72,7 +74,6 @@ The sections below describe each gate.
 In both brownfield and greenfield work:
 
 - `rg` finds the file, but you still have to open it, because a search hit only points to the code. Cite a path:line for every claim about how the code behaves, or add the claim to the criteria list as an assumption. That rule includes a summary from an explorer or a sub-agent. Before adding a helper, module, component, hook, or error type, search the repo for the operation. Cite the closest thing you found, at path:line, and why it doesn't fit. When you find nothing, quote the search you ran, including the pattern.
-- Read the behavior record for the area you're touching. Its entries are the standing claims about that area, so when an entry contradicts the request, ask the user before writing any code.
 
 ## Evidence for each criterion
 
@@ -122,13 +123,35 @@ There are three stops, in the running order above. The sizing table says which o
 
 Never write "assuming yes, proceeding" past a stop, which leaves this skill with no checkpoints at all.
 
+## Design before the plan
+
+Run the design pass after stop 1 and before the plan, at both sizes. Load these three skills for it:
+
+- `toby-swd-strategy` runs the pass itself. Sketch two approaches that put the hard part in different modules. The second approach is the strongest other option, the one a competent engineer would pick. Check both against the near-future variants. Pick the one with the simpler interface for callers.
+- `toby-swd-modules` covers every new module and every module that gains a job. Run its checks, which include the SOLID principles. Fix each red flag in the design, before it reaches the plan.
+- `toby-swd-interfaces` covers every new or changed signature. Write its interface comment first, and run the comment test on it.
+
+When the design shows that the current structure no longer fits the change, the refactor that makes it fit is part of the work. Put that refactor first, as its own step, with its cost. A refactor stated in the design and approved with the plan passes the don't-build catalog.
+
+The design pass produces these lines:
+
+- The structure chosen, and the main reason for it.
+- The alternative rejected, and why.
+- The red flags that the sibling feature has, at file:line, or "none". Each flag the new code would otherwise copy gets a fix in the design.
+- Each rule the feature adds, such as a count, a limit, or a table of values. Give the one function that computes it and every caller of that function.
+- Each new or changed module, with the knowledge it hides from its callers.
+- Each new or changed signature, with its interface comment.
+- Any refactor that runs before the feature code.
+
+Strategic work puts these lines in the plan's design block. Tactical work states the first two and any new signature in chat before the first edit.
+
 ## The plan document
 
 Write the plan as a file, and never agree on a plan in scrollback, because nobody can check off items in scrollback. The operating guide defines the format: `Toby's plan for [task]`, task groups, checkboxes, and a verification block ending each group. This file defines when the plan gets written and what a step must contain for someone to approve it.
 
 - The plan is **written when** the user asks. A yes at stop 1 counts as asking only when stop 1 mentioned the plan.
-- The plan goes **where** the repo already keeps plans. When there is no obvious place, propose a path and get a yes, which is the same gate the behavior record has.
-- The plan **opens with** the mode, the one-line problem, the criteria in their pre-code wording, and what's out of scope. One task group per slice follows, in the order the slices ship. Each group takes its slice's name as its title and ends in its verification block. An operator approving a plan is approving the boundary as much as the work.
+- The plan goes **where** the operating guide says: `docs/plans/<feature-group>/<plan-name>.md`.
+- The plan **opens with** the mode, the one-line problem, the criteria in their pre-code wording, and what's out of scope. The design block follows, with the lines from the design section. One task group per slice comes after it, in the order the slices ship. Each group takes its slice's name as its title and ends in its verification block. An operator approving a plan is approving the boundary as much as the work.
 - **Anything on** the ask-list in the operating guide or toby-swd-environment appears as its own step with the exact command. That ask-list includes a migration, install, seed, snapshot, deletion, process, or port.
 - **The plan is the execution record.** Check items off as they are done. When execution diverges from an approved step, edit the plan and say what changed before continuing.
 - **A step an operator can approve** gives the path of the file it touches, and whether the step creates, edits, or deletes that file. It says what changes there, concretely enough for someone to disagree with. It quotes the criterion the step is for, and what proves it, with the result that would mean it failed. Write each step as whole sentences. `references/examples.md` contains a task group written at that detail.
@@ -136,7 +159,7 @@ Write the plan as a file, and never agree on a plan in scrollback, because nobod
 ## Build one slice at a time
 
 - Work on one criterion per cycle: write the test first, watch it fail, make it pass, and run it. toby-swd-testing covers when test-first is skipped. When you skip it, give the skip reason in toby-swd-testing's words, run the criterion by hand, and quote the output.
-- Write what the design called for. If you find yourself writing less code than the design called for, the design was wrong, so fix the design and say you did.
+- Write what the design called for. When the code needs a different module, boundary, or signature than the design states, stop. Edit the design and say what changed before continuing.
 - Confirm every symbol this change didn't define against the installed source or the pinned manifest. A symbol can be a library function, config field, env var, CLI flag, component prop, or error type. Skip the check when this repo already calls the symbol somewhere you can cite at path:line. The lockfile version is the one that runs, so docs for a later version are a guess.
 - Re-read a file before editing it a second time when anything else happened in between. Your memory of a file you changed three steps ago may be wrong, even when you feel sure of it.
 - When the change alters an existing function, method, or other callable, run the caller sweep that `toby-swd-interfaces` describes and put its result in the handoff.
@@ -154,23 +177,13 @@ Write the plan as a file, and never agree on a plan in scrollback, because nobod
 - A green type-check, a lint pass, or an existing suite that never runs the changed lines proves only that the repo still builds. The repo also built before you started.
 - Run the change the way a user would and quote what came back. When that needs an approval-gated command, write out the command and ask for approval. Saying "this needed approval" with no command given is a skipped step. Hand manual steps to the user only for what you couldn't run, labelled run-by-me or for-you. Every for-you step says what blocked you. When a step is handed over with no reason, the user reads it as a chore you assigned.
 
-## Write the behavior down
-
-Write down what the request said the behavior should be. A year later, the code shows what it does but not what it was for. The next reader then checks the code against their own guess and files the difference as a bug.
-
-- **Fires** when the request contains words for a behavior, from the user or the ticket, and the record doesn't state that behavior yet. `references/behavior-record.md` lists the changes that write no entry and says where an inferred behavior goes. When a run writes no entry, give the reason from that list.
-- **Home** is a prose file the repo already keeps for stated behavior. When no such file exists, propose `docs/behavior.md` and get a yes before creating it, which is the same gate the plan file has.
-- **Entry** is a heading that states the behavior in one sentence. The sentence gives the trigger and the observable result at the public interface `toby-swd-testing` tests through. It mentions no function, file, or internal state. Add who asked, quoted, and when. Two sentences means two behaviors, so split them. The test description quotes that sentence verbatim, character for character.
-- **Check**, before handoff: run the grep in `references/behavior-record.md` and report what it printed. Each line it prints is a stated behavior that has no test, so list each one in the handoff.
-- **Retire** an entry in the diff that deletes its test, and edit a falsified sentence in the diff that falsifies it. `references/behavior-record.md` covers both, the entry rules in full, and the two-branch case.
-
 ## Don't build
 
 `references/checks.md` lists the seven things that get built without anyone asking for them. Each stays out unless a criterion asks for it and that criterion's Source line quotes the user or the ticket. Read the seven before writing the plan's out-of-scope line, or before the first edit where there is no plan. Never write a criterion yourself to allow one of them, because the catalog is there to prevent that.
 
 ## Resuming half-built work
 
-Before touching code, recover five things: the mode, the criteria list, the plan, which steps are checked off, and the last checkpoint decision. Look in the thread, the diff, the plan file, the behavior record, and the repo. When you cannot find any of them, rebuild them from the code that exists and the original request, show them, and confirm before continuing. Criteria rebuilt from a diff match that diff, including the places where the diff was wrong. Name whichever ones you couldn't recover. Half-built experiment code is still experiment code until the user says otherwise.
+Before touching code, recover five things: the mode, the criteria list, the plan, which steps are checked off, and the last checkpoint decision. Look in the thread, the diff, the plan file, and the repo. When you cannot find any of them, rebuild them from the code that exists and the original request, show them, and confirm before continuing. Criteria rebuilt from a diff match that diff, including the places where the diff was wrong. Name whichever ones you couldn't recover. Half-built experiment code is still experiment code until the user says otherwise.
 
 ## Red flags
 
@@ -183,7 +196,7 @@ Lead with the behavior that now exists, stated the way the user would observe it
 This file adds two sections, and both always appear:
 
 1. List each criterion in its pre-code wording, marked met with the check that proved it, or unverified with the reason. For multi-slice work, list each slice by name, marked done or not-done, with its evidence.
-2. List the behavior record entries written, edited, or retired, and the result of the check. When no entry fired, say so and why. Say where the plan is, and list any step that ran differently from the approved wording.
+2. Give the structure chosen and the alternative rejected, in one line each. Say where the plan is, and list any step that ran differently from the approved wording.
 
 Then give the operating guide's list: anything incomplete or risky, tests deleted or weakened, heavy commands skipped, processes left running, and unsettled assumptions.
 
@@ -192,5 +205,4 @@ Phrase each standing assumption so the user can settle it in a word. List the qu
 ## References
 
 - `references/checks.md` lists the seven don't-build entries and the eight red flags, each under the name a handoff cites.
-- `references/behavior-record.md` covers what the record skips, the entry and binding rules in full, the grep, retiring, and the two-branch case.
-- `references/examples.md` has worked slice cuts for four kinds of feature, greenfield and brownfield. It also has a plan with steps at approval detail, and a filled behavior record with its bindings and a retired entry.
+- `references/examples.md` has worked slice cuts for four kinds of feature, greenfield and brownfield. It also has a plan with steps at approval detail.

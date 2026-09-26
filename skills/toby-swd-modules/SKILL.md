@@ -149,3 +149,4 @@ Open one of these files. Read the stack file that matches the code you are placi
 - `references/backend-apis.md` covers Java/Spring, Go, and TypeScript backends. Its examples show composition versus inheritance most concretely.
 - `references/databases.md` covers the repository pattern, schema as interface, ORMs, and transactions.
 - `references/caching.md` covers the cache as a deep module, invalidation, and stampedes.
+- `references/solid.md` maps SOLID to these checks.

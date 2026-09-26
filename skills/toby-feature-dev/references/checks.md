@@ -7,10 +7,10 @@ toby-feature-dev checks work against the don't-build catalog and the red-flag li
 Each stays out unless a criterion asks for it and that criterion's Source line quotes the user or the ticket. Never write a criterion to allow one of these, because the catalog is there to prevent that. When one ships anyway, state the entry and the criterion that allowed it.
 
 - **The one-caller config option** is a setting, hook, or extension point that exactly one call site reads. A slice flag ships with the slice that deletes it, but this option ships with a default. Its value is `true` today and stays `true` until the repo is archived.
-- **The wrapper over one instance** is a new module, layer, or adapter in front of a single implementation. Widen the interface you already have per toby-swd-interfaces and wait for a second instance, because a second instance shows you the pattern.
+- **The wrapper over one instance** is a new module, layer, or adapter in front of a single implementation. Widen the interface you already have per toby-swd-interfaces and wait for a second instance, because a second instance shows you the pattern. A module with two or more callers is not a wrapper over one instance. A module the design pass approved for depth also passes this entry. Examples are a module that hides a storage layout or an external API from its callers.
 - **Handling for a ruled-out condition** is error handling for a state that the types or an earlier check already exclude. A catch block that has never caught anything does no more than a comment would, but it still costs time at runtime.
 - **The adjacent feature, and the adjacent bug** are the thing the request implies and the defect you found on the way to it. Changes made "while I was in there" turn a two-file diff into a nine-file diff. List each as a follow-up and stop. The one exception is toby-swd-strategy's reactive pass. It allows a small local cleanup inside a file a criterion already mentions, reported on its own line.
-- **The uninvited migration** is a migration, rename, or reorganization that no criterion asked for. It appears unrequested in somebody else's review, so the reviewer has to decide whether to trust it.
+- **The uninvited migration** is a migration, rename, or reorganization that no criterion asked for. It appears unrequested in somebody else's review, so the reviewer has to decide whether to trust it. A refactor stated in the plan's design block and approved with the plan passes this entry.
 - **Faster than nothing** is performance work with no measurement behind it. Without a starting measurement, a claim such as 40% faster has no recorded number to compare against.
 - **The dependency nobody approved** is a new dependency added without approval. Adding it makes a decision for the user about their lockfile, build, and security review.
 
@@ -25,7 +25,7 @@ Check the finished work against all eight before writing the handoff. Every one 
 - **Code ahead of its plan** is an edit written before the step covering it was approved. It also covers a step that ran differently from its approved wording with no edit to the plan.
 - **The placeholder in a production path** is a TODO, a hardcoded return in place of real work, an unimplemented branch, a swallowed error, or a fixture the runtime reads.
 - **Partial work reported whole** is a multi-slice feature handed over as done, with the remaining work moved to a closing note that begins "the rest is just wiring".
-- **Nothing accounts for it** is a file in the diff that traces to no criterion and no reported cleanup. It also covers a user-quoted behavior with no record entry, a record entry no test quotes, and an assumption stated mid-run but missing from the handoff.
+- **Nothing accounts for it** is a file in the diff that traces to no criterion and no reported cleanup. It also covers an assumption stated mid-run but missing from the handoff.
 
 ## Process failure modes — cited from the body
 

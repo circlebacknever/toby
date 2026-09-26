@@ -12,7 +12,9 @@ description: >-
 
 Validate the change, report the real risks, and stop. Six findings that look confident but turn out fake waste more time than the bug itself. Size the report to the change. A busy engineer should read it once and trust it.
 
-**Report problems and do not fix them.** This skill reports and edits nothing. A bug or a security finding does not cite a skill for the fix, because the finding already states the fix. A design or coverage finding cites the skill for the fix, so the next agent knows which skill to load. The skills for these fixes are `toby-swd-interfaces` for a contract, `toby-swd-modules` for placement, `toby-swd-complexity` for an error path or a cache, `toby-swd-testing` for coverage, `toby-swd-clarity` for a name or a comment, `toby-swd-strategy` for a design that got worse. `toby-simplify-code` is for behavior-preserving cleanup the user asked for.
+**Report problems and do not fix them.** This skill reports and edits nothing.
+
+**Write every finding so a reader without these skills can act on it.** The author of the code often does not have the Toby skills installed. State the fix in plain engineering words inside the finding. Never name a Toby skill or a skill-only term in the report, such as "reactive pass" or "comment test". Use the skills yourself while reviewing, to decide what the fix is. `toby-swd-interfaces` covers a contract. `toby-swd-modules` covers placement and module depth. `toby-swd-complexity` covers an error path or a cache. `toby-swd-testing` covers coverage. `toby-swd-clarity` covers a name or a comment. `toby-swd-strategy` covers a design that got worse.
 
 ## Disposition
 
@@ -35,15 +37,17 @@ Write each finding as three labelled lines, and make each line a whole sentence.
 
 - **Consequence** — This line says in plain words what breaks and for whom, at file:line. An example is "The account page returns last month's balance to a logged-in user on first load (api/account.ts:42)." Claim only the effects that the trigger and path can cause. If the path ends at a failed request, the consequence ends there. Claim data loss only when the path includes the write.
 - **Fires when** — This line states the input or state that triggers the failure, and the real caller, route, input, or test that supplies it. If you can't show where the value comes from, you're guessing it can happen, so move it to a question or drop it.
-- **Guard** — This line quotes the check that should stop the failure and says why the check misses. When no check exists, write one sentence that says so and lists where you looked, such as "No check in the router or `api/middleware/` stops it." Before writing this line, assume the code is right and you are wrong. Search for the guard that would make your finding fake, and then say why that guard still fails. Most fake findings fail at this step.
+- **Guard** — This line quotes the check that should stop the failure and says why the check misses. When no check exists, write one sentence that says so and lists where you looked, such as "No check in the router or `api/middleware/` stops it." Before writing this line, assume the code is right and you are wrong. Search for the guard that would make your finding fake, and then say why that guard still fails. Most fake findings fail at this step. When the guard could be in a file you cannot read, such as authentication middleware or settings, ask the author a question and report no finding.
 
 Run the changed code before writing findings, so you find what you have missed. Run unasked what `toby-swd-environment` calls safe inspection or narrow verification: the changed function in a REPL, a scratch script, the one test file covering it. Ask before anything on that skill's ask-list: the full suite, a migration, an install, a dev server. State the command you want and why. In the report, say which findings depend on reading alone.
 
 Give changed arithmetic and changed predicates the inputs a quick read misses: negative, zero, empty, and the value either side of every boundary. Then paste what came back into the Consequence line. These inputs reveal sign errors, unit mismatches, and totals that disagree with what got stored. No catalog lists those bugs.
 
-A design smell finding has three different lines: the entry name from `references/smells.md`, the file:line, and the code there that meets the entry's Fires-when criterion. A smell costs future readers and future changes. So if you demand a runtime consequence for a smell, you will drop every real smell or invent a consequence for it. The drop rule above still applies, so fill all three lines from the file or drop the finding.
+A design smell finding has four lines. They are the entry name from `references/smells.md`, the file:line, the code that meets the entry's Fires-when criterion, and the fix. Write the fix from the entry's Fix line, applied to this code. The entry names are standard smell names that a reader can look up.
 
-When the fix isn't plain, add one sentence that says how to fix it. Don't restate the code, because the author has the diff. Order findings by how much harm each one causes.
+A smell costs future readers and future changes. So if you demand a runtime consequence for a smell, you will drop every real smell or invent a consequence for it. The drop rule above still applies, so fill all four lines from the file or drop the finding.
+
+When the fix isn't plain, add one sentence that says how to fix it. Don't restate the code, because the author has the diff. Check the fix against the diff before writing it. A fix that deletes a method an interface requires, or a method a caller uses, breaks the code, so the finding is wrong. Cite line numbers only from the diff's hunk headers, and cite the function name when you cannot count the line. Order findings by how much harm each one causes.
 
 Leave off P1/P2 labels, because a severity label is a claim about impact. The reviewer has the diff but not the roadmap, the incident history, or what ships Thursday. A consequence sentence claims only what the traced path shows, but a severity label depends on information the reviewer never had.
 
@@ -57,30 +61,33 @@ Run them in this order. Give each pass its own standard of proof and its own fin
 
 1. **Bugs and regressions.** Find what breaks, and for whom.
 2. **Security.** Check auth, authorization, injection, secrets, and exposure.
-3. **Compliance.** Check the change against what was agreed. Skip this pass when no acceptance criteria, plan file, or behavior record exists.
+3. **Compliance.** Check the change against what was agreed. Skip this pass when no acceptance criteria or plan file exists.
 4. **Design.** Ask what the change cost the next person to touch this code, and which document it left wrong.
 
 The three-finding limit above applies to each pass on its own. Three findings in the bugs pass still allow three findings in the compliance pass.
 
 ### The compliance pass
 
-Read the audit trail `toby-feature-dev` leaves, because the diff alone shows only part of the change. Where acceptance criteria, a plan file, or a behavior record exist for this work, check three things and report what failed:
+Read the audit trail `toby-feature-dev` leaves, because the diff alone shows only part of the change. Where acceptance criteria or a plan file exist for this work, check three things and report what failed:
 
 - Check every acceptance criterion against the diff. When nothing in the diff meets a criterion, report that criterion as the finding, quoted in the wording it had before coding started.
 - Check every plan step against what the diff contains. A step that ran differently from its approved wording, with no note recording the change, is the finding.
-- Check every behavior-record sentence against the tests. A record sentence that the tests do not check is the finding, reported at the entry's heading.
+- Check the plan's design block against the diff. A module, boundary, or signature that the diff builds differently from the block, with no note recording the change, is the finding.
 
 None of the three needs a runtime consequence. The consequence is that the change and the agreement disagree. The reviewer can quote both.
 
 ### The design pass
 
-Ask whether the design is at least as good after the change as before it, which only this pass asks. These questions come from `toby-swd-strategy`:
+Ask whether the design is at least as good after the change as before it, which only this pass asks. Load `toby-swd-strategy`, `toby-swd-modules`, and `toby-swd-interfaces` for it, and ask these questions of each new or changed module and signature:
 
 - What special case did this diff add, and which caller now has to know about it?
 - What hidden dependency did it create? Examples are a decision in two modules, an ordering a caller must respect, and a field layout two files share with nothing enforcing it.
+- Does each new or changed module hide more than its interface costs a caller to learn? A module whose interface is about as complex as its body is shallow.
+- Can a caller use each new or changed signature correctly from its interface comment alone?
+- Does the change break a SOLID principle? `toby-swd-modules` maps each principle to the check that applies it. Report the break under the matching entry in `references/smells.md`, and write the principle's name in the finding.
 - Which of these was cheaper to fix in this diff than it will ever be again?
 
-Report at most one design finding, at file:line, and cite `toby-swd-strategy` in it. The author already had to answer this question, so answering it is in scope. Reopening the design is out of scope.
+Use the smell format when an entry in `references/smells.md` matches. Otherwise use the three evidence lines, with the Consequence line stating what the next change will cost. When a plan's design block approved a choice, report it only where the diff differs from the block.
 
 ## What to catch
 

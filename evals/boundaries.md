@@ -14,7 +14,7 @@ the description's skip clause has to say out loud.
 | `toby-swd-docs` | `AGENTS.md` and `README.md` in the user's own modules | public API changes | docs fires when the module's documented surface moved | code comments and docstrings |
 | `toby-swd-environment` | commands, processes, ports, installs, migrations, state outside the edit | nothing | environment always fires on a command | a pure code edit with nothing to run |
 | `toby-swd-experiment` | spikes, parameter sweeps, throwaway debug surfaces, proof of concept | retries, timeouts, tests, design | the throwaway frame outranks every noun inside it | work the user intends to keep |
-| `toby-feature-dev` | mode, acceptance criteria, slicing, the approved plan, the behavior record | features, endpoints, screens | feature-dev owns multi-file new behavior and routes method to the swd skills | a one-file edit following a pattern already in that file |
+| `toby-feature-dev` | mode, acceptance criteria, slicing, the approved plan | features, endpoints, screens | feature-dev owns multi-file new behavior and routes method to the swd skills | a one-file edit following a pattern already in that file |
 | `toby-code-review` | findings on a diff the user asks about | "review my changes" | code-review fires on the word review | a request to change the code |
 | `toby-simplify-code` | behavior-preserving cleanup the user asked for | "review my changes" | simplify-code fires only when the user asked to change the code | a request for findings |
 
