@@ -2,12 +2,13 @@
 
 Eleven prompts. Each names the skills that should load and the skills that must
 not. A skill that fires when it should not costs 100 percent of its tokens, so
-the four probes at the end count as much as the four positives.
+the seven probes at the end count as much as the four positives.
 
-The runner shows an agent the nine `toby-swd-*` descriptions plus
-`toby-feature-dev`, `toby-code-review`, and `toby-simplify-code`, then asks
-which it would load. Descriptions are the whole test surface, because that is
-all a host tool sees before it decides.
+The runner, `scripts/trigger-probe.py`, shows an agent 16 descriptions and
+asks which skills it would load. They are the nine `toby-swd-*` skills,
+`toby-feature-dev`, `toby-code-review`, `toby-simplify-code`, `toby-game`,
+`toby-squall`, `toby-learning`, and `toby-explain`. The agent sees only the descriptions, because a host tool
+reads only the descriptions when it picks a skill.
 
 ## Positive probes
 
@@ -86,7 +87,8 @@ Forbidden: toby-swd-strategy, toby-feature-dev, toby-game, toby-squall
 ```
 
 Should load: exactly one of `toby-code-review` or `toby-simplify-code`.
-Should not load: both. They collide today and neither names the other.
+Should not load: both. Each skip clause names the other skill, so a host tool
+should load only one.
 Owns the decision: code-review, because "review" is the word in the prompt.
 
 ### N3 — parameter spike
@@ -100,7 +102,8 @@ Forbidden: toby-swd-testing, toby-swd-strategy, toby-swd-complexity, toby-featur
 
 Should load: `toby-swd-experiment`.
 Should not load: `toby-swd-testing`, `toby-swd-strategy`, `toby-swd-complexity`.
-Retries and timeouts are complexity nouns, and the throwaway frame outranks them.
+The prompt mentions retries and timeouts, which match `toby-swd-complexity`, but
+the word "throwaway" takes priority over them.
 
 ### N4 — single-file edit following a local pattern
 > Add a `phone` field to the `ContactForm` component, the same way `email` is
@@ -157,7 +160,8 @@ fired on this phrasing before both descriptions named the boundary.
 ## Scoring
 
 Per scenario: one point for every should-load skill that fired, minus one for
-every should-not-load skill that fired. Eight scenarios, so the ceiling moves
-with the expected sets. The number that matters is the total of false firings
-across N1 to N7, because that is the co-load bill. N5 and N6 are the two
-invoke-only skills. A single firing there is a defect. The other probes cost tokens, and these two break a stated rule.
+every should-not-load skill that fired. The suite has eleven scenarios. The
+maximum score depends on how many should-load skills each scenario lists. The
+main score is the total of false firings across N1 to N7, because each false
+firing loads a skill that the task does not need. N5 and N6 test two invoke-only
+skills, `toby-game` and `toby-squall`. A single firing there is a defect. The other probes cost tokens, and these two break a stated rule.

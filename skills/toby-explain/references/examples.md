@@ -8,7 +8,7 @@ These examples are not for reuse, so copy the pattern and write new material for
 
 The user asks what a function is in mathematics. No code or equation has been shown yet.
 
-→ `f(x) = x²` sends 3 to 9, and −3 to 9 as well. Two different inputs may share an output. The entire rule is that one input may never have two outputs. Check `x² + y² = 1` at `x = 0`. y comes out to both 1 and −1, so one input produces two outputs and the circle fails the rule. The whole test is to pick an input and count the outputs it produces.
+→ `f(x) = x²` sends 3 to 9, and −3 to 9 as well. Two different inputs may share an output. A function has only one rule, which is that one input never has two outputs. Check `x² + y² = 1` at `x = 0`. y comes out to both 1 and −1, so one input produces two outputs and the circle fails the rule. To test any relation, pick an input and count its outputs.
 
 ---
 

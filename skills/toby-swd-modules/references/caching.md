@@ -1,10 +1,9 @@
 # Worked Examples — Caching
 
 Caches are among the most common small additions that spread across a codebase.
-They easily leak knowledge into call sites. Three things determine whether
-a cache is a deep module or a maintenance liability: where the cache calls are,
-who owns invalidation, and whether the cache or the
-caller handles concurrent misses.
+They easily leak knowledge into call sites. Whether a cache is a deep module
+or a liability depends on where its calls are, who handles invalidation, and
+who handles concurrent misses.
 
 ---
 
@@ -234,13 +233,13 @@ The batch importer and the admin tool call `Insert` and get correct
 invalidation automatically.
 
 For higher-volume systems this same logic moves to an event/CDC stream and a
-worker that invalidates based on database changes. The principle is the same,
-because one module handles invalidation, so callers don't keep
+worker that invalidates based on database changes. The principle stays the same.
+One module handles invalidation, so callers don't keep
 the list.
 
 ---
 
-## Where the cache should sit
+## Where to put the cache
 
 | Layer | Use the cache here? |
 |---|---|

@@ -40,7 +40,7 @@ Here is the complete interface comment:
 > authenticate in try/catch and handle BiometryNotAvailable,
 > BiometryNotEnrolled, and BiometryLockoutPermanent separately.
 
-The comment has twelve sentences. It describes ordering ("Call X first, then
+The comment has nine sentences. It describes ordering ("Call X first, then
 Y") and platform-specific protocol. The "interface" is seven separate APIs
 the caller must compose, plus platform quirks. The comment
 test detects that failure.
@@ -76,7 +76,7 @@ caller's view, because status's discriminator covers them. Key lifecycle,
 Info.plist errors, and lockout handling are all inside the module. Common callers call
 `prompt({ reason: 'Confirm payment' })` and switch on the result.
 
-The guardrail check is whether anything caller-facing got hidden. The
+Step 7 in `SKILL.md` asks whether the redesign hid anything the caller needs. The
 caller still needs to know that a payload signature is per-device. So
 sending the signature to the server is meaningful only if the server
 trusts that device. One sentence in the comment states that fact. The
@@ -115,7 +115,7 @@ Here is the interface comment for `ProductDetail`:
 > recommendations will be empty and user will be the deep-link guest user;
 > in that case the screen shows a "log in to see recommendations" CTA.
 
-The comment has seven sentences. It describes the data flow into the screen
+The comment has six sentences. It describes the data flow into the screen
 and what happens when each field is missing. The "interface" is leaking the structure of the
 navigating screen's state and the staleness model. The deep-link case has
 to be specially described because the contract was designed for the
@@ -141,8 +141,8 @@ Comment:
 > recommendations on mount via the products repository. Renders a guest
 > view if the user is not signed in.
 
-The comment has two sentences. The route now contains only identity, which
-is what to show. Loading,
+The comment has three sentences. The route now contains only the product id, which
+tells the screen what to show. Loading,
 staleness, and signed-in-vs-guest are handled by the screen itself, which
 reads `useAuth()` and a `useProduct(productId)` query. Deep links work
 because the route is serializable and small.
@@ -178,7 +178,7 @@ Here is the complete comment:
 > and the database has a configurable total cap. iOS has no comparable
 > per-key limit.
 
-The comment has six sentences. The "interface" is `get/set/delete/clear`,
+The comment has seven sentences. The "interface" is `get/set/delete/clear`,
 but a caller must still learn the operational contract. That contract covers
 JSON serialization, key namespacing, versioning, not clearing auth on logout,
 and the Android size limit. Every screen that uses Storage must repeat
@@ -275,7 +275,7 @@ Comment:
 > on first mount before the user context resolves; treat undefined as
 > "not allowed."
 
-The comment has six sentences, describes invariants about combinations of
+The comment has five sentences, describes invariants about combinations of
 fields, and gives "treat X as Y" instructions. The hook returns five fields and
 requires the caller to coordinate them.
 
@@ -304,7 +304,7 @@ Comment:
 > (an action absent from actions is not permitted). Action methods return
 > Result so callers can surface failures without try/catch.
 
-The comment has three sentences, and the contract improves in two places:
+The comment has four sentences, which is within the comment test's limit. The contract improves in two places:
 
 - The discriminator eliminates the "what does undefined mean" problem.
 - Permissions move from "boolean per action" to "presence of the action in

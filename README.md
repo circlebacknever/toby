@@ -72,8 +72,8 @@ That copies both hooks to `~/.claude/toby/hooks`, then prints the `settings.json
 block to paste, with the paths already filled in. It does not edit
 `settings.json` itself. Merge the block with any hooks already there.
 
-Without being asked, the agent runs it on every prose file a turn wrote, because
-the operating guide's Self Review tells it to. The agent fixes everything under FIX and
+Without being asked, the agent runs the voice checker on every prose file a turn wrote,
+because the operating guide's Self Review tells it to. The agent fixes everything under FIX and
 answers every line under DECIDE. Then it reads every sentence against the READ
 list, which covers the rules the patterns do not check. The patterns miss 7 of the 49
 bad sentences in `evals/gold/labels.jsonl`, so the agent needs the READ
@@ -84,12 +84,12 @@ it sends.
 
 ### Claude Code: pick one of two layouts
 
-The writing rules go in `CLAUDE.md`, or in an output style. Never both: that
-puts the same 2,400 tokens in front of every turn twice, which is what the flag
-below exists to prevent.
+The writing rules go in `CLAUDE.md`, or in an output style. Do not use both,
+because the same 2,400 tokens would then go in front of every turn twice. The
+`--output-style` flag below prevents that.
 
-**Default.** Everything in `CLAUDE.md`. Works as soon as it is installed, and needs no
-further setup.
+**Default.** The writing rules and the operating floor all go in `CLAUDE.md`. This
+layout works as soon as it is installed.
 
 ```sh
 scripts/install.sh --tool claude
@@ -101,8 +101,8 @@ then contains the operating floor alone: authority, verification, plan format,
 work modes, skill routing, environment safety, the work loop, and self review.
 
 The split costs about 200 tokens more than the default, because the two files
-contain two headers where one did. Choose it for where the rules sit, and not to save
-anything.
+contain two headers where one did. Choose it because it puts the writing rules in the
+system prompt, and not to save tokens.
 
 ```sh
 scripts/install.sh --tool claude --output-style
@@ -122,7 +122,7 @@ write something before the style is on.
 | | Default | `--output-style` |
 |---|---|---|
 | Resident tokens per turn | 5,126 | 5,314 (2,543 style, 2,771 `CLAUDE.md`) |
-| Where the writing rules sit | a user message | the system prompt |
+| Where the writing rules are loaded | a user message | the system prompt |
 | Restated late in a session | no | yes |
 | Setup after install | none | `/config`, Output style, Toby |
 | Reaches a subagent | yes | no, a subagent runs its own system prompt |
@@ -159,7 +159,7 @@ When the block is already there, only the block changes. When there is no block,
 
 The operating guide owns safety, work loop, skill routing, verification posture, and voice. Skills own task method.
 
-The voice rules ship three ways, because each one reaches a surface the others miss. The instruction files put them in a user message every tool reads. The output style puts the writing sections in Claude Code's system prompt, which has priority over that and gets restated during a long conversation. The Stop hook reads the finished reply, which no file check can do.
+The instruction files, the output style, and the Stop hook each deliver the voice rules, because each one reaches a place the others miss. The instruction files put them in a user message every tool reads. The output style puts the writing sections in Claude Code's system prompt, which has priority over that and gets restated during a long conversation. The Stop hook reads the finished reply, which no file check can do.
 
 Turn the style on with `/config`, then Output style, then Toby. It sets `keep-coding-instructions: true`, so the engineering behaviour is untouched.
 
@@ -184,7 +184,7 @@ The rest of the standalone skills are Toby-specific:
 - `toby-voice` - fix output that wandered off voice.
 - `toby-game` - build and tune a playable thing.
 
-The `toby-swd-*` set is the engineering method, one skill per habit:
+The `toby-swd-*` skills are the engineering method, with one skill for each habit.
 
 The SWD skills come from two books whose fans rarely agree. Toby read John Ousterhout's *A Philosophy of Software Design* and Robert C. Martin's *Clean Code* as source material, then kept the parts he trusts when he edits code.
 
@@ -217,9 +217,9 @@ git diff --check
 `evals/run.py gates` runs the validator and then compares this tree against the
 numbers in `evals/baselines/gates.json`: warnings by kind, body tokens per
 skill, co-load tokens per routing group, and the list of rules that have left
-the repo. It goes red when any of them gets worse. When the change is meant to
-move one, `evals/run.py record` writes the new number down, and that is the step
-that makes an improvement stick.
+the repo. It goes red when any of them gets worse. When a change is meant to
+improve one of these numbers, run `evals/run.py record` to write the new number to
+`evals/baselines/gates.json`, so later runs fail if it gets worse.
 
 `tests/test-gates.py` seeds a regression against each gate and checks it goes
 red, so a gate cannot quietly lose the ability to fail. The evals that need a
@@ -234,7 +234,7 @@ scripts/test-install.sh
 
 It installs into a throwaway `HOME`, then checks what it installed. Skill counts are read from the repo, so adding a skill cannot leave the test quietly red. Every installed skill is compared byte-for-byte against `skills/`, and every instruction block is compared against `base/toby.md`.
 
-It also tests the two promises above. A re-install without `--force` must refuse, text around a marker block must survive, and a file with no marker block must come back untouched. The temp dirs clear on the way out.
+It also tests the installer's marker-block and `--force` rules described above. A re-install without `--force` must refuse, text around a marker block must survive, and a file with no marker block must come back untouched. The temp dirs clear on the way out.
 
 ## Making it yours
 

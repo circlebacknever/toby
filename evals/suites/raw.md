@@ -2,7 +2,7 @@
 
 Eight outputs built from raw material: code, command output, a diff, and eval
 results. The writer forms every sentence. No task hands over a finished
-sentence to copy. Frozen on 2026-09-14 before any writer ran.
+sentence to copy. These tasks were frozen on 2026-09-14, before any writer ran.
 
 Use only what the material shows, plus arithmetic on it. Tasks 1 and 6 also
 allow standard knowledge of the tools they name.

@@ -34,7 +34,7 @@ Here is the full interface comment:
 > being non-null and position 0 being non-null as a stale-data state, where
 > the previous value is still displayed.
 
-That comment is six sentences. It describes the data structure (positions
+That comment is seven sentences. It describes the data structure (positions
 0-4) and the ordering (which is non-null when). It is hard to read and
 impossible to use correctly from the destructuring site. The reason is that the names
 `product`, `error`, `loading`, `refetch`, `mutate` are the caller's choice,
@@ -151,11 +151,11 @@ prop combinations the caller must assemble correctly each time.
 Interface comment for `DestructiveConfirmDialog`:
 
 > Renders a destructive-action confirmation when open is true. Calls
-> onConfirm if the user proceeds. Calls onClose in all other paths
-> (cancel, esc, overlay click). Focus defaults to the cancel button.
-> esc and overlay-click are enabled and treated as cancel.
+> onConfirm if the user proceeds. Every other path counts as cancel and
+> calls onClose, including esc and overlay click. Focus defaults to the
+> cancel button.
 
-The comment has three sentences and lists no prop combinations to memorize. The destructive-confirm
+The comment has four sentences and lists no prop combinations to memorize. The destructive-confirm
 intent defines the safe defaults (focus on cancel, confirm button styled red), so
 callers can't accidentally produce an unsafe variant. Common-case caller
 burden drops from eleven decisions to four.
@@ -229,13 +229,13 @@ interface CartStore {
 
 Comment:
 
-> Stores the cart. items, coupon, shipping, and total hold the current
-> state. The mutation methods enforce invariants (no duplicate variants,
-> qty >= 1, coupon valid for the current items) and recompute total. Errors
-> from applyCoupon are returned as Result. The cart state is unchanged on
-> failure.
+> Stores the cart, whose items, coupon, shipping, and total hold the
+> current state. The mutation methods enforce invariants (no duplicate
+> variants, qty >= 1, coupon valid for the current items) and recompute
+> total. Errors from applyCoupon are returned as Result. The cart state is
+> unchanged on failure.
 
-The comment has three sentences and never says "callers must". The invariants
+The comment has four sentences and never says "callers must". The invariants
 are in one place, where they can be tested once. The store is now deep. The interface has
 six operations that express intent. The implementation handles dedup,
 validation, total computation, coupon validity, async network calls during
@@ -308,11 +308,12 @@ function useCombobox<T>(opts: {
 
 Comment:
 
-> Implements a headless combobox state machine. Pass the current items and an id
-> function. Receive prop bundles that wire ARIA attributes and keyboard
-> handlers to the input, list, and items. filteredItems is computed from the current
-> input value through filter. highlightedIndex tracks keyboard navigation.
-> onSelect fires when the user confirms a choice via Enter or click.
+> Implements a headless combobox state machine for the items and id
+> function the caller passes. Returns prop bundles that wire ARIA attributes
+> and keyboard handlers to the input, list, and items. Rendering state
+> includes filteredItems, computed from the current input value through
+> filter, and highlightedIndex, which tracks keyboard navigation. onSelect
+> fires when the user confirms a choice via Enter or click.
 
 The comment has four sentences. The caller spreads the prop bundles onto
 their elements and renders against `filteredItems`. Keyboard, ARIA,

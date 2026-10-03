@@ -2,7 +2,7 @@
 
 ## Trigger routing
 
-Same eight prompts, three runs. `baseline/triggering.txt` is the before run.
+The three runs used the same eight prompts. `baseline/triggering.txt` is the before run.
 `evals/out/triggering-after.txt` is the after run. `evals/out/triggering-blind.txt`
 is a second after run with no mention of skip clauses in the instructions, to
 check whether the first run had only followed a hint.
@@ -20,8 +20,9 @@ field addition. Each stopped for a named phrase in its own skip clause.
 
 ## Code review, before and after
 
-Same diff, same criteria, one seeded security bug and two seeded criteria with
-no test. `evals/out/review-old.md` and `evals/out/review-new.md`.
+Both skills reviewed the same diff against the same criteria. The diff has one
+seeded security bug and two seeded criteria with no test. The two reviews are in
+`evals/out/review-old.md` and `evals/out/review-new.md`.
 
 | | Old skill | New skill |
 |---|---|---|
@@ -32,11 +33,11 @@ no test. `evals/out/review-old.md` and `evals/out/review-new.md`.
 | Owning skill named | no | yes |
 | Question raised for the author | no | yes, on the missing decorator |
 
-The compliance pass is what separated the two criteria findings from the bug.
+The compliance pass separated the two criteria findings from the bug.
 The old skill reported "two of three required tests don't exist" as one line
 under the bug, and the new one checked each criterion against the diff and quoted
 its wording.
 
-One defect the run exposed: the new skill routed the security bug to
-`toby-swd-interfaces`, which owns nothing about it. The frame now says a bug or
-a security finding needs no routing, because the fix is the finding.
+The run exposed one defect, because the new skill routed the security bug to
+`toby-swd-interfaces`, which has no rule about security bugs. The frame now says a bug or
+a security finding needs no routing, because the finding already states the fix.

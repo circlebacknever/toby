@@ -1,10 +1,11 @@
 # Engineering skill tasks
 
-Eight outputs, one for each `toby-swd-*` skill that produces written text: a
-module guide, test names and a test comment, an interface docstring, error
-messages, an experiment report, an approval request, a design note, and a
-placement note. Each task gives raw material and names the skill file a writer
-reads before writing it. Frozen on 2026-09-14 before any writer ran.
+This suite has eight tasks, one for each `toby-swd-*` skill with guidance on
+written output. Four tasks ask for a module guide, test names with a test
+comment, an interface docstring, and error messages. The other four tasks ask
+for an experiment report, an approval request, a design note, and a placement
+note. Each task gives raw material and names the skill file a writer reads before
+writing it. These tasks were frozen on 2026-09-14, before any writer ran.
 
 Use only what the material shows, plus arithmetic on it and standard knowledge of
 the language or tool the task names.

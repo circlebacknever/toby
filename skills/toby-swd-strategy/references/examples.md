@@ -68,7 +68,7 @@ slightly different backoff. Now there are two retry policies that drift.
 
 B has the simpler caller-side interface. It also handles the "there will be more
 call sites" variant at no extra cost. Pick B even though its implementation (wrapping
-the transport, classifying retryable errors) are more work than a loop. That
+the transport, classifying retryable errors) is more work than a loop. That
 extra work is an investment that you pay for once. Every current and future
 call site benefits from it.
 
@@ -143,7 +143,7 @@ this available for this user." Adding a channel takes one class and one entry. T
 call sites lose their copied checks, because `deliver` handles an unavailable
 channel internally.
 
-This dispatch uses rung 4 of the ladder in `toby-swd-modules`. That rung is an
+This dispatch uses option 4, polymorphism, from `toby-swd-modules`. That option is an
 interface with one implementation per case. The cost over the tactical version is a dict and an
 interface, paid once at design time.
 

@@ -99,7 +99,7 @@ Copy and adapt these sentences when you need a quick demo paragraph or callout b
 - "Drift posterior is trending high, so defer the decision until the two-sample rule passes."
 - "Retry volume is 18% above baseline, but the two-sample rule has not tripped yet."
 - "Crossing 900 km enters the LEO debris-flux watch band. Defer the next decision until the debris model is updated."
-- "Approve controlled release with named rollback owner on record (Sayo · mission ops)."
+- "Approve the controlled release, with Sayo (mission ops) on record as the rollback owner."
 - "Pass length is shrinking by 0.2 min per day."
 - "The residual is no longer random, so extend the model with a non-linear panel-angle term."
 - "Both meters are above their watch threshold for two consecutive samples (T+04:08, T+04:12)."

@@ -79,10 +79,10 @@ GET /api/users?filter=<url-encoded JSON>&page_token=...&page_size=50
 
 The redesigned endpoint has this comment:
 
-> Lists users matching the filter. Filter fields are optional and AND'd
-> together. Results are paginated with opaque page tokens. The next-page
-> token is returned in the response. Page size defaults to 50 and has a maximum of
-> 200.
+> Lists users matching the filter, whose optional fields are AND'd
+> together. Each response returns an opaque token for the next page. The
+> default page size is 50, up to a maximum of 200. An expired page token
+> returns a distinct status that tells the caller to restart paging.
 
 The comment has four sentences. Definitions of "active" and validation
 specifics move to the filter object's schema (versioned, documented separately
@@ -92,7 +92,7 @@ result, callers never see the performance limits. The endpoint now matches
 its contract, which is "list users by criteria" with one criteria input and
 one pagination control.
 
-The guardrail question is whether the redesign hid anything callers need. The
+Step 7 in `SKILL.md` asks whether the redesign hid anything callers need. The
 performance limit on deep pagination is caller-facing. Opaque
 tokens expose the limit indirectly, because the token stops being valid past a limit.
 The response returns a specific status the caller can branch on when that
@@ -139,7 +139,7 @@ Here is the complete comment:
 > which is a separate transaction and may leave a captured payment with no
 > persisted order in rare cases — the reconciliation job handles these.
 
-The comment has eleven sentences. It states call order ("First X, then Y"),
+The comment has eight sentences. It states call order ("First X, then Y"),
 internal exception names, edge-case flags (`skipTaxValidation`), and
 partial-failure semantics the caller must know about. The comment fails the
 test at several levels.
@@ -187,7 +187,7 @@ an in-progress status). The contract still doesn't expose the implementation str
 The `idempotencyKey` is part of that contract too. A retry with the key
 it used the first time returns the original result and never places a second
 order. A mutation is safe to retry only when the request has a key the
-server dedupes on, or the operation is naturally idempotent. The key is what
+server dedupes on, or the operation is naturally idempotent. The key
 lets a caller re-send a `placeOrder` that timed out without risking a double
 charge.
 
@@ -320,11 +320,11 @@ Each RPC has its own comment:
 >
 > AssignUserRole — Sets the user's role. Permission re-evaluation across the
 > user's resources is async, so the new role may not be in effect for the
-> next request. That side effect is stated in the operation's purpose.
+> next request.
 
 Each comment is one to two sentences. Each RPC has one effect that the
 caller can reason about. The proto3 presence problem disappears because
-no field is "set or unset". Every field on every message is required to
+no field is "set or unset". Every field on every message is required by
 the operation. The side effects are no longer hidden in the prose, because they are stated in
 the operation's purpose.
 

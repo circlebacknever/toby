@@ -1,7 +1,7 @@
 # Worked Examples — Databases and Data Access
 
-The data layer is where both "naturally efficient design" and "death by a
-thousand cuts" happen. Get the structural choices right (where the
+Whether a system is fast by design or slowed by many small inefficiencies
+depends on data-layer choices. Get the structural choices right (where the
 joins happen, how transactions retry, what the indexes are) and the
 system runs fast without per-query tuning. If those choices are wrong,
 caller-side tuning cannot make the system fast.
@@ -25,8 +25,8 @@ for addresses, 50 queries for line items, 250 queries for products. That is 351
 queries to render a list. P99 latency is bad even though no single query
 is "slow."
 
-The N+1 loop is the death-by-a-thousand-cuts case from the SKILL, because no profiler
-will show one expensive call. The fundamental fix is at the design level.
+The N+1 loop makes many cheap calls that add up to a slow page. A profiler
+shows no single expensive call. The fundamental fix is at the design level.
 
 The fixes below are in roughly increasing complexity:
 
@@ -72,7 +72,7 @@ never the right first move.
 
 The design-time choice of eager-load hints or purpose-built read models
 costs no more complexity than the slow version. The default of "let the
-ORM lazy-load whatever I touch" is what produces the N+1. Explicit
+ORM lazy-load whatever I touch" produces the N+1. Explicit
 eager-loading is the naturally-efficient simple choice.
 
 ---
@@ -139,14 +139,14 @@ The wrapper gives one retry policy, one place that defines what's transient, and
 jittered backoff so retries don't synchronize. Callers only see deadlocks that
 persist through 5 attempts, because the wrapper masks routine ones.
 
-Guardrail: the transaction body must be idempotent or fully transactional
+The transaction body must be idempotent or fully transactional
 with no side effects outside the database (no email sends, no API calls
 inside the transaction). The retry mechanism assumes "running this again
 is safe." A transaction that calls `sendEmail` and then writes to the DB
 will send the email twice when the retry succeeds. Move side effects
 outside the retried block.
 
-Second guardrail: do the reads inside `fn`. A deadlock or serialization
+Also do the reads inside `fn`. A deadlock or serialization
 failure rolls the transaction back, so the snapshot the body computed against
 is gone. If `fn` closes over rows read before `WithRetry`
 and writes values derived from them, each retry re-applies a stale
@@ -257,9 +257,8 @@ If it isn't, the index does not match the query, so fix the index
 or the query.
 
 Choosing indexes is naturally efficient design-time work. The wrong default
-is to create no indexes and add them when something is slow. That default
-produces the death-by-thousand-cuts case at scale, when every query is slow
-and there's no single index to add. Index choice is a high-consequence decision at the
+is to create no indexes and add them when something is slow. At scale, that
+default leaves every query slow, with no single index to add. Index choice is a high-consequence decision at the
 schema-design stage.
 
 ---
@@ -327,8 +326,8 @@ above) or an unexpected slow query.
 ## Example 6 — Concurrency control: where the conflict gets caught
 
 Two transactions read an inventory row, both see one unit left, and both sell it.
-Example 2 shows how to retry a conflict once the database raises one. This example answers
-the earlier question of how to guard the row so the database detects the conflict
+Example 2 shows how to retry a conflict once the database raises one. This example shows
+how to guard the row so the database detects the conflict
 at all. Each of the two strategies below keeps the concurrency control in one place.
 
 **Optimistic — a version column.** The row has a `version`, and the update

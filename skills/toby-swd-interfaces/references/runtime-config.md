@@ -50,7 +50,7 @@ import { config } from "./config";
 
 const db = new Database(config.databaseUrl);
 const logger = new Logger(config.logLevel);
-const gateway = GATEWAYS[config.gatewayName];   // GATEWAYS is the rung-2 map from the conditional ladder
+const gateway = GATEWAYS[config.gatewayName];   // GATEWAYS maps each gateway name to its implementation (data-driven dispatch, option 2 in toby-swd-modules).
 
 const app = new App({ db, logger, gateway });
 app.listen();
@@ -60,9 +60,9 @@ Every module below `main.ts` takes `db`, `logger`, and `gateway` as constructor 
 
 ---
 
-## The tie to the conditional ladder
+## Choosing behavior by environment
 
-Choosing behavior by environment, such as which gateway, storage driver, or log sink to use, is one decision made once at the composition root. Read the config value, pick the implementation from a map, and inject it. A codebase with `if (process.env.NODE_ENV === "production")` in ten modules has spread one decision across ten files. That spread is the copied-conditional smell, with an environment variable as the tag.
+Choosing behavior by environment, such as which gateway, storage driver, or log sink to use, is one decision made once at the composition root. Read the config value, pick the implementation from a map, and inject it. A codebase with `if (process.env.NODE_ENV === "production")` in ten modules has spread one decision across ten files. That spread is the copied-decision case that `toby-swd-modules` describes in `replace-the-conditional.md`, with an environment variable as the tag.
 
 ---
 

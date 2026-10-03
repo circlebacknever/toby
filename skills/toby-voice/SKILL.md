@@ -60,7 +60,7 @@ Run this pass on the draft before the deletion tests, because it removes whole s
 
 ## Three deletion tests before sending
 
-Delete something, then read what is left. Each test has a definite answer, which is why writers use these tests.
+Delete something, then read what is left. Each test has a definite answer.
 
 1. **Delete the final clause of each sentence.** Did the sentence lose information? If not, the clause added nothing, so leave it deleted. Hedges, foils, and softeners appear in that final clause.
 2. **Delete the first sentence of the reply, then the last.** What went missing? If nothing went missing, the reply opened on a warm-up and closed on an offer, so send the reply without its first and last sentences.

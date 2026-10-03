@@ -22,8 +22,8 @@ class RateLimiter:
 The full interface comment is long. The caller must fetch a bucket, refill
 it with the current time, check tokens, and then consume. If those calls
 happen out of order, the rate limiter breaks. The comment has to describe the
-bucket mechanism before a caller can use it. The comment fails the test three
-ways at once, because it is long, order-dependent, and leaks internals. The
+bucket mechanism before a caller can use it. The comment fails the test
+because it is long, order-dependent, and leaks internals. The
 design is temporal decomposition with a class around it.
 
 **Redesigned interface (designed by knowledge: "whether this client may proceed
@@ -38,10 +38,10 @@ class RateLimiter:
         buckets, tokens, or time."""
 ```
 
-The complete contract is two sentences and mentions none of its internals. Tokens,
+The complete contract is four sentences and mentions none of its internals. Tokens,
 refill cadence, and the clock moved inside. The interface got smaller, and at the same time the
-module got deeper. The guardrail check is whether anything the caller
-needs is now hidden. If callers must show a retry-after hint, expose that one value
+module got deeper. Step 7 in `SKILL.md` asks whether the redesign hid
+anything the caller needs. If callers must show a retry-after hint, expose that one value
 (`allow` returns `RetryAfter | None`) and keep the bucket internal.
 
 ---
@@ -97,6 +97,5 @@ files) is the reason for it. It is the kind
 of synthesis the design-it-twice step is supposed to produce. The interface
 comment for C is short and mentions no internals, so it passes the test.
 
-Guardrail: if a caller must know whether the upload was durably committed
-before `upload` returns, that need is real. `upload` returns once the data is
-durably stored. The comment states that guarantee.
+A caller may need to know that the upload is durable when `upload`
+returns, so `upload` returns only after the data is durably stored. The comment states that guarantee.

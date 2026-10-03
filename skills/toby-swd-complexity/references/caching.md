@@ -26,9 +26,8 @@ Do this work before adding any cache:
 2. **Find where the time goes.** Check whether it is a database query, a
    downstream API call, or CPU work in serialization. Check this because a 5x improvement
    in the wrong layer gains nothing.
-3.
 
-**Estimate the hit ratio.** A cache that's invalidated on every
+3. **Estimate the hit ratio.** A cache that's invalidated on every
    request (because the data changes constantly, or the cache key is
    too narrow) saves nothing. It also adds latency on the miss path.
 4. **Estimate the staleness tolerance.** Some data, such as account
@@ -36,7 +35,7 @@ Do this work before adding any cache:
    The TTL is a product decision, so set it from the staleness budget.
 
 After this, the cache is either plainly right (slow database query,
-high hit ratio, tolerant of seconds-to-minutes staleness). Otherwise it is plainly
+high hit ratio, tolerant of seconds-to-minutes staleness) or plainly
 wrong (mostly already-fast, low repeat-access rate, near-zero staleness
 budget).
 
@@ -256,8 +255,8 @@ The right move depends on the goal:
   complexity only when it hits.
 - If the issue was perceived and never measured, add no cache at all.
 
-A cache is worth its complexity only when it *hits often enough to
-matter*. If the access pattern produces a low hit rate, the cache adds
+A cache is worth its complexity only when its hit rate is high enough to
+cut latency or load measurably. If the access pattern produces a low hit rate, the cache adds
 complexity and nothing else.
 
 ---
@@ -273,6 +272,6 @@ complexity and nothing else.
 | How do I know it's working? | Hit rate, miss rate, miss-path latency, all as metrics |
 | When to remove a cache? | Hit rate stays low; the work it was protecting is no longer slow |
 
-When you decide on a cache, you also decide on complexity. When the evidence does not
+Each cache adds complexity, such as invalidation, stampede handling, and hit-rate metrics. When the evidence does not
 justify a cache, skip it. The system then stays simpler to operate, easier to
 test, and clearer to reason about. Add a cache only on measured improvement.

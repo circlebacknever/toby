@@ -1,7 +1,7 @@
 # Learning suite
 
-Two questions. Does the skill change what the agent does? And does a beginner
-get taught without being buried?
+The suite answers two questions. Does the skill change what the agent does?
+And does a beginner get taught in replies of five sentences or fewer?
 
 ## Suite A — does it change anything
 
@@ -13,12 +13,14 @@ Counted per arm: questions that force the learner to produce something, turns
 that end with the learner owing something, and whether turn 4's "ok that makes
 sense" gets accepted or handed work.
 
-Recorded result: with the skill, three of each and the assent refused. Plain
-chat, none of either and the assent accepted.
+With the skill, the recorded run asked three questions that forced the learner
+to produce something, ended three turns with the learner owing something, and
+refused the assent. In plain chat, the recorded run asked no such questions,
+ended no turn with the learner owing something, and accepted the assent.
 
 ## Suite B — the beginner path
 
-`fixtures/learner-novice.md`. The learner invokes the skill and says they know
+Suite B uses `fixtures/learner-novice.md`. The learner invokes the skill and says they know
 nothing. This is the case the skill was rebuilt for, and it is the one that
 fails quietly, because a wall of text reads as thorough.
 

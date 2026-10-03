@@ -2,8 +2,8 @@
 
 Seven outputs, one for each kind of written artifact: code comments, a review, a
 plan, a diagram, slide copy, chart text, and a PR description. Each task gives
-raw material and names the skill files a writer reads before writing it. Frozen
-on 2026-09-14 before any writer ran.
+raw material and names the skill files a writer reads before writing it. These
+tasks were frozen on 2026-09-14, before any writer ran.
 
 Use only what the material shows, plus arithmetic on it and standard knowledge of
 the language or tool the task names.

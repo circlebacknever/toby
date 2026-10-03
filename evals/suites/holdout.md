@@ -1,8 +1,8 @@
 # Held-out tasks
 
 Six outputs on a product and a session that no rule in this repo was tuned
-against. The content suite trained the rules, so a change that only fixes the
-content suite fails here. Each task gives every fact the output needs, and a
+against. The rules were written from the content suite, so a change that only
+fixes the content suite fails here. Each task gives every fact the output needs, and a
 writer who adds a fact has broken the task.
 
 ## 1. Tool overview

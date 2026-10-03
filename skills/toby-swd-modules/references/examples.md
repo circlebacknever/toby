@@ -39,7 +39,7 @@ is removed from the interface. If a hard override is needed for some
 environment, keep it as an optional argument with that computed value as the
 default. Callers in the common case then pass nothing.
 
-The guardrail check passes. This complexity is related to the transport's own
+The condition in step 3 of `SKILL.md` holds. This complexity is related to the transport's own
 job. Pulling it down is correct here because it simplifies every caller.
 
 ---

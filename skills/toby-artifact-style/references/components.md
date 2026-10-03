@@ -33,7 +33,7 @@ Beyond the signatures above, Toby Artifact ships ~60 components total.
 - **Accordion** (covers Collapsible) — Only one section opens at a time by default, but passing `multi` lets multiple sections open.
 - **Toolbar** — The toolbar is an inline strip of mini-controls. `.toolbar__btn--on` fills with ink + `--text-on-dark`.
 - **Pagination** — It uses 32px mono cells with tabular numerals. Ellipses stay when the range overflows.
-- **Breadcrumb** — slash-separated trail. Its last item is the current page and has no link styling.
+- **Breadcrumb** — The breadcrumb is a trail of page links separated by slashes. Its last item is the current page and has no link styling.
 
 ### Form controls
 - **Button** — Its variants are `default` (paper), `primary` (ink), `ghost` (transparent), and `consequence` (accent). `--sm` sets a 28px height.

@@ -1,6 +1,6 @@
 # Volume, recall, and language
 
-The one-decision loop does not work for two cases: many items the learner must remember, and language use. The method from `SKILL.md` still applies, meaning predict before reveal, respond to the answer, climb the ladder, and close with retrieval. Here the method covers many small items on a schedule, or covers production.
+Teaching one decision at a time does not fit a learner who must remember many items or a learner who wants to use a language. The method from `SKILL.md` still applies, meaning predict before reveal, respond to the answer, climb the ladder, and close with retrieval. Here the method covers many small items on a schedule, or covers production.
 
 ## Spot the mode
 
@@ -36,7 +36,7 @@ When you switch from leaving errors uncorrected to a pass that corrects errors, 
 
 ## Cards and quizzes
 
-Offer cards and quizzes, because the owner wants them. Make cards from items the learner missed this session, at a pause or the close, so each card comes from a miss the learner remembers. Each card has to meet these rules:
+Offer cards and quizzes, because the skill's author asked for them. Make cards from items the learner missed this session, at a pause or the close, so each card comes from a miss the learner remembers. Each card has to meet these rules:
 
 - Put one fact on each card, so split a two-part answer into two cards.
 - Use productive recall. Make them produce the term. Avoid multiple choice by default, because it trains "I've seen this" and inflates confidence.

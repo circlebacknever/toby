@@ -38,6 +38,13 @@ BREAKS = [
     "The retry wrapper is at line 88 and the two call sites that reach it are both "
     "in the same file, which means removing it changes nothing outside that "
     "module, though the test suite has not run yet so that is still open.",
+    "Very close. The score has to be 0 at the center.",
+    "Here's why. The constant score never rises under any rule.",
+    "Your sentence, repaired: the rule never raises the score.",
+    "Short answer: the cache is stale.",
+    "Two fixes, and both matter. The rule is fixed.",
+    "Good. Now write the guard for the empty case.",
+    "Great! The derivative is the slope at one point.",
 ]
 
 CLEAN = [
@@ -65,6 +72,13 @@ CLEAN = [
     "The index does not match the query, so the planner reads the table instead.",
     "Two entry points changed: the export route and the CLI subcommand.",
     'You flagged "The rule lives in AGENTS.md." I rewrote it as "The rule is in AGENTS.md."',
+    "Almost. Two tables are left to migrate.",
+    "Here is the stack trace from the failing run.",
+    "Two tests failed, and both are in auth.test.ts.",
+    "The parser calls itself on each child node.",
+    "Exactly 12 rows differ from the ledger by more than $1.",
+    "Correct. The index covers both columns.",
+    "Yes, the migration ran on all four tables.",
 ]
 
 
@@ -312,6 +326,91 @@ list_weld_out = check_text("1. An agent starting from a plugin edits; one starti
 expect("a semicolon join inside a list item fails the run", list_weld_out.returncode, 1)
 label_out = check_text("- Supported but vague — sharpen it before you evaluate anything.\n")
 expect("a label and a dash in a list item pass", label_out.returncode, 0)
+
+
+def expect_text(label: str, out: str, wanted: str, present: bool) -> None:
+    if (wanted in out) == present:
+        print(f"ok   {label}")
+    else:
+        print(f"FAIL {label}")
+        notes.append(label)
+
+
+# Editing leftovers are wrong on every reading, so they fail the run. A code
+# span followed by a period is not a stray period, because prose_only blanks it.
+expect("a period alone at the start of a line fails the run",
+       check_text("The interface looks fine\n. The hidden contract is the cache.\n").returncode, 1)
+expect("a list number with no text fails the run",
+       check_text("1. Measure the latency.\n2.\n\nEstimate the hit ratio.\n").returncode, 1)
+expect("a code span before a period passes",
+       check_text("Record the distribution in\n`baselines/voice.json`. Set the minimum from the spread.\n").returncode, 0)
+
+# The sentence-count claim is checked against the comment above it. The repo
+# review found four of these wrong, and a later pass found twelve more.
+COUNTED = """```ts
+/**
+ * Returns the cached value or loads it. A cache outage calls load() directly.
+ * The cache never returns stale data.
+ */
+```
+
+The comment has {n} sentences.
+"""
+expect_text("a wrong sentence count is reported", check_text(COUNTED.format(n="two")).stdout,
+            "sentence count does not match the comment", True)
+expect_text("a correct sentence count passes", check_text(COUNTED.format(n="three")).stdout,
+            "sentence count does not match the comment", False)
+
+# A sentence made only of code spans has no subject or verb.
+expect_text("a sentence of only code spans is a fragment",
+            check_text("`evals/out/old.md` and `evals/out/new.md`.\n").stdout, "fragment", True)
+expect_text("a sentence with a verb after a code span passes",
+            check_text("`evals/out/old.md` holds the old run.\n").stdout, "fragment", False)
+
+# The guide bans `really` and `actually` when nothing states the contrast.
+expect_text("an intensifier with no contrast is reported",
+            check_text("The query is really slow on large tables.\n").stdout, "intensifier with no contrast", True)
+expect_text("an intensifier with a stated contrast passes",
+            check_text("The query looks fast, but it is really slow on large tables.\n").stdout,
+            "intensifier with no contrast", False)
+
+# The Stop hook lists every hit, and a colon before a bullet ends a sentence.
+def hook_stderr(reply: str) -> str:
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
+        handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": reply}]}}) + "\n")
+        transcript = handle.name
+    payload = json.dumps({"transcript_path": transcript, "stop_hook_active": False})
+    result = subprocess.run([sys.executable, str(HOOK)], input=payload, capture_output=True, text=True)
+    Path(transcript).unlink()
+    return result.stderr
+
+
+LONG = " ".join(["word"] * 45) + "."
+LONG_TOO = " ".join(["other"] * 45) + "."
+two_hits = hook_stderr(f"Hope this helps with the first part. {LONG} Feel free to ask. {LONG_TOO}")
+expect_text("the Stop hook lists both long sentences", two_hits, two_hits.count("-word sentence") == 2 and "-word sentence" or "missing", True)
+expect_text("the Stop hook lists both closing offers", two_hits, "'Hope this helps'" if "'Feel free'" in two_hits else "missing", True)
+expect_text("the Stop hook asks for a rewrite of the whole reply", two_hits, "rewrite the whole reply", True)
+bullets = "The test missed the conditions where the failure happens, for these reasons:\n" + "\n".join(
+    f"- **Item {n}.** Each writer read the style as its first step, with only the draft to fix." for n in range(3))
+expect_text("a label line and its bullets are separate sentences", hook_stderr(bullets), "-word sentence", False)
+table = "The new message did best.\n\n| Measure | A | B | C |\n|---|---|---|---|\n" + "\n".join(
+    f"| Unnamed problem types fixed in round {n} | 11 of 13 | 11 of 13 | 12 of 13 |" for n in range(6))
+expect_text("table rows are not counted as one long sentence", hook_stderr(table), "-word sentence", False)
+
+
+# A reference file that names a concept its skill never defines.
+with _tf.TemporaryDirectory() as skill_dir:
+    skill = Path(skill_dir) / "toby-sample"
+    (skill / "references").mkdir(parents=True)
+    (skill / "SKILL.md").write_text("# Sample\n\nSkip the rules about outcomes for a pure toy.\n")
+    reference = skill / "references" / "play.md"
+    reference.write_text("A pure toy has no verdict, so skip the outcome laws.\n")
+    term_out = subprocess.run([sys.executable, str(CHECKER), str(reference)], capture_output=True, text=True)
+    expect_text("a term the skill never defines is reported", term_out.stdout, "term the skill never defines", True)
+    (skill / "SKILL.md").write_text("# Sample\n\nSkip the outcome laws for a pure toy.\n")
+    term_out = subprocess.run([sys.executable, str(CHECKER), str(reference)], capture_output=True, text=True)
+    expect_text("a term SKILL.md uses passes", term_out.stdout, "term the skill never defines", False)
 
 print()
 if failures or notes:

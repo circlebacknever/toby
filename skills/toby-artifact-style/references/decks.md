@@ -208,7 +208,7 @@ Build the end slide from these parts:
 - **Bottom mono stripe:** show two captions, with the source line on the left and a "begin again at § 02" pointer on the right.
 - **No content cards:** leave out KPIs, tables, and callouts, so the closing slide has only one sentence and a frame.
 
-Example claim line: `Bound orbits are ellipses, and everything else about them is detail.`
+Example claim line: `Bound orbits are ellipses, with the Sun at one focus.`
 
 ---
 

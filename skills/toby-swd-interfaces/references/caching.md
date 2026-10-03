@@ -63,7 +63,7 @@ to implement `getOrLoad`, but public `get` and `set` lead callers into the
 scattered-cache antipattern. The narrower public interface forces callers
 into the load-through pattern, which is what they wanted anyway.
 
-The guardrail still applies, because rare cases legitimately need `set`
+Step 7 in `SKILL.md` still applies, because rare cases legitimately need `set`
 without an associated load (precomputed cache warming, for example). Expose a `warm(key, value,
 ttl)` method that explicitly signals the intent. The mechanism (`set`)
 remains hidden, so callers see only the `warm` operation in the contract.
@@ -91,8 +91,8 @@ class ProductsService {
 }
 ```
 
-The service's interface (`getProduct`, `updateProduct`) looks fine
-. The hidden contract is that callers of the underlying
+The service's interface (`getProduct`, `updateProduct`) looks fine.
+The hidden contract is that callers of the underlying
 `ProductsStore` must not bypass this service, or cached data goes stale.
 That bypass rule is an implicit caller obligation that is not stated in any
 interface.
@@ -160,8 +160,8 @@ caller.
 
 ## Example 3 — Cache key as an interface element
 
-The naive cache treats keys as strings. Most caches expose string keys, and
-string keys are where typos and version mismatches happen:
+The naive cache treats keys as strings. Most caches expose string keys, which
+make typos and version mismatches easy:
 
 ```ts
 // in productsService.ts
@@ -242,18 +242,17 @@ interface Cache {
      * If the cache itself is unavailable, calls load() directly and
      * does not cache the result. Cache outages are surfaced via metrics
      * and the optional onCacheError callback and are never thrown as exceptions to
-     * callers. The cache never returns stale data. If it cannot serve a
-     * value, it loads fresh.
+     * callers. The cache never returns stale data, so it loads fresh when
+     * it cannot serve a value.
      */
     getOrLoad<T>(key: string, ttl: number, load: () => Promise<T>): Promise<T>;
 }
 ```
 
-The comment has three sentences. Silent handling of cache failures is part
+The comment has four sentences. Silent handling of cache failures is part
 of the contract, so callers do not write defensive code. The cache layer
-commits to handling its own outages. This failure behavior is the kind of
-caller-facing information that, under the guardrail (step 7 of the procedure), you keep in
-the interface. `getOrLoad` promises graceful degradation during a cache
+commits to handling its own outages. Step 7 in `SKILL.md` says to keep
+caller-facing information like this failure behavior in the interface. `getOrLoad` promises graceful degradation during a cache
 outage, and that promise has to be visible.
 
 The alternative interface, which surfaces outages explicitly, is also

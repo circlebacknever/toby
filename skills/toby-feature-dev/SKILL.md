@@ -127,7 +127,7 @@ Never write "assuming yes, proceeding" past a stop, which leaves this skill with
 
 Run the design pass after stop 1 and before the plan, at both sizes. Load these three skills for it:
 
-- `toby-swd-strategy` runs the pass itself. Sketch two approaches that put the hard part in different modules. The second approach is the strongest other option, the one a competent engineer would pick. Check both against the near-future variants. Pick the one with the simpler interface for callers.
+- `toby-swd-strategy` sets the method for the design pass. Sketch two approaches that put the hard part in different modules. The second approach is the strongest other option, the one a competent engineer would pick. Check both against the near-future variants. Pick the one with the simpler interface for callers.
 - `toby-swd-modules` covers every new module and every module that gains a job. Run its checks, which include the SOLID principles. Fix each red flag in the design, before it reaches the plan.
 - `toby-swd-interfaces` covers every new or changed signature. Write its interface comment first, and run the comment test on it.
 
@@ -163,7 +163,7 @@ Write the plan as a file, and never agree on a plan in scrollback, because nobod
 - Confirm every symbol this change didn't define against the installed source or the pinned manifest. A symbol can be a library function, config field, env var, CLI flag, component prop, or error type. Skip the check when this repo already calls the symbol somewhere you can cite at path:line. The lockfile version is the one that runs, so docs for a later version are a guess.
 - Re-read a file before editing it a second time when anything else happened in between. Your memory of a file you changed three steps ago may be wrong, even when you feel sure of it.
 - When the change alters an existing function, method, or other callable, run the caller sweep that `toby-swd-interfaces` describes and put its result in the handoff.
-- Refactors go in their own commit unless the refactor is what makes the behavior fit.
+- Refactors go in their own commit unless the new behavior depends on the refactor.
 
 ## Prove the slice before starting the next
 
@@ -174,7 +174,7 @@ Write the plan as a file, and never agree on a plan in scrollback, because nobod
       after   test_cancel_rejects_shipped  PASS
 
   Use the same form for every criterion in every slice, with the command written beside it. The check has to execute the new code path, so an `after` run with no `before` run proves only that the harness runs. Report that criterion met-unproven and state the run that never happened.
-- A green type-check, a lint pass, or an existing suite that never runs the changed lines proves only that the repo still builds. The repo also built before you started.
+- A green type-check, a lint pass, or an existing suite that never runs the changed lines proves only that the repo still builds, as it did before the change.
 - Run the change the way a user would and quote what came back. When that needs an approval-gated command, write out the command and ask for approval. Saying "this needed approval" with no command given is a skipped step. Hand manual steps to the user only for what you couldn't run, labelled run-by-me or for-you. Every for-you step says what blocked you. When a step is handed over with no reason, the user reads it as a chore you assigned.
 
 ## Don't build
@@ -183,7 +183,7 @@ Write the plan as a file, and never agree on a plan in scrollback, because nobod
 
 ## Resuming half-built work
 
-Before touching code, recover five things: the mode, the criteria list, the plan, which steps are checked off, and the last checkpoint decision. Look in the thread, the diff, the plan file, and the repo. When you cannot find any of them, rebuild them from the code that exists and the original request, show them, and confirm before continuing. Criteria rebuilt from a diff match that diff, including the places where the diff was wrong. Name whichever ones you couldn't recover. Half-built experiment code is still experiment code until the user says otherwise.
+Before touching code, recover the mode, the criteria list, the plan, the steps already checked off, and the last checkpoint decision. Look in the thread, the diff, the plan file, and the repo. When you cannot find any of them, rebuild them from the code that exists and the original request, show them, and confirm before continuing. Criteria rebuilt from a diff match that diff, including the places where the diff was wrong. Name whichever ones you couldn't recover. Half-built experiment code is still experiment code until the user says otherwise.
 
 ## Red flags
 
@@ -193,7 +193,7 @@ Before writing the handoff, check the finished work against all eight entries in
 
 Lead with the behavior that now exists, stated the way the user would observe it. Any criterion unmet or unverified is named in the first line, with which of the two it is and what is missing. Do not save what didn't ship for the end of the report, because that order makes the work look better than it is.
 
-This file adds two sections, and both always appear:
+Always write these two sections before the operating guide's list:
 
 1. List each criterion in its pre-code wording, marked met with the check that proved it, or unverified with the reason. For multi-slice work, list each slice by name, marked done or not-done, with its evidence.
 2. Give the structure chosen and the alternative rejected, in one line each. Say where the plan is, and list any step that ran differently from the approved wording.

@@ -11,7 +11,7 @@ Toby Artifact Style fixes the tokens, copy constraints, and visual rules, but it
 
 If you are about to reuse the layout you built last time, stop and pick a different one. Reused layouts lead to convergence, where every artifact looks like every other artifact. The fixed tokens, copy rules, and visual rules keep quality consistent. Within those rules, vary every other part of the structure.
 
-## Three principles
+## Color roles
 
 **Paper is the surface for working content.** `--toby-paper` (`#fdfaf1`) is the default surface. Use paper for panels where the reader reads, compares, and parses content.
 
@@ -19,7 +19,7 @@ If you are about to reuse the layout you built last time, stop and pick a differ
 
 **Red is for consequences.** Use `--toby-accent` (`#c44e3f`) for risk, breach, finality, and threshold violation. Never use red as a brand accent or for plain emphasis. Keep it rare, because readers stop noticing a red that appears often.
 
-## Six visual patterns that make Toby Artifact Style coherent
+## Visual patterns
 
 If a panel uses none of these patterns, ask whether the artifact needs that panel.
 

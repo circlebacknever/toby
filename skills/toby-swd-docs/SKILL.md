@@ -14,7 +14,7 @@ description: >-
 
 In this skill, `AGENTS.md` refers to the file inside the user's own module tree, which this skill tells you how to write. Toby's operating guide is a different file that the host tool already loaded. These rules never refer to it.
 
-A module has two categories of information that the code itself can't express. The code shows what the module does. These files record why it exists, who it is for, and how to think about it.
+A module has information that its code cannot show. The code shows what the module does. These files record why it exists, who it is for, and how to think about it.
 
 Don't mix up the two files, because they have different audiences and different jobs.
 
@@ -30,7 +30,7 @@ An agent without an AGENTS.md has no record of these reasons, so it finds the ga
 
 Create an AGENTS.md at the root of a module, package, or feature that is responsible for a distinct area of knowledge. Examples include a service, a bounded domain package, a frontend feature, a design-system package, and a store module. Don't create one for a leaf folder, a single-file utility directory, or a folder that exists for file organization alone.
 
-Many small AGENTS.md files repeat the over-subdivision problem, because they go out of date and readers learn to ignore them. When you are unsure, move the documentation up to the nearest meaningful module root.
+Many small AGENTS.md files go out of date, so readers learn to ignore them. When you are unsure, move the documentation up to the nearest meaningful module root.
 
 ### Sections, in order
 

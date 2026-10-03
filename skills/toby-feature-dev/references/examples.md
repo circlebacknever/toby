@@ -2,7 +2,7 @@
 
 These examples cut four kinds of feature into slices. All four use one invented repo with orders, a members screen, a billing module, and a search path. Each example shows the criteria in full, the slice order and names, and the wiring line that proves the slice is reachable. It also shows where a stop is worth making. The paths are invented, but the method comes from work in a real repo.
 
-Every criterion below has all three lines, because a criterion missing one is the thing the skill tells you to drop.
+Every criterion below has all three lines, because the skill tells you to drop a criterion that is missing one.
 
 ## 1. Brownfield, one entry point — new endpoint on an existing resource
 
@@ -17,9 +17,9 @@ Slices: there is one slice, `an open order can be cancelled from the account pag
 
 Wiring: `api/routes.ts:142` registers the route with `router.post('/orders/:id/cancel', cancelOrder)`. Without that line, the handler is unreachable, however well it is tested.
 
-Stops: show the criteria in one line and keep working. The strategic triggers do not apply, because the boundary already exists even though the route is new. `api/orders.ts` is the sibling at path:line. A one-slice tactical change gets no plan file.
+Stops: show the criteria in one line and keep working. The strategic triggers do not apply, because the boundary already exists even though the route is new. The sibling feature is the set of other order routes in `api/orders.ts`, which run the ownership check at `api/orders.ts:31`. A one-slice tactical change gets no plan file.
 
-Record: criteria 1 and 2 quote a person, so both get entries. Criterion 3 cites a repo fact, so it gets none.
+Criteria 1 and 2 take their Source line from the user's words. Criterion 3 takes it from `api/orders.ts:31`, because the request says nothing about that case.
 
 ## 2. Two entry points — a flow crossing two screens
 
@@ -30,7 +30,7 @@ Request: "users should be able to invite a teammate and see the invite pending."
 3. Observable — opening a used or expired link shows an expired state and creates no account. Source — in the follow-up about resent links, the user said "once I resend, the first link should be scrap". Check — the criterion is unmet if `test_expired_link_creates_no_account` finds that an account exists afterwards.
 4. Stays working — the members list still renders for an org with no pending invites. Source — the behavior is part of the existing contract. Check — the `members_list` suite tests it.
 
-Slices: there are two, each named for what it lets someone do. The first is `invite shows up as pending`, and the second is `the invite email opens the accept screen`. Criteria 1 and 4 are observed at the members screen, and criteria 2 and 3 at the mail and the accept route. The criteria are observed at different entry points, so they form different slices.
+Slices: first `invite shows up as pending`, then `the invite email opens the accept screen`. Criteria 1 and 4 are observed at the members screen, and criteria 2 and 3 at the mail and the accept route. The criteria are observed at different entry points, so they form different slices.
 
 Wiring: slice one connects at `screens/Members.tsx:210` through `<InviteForm onSubmit={createInvite} />`, and slice two connects at `jobs/index.ts:17` through the `invite.created` subscription.
 
@@ -56,7 +56,7 @@ Before the second file exists, greenfield work adds these steps:
 - The boundary is written once, per toby-swd-modules and toby-swd-interfaces. The module exposes `seatCountForDay(workspace, date)` and defines the storage layout that the function reads, so callers never read or write rows directly.
 - The user chooses the name. Today `seat`, `member`, and `active user` mean the same thing, but one of them is about to appear on an invoice.
 
-Slices: there are two, first `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI gives slice one an entry point a user can run, so slice one is not a layer cut.
+Slices: first `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI gives slice one an entry point a user can run, so slice one is not a layer cut.
 
 Stops: show the criteria, then run the design pass, then write the plan. A persisted format and money are both strategic triggers, so the design lines come before the plan lists any file.
 
@@ -76,7 +76,7 @@ Stops: show the criteria only. Criterion 3 came out of the ambiguity pass, becau
 
 # A plan an operator can approve
 
-The plan below covers slice one of the invite flow, in the operating guide's plan format. The detail in each step is what makes it reviewable.
+The plan below covers slice one of the invite flow, in the operating guide's plan format. The detail in each step makes the plan reviewable.
 
 ```markdown
 # Toby's plan for team invites
@@ -97,11 +97,12 @@ resend. Each one is a follow-up.
 
 Design:
 - Structure chosen: an `invites` module exposes `createInvite(org, email)` and
-  `acceptInvite(token)`. It stores tokens, expiry, and email sending, so the
-  members screen and the accept route never read the table.
+  `acceptInvite(token)`. It stores the tokens and their expiry and sends the
+  invite email, so the members screen and the accept route never read the
+  table.
 - Alternative rejected: invite rows in `members` with a `pending` status. Every
   query on `members` would then need a status filter, and the invite expiry rule
-  would sit in three files.
+  would be repeated in three files.
 - `createInvite(org, email)` returns the pending invite. It sends one email and
   throws `AlreadyMember` when the address is already in the org.
 - `acceptInvite(token)` returns the new member. It throws `InviteExpired` for a

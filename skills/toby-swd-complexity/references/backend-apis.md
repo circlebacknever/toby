@@ -136,7 +136,7 @@ Every RPC client method wraps its call in the one function `retryGRPC`.
 The retryability decision is in one place (`isRetryableGRPC`), which
 reads the gRPC status code and applies the table above.
 
-Per-call-site retry logic is where this design goes wrong. When each site has
+Retry logic written separately at each call site goes wrong. When each site has
 its own retry-or-not check, each check gets something slightly wrong, such as
 missing the deadline propagation or double-retrying on `ABORTED`. The helper
 applies the ladder in one place and masks the transient cases. Permanent errors bubble up where the
@@ -153,7 +153,7 @@ putting it there keeps it out of 50 call sites.
 
 ## Example 3 — Timeouts as performance design
 
-The timeout is the complexity that people forget, as in this service that calls a downstream service:
+People often leave out the timeout, as in this service that calls a downstream service:
 
 ```ts
 async function getRecommendations(userId: string): Promise<Recommendation[]> {
@@ -194,8 +194,8 @@ arrives. That design move removes the recommendation's slowness from the
 user's critical path, so the timeout never applies.
 
 Removing the panel from the critical path applies `examples.md` Example 1
-("define the error out of existence") to latency. The most reliable way to handle a slow
-dependency is to remove it from your critical path.
+("define the error out of existence") to latency. When a slow dependency is
+non-critical, remove it from the critical path.
 
 ---
 
@@ -234,8 +234,8 @@ When is the complexity worth its cost?
 Adding a circuit breaker because "we should" is a mistake. It produces a
 piece of stateful complexity that:
 
-- Has bugs that only surface during incidents (the worst time to find
-  them).
+- Has bugs that only surface during incidents, when they are hardest to
+  diagnose and fix.
 - Has tuning parameters (window size, threshold, half-open timing) that
   are hard to understand well enough to set correctly.
 - Hides downstream failures from operators (the breaker has tripped, so

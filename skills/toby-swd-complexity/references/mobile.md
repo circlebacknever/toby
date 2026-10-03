@@ -248,7 +248,7 @@ A profile screen shows 50 avatars, and each one is a 4MB camera-roll image:
 
 The phone fetches 50 × 4MB = 200MB over the network, then decodes each JPEG to
 a full bitmap to draw a 40×40 thumbnail. A 4MB JPEG expands to tens of
-MB of RGBA once decoded. The decoded bitmaps are what exhaust memory. After
+MB of RGBA once decoded. The decoded bitmaps exhaust memory. After
 two screens, the app crashes with an OOM.
 
 The team's first instinct is to lazy-load, which helps. The larger fix is to

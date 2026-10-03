@@ -1,6 +1,6 @@
 # Gameplay — how it feels to play
 
-Each of these rules for how a game feels was learned from a rebuild. A pure toy or sim has no outcome, meaning no verdict, no win, and no opponent, so skip the outcome laws. A toy or sim needs real motion, watchable emergence, and a knob worth turning. The rest is for games that resolve something.
+Each of these rules for how a game feels was learned from a rebuild. A pure toy or sim has no outcome, meaning no verdict, no win, and no opponent, so skip the rules about outcomes. A toy or sim needs real motion, watchable emergence, and a knob worth turning. The rest is for games that resolve something.
 
 **Tie outcomes to player choices.** Every outcome the player cares about traces to a choice they made and saw coming. Put chance before the choice, in things the player can read. Examples are aim wobble, a keeper's lean, and a wake risk that climbs as the night gets loud. Never add a hidden coin flip on top of a decision. Show the gamble before the player takes it, as a number and a green/amber/red rating on the thing about to happen. Show the outcome forming as the player drags, and lock it on release. A sim that only nudges a hidden probability gets the same note every time, which is that the player has too little control.
 

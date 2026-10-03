@@ -1,7 +1,7 @@
 # Skill boundaries
 
-One row per skill. The third column decides a collision, and the fourth is what
-the description's skip clause has to say out loud.
+One row per skill. The fourth column decides which skill wins a shared rule. The
+fifth column lists what the description's skip clause has to state.
 
 | Skill | Owns alone | Shares | Who wins the shared rule | Never fires on |
 |---|---|---|---|---|

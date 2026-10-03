@@ -3,7 +3,8 @@
 Six outputs: a module guide, a design note, and a placement note, twice each.
 Tasks 1 to 3 come from `swd.md`. Tasks 4 to 6 are new, and no rule was written
 against them. Each task gives raw material and names the skill file a writer
-reads before writing it. Frozen on 2026-09-15 before any writer ran.
+reads before writing it. These tasks were frozen on 2026-09-15, before any
+writer ran.
 
 Use only what the material shows, plus arithmetic on it and standard knowledge of
 the language or tool the task names.

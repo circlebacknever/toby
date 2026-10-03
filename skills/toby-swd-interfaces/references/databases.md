@@ -63,7 +63,7 @@ The comment for `update_profile` reads:
 > updated user. The update is atomic. Returns NotFound if no such user exists. Returns
 > ValidationFailed with field-level reasons if any change is invalid.
 
-The comment has three sentences. The session, ORM, query syntax, commit policy, and
+The comment has four sentences. The session, ORM, query syntax, commit policy, and
 detachment problem are all internal. The caller writes
 `users.update_profile(id, ProfileChanges(name="new"))` and gets a typed
 result back.
@@ -146,9 +146,9 @@ public record UserQuery(
 
 The comment for `find` reads:
 
-> Returns users matching the query. Filters are AND'd. Unset filters are
-> ignored. Results are paginated. The response includes the next page
-> token if there are more results.
+> Returns users matching the query. The set filters are AND'd together, so
+> an unset filter has no effect. Results are paginated, so the response
+> includes the next page token if there are more results.
 
 The comment has three sentences. `UserQuery` has its own comment describing each filter,
 but it's a value object. Its contract is "what each field means", so a
@@ -251,8 +251,8 @@ The comment for `OrdersRepository.insert` now reads:
 The comment is one sentence, because the `UnitOfWork.run` contract handles
 the transactional guarantee separately.
 
-The guardrail question is whether the redesign hid anything callers need, and it
-did. Sometimes the caller needs to know whether they are inside a transaction (for example, to avoid
+Step 7 in `SKILL.md` asks whether the redesign hid anything callers need, and this
+redesign did. Sometimes the caller needs to know whether they are inside a transaction (for example, to avoid
 firing an out-of-process event that would commit independently). For that
 case, expose `UnitOfWork.isActive()` as a one-method check and keep the `tx`
 parameter off every method.
@@ -299,8 +299,8 @@ class Migration:
     so the application must work with every intermediate schema. backfill
     is safe to re-run. schema_down is reverse-only and may be destructive, because
     dropping a column added on the way up loses whatever was written to it.
-    A zero-downtime cutover needs more: a dual-write, dual-read window held
-    across two deploys, which is a larger interface this one doesn't express."""
+    A zero-downtime cutover also needs a dual-write, dual-read window held
+    across two deploys. This interface does not express that window."""
 
     def schema_up(self): ...
     def backfill(self): ...     # This step is idempotent.

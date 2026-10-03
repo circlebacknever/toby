@@ -12,7 +12,7 @@ Each example was written for one situation, so do not reuse its words. Copy the 
 
 Most findings look like the examples in this section.
 
-- `parseConfig` reads the file on every call. It is called once per request, so a config reload is 4,000 file reads a minute.
+- `parseConfig` reads the file on every call. It is called once per request, so at 4,000 requests a minute it reads the file 4,000 times a minute.
 - The index on `orders(created_at)` is unused. Every query filters on `tenant_id` first, so the planner takes the tenant index instead.
 - Deleting a user leaves their sessions in the table. Add the cascade, or delete sessions in the same transaction.
 - The handler catches `Exception` and logs at `debug`. Production runs at `info`, so the production logs never show these failures.
@@ -26,7 +26,7 @@ Most findings look like the examples in this section.
 - The variable is named `temp`. It is returned from the function, written to the database, and rendered on the homepage. Rename it for what it holds.
 - A `// temporary` comment dates from 2019. Both the engineer who wrote it and the one who approved it have left. The comment is still in the code.
 - The retry count and the timeout are both configurable, but the URL they wrap is hardcoded to staging.
-- It retries the 400 four times. It sends the same wrong request on each of the three retries.
+- It retries the 400 three times. It sends the same wrong request on each retry.
 - The catch block turns the error into null and returns it. The crash still happens two lines later, in the caller.
 - `process` is 200 lines and does nine separate things. The name describes none of them.
 

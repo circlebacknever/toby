@@ -89,10 +89,66 @@ FOIL_PATTERNS = [
 ]
 
 
+# TIC_PATTERNS matches chat tics. Four forms are whole sentences that grade the
+# user, announce the next sentence, or label the answer. The fifth is a tail
+# that flags importance. They came from a lesson reply the user rejected on
+# 2026-10-02, which opened "Very close. Two fixes, and both matter." Each one
+# fails the Job test, because it gives no answer, reason, step, risk, or
+# decision. Each form matches a whole sentence or a fixed tail, so "Almost. Two
+# tables are left." passes.
+# voice-check.py puts these in FIX, and the Stop hook blocks a reply on them.
+# A sentence also starts after an opening quote, because skills quote the reply
+# they want, as in `"Good. You write the guard."`, and an agent copies it.
+SENTENCE_START = r"(?:^|(?<=[.!?]\s)|(?<=[.!?]\s\s)|(?<=\")|(?<=“))"
+TIC_PATTERNS = [
+    # "Good." and "Great!" praise the user and say nothing about the subject.
+    # "Right." and "Correct." are left out, because each one can be the answer.
+    (re.compile(SENTENCE_START + r"(?:Good|Great|Nice|Perfect|Excellent|Awesome|Wonderful|Lovely)"
+                r"(?: (?:work|job|thinking|question))?[.!]", re.M),
+     "praise for the user, so open with the answer"),
+    # "right — what happens when the input is empty?" grades the answer, then
+    # welds the next clause on with a dash.
+    (re.compile(SENTENCE_START + r"(?:[Rr]ight|[Cc]orrect|[Ee]xactly|[Yy]es|[Gg]ood|[Gg]reat|[Nn]ice)\s+—", re.M),
+     "grade and a dash, so delete the grade and start with the next clause"),
+    (re.compile(SENTENCE_START + r"(?:Very close|So close|Spot on|Bingo|(?:You )?[Nn]ailed it|"
+                r"You(?:'ve| have)? got it|Good (?:instinct|intuition|eye|thinking)|"
+                r"(?:Good|Nice|Great) catch|Right (?:idea|instinct|track)|"
+                r"(?:Partly|Half|Mostly|Exactly) right|You(?:'re| are) (?:close|almost there|on the right track)|"
+                r"Almost there|Close,? but not quite)[.!]", re.M),
+     "grade on the user's attempt, so open with the answer"),
+    (re.compile(SENTENCE_START + r"(?:Here(?:'s| is) (?:why|how|the thing|the catch|the deal|the kicker|"
+                r"the trick|the twist|what happens|what's going on|the idea)|Let me explain|"
+                r"Let me break (?:it|this|that) down|Think (?:about|of) it (?:this|like this) way|Consider this|"
+                r"Put another way|To put it (?:simply|another way)|In other words)\s*[.:]", re.M),
+     "sentence that announces the next one, so delete it"),
+    (re.compile(SENTENCE_START + r"(?:(?:The )?(?:[Ss]hort|[Ll]ong|[Qq]uick|[Ss]imple|[Dd]irect) (?:answer|version)|"
+                r"(?:The )?[Bb]ottom line|In short|In a nutshell|Put simply|Simply put|"
+                r"The gist|The upshot|The verdict|Spoiler)\s*:", re.M),
+     "labelled answer, so delete the label and state the answer"),
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:Your|The|My)\s+(?:[\w-]+\s+){0,2}[\w-]+,\s+"
+                r"(?:repaired|corrected|rewritten|revised|tightened|cleaned up|reworded|improved|simplified)\s*:", re.M),
+     "labelled answer, so delete the label and give the new version"),
+    (re.compile(r",\s+and\s+(?:both|all(?: three| four| of them)?|each(?: one)?)\s+"
+                r"(?:matters?|counts?|(?:is|are) important)\b", re.I),
+     "importance flag on a count, so delete it and give the items"),
+]
+
+
+# Editing leftovers that are wrong on every reading: a period alone at the
+# start of a line, and a list number with no text. The repo review on
+# 2026-10-02 found one of each in the skills. An unfilled `path:line` was found
+# too, but eight skill lines use that phrase to name the citation format, so no
+# pattern checks it.
+MECHANICAL_PATTERNS = [
+    (re.compile(r"^[ \t]*\.(?!\.)(?:[ \t]+\S|[ \t]*$)", re.M), "stray period at the start of a line"),
+    (re.compile(r"^[ \t]*\d+\.[ \t]*$", re.M), "list number with no text"),
+]
+
+
 # The reply check in hooks/voice-stop-check.py runs FOIL_PATTERNS, these forms,
-# FIGURATIVE_FRAMES, and COINED_TERMS. Each form here matches a fixed phrase,
-# because a user turns off a hook that blocks correct replies.
-REPLY_PATTERNS = FOIL_PATTERNS + [
+# TIC_PATTERNS, FIGURATIVE_FRAMES, and COINED_TERMS. Each form here matches a
+# fixed phrase, because a user turns off a hook that blocks correct replies.
+REPLY_PATTERNS = FOIL_PATTERNS + TIC_PATTERNS + [
     (re.compile(r"\bnot just\b"), "`not just`, so say what it is"),
     (re.compile(r"\brather than\b"), "`rather than`, so write only the thing you chose"),
     (re.compile(r",\s*though\.?\s*$", re.M), "trailing `though` on a sentence that was already complete"),
@@ -121,6 +177,8 @@ VOICE_SCAN_EXEMPT = {
     REPO_ROOT / "skills" / "toby-voice" / "references" / "plain-language.md",
     REPO_ROOT / "skills" / "toby-voice" / "references" / "plain-language-examples.md",
     REPO_ROOT / "skills" / "toby-voice" / "references" / "examples" / "banned-writing-patterns.md",
+    # A compressed copy of the guide that one eval arm loads in place of it.
+    REPO_ROOT / "evals" / "arms" / "core.md",
     # The same reference files, as they sit in an installed toby-voice skill.
     REPO_ROOT / "references" / "toby.md",
     REPO_ROOT / "references" / "plain-language.md",
@@ -201,9 +259,14 @@ COINED_RE = [
 # "moving parts" was tried and left out: it is a dead metaphor, in the
 # dictionary, and the guide keeps established terms of art.
 FIGURATIVE_FRAMES = [
-    "wearing a", "wears a", "dressed as", "dressed up as", "in disguise",
+    "wears a", "dressed as", "dressed up as", "in disguise",
     "masquerading as", "pretending to be", "with a new hat", "with a hat on",
     "under the hood", "in a trench coat", "puts on a", "wrapped in a costume",
+    # From the repo review on 2026-10-02: "five runs took back" a result, "it
+    # moved nothing", a check a metaphor "walks past", and a stranger "wearing"
+    # Toby's clothes.
+    "wearing", "took back", "moved nothing", "walks past", "walk past", "handed straight back",
+    "without being buried", "death by a thousand cuts", "death-by-a-thousand-cuts",
     # Verbs of place and motion used for code, rules, and findings. A rule is in
     # a file, and a finding depends on the diff. The eval writers and this repo
     # both wrote each of these, and the reader stopped on every one.
@@ -303,8 +366,104 @@ IRREGULAR_VERB_RE = re.compile(
 # Habits predicted from what this reader has rejected so far. None of them is
 # in the skills today, and agents write all of them, so each hit is a question.
 PREDICTED_PATTERNS = [
-    (re.compile(r"(?:^|(?<=[.!?]\s))(?:The (?:result|catch|fix|problem|answer|twist|upshot|kicker|good news|bad news)|Why does (?:this|that|it) matter|So what does (?:this|that) mean|What does (?:this|that) mean|The short version)\?", re.M),
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:The (?:result|catch|fix|problem|answer|twist|upshot|kicker|good news|bad news|reason)|Why does (?:this|that|it) matter|So what does (?:this|that) mean|What does (?:this|that) mean|The short version|(?:And )?[Ww]hy|How)\?", re.M),
      "setup question"),
+    # "Almost." and "Exactly." grade the user's attempt before the answer. Each
+    # one is also a correct reply to "is it done?", so a person decides.
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:Close|Almost|Nearly|Not quite|Exactly|Precisely|Sort of|Kind of|Partially)[.!]", re.M),
+     "grade before the answer"),
+    # "Two fixes." and "Three things to know:" give a count and hold the items back.
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:Two|Three|Four|Five|A few|A couple of|Several)\s+(?:[a-z-]+\s+)?"
+                r"(?:fixes|corrections|things|issues|problems|points|caveats|catches|notes|differences|"
+                r"reasons|tweaks|mistakes|gaps|ideas|parts|pieces|changes)(?:\s+to\s+(?:know|fix|note|check))?"
+                r"(?:\s+here)?(?:[.:](?=\s|$)|,\s+and\s+(?:both|all|each)\b)", re.M),
+     "count before the items"),
+    # "The theorem would be worthless" and "every system on Earth" add drama to a
+    # claim that needs none. The guide bans dramatic words used for emphasis.
+    # "The worst time to find them" comes from the repo review on 2026-10-02.
+    # `worst-case` is a term, so it passes.
+    (re.compile(r"\b(?:worthless|pointless|catastroph\w+|damning|dire|disastrous|devastating|"
+                r"theater|on Earth|in the world|of all time|lives or dies|make or break|"
+                r"worst(?![- ]case)|pure (?:complexity|overhead|waste)|"
+                r"everything (?:hinges|rests|depends) on)\b", re.I),
+     "dramatic word"),
+    # "Widening the set is the whole job" and "The entire rule is". The form
+    # needs the copula, because "a retry runs the whole job again" is literal.
+    (re.compile(r"\b(?:is|are|was) the (?:whole|entire) (?:point|game|trick|story|job|rule|test|idea|purpose|fix)\b|"
+                r"(?:^|(?<=[.!?]\s))(?:The|Its|Their) (?:whole|entire) (?:point|rule|test|idea|trick|job) is\b", re.I | re.M),
+     "dramatic word"),
+    # "The bitmaps are what exhaust memory" says "The bitmaps exhaust memory"
+    # with extra words. A noun clause such as "what the field holds" passes,
+    # because a determiner or pronoun follows `what`.
+    (re.compile(r"\b(?:is|was|are|were|that's|that is) what (?!(?:the|a|an|it|its|they|their|you|your|we|our|"
+                r"I|my|this|that|these|those|he|she|his|her|people|users?|callers?)\b)[a-z]+", re.I),
+     "cleft for emphasis"),
+    # "Per-call-site retry logic is where this design goes wrong."
+    (re.compile(r"\b(?:is|are|was|were) where\b[^.:;]{0,80}?\b(?:happens?|goes wrong|go wrong|breaks?|fails?|starts?)\b", re.I),
+     "cleft for emphasis"),
+    # "This is the tool to run" and "is the one who can tell" put a filler noun
+    # between the subject and the verb that does the work.
+    (re.compile(r"\b(?:is|are) the (?:one|ones|thing|step|tool|part|error|piece|place|complexity|person) "
+                r"(?:who|that|to|the)\b", re.I),
+     "cleft for emphasis"),
+    # ", which is why writers use these tests" and "That last one is why".
+    (re.compile(r"\b(?:which|that|this|one) is why\b", re.I), "cleft for emphasis"),
+    # "Performance work has three layers." and "The voice rules ship three
+    # ways" give a count of a vague noun and hold the items back. A count
+    # followed by a colon passes, because its list follows at once, and the
+    # repo review could not tell those apart from cited counts by pattern.
+    (re.compile(r"\b(?:two|three|four|five|six|seven|eight|nine|ten)\s+(?:[a-z-]+\s+)?(?:things|ways|problems|"
+                r"categories|layers|mechanisms)\b(?![^.:\n]*:)", re.I),
+     "count before the items"),
+    # "This file adds two sections, and both always appear:" flags the count.
+    (re.compile(r"\band (?:both|all (?:three|four|five)|each) (?:always )?(?:appear|apply|matter|count)\b", re.I),
+     "importance flag"),
+    # "Descriptions are all a host tool sees" and "the checker cannot see"
+    # give a program a person's senses.
+    (re.compile(r"\b(?:checker|script|linter|hook|tool|compiler|regex|patterns?)\s+(?:(?:cannot|can't|does not|"
+                r"doesn't|never|can)\s+)?(?:sees?|notices?|knows?|wants?|decides?)\b", re.I),
+     "code given senses"),
+    # "Consider this service code:" announces the code and says nothing about it.
+    (re.compile(r"(?:^|(?<=[.!?]\s))Consider (?:this|the following)\b[^.:]{1,40}:", re.M),
+     "sentence that announces the next one"),
+    # "The guardrail question" names step 7 of toby-swd-interfaces with a word
+    # its SKILL.md never uses. Twelve skill lines used it on 2026-10-02.
+    (re.compile(r"\bguardrails?\b", re.I), "coined name"),
+    # "The number that matters" flags importance without stating it.
+    (re.compile(r"\bthe (?:number|thing|part|metric|question) that (?:matters|counts)\b", re.I), "importance flag"),
+    # "is either plainly right (...)." keeps half of an either-or pair.
+    (re.compile(r"\b(?:is|are|was|were|be)\s+either\b(?![^.!?]*\bor\b)", re.I), "either with no or"),
+    # "Bound orbits are ellipses, and everything else about them is detail."
+    (re.compile(r"\b(?:everything else|the rest)\b[^.]{0,20}\bis (?:detail|noise|commentary|history)\b", re.I),
+     "punchline closer"),
+    # "Where the writing rules sit" places a rule as if it had a seat.
+    (re.compile(r"\bwhere\b[^.,]{1,30}?\b(?:should |would |now )?(?:sits?|lives?)\b(?!\s+(?:in|on|at|inside|next))", re.I),
+     "picture word"),
+    # Fragments that open a note: "Frozen on 2026-09-14 before any writer ran.",
+    # "Same diff, same criteria.", and "Not context, not a restatement."
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:Frozen|Scored|Recorded|Answered|Taken|Graded|Measured)\s+"
+                r"(?:on|by|in|from|before|after|twice|at|with)\b", re.M),
+     "fragment"),
+    (re.compile(r"(?:^|(?<=[.!?]\s))Same\s+[\w-]+(?:\s+[\w-]+)?,", re.M), "fragment"),
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:Not|No)\s+[^,.!?]{1,40},\s+(?:not|no)\b", re.M), "fragment"),
+    # "an optimization has is worth its cost" keeps two verbs from two drafts.
+    (re.compile(r"\b(?:an?|the)\s+[\w-]+\s+has\s+is\b|\bhave\s+are\b", re.I), "doubled verb"),
+    # "The rule is the system itself" stresses a noun that needs no stress. The
+    # form needs `is` before it, because "the code itself can't express" marks
+    # a contrast the docs in this repo draw on purpose.
+    (re.compile(r"\b(?:is|are|was|were)\s+the\s+[a-z][\w-]*\s+itself\b", re.I),
+     "reflexive for emphasis"),
+    # "Rule C tests this: the spin" and "the one that matters:" hold the noun
+    # back past a colon. The noun has to follow on the same line, because "like
+    # this:" before a code block or a list is how the docs introduce an example.
+    (re.compile(r"\b(?<!like )(?:(?:exactly|precisely)\s+)?(?:this|that)\s*:[ \t]+\S|"
+                r"\bthe (?:one|part|bit|thing|piece|question|step|rule|line) that (?:matters|counts)\s*:|"
+                r"\bwhat matters\s*:", re.I),
+     "deferred antecedent"),
+    # "That's the whole trick." ends a reply on a punchline.
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:And )?(?:That's|That is|This is|Which is) "
+                r"(?:it|the (?:whole|entire) [\w-]+|the (?:point|trick|idea|secret|magic)|all there is(?: to it)?)\.", re.M),
+     "punchline closer"),
     (re.compile(r"\b(?:provides? the ability to|enables? the creation of|the implementation of|facilitates?|utilization|in terms of|with regard to|with respect to)\b", re.I),
      "noun doing a verb's job"),
     (re.compile(r"\b(?:the ask|bandwidth|action items?|learnings|net-new|quick win|big lift|touch base|level set|align on|alignment on|double down)\b", re.I),
@@ -365,6 +524,13 @@ PREDICTED_PATTERNS = [
                 r"(?:is|are|was|were|has|have|had|[a-z]+(?:s|ed))\b"),
      "two facts joined by and"),
 ]
+# The guide bans `actually`, `really`, and `truly` when nothing in the
+# sentence states the contrast they imply. voice-check.py reads the whole
+# sentence, because the contrast word can come before or after.
+INTENSIFIER_RE = re.compile(r"\b(?:actually|really|truly)\b", re.I)
+CONTRAST_RE = re.compile(r"\b(?:but|while|whereas|although|though|instead|yet|despite|however|looks?|seems?)\b", re.I)
+
+
 # Words too common to show that a bullet repeats its heading.
 RESTATE_STOPWORDS = set(
     "a an the of to in on at by for from with and or but so is are was were be been it its this "

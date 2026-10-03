@@ -93,6 +93,22 @@ SLOGAN_NOTES = {
     "bare `that` as an object": "say the noun after `that`, rule 9",
     "rider after a complete claim": "delete the clause, because the sentence before it already said this, Banned Constructions",
     "heading joins two clauses": "write a one- or two-word label, or a phrase that says what the section covers, rule 23",
+    "grade before the answer": "delete the grade and open with the answer, unless the word is the answer, rule 30",
+    "count before the items": "delete the count and give the items, rule 30",
+    "dramatic word": "delete the word, or state the consequence in numbers, Banned Constructions",
+    "cleft for emphasis": "drop `is what` and let the subject act: the rule forces, rule 24",
+    "reflexive for emphasis": "delete `itself` unless it marks a contrast someone made, rule 3",
+    "deferred antecedent": "put the noun where `this:` is, Banned Constructions",
+    "punchline closer": "delete it, the reply ends at the last fact, rule 30",
+    "code given senses": "say what the program reads or matches, rule 27",
+    "sentence that announces the next one": "say what the reader should look for in the code, rule 32",
+    "coined name": "use the name the source skill uses, such as the step number, rule 10",
+    "importance flag": "delete the flag and state the fact, Banned Constructions",
+    "picture word": "say where it is: is in, is loaded from, rule 26",
+    "fragment": "give the sentence a subject and a verb, rule 29",
+    "doubled verb": "delete one of the two verbs, rule 29",
+    "intensifier with no contrast": "delete the word, or state the contrast it implies, Banned Constructions",
+    "either with no or": "give the other half after `or`, or delete `either`, rule 29",
 }
 
 # READ_RULES lists the rules that the patterns in voice_rules.py do not check, in the
@@ -161,6 +177,113 @@ class Finding(NamedTuple):
         return f"{self.source}:{self.line}  {self.rule}\n      {self.sentence}\n      -> {self.note}"
 
 
+NUMBER_WORDS = {w: i for i, w in enumerate(
+    "zero one two three four five six seven eight nine ten eleven twelve".split())}
+SENTENCE_CLAIM_RE = re.compile(
+    r"\b(?:comment|docstring|contract)\s+(?:has|is)\s+(" + "|".join(NUMBER_WORDS) + r"|\d+)\s+sentences?\b", re.I)
+COMMENT_LINE_RE = re.compile(r"^\s*(?:/\*\*?|\*/?|//+|#+)\s?(.*)$")
+CODE_SPAN_RE = re.compile(r"`[^`\n]+`")
+BLOCKQUOTE_RUN_RE = re.compile(r"(?:^>.*(?:\n|$))+", re.M)
+
+
+def comment_groups(block: str) -> list[str]:
+    """Return the text of each run of comment lines or docstring in a code block."""
+    groups: list[list[str]] = []
+    current: list[str] = []
+    in_doc = False
+    for line in block.splitlines()[1:-1]:
+        stripped = line.strip()
+        quotes = stripped.count('"""')
+        if in_doc or quotes:
+            current.append(stripped.replace('"""', "").strip())
+            in_doc = in_doc != (quotes % 2 == 1)
+            continue
+        match = COMMENT_LINE_RE.match(line)
+        if match and not stripped.startswith("#!"):
+            current.append(match.group(1).strip().rstrip("*/").strip())
+        elif current:
+            groups.append(current)
+            current = []
+    if current:
+        groups.append(current)
+    return [" ".join(part for part in group if part) for group in groups]
+
+
+def sentence_count_findings(raw: str, label: str) -> list[Finding]:
+    """Check "The comment has N sentences" against the code block above it.
+
+    The repo review on 2026-10-02 found four of these claims wrong in one
+    skill, and the count is a fact the checker can read off the page.
+    """
+    found = []
+    # The comment is in a fenced code block or quoted in a blockquote. The
+    # nearest one above the claim that holds a real comment is the one meant,
+    # and a placeholder such as `// ...` does not count.
+    sources = [(b.end(), comment_groups(b.group(0))) for b in v.FENCE_RE.finditer(raw)]
+    sources += [(q.end(), [" ".join(line.lstrip("> ").strip() for line in q.group(0).splitlines())])
+                for q in BLOCKQUOTE_RUN_RE.finditer(raw)]
+    sources.sort()
+    for match in SENTENCE_CLAIM_RE.finditer(v.prose_only(raw)):
+        word = match.group(1).lower()
+        claimed = NUMBER_WORDS.get(word, int(word) if word.isdigit() else -1)
+        counts = []
+        for end, groups in reversed([s for s in sources if s[0] <= match.start()]):
+            counts = [len(v.sentences_in(g)) for g in groups if len(v.WORD_RE.findall(g)) >= 3]
+            if counts:
+                break
+        if counts and claimed not in counts:
+            line = v.line_for_offset(raw, match.start())
+            found.append(Finding(label, "decide", line, "sentence count does not match the comment",
+                                 sentence_at(v.prose_only(raw), match.start()),
+                                 f"the comment above has {' or '.join(map(str, sorted(set(counts))))} sentences, "
+                                 "so correct the number, rule 31"))
+    return found
+
+
+def code_only_findings(written: str, label: str) -> list[Finding]:
+    """Flag a sentence that is only code spans, such as "`a.md` and `b.md`."."""
+    found = []
+    # Read joined paragraphs, because a wrapped line such as "`userId`." is
+    # the end of a sentence that started on the line above.
+    for number, paragraph in v.prose_paragraphs(written):
+        for sentence in v.sentences_in(paragraph):
+            if not sentence.endswith(".") or not CODE_SPAN_RE.search(sentence):
+                continue
+            rest = CODE_SPAN_RE.sub(" ", sentence)
+            if not [w for w in v.WORD_RE.findall(rest) if w.lower() not in ("and", "or")]:
+                found.append(Finding(label, "decide", number, "fragment", sentence[:200],
+                                     "give the sentence a subject and a verb, rule 29"))
+    return found
+
+
+# A term such as "the outcome laws" or "the one-decision loop" in a reference
+# file names something the skill never defines. The reader of the reference
+# came from SKILL.md and has to guess what it means.
+# The head nouns are the ones the review found coined. "case" and "problem"
+# were tried and dropped, because "the deep-link case" describes rather than names.
+TERM_RE = re.compile(r"\bthe\s+((?:[a-z]+-)+[a-z]+\s+(?:loop|laws?|ladder|smell|principle)|"
+                     r"[a-z]+\s+(?:laws|ladder|smell))\b", re.I)
+
+
+def undefined_term_findings(text: str, label: str) -> list[Finding]:
+    """Flag a named concept that its skill's SKILL.md and other files never use."""
+    path = Path(label).resolve()
+    if path.parent.name != "references" or not (path.parent.parent / "SKILL.md").exists():
+        return []
+    skill = path.parent.parent
+    others = " ".join(p.read_text().lower() for p in skill.rglob("*.md") if p.resolve() != path)
+    others = " ".join(others.replace("-", " ").split())
+    found = []
+    for match in TERM_RE.finditer(text):
+        term = " ".join(match.group(1).lower().replace("-", " ").split())
+        if term not in others:
+            found.append(Finding(label, "decide", v.line_for_offset(text, match.start()),
+                                 f"term the skill never defines {match.group(1)!r}",
+                                 sentence_at(text, match.start()),
+                                 "use the name SKILL.md uses, or define the term where it first appears, rule 10"))
+    return found
+
+
 def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
     text = v.prose_only(raw)
     tiers = v.load_banned_words()
@@ -195,6 +318,20 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
                 add(fix, f"figurative frame {m.group(0)!r}", m.start(), "say what the thing is, no metaphor")
         for m in CLOSING_OFFER_RE.finditer(text):
             add(fix, f"closing offer {m.group(0)!r}", m.start(), "delete it, the reply ends at the answer")
+        for pattern, reason in v.TIC_PATTERNS:
+            for m in pattern.finditer(text):
+                add(fix, f"chat tic {m.group(0).strip()!r}", m.start(), f"{reason}, rule 32")
+        # The mechanical checks read the line as written. prose_only blanks
+        # inline code, which would make "`a.json`. Set" look like a stray period.
+        written = raw
+        for block in (v.FRONTMATTER_RE, v.FENCE_RE):
+            written = block.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), written)
+        for pattern, reason in v.MECHANICAL_PATTERNS:
+            for m in pattern.finditer(written):
+                add(fix, reason, m.start(), "repair the line, it is wrong on every reading")
+        decide.extend(code_only_findings(written, label))
+        decide.extend(sentence_count_findings(raw, label))
+        decide.extend(undefined_term_findings(text, label))
     for m in WELD_RE.finditer(text):
         # A dash after a one- or two-word label at the start of a sentence, as in
         # "Source — the user said", separates a field name from its value.
@@ -217,10 +354,18 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
                 note = SENSE_NOTES.get(m.group(0).lower(),
                                        "banned as a significance flag, fine as a plain noun. Which is it here?")
                 add(decide, f"sense-scoped {m.group(0)!r}", m.start(), note)
+    for m in v.INTENSIFIER_RE.finditer(text):
+        sentence = sentence_at(text, m.start())
+        if not v.CONTRAST_RE.search(sentence):
+            decide.append(Finding(label, "decide", v.line_for_offset(text, m.start()), "intensifier with no contrast",
+                                  sentence, SLOGAN_NOTES["intensifier with no contrast"]))
     for m in BARE_PRONOUN_RE.finditer(text):
         add(decide, f"bare {m.group(1).lower()!r}", m.start(),
             "say the noun after it unless the reference is unmistakable, rule 9")
     for number, form, excerpt in v.slogan_findings(text):
+        # The guide lists the dramatic words to ban them, like the banned words.
+        if defining and form == "dramatic word":
+            continue
         decide.append(Finding(label, "decide", number, form, excerpt[:200], SLOGAN_NOTES[form]))
 
     for number, line in enumerate(text.splitlines(), 1):

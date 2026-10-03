@@ -246,8 +246,8 @@ The handler now invokes three named operations, each handling one body of knowle
 rate-limit, and tenant context become explicit dependencies of the operations
 that need them.
 
-Cross-cutting interceptors (logging, metrics) can still exist. They are the
-narrow category Nest interceptors and Express middleware fit. The
+Cross-cutting interceptors (logging, metrics) can still exist. Nest interceptors and Express
+middleware suit only this narrow category of concerns. The
 seven-middleware pipeline shrinks to two or three middlewares when each one
 represents a real cross-cutting concern and the rest move into named modules.
 

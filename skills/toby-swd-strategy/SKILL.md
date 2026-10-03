@@ -31,7 +31,7 @@ For anything beyond a one-line change, don't implement the first idea.
 
 ## While writing — put complexity in the right place
 
-Put the hard part where it costs the fewest callers. Skew the ratio of interface cost to implementation benefit heavily toward the implementation side. `toby-swd-modules` defines the deep module and lists the checks that find a shallow one.
+Put the hard part where it costs the fewest callers. Accept a harder implementation to keep the interface simple for callers. `toby-swd-modules` defines the deep module and lists the checks that find a shallow one.
 
 Do not expose internal mechanics, config knobs, or special cases because they are the quickest option in the code you are editing. Every parameter a caller must manage is overhead distributed across every future call site. Prefer computing a value internally over exporting a configuration parameter or throwing back to the caller.
 

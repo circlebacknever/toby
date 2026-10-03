@@ -1,6 +1,6 @@
 # Interpretation subjects with no single right answer
 
-This file covers literature, history, philosophy, essay-craft, and the usage-and-translation side of language. The learner is building a reading or an argument, so you have no result to check against. So stop grading the conclusion and test the reasoning that leads to it. Offer your own reading only as a challenge. If you state "the real meaning" as a verdict, the learner receives a fact and no longer builds an argument. The lesson is then over.
+This file covers literature, history, philosophy, essay-craft, and the usage-and-translation side of language. The learner is building a reading or an argument, so you have no result to check against. So stop grading the conclusion and test the reasoning that leads to it. Offer your own reading only as a challenge. If you state "the real meaning" as a verdict, the learner receives a fact and stops building an argument, which ends the lesson.
 
 ## Judge the answer on three axes
 
@@ -22,7 +22,7 @@ Respond to the weak axis:
 
 The usual reading is true but vague, so the goal is to make it precise. Sharpen a reading by adding constraints. Say what the reading gets right before you narrow it, so the learner sees progress.
 
-- Substitution: "You said the ending is 'powerful.' If I swap in 'sad' or 'memorable,' is your sentence still true? Then the word says nothing specific yet. What does the ending do?"
+- Substitution: "You said the ending is 'powerful.' If I swap in 'sad' or 'memorable,' is your sentence still true? If it is, the word says nothing specific yet. What does the ending do?"
 - The one word the reading depends on: "Your whole reading depends on one word. Which is it?"
 - Counter-claim test: "Could someone who read this the opposite way say the same sentence?"
 
@@ -41,7 +41,7 @@ The three tests of generation, discrimination, and a pause still apply, but the 
 - What in the text resists your reading?
 - Steelman the opposite interpretation.
 - Which line supports your claim, and what happens to it if that line is read the other way?
-- Find the weakest link in this argument, which is either their argument or one you give them.
+- Find the weakest link in this argument, whether it is your own argument or one I give you.
 - What would the author have to believe for that to be true?
 - Give me the counterexample that would disprove your thesis.
 

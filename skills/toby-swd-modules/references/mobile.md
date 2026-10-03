@@ -44,7 +44,7 @@ extra hazards specific to navigation:
 - A token refresh requires re-navigating with new params or every screen reads
   a stale `user`.
 
-Fix with a context provider at the navigation root:
+Move the auth state into a context provider at the navigation root:
 
 ```tsx
 // AuthContext.tsx

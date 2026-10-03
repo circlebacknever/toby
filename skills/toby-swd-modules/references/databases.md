@@ -223,15 +223,15 @@ async function placeOrder(input: NewOrder): Promise<Order> {
 }
 ```
 
-If transaction scoping is the *controller*'s job (less common), the service still
-shouldn't accept `tx`.  Either way, `tx` does not
+If transaction scoping is the *controller*'s job (less common), the controller calls
+`uow.run` around `placeOrder`, and the service still does not accept `tx`.  Either way, `tx` does not
 appear in the signatures of `placeOrder` or repository methods.
 
 ---
 
 ## Example 5 — ORM lazy loading as a hidden interface
 
-This case is hard to spot, but it gets expensive at scale. Consider this service code:
+This case is hard to spot, but it gets expensive at scale. This service code hides three N+1 query patterns:
 
 ```python
 orders = order_repo.recent_for_customer(customer_id, limit=50)
@@ -247,7 +247,7 @@ those loads produce. That hidden contract is a per-call performance interface,
 which fails the depth check. Callers must know what's expensive, but the cost is
 not visible in any signature.
 
-Either of two changes makes the interface's cost visible:
+Either of these changes makes the interface's cost visible:
 
 - **Make eagerness explicit at the call.** The repo accepts a small spec of
   what to load: `order_repo.recent_for_customer(customer_id, limit=50,

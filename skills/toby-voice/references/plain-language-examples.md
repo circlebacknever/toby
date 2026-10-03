@@ -73,7 +73,7 @@ A reader who acts on the first half of the sentence before finishing it does the
 ### Two `-ing` clauses means a procedure
 
 - Before: "Loading the fixtures while running the migration causes the seed to race the schema change."
-- After: "Load the fixtures. Wait for the migration to finish. Otherwise the seed races the schema change."
+- After: "Wait for the migration to finish. Then load the fixtures. Otherwise the seed races the schema change."
 
 ## The note test
 
@@ -126,7 +126,7 @@ Someone wrote each of these terms in this repo. A reader later flagged each one 
 - Before: "a hook's return shape" → After: "a hook's return type"
 - Before: "the shape of a signature" → After: "what a signature exposes"
 - Before: "Narrow the blast radius." → After: "Point them at the smallest piece that could be wrong."
-- Before: "One move covers all six forms below." → After: "All six below are the same habit."
+- Before: "One move covers all six forms below." → After: "All six patterns below are the same habit."
 
 The test is whether a reader could look the word up and find your meaning. "Surface" in a dictionary is the outside of a thing. It is not a set of function parameters, so a reader who does not already know that usage has to guess.
 

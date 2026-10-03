@@ -1,12 +1,12 @@
 ---
 name: toby-swd-complexity
 description: >-
-  Decide whether an error path, a retry, a cache, or an optimization has
+  Decide whether an error path, a retry, a cache, or an optimization
   is worth its cost. Use it when a task touches error handling, retries,
   validation, recovery paths, caching, concurrency, batching, or a measured
-  performance problem. Two things here are cheap: removing error conditions that
-  need not exist, and refusing speculative optimization. Heavier performance
-  work starts only after a measurement. Skip it for a throwaway parameter
+  performance problem. Removing error conditions that need not exist is cheap,
+  and so is refusing speculative optimization. Heavier performance work starts
+  only after a measurement. Skip it for a throwaway parameter
   loop, which `toby-swd-experiment` is for, and skip designing the cache's
   surface, which `toby-swd-interfaces` is for.
 ---
@@ -35,13 +35,13 @@ Count what an error signal costs before adding one. It costs the handling it for
 
 Some failures can't be defined away, masked, or aggregated, and stopping would make things worse. When the operation must continue in a reduced or safer mode, the handling is a deliberately designed degraded path the system was built to expect. An undesigned degraded path is the barely-tested error branch the hard rules warn about.
 
-**Guardrail**: eliminating, masking, or crashing is correct only when the information is not needed outside the module. A module that swallows every network error so callers can't tell a message was lost hasn't reduced complexity. It has made reliable use impossible. Decide what information matters. Hide what callers do not need, and surface what they do. Never define away or mask into success a security or authorization outcome, such as auth denied, a validation rejection, or a permission failure. Surface it as a real result the caller acts on.
+**Limit**: eliminating, masking, or crashing is correct only when the information is not needed outside the module. A module that swallows every network error so callers can't tell a message was lost hasn't reduced complexity. It has made reliable use impossible. Decide what information matters. Hide what callers do not need, and surface what they do. Never define away or mask into success a security or authorization outcome, such as auth denied, a validation rejection, or a permission failure. Surface it as a real result the caller acts on.
 
 **Hard rules**: don't signal an error for conditions a well-designed API would not produce. If you can't decide what to do, the caller probably can't either, so throwing just relocates the problem and adds cost. Treat handler code that can't be tested reliably with extra skepticism. A large share of production failures come from bugs in barely-exercised error paths.
 
 ## Performance design
 
-Do the design before you measure, and measure before you optimize. Simple code tends to be fast, because defined-away special cases need no checks and deep modules cross fewer layers. Beyond good design, performance work has three layers.
+Do the design before you measure, and measure before you optimize. Simple code tends to be fast, because defined-away special cases need no checks and deep modules cross fewer layers. Beyond good design, performance work follows the three rules below.
 
 **At design time, always know what is expensive.** Learn which operations cost orders of magnitude more: network round trips, disk I/O, dynamic allocation, cache misses. When a naturally efficient option is no more complex than a slow one, take it. For example, use a hash table when ordering isn't needed, and allocate one block where many would do. Design awareness costs nothing. It prevents a system that ignored performance from running 5 to 10 times slower with no single fix available. Some costs appear only in aggregate. An operation that is cheap once can exceed the budget in a tight repeated loop. Allocation that accumulates forces later reclamation. In a steady-state loop, prefer reusing memory over allocating fresh, and prefer skipping or deferring work over blocking the loop to retry.
 

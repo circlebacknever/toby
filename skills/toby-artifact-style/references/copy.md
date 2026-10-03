@@ -33,7 +33,7 @@ Apply this cut after the first three tests pass. If a reader who already knows t
 
 Do not invent contrasts, because `It's not X, it's Y` is filler whenever nobody claimed X. Write the positive form.
 
-A comparison of two options that both exist counts as content. A comparison table, a rejected-alternative callout, and a "chose A over B because C" caption all refer to a real option, so they ship. The operating guide states the full rule.
+A comparison of two options that both exist counts as content. Keep a comparison table, a rejected-alternative callout, or a "chose A over B because C" caption, because each refers to a real option. The operating guide states the full rule.
 
 ---
 
@@ -138,7 +138,7 @@ The global voice rules apply to artifact copy. This reference adds artifact cons
 - A reference deck that teaches a concept keeps a serious tone when the concept requires one.
 
 **Where lighter phrasing is allowed:**
-- **Identifiers can be long and specific.** `priceIncludingCheckoutFee` ships if that is what the field holds.
+- **Identifiers can be long and specific.** `priceIncludingCheckoutFee` is a correct name when the field holds a price that includes the checkout fee.
 - **State what nobody understands yet.** "The drop appeared in three independent runs, but nobody knows the cause yet." gives the reader more than a confident theory.
 - **State when a judgment is based on taste.** "This looks wrong to me, because it resembles the cache-coherence bug from M-03." is a valid note in an investigation artifact.
 - **Keep lighter phrasing out of the data.** A slide heading can be a plain sentence. An axis label, a KPI value, and a legend entry show only the quantity the reader came for.

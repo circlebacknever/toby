@@ -51,6 +51,23 @@ def find_rules_dir() -> Path | None:
 # hook that argues about a 27-word sentence gets switched off.
 SENTENCE_LIMIT = 40
 
+# A sentence ends at terminal punctuation, even inside bold such as "fixed.**",
+# and at a blank line or a new list item, so a label line ending in a colon is
+# not joined to the bullet below it.
+SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\**\s+|\n\s*\n|\n(?=\s*(?:[-*]|\d+\.)\s)")
+
+# The matched lines are symptoms. A blocked reply often has problems no
+# pattern finds, and an eval on 2026-10-02 showed that agents rewrite the whole
+# reply when asked to. The same eval showed a request to cut sentences also cut
+# facts the reader needed, so the message asks to keep them.
+REPROMPT = """The voice hook blocked this reply. The lines below matched its patterns. A reply with these lines usually has other problems that no pattern finds, so rewrite the whole reply before you send it again.
+1. Put the answer, and every condition that changes it, in the first sentence.
+2. Keep every fact, number, command, path, and URL the user needs.
+3. Cut each sentence that only repeats an earlier one, introduces the next one, or sums up.
+4. Check each count and number against the facts in the reply.
+5. Define each term the user has not seen, or replace it with a plain word.
+6. Fix every matched line:"""
+
 # Fenced code, inline code, and quoted text are not Toby's prose. A reply quotes
 # a sentence to report on it, such as a sentence the user flagged, and the rules
 # exempt exact quotes.
@@ -58,6 +75,8 @@ FENCE_RE = re.compile(r"```.*?```", re.S)
 INLINE_RE = re.compile(r"`[^`\n]*`")
 DOUBLE_QUOTE_RE = re.compile(r'"[^"\n]{1,300}"|\u201c[^\u201d\n]{1,300}\u201d')
 QUOTE_RE = re.compile(r"^>.*$", re.M)
+# A table row is cells, not a sentence, so it never counts toward the length check.
+TABLE_RE = re.compile(r"^\s*\|.*$", re.M)
 
 
 def last_assistant_text(transcript: Path) -> str:
@@ -82,7 +101,7 @@ def last_assistant_text(transcript: Path) -> str:
 
 
 def prose_only(text: str) -> str:
-    for pattern in (FENCE_RE, INLINE_RE, QUOTE_RE, DOUBLE_QUOTE_RE):
+    for pattern in (FENCE_RE, INLINE_RE, QUOTE_RE, TABLE_RE, DOUBLE_QUOTE_RE):
         text = pattern.sub(" ", text)
     return text
 
@@ -108,33 +127,32 @@ def main() -> int:
     sys.path.insert(0, str(rules_dir))
     import voice_rules as v
 
+    # Every match is listed, because a list that stops at the first hit tells
+    # the agent the fix is local and complete.
     hits = []
     for pattern, reason in v.REPLY_PATTERNS:
-        match = pattern.search(reply)
-        if match:
+        for match in pattern.finditer(reply):
             hits.append(f"{match.group(0).strip()!r}: {reason}")
 
     for frame, pattern in v.FIGURATIVE_RE:
-        match = pattern.search(reply)
-        if match:
+        for match in pattern.finditer(reply):
             hits.append(f"{match.group(0)!r}: figurative frame, say what the thing is")
 
     for term, pattern in v.COINED_RE:
-        match = pattern.search(reply)
-        if match:
+        for match in pattern.finditer(reply):
             hits.append(f"{match.group(0)!r}: invented term, {v.COINED_TERMS[term]}")
 
-    for sentence in re.split(r"(?<=[.!?])\s+", reply):
-        words = len(sentence.split())
-        if words > SENTENCE_LIMIT:
-            hits.append(f"a {words}-word sentence: the ceiling is 25, so split it")
-            break
+    for sentence in SENTENCE_SPLIT_RE.split(reply):
+        words = sentence.split()
+        if len(words) > SENTENCE_LIMIT:
+            hits.append(f"the {len(words)}-word sentence starting {' '.join(words[:6])!r}: "
+                        "the ceiling is 25, so split it")
 
     if not hits:
         return 0
 
-    print("Voice break in the reply just sent. Rewrite those sentences and send again:", file=sys.stderr)
-    for hit in hits:
+    print(REPROMPT, file=sys.stderr)
+    for hit in dict.fromkeys(hits):
         print(f"  - {hit}", file=sys.stderr)
     return 2
 

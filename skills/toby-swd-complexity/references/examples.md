@@ -43,7 +43,7 @@ which catches it once and produces the 400. That one handler replaces the dozens
 
 Separately, the same server calls a `malloc`-equivalent allocator many call levels down in request
 parsing. Out-of-memory is rare. When it happens there is nothing useful to do, so checking it
-at every allocation is pure complexity. Out-of-memory is a case where the program should crash, so
+at every allocation adds complexity with no benefit. Out-of-memory is a case where the program should crash, so
 use one checked allocation wrapper that aborts with a diagnostic. A corrupt
 request body is expected and per-request, so the aggregated handler turns it into
 the 400, and it does not trigger the abort.

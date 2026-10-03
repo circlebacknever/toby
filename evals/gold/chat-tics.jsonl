@@ -1,0 +1,24 @@
+{"id": "t01", "label": "bad", "strength": "user-flagged", "text": "Very close. Two fixes, and both matter.", "where": "chat reply in a math lesson, 2026-10-02", "why": "grade on the user's attempt, count before the items, importance flag"}
+{"id": "t02", "label": "bad", "strength": "user-flagged", "text": "Your sentence, repaired:", "where": "chat reply in a math lesson, 2026-10-02", "why": "labelled answer"}
+{"id": "t03", "label": "bad", "strength": "user-flagged", "text": "Without that requirement, the theorem would be worthless. Here's why.", "where": "chat reply in a math lesson, 2026-10-02", "why": "dramatic word, sentence that announces the next one"}
+{"id": "t04", "label": "bad", "strength": "user-flagged", "text": "No rule can ever make it go up, so every system on Earth would pass.", "where": "chat reply in a math lesson, 2026-10-02", "why": "dramatic word"}
+{"id": "t05", "label": "bad", "strength": "user-flagged", "text": "The legal requirement is what forces the score to mean distance from the center.", "where": "chat reply in a math lesson, 2026-10-02", "why": "cleft for emphasis"}
+{"id": "t06", "label": "bad", "strength": "user-flagged", "text": "The rule is the system itself, handed to you on the exam.", "where": "chat reply in a math lesson, 2026-10-02", "why": "reflexive for emphasis"}
+{"id": "t07", "label": "bad", "strength": "user-flagged", "text": "Rule C tests exactly this: the spin with score x² + y², where the score never changed.", "where": "chat reply in a math lesson, 2026-10-02", "why": "deferred antecedent, vague intensifier"}
+{"id": "t08", "label": "bad", "strength": "predicted", "text": "Short answer: the cache is stale.", "where": "same family as t02", "why": "labelled answer"}
+{"id": "t09", "label": "bad", "strength": "predicted", "text": "Good instinct. The derivative is the slope at one point.", "where": "same family as t01", "why": "grade on the user's attempt"}
+{"id": "t10", "label": "bad", "strength": "predicted", "text": "Three things to know: the rule is fixed, the score is yours, and the score must be positive.", "where": "same family as t01", "why": "count before the items"}
+{"id": "t11", "label": "bad", "strength": "predicted", "text": "Swap the two terms and the proof breaks. That's the whole trick.", "where": "same family as t03", "why": "punchline closer"}
+{"id": "t12", "label": "good", "strength": "near-miss", "text": "Almost. Two tables are left to migrate.", "where": "status reply", "why": "Almost is the answer to whether the migration finished"}
+{"id": "t13", "label": "good", "strength": "near-miss", "text": "Here is the stack trace from the failing run.", "where": "status reply", "why": "the sentence gives the trace"}
+{"id": "t14", "label": "good", "strength": "near-miss", "text": "Two tests failed, and both are in auth.test.ts.", "where": "status reply", "why": "a count with its location"}
+{"id": "t15", "label": "good", "strength": "near-miss", "text": "The parser calls itself on each child node.", "where": "code explanation", "why": "itself is the object of calls"}
+{"id": "t16", "label": "good", "strength": "near-miss", "text": "Close the file handle before the retry.", "where": "code review", "why": "Close is a verb"}
+{"id": "t17", "label": "good", "strength": "near-miss", "text": "Exactly 12 rows differ from the ledger by more than $1.", "where": "data reply", "why": "Exactly qualifies a number"}
+{"id": "t18", "label": "good", "strength": "near-miss", "text": "The score is 0 at the center and positive everywhere else.", "where": "math explanation", "why": "plain definition"}
+{"id": "t19", "label": "bad", "strength": "user-flagged", "text": "Give them the next step on that exact point. \"Good. You write the guard for the empty case.\"", "where": "toby-learning SKILL.md example reply, 2026-10-02", "why": "praise for the user inside a quoted example reply"}
+{"id": "t20", "label": "bad", "strength": "user-flagged", "text": "Ask the one why that separates a memorized answer from an understood one: \"right — what happens when the input is empty?\"", "where": "toby-learning SKILL.md example reply, 2026-10-02", "why": "grade and a dash inside a quoted example reply"}
+{"id": "t21", "label": "bad", "strength": "predicted", "text": "Great! The derivative is the slope at one point.", "where": "same family as t19", "why": "praise for the user"}
+{"id": "t22", "label": "good", "strength": "near-miss", "text": "Yes, the migration ran on all four tables.", "where": "status reply", "why": "yes is the answer"}
+{"id": "t23", "label": "good", "strength": "near-miss", "text": "Correct. The index covers both columns.", "where": "chat reply", "why": "correct is the answer to a yes-or-no question"}
+{"id": "t24", "label": "good", "strength": "near-miss", "text": "The good path returns 200, and the error path returns 503.", "where": "code explanation", "why": "good is an adjective inside the sentence"}

@@ -360,8 +360,8 @@ irrelevant most of the time. The component handles rendering, filtering,
 keyboard handling, focus management, popover positioning, multi-select,
 creation, and grouping, so every feature adds to one list of props.
 
-The component mixes two things: the *behavior* of a combobox (keyboard navigation,
-selection state, ARIA semantics, popover open/close) and the *presentation*
+The component mixes the *behavior* of a combobox (keyboard navigation,
+selection state, ARIA semantics, popover open/close) with its *presentation*
 (how options look, how the trigger looks, the popover style). Split the behavior from the presentation.
 
 ```tsx

@@ -45,7 +45,7 @@ Put unavoidable complexity inside the module, when it is related to that module'
 
 Prefer computing a value internally over exporting a configuration parameter or throwing to the caller. Before exposing a parameter, ask whether the caller can choose a better value than the module can.
 
-Guardrail: pull down only the complexity that relates to the module's function and simplifies both the callers and the interface. Pulling unrelated complexity down is another form of leakage, and in the extreme case it produces a god module. When a boundary is also a serialization or process boundary, crossing it costs a round trip and a serialize/deserialize at runtime. That runtime cost adds to the cognitive cost. Prefer one coarse call over many fine-grained ones across that boundary.
+Pull down only the complexity that relates to the module's function and simplifies both the callers and the interface. Pulling unrelated complexity down is another form of leakage, and in the extreme case it produces a god module. When a boundary is also a serialization or process boundary, crossing it costs a round trip and a serialize/deserialize at runtime. That runtime cost adds to the cognitive cost. Prefer one coarse call over many fine-grained ones across that boundary.
 
 ### 4. Give adjacent layers different abstractions
 
@@ -102,7 +102,7 @@ Work through these options in order and stop at the first one that fits.
 4. **Polymorphism** fits when each case owns behavior, private state, or its own dependencies.
 5. **Registry** fits when new cases must be addable without editing a central file. It is the most complex option.
 
-Move to the next option only when the case bodies are substantial. Options 4 and 5 need two conditions at once: a case set that visibly grows, and case bodies that own state or dependencies. `references/replace-the-conditional.md` gives the reasoning per option and a worked example of each.
+Move to the next option only when the case bodies are substantial. Options 4 and 5 need both a case set that visibly grows and case bodies that own state or dependencies. `references/replace-the-conditional.md` gives the reasoning per option and a worked example of each.
 
 In greenfield code, build the dispatch from the start. In brownfield code, fixing a scattered conditional is a scoped refactor. Offer it with its cost and benefit, and keep it out of an unrelated change.
 

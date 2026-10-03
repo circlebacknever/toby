@@ -19,7 +19,7 @@ Treat whatever the user named as one instance of a bigger set.
 
 Turn the specific thing into a set before doing anything else. Then expand the set with instances they didn't name: similar instances, less obvious members, the same pattern applied elsewhere. Then present what you've found for them to react to.
 
-Widening the set is the whole job. If you only repeat what they already said in slightly different words, the skill failed.
+The skill succeeds only when the set is wider than what the user said. If you only repeat what they already said in slightly different words, the skill failed.
 
 ## Stay neutral
 
@@ -55,6 +55,6 @@ If the conversation is moving fast and the user is reacting to options, use pros
 
 ## Posture
 
-Treat Toby Squall as a way of working, where the work is in how you read the user's input. Read it more widely, and be more skeptical of their literal phrasing. Then propose self-contained options for them to pick from. There's no step-by-step checklist to run through.
+Toby Squall changes how you read the user's input. Read it more widely, and be more skeptical of their literal phrasing. Then propose self-contained options for them to pick from. There's no step-by-step checklist to run through.
 
 If you start to invent a hypothetical example to make the conversation concrete, stop. They didn't give you one because they don't have one yet. Ask them a question, or wait for them.

@@ -10,7 +10,7 @@ description: >-
 
 # Toby Code Review
 
-Validate the change, report the real risks, and stop. Six findings that look confident but turn out fake waste more time than the bug itself. Size the report to the change. A busy engineer should read it once and trust it.
+Validate the change, report the real risks, and stop. Six confident findings that turn out fake cost the reader more time than one real bug does. Size the report to the change. A busy engineer should read it once and trust it.
 
 **Report problems and do not fix them.** This skill reports and edits nothing.
 
@@ -41,7 +41,7 @@ Write each finding as three labelled lines, and make each line a whole sentence.
 
 Run the changed code before writing findings, so you find what you have missed. Run unasked what `toby-swd-environment` calls safe inspection or narrow verification: the changed function in a REPL, a scratch script, the one test file covering it. Ask before anything on that skill's ask-list: the full suite, a migration, an install, a dev server. State the command you want and why. In the report, say which findings depend on reading alone.
 
-Give changed arithmetic and changed predicates the inputs a quick read misses: negative, zero, empty, and the value either side of every boundary. Then paste what came back into the Consequence line. These inputs reveal sign errors, unit mismatches, and totals that disagree with what got stored. No catalog lists those bugs.
+Give changed arithmetic and changed predicates the inputs a quick read misses: negative, zero, empty, and the value either side of every boundary. Then paste what came back into the Consequence line. These inputs reveal sign errors, unit mismatches, and totals that disagree with what got stored. The smell catalog in `references/smells.md` does not list these bugs, so only these inputs find them.
 
 A design smell finding has four lines. They are the entry name from `references/smells.md`, the file:line, the code that meets the entry's Fires-when criterion, and the fix. Write the fix from the entry's Fix line, applied to this code. The entry names are standard smell names that a reader can look up.
 
@@ -51,7 +51,7 @@ When the fix isn't plain, add one sentence that says how to fix it. Don't restat
 
 Leave off P1/P2 labels, because a severity label is a claim about impact. The reviewer has the diff but not the roadmap, the incident history, or what ships Thursday. A consequence sentence claims only what the traced path shows, but a severity label depends on information the reviewer never had.
 
-The author reads a P1 and answers "this is a nit, get over yourself". The author is the one who can tell how severe it is. Let the consequence sentence show the harm.
+The author reads a P1 and answers "this is a nit, get over yourself". Only the author can tell how severe it is. Let the consequence sentence show the harm.
 
 If you've written more than three findings in one pass, stop and check each one against the standard of proof again. More than a handful of findings means the list includes unproven suspicions.
 
@@ -112,7 +112,7 @@ Use the smell format when an entry in `references/smells.md` matches. Otherwise 
 
 ## How to review a skills or config diff
 
-Review a change to a `SKILL.md`, an operating guide, a hook, or an agent config for what it does to every later run. Reading it as prose misses those effects, so ask these three questions. Only this section asks them:
+Review a change to a `SKILL.md`, an operating guide, a hook, or an agent config for what it does to every later run. Reading it as prose misses those effects, so ask these three questions. The four passes above do not ask these questions.
 
 - **Does this rule contradict another skill?** Quote both, at path:line. Two skills stating opposite rules is a finding whichever one is right.
 - **Does a description edit change what fires?** A widened trigger noun makes the agent load a skill on tasks it should skip. A narrowed trigger noun stops the agent from loading the skill on tasks that need it. Give a task that now loads a different skill.

@@ -30,7 +30,7 @@ Each command belongs to one of the classes below, so use its class to choose whe
 | State-changing | writing files, installing packages, codegen, snapshot updates, migrations, seed scripts | ask first, unless the command directly implements a plan the user approved |
 | Runtime-affecting | starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers | ask first, always |
 | Destructive | deleting files, dropping data, force pushes, hard reset, killing processes, clearing caches, deleting volumes, anything starting `rm -rf` | always ask first, and name exactly what will be deleted or stopped |
-| Repo-guidance-driven | `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, the giant validation script | summarize it, say why the repo recommends it, ask, unless it is narrow and cheap |
+| Repo-guidance-driven | `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, a full-repo validation script | summarize it, say why the repo recommends it, ask, unless it is narrow and cheap |
 
 Editing files inside the planned scope is fine, but running a migration the user
 did not mention is not. A `pnpm dev` restart has the same effect as a kill, because any

@@ -1,6 +1,6 @@
 # Explain suite
 
-The job is a clear answer, backed, and short. This suite measures whether the
+A passing answer is clear, backed by evidence, and short. This suite measures whether the
 skill delivers that or writes an essay.
 
 Four questions in `fixtures/explain-questions.md`, each answered as one turn.
@@ -8,15 +8,16 @@ The length numbers below are measured, and everything else is read.
 
 ## What a passing answer does
 
-- **Answers in the first sentence.** Not context, not a restatement of the
-  question, not what it is about to explain.
+- **Answers in the first sentence.** It does not open with context, a
+  restatement of the question, or a preview of the answer.
 - **Runs to two or three sentences** unless the question asks for depth. Q3 asks
   for brevity outright and a long answer there is a plain failure.
 - **Backs every claim.** Code gets a path and a line. Behavior gets the output.
   Outside facts get a source. An unbacked claim is named as a guess, in that
-  word. Q4 exists to test this: "safe to remove" is a claim about behavior and
-  needs the callers checked or the check named as not run.
-- **Asks nothing back.** No quiz, no withheld answer, no "what do you think?".
+  word. Q4 tests this, because "safe to remove" is a claim about behavior. A
+  passing answer checks the callers or says that the check did not run.
+- **Asks nothing back.** The answer does not quiz the reader, withhold the
+  answer, or ask "what do you think?"
   That belongs to `toby-learning`, which fires only when invoked.
 
 - **Uses ordinary English.** A word doing a job its normal meaning does not

@@ -40,7 +40,7 @@ Ask these four questions early:
 
 The mistake in the other direction is speculative generality, which adds parameters or extension points for future needs that never come. The word "somewhat" in the heading sets the limit. Cover today's needs and one or two near-future variants you can name, and stop there.
 
-The interface-segregation principle sets the minimum rule here: a caller should depend only on the parts of the interface it uses. A consumer that needs one method gets an interface with one method. For a backend service, `references/backend-apis.md` shows how to apply this rule.
+The interface-segregation principle says that a caller should depend only on the parts of the interface it uses. A consumer that needs one method gets an interface with one method. For a backend service, `references/backend-apis.md` shows how to apply this rule.
 
 Each parameter forces every caller to answer a question. Before adding one, check whether the module can compute or set the value itself. A default lowers the burden, but the coupling stays. The caller still reads the default to know the behavior. Prefer a computed value or a narrower operation over a configurable one.
 

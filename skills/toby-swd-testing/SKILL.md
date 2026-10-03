@@ -56,7 +56,7 @@ Before accepting a snapshot update, read the diff and confirm every change is in
 
 ## How much to test
 
-Cover the contract's distinct observable outcomes, then stop: the success path, each documented failure mode, and the boundary conditions. Keep one behavioral concept per test. Multiple asserts are fine when they prove that one behavior. A behavioral outcome can be checked by example (one named scenario) or by property (an invariant that holds over a range of generated inputs). Prefer whichever states the contract more directly.
+Cover the contract's distinct observable outcomes, which are the success path, each documented failure mode, and the boundary conditions, and then stop. Keep one behavioral concept per test. Multiple asserts are fine when they prove that one behavior. A behavioral outcome can be checked by example (one named scenario) or by property (an invariant that holds over a range of generated inputs). Prefer whichever states the contract more directly.
 
 ## Each test is independent
 

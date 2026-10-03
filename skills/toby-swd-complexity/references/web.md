@@ -2,7 +2,7 @@
 
 The web stack has its own complexity patterns. Errors arrive from three
 sources at once: network, render, and user input. Performance problems
-come from a fourth source: re-renders, large lists, and memoization decisions.
+come from re-renders, large lists, and memoization decisions.
 The ladders apply. The right fix in each framework uses that framework's idioms.
 
 ---

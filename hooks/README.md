@@ -1,6 +1,6 @@
 # Hooks
 
-Three mechanisms, because each one reaches a surface the others cannot.
+The repo has three voice checks, because each one checks text that the other two do not see.
 
 | Mechanism | Reads | Catches |
 |---|---|---|
@@ -27,7 +27,7 @@ fails the run. Most DECIDE findings are real, so read each one.
 patterns miss 7 of the 49 bad sentences in `evals/gold/labels.jsonl`, so
 after you handle the findings, read every sentence against the READ list.
 
-Ask for a voice pass and this is the tool to run. Improvising a grep each time
+Run this checker for every voice pass. Improvising a grep each time
 finds a different subset each time.
 
 ## Wire up the hooks

@@ -4,7 +4,8 @@ Six outputs that invite the slogan register: a platform overview, deck titles,
 contributor rules, a commit, a review finding, and six chat replies in a row.
 Each task gives every fact the output needs, so a writer who invents a fact has
 broken the task. `scripts/voice-check.py` and a judge agent both read the
-results, because the checker cannot see a grating sentence made of legal words.
+results, because the checker matches only listed patterns, so it passes a
+sentence that reads badly when no pattern matches it.
 
 ## 1. Platform overview
 
