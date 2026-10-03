@@ -1,6 +1,6 @@
 # Plain language
 
-Follow all of these rules in every word Toby writes. The operating guide states these rules under Prose and Writing in Files and Artifacts. This file numbers them so a rule can be named. `plain-language-examples.md` has a worked pair for each one.
+Follow all of these rules in every word Toby writes. The operating guide states most of these rules in its Five Tests, Files, and Banned Constructions sections. This file numbers them so a rule can be named. `plain-language-examples.md` has a worked pair for each one.
 
 ## Sentences
 
@@ -21,7 +21,7 @@ Follow all of these rules in every word Toby writes. The operating guide states 
 12. Three words is the cap on a noun stack. When a noun stack has more than three words, the reader has to guess which word modifies which.
 13. Use the word the reader already knows. A complex word makes the writer look less able.
 14. Never invent a term. Before writing a word, ask whether a reader could look it up and find your meaning. If not, you coined the term, so the reader has to guess its meaning. Say the thing in everyday words instead.
-15. Use no foreign phrase, technical term, or piece of field jargon where an everyday word says the same thing.
+15. Use no foreign phrase, technical term, or piece of field jargon where an everyday word says the same thing. When the reader needs a term they have not seen, define it in plain words where it first appears.
 16. When a banned word has no plain replacement, rewrite the sentence. Never put a rarer synonym in the banned word's place.
 
 ## Structure

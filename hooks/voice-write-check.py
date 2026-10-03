@@ -93,7 +93,7 @@ def main() -> int:
           "and answer each DECIDE sentence.",
           file=sys.stderr)
     print(result.stdout.strip(), file=sys.stderr)
-    print("These patterns miss 7 of the 49 bad sentences in the gold set. Before you finish the task, run "
+    print("These patterns miss 94 of the 170 bad sentences in the repo-review gold set. Before you finish the task, run "
           "voice-check.py on the file and read every sentence against the READ list it prints.",
           file=sys.stderr)
     return 2

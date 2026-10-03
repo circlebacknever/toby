@@ -75,8 +75,8 @@ block to paste, with the paths already filled in. It does not edit
 Without being asked, the agent runs the voice checker on every prose file a turn wrote,
 because the operating guide's Self Review tells it to. The agent fixes everything under FIX and
 answers every line under DECIDE. Then it reads every sentence against the READ
-list, which covers the rules the patterns do not check. The patterns miss 7 of the 49
-bad sentences in `evals/gold/labels.jsonl`, so the agent needs the READ
+list, which covers the rules the patterns do not check. The patterns miss 94 of the 170
+bad sentences in `evals/gold/repo-review.jsonl`, so the agent needs the READ
 pass. The hooks run the patterns on each file the agent writes and each reply
 it sends.
 

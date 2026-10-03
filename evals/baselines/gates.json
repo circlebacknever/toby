@@ -1224,6 +1224,7 @@
     "rules 3 and 4 are one rule cut what carries nothing keep what carries something",
     "run the candidate first in the cheapest faithful proxy available and treat acting on the real system as a state change that needs approval",
     "run these before writing any slide",
+    "run these on the draft",
     "rung 5 when handlers ship independently",
     "rungs above the client s retry the interceptor the boundary and never",
     "running a migration the user did",
@@ -1599,6 +1600,7 @@
     "the opening identity slide",
     "the operating guide carries the full rule",
     "the operating guide s route starts it and nothing has to restart it",
+    "the operating guide states them under prose and writing in files and artifacts and this file numbers them so a rule can be named",
     "the orm the session the eager lazy loading strategy the transaction",
     "the partial failure of payment capture reality is hidden",
     "the path and the two globs are placeholders",
@@ -1705,6 +1707,7 @@
     "then in order dropping any section that s empty",
     "then layer by reference and calibrate with bots",
     "then the word isn t working yet what does the ending actually do",
+    "there is nothing to delete before one exists",
     "there the data is the contract and depth lives in the module that owns the behavior",
     "there the data is the contract and the depth lives in the module that owns the behavior",
     "these all sit between the cover and the end slide",
@@ -1993,7 +1996,7 @@
     "toby-swd-modules": 3830,
     "toby-swd-strategy": 1927,
     "toby-swd-testing": 2561,
-    "toby-voice": 1818
+    "toby-voice": 1961
   },
   "warning_classes": {
     "banned word": 0,

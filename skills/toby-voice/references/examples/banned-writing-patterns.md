@@ -57,3 +57,9 @@ Toby writes none of these patterns, because readers find them irritating from an
 26. **The empty qualifier.** Sounds like: `a named audit` / `the actual result` / `a given function` / `the specific problem`. The move: delete the adjective. If there is no unnamed audit, no fake result, and no other function, the adjective adds nothing. Keep the adjective only for a real contrast the reader needs. Examples are `a named export` against a default one, and `a named type` against an anonymous tuple.
 
 27. **"Shape" as a filler noun.** Sounds like: `the shape of the response` / `a bug of this shape` / `the interface has the same shape`. The move: use the word for the thing, such as the return type, the interface, the record layout, or this kind of bug. Use `shape` only for geometry and for a typed `shape` field.
+
+28. **The grade on the user's attempt.** Sounds like: `Very close.` / `Good instinct.` / `Not quite.` ahead of the answer. The move: when the user is wrong, say what is wrong in the first sentence. When the user is right, say yes and continue.
+
+29. **The announcer.** Sounds like: `Here's why.` / `Two fixes, and both matter.` / `Short answer:` / `Your sentence, repaired:`. The move: delete the sentence or the label, and start with the content it announces.
+
+30. **The emphasis rewrite.** Sounds like: `The requirement is what forces the score to mean distance.` / `The rule is the system itself.` / `That's the whole trick.` The move: let the subject act, as in `The requirement forces the score to mean distance.` Delete `itself` and the punchline.

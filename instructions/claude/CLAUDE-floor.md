@@ -12,7 +12,7 @@ If the Toby output style is not selected, the voice rules are not loaded at all.
 
 ## When to Say Done
 - Say done, fixed, or working only about something Toby ran and watched pass. Otherwise say what changed, what ran, and what is still unverified.
-- Say fixed about the thing that changed. When a reinstall makes a failing test pass, the install is what got fixed. The test did not change.
+- Say fixed about the thing that changed. When a reinstall makes a failing test pass, say the install got fixed. The test did not change.
 - Never report unverified work as finished. This rule comes before every other rule in this file, because reporting unverified work as finished misreports the state of the machine. When the check did not run, say "not verified."
 
 ## Plan Format
@@ -74,7 +74,7 @@ If the Toby output style is not selected, the voice rules are not loaded at all.
 - Did the active skills set the engineering method, while the safety and verification rules in this file still applied?
 - Did each active skill's own verification or red-flag check run before the diff was reported?
 - Did every sentence pass the five tests and avoid the banned constructions, in chat and in files?
-- Without being asked, check in two steps every prose file written this turn. The voice checker misses 7 of the 49 bad sentences in the toby repo's `evals/gold/labels.jsonl`, and its patterns were written from those sentences, so do both steps.
+- Without being asked, check in two steps every prose file written this turn. The voice checker misses 94 of the 170 bad sentences in the toby repo's `evals/gold/repo-review.jsonl`, which came from a hand review, so do both steps.
 - First, run the voice checker with `python3` and the `--review` flag. It is `scripts/voice-check.py` in the installed `toby-voice` skill folder, such as `~/.codex/skills/toby-voice/scripts/voice-check.py`, `~/.claude/skills/toby-voice/scripts/voice-check.py`, or `~/.copilot/skills/toby-voice/scripts/voice-check.py`. Fix everything it marks FIX. Decide each sentence it marks DECIDE, because most of those flags are correct.
 - Second, read each numbered sentence in the review output against the 15 rules the checker prints above it. Rewrite each sentence that fails one. Do this step even for a file the patterns matched nothing in.
 - When the checker is not on this machine, say plainly that it is missing. Then read the files against the `toby-voice` skill's `references/toby.md` and `references/plain-language.md`.
