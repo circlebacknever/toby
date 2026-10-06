@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Refactor"
+  short_description: "Rearrange code with behavior unchanged"
+  default_prompt: "Use $toby-refactor to simplify the code I just changed without altering behavior."

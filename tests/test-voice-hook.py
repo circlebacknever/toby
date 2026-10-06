@@ -385,6 +385,30 @@ def hook_stderr(reply: str) -> str:
     return result.stderr
 
 
+def hook_stdout(reply: str) -> str:
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
+        handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": reply}]}}) + "\n")
+        transcript = handle.name
+    payload = json.dumps({"transcript_path": transcript, "stop_hook_active": False})
+    result = subprocess.run([sys.executable, str(HOOK)], input=payload, capture_output=True, text=True)
+    Path(transcript).unlink()
+    return result.stdout
+
+
+# A blocked reply gets rewritten below the first draft in the same message, so
+# the hook asks for a blue row and a fixed heading the user can spot and search
+# for, and it shows the user a notice of its own.
+blocked = "Short answer: the cache is stale."
+expect_text("the reprompt asks for the Toby rewrite heading", hook_stderr(blocked), "## Toby rewrite", True)
+expect_text("the reprompt asks for the blue row", hook_stderr(blocked), "\U0001f7e6" * 20, True)
+try:
+    notice = json.loads(hook_stdout(blocked)).get("systemMessage", "")
+except ValueError:
+    notice = ""
+expect_text("a block shows the user a Toby rewrite notice", notice, "Toby rewrite", True)
+expect_text("a clean reply prints nothing on stdout", repr(hook_stdout(CLEAN[0])), "''", True)
+
+
 LONG = " ".join(["word"] * 45) + "."
 LONG_TOO = " ".join(["other"] * 45) + "."
 two_hits = hook_stderr(f"Hope this helps with the first part. {LONG} Feel free to ask. {LONG_TOO}")

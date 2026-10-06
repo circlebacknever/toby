@@ -1,6 +1,6 @@
 # Worked Examples
 
-Reuse the structure and the scope decisions in your own modules. The examples cover a backend module and a frontend module, each with an AGENTS.md and a README.md.
+Reuse the structure and the scope decisions in your own modules. The examples cover a backend module with an AGENTS.md and a README.md, and a frontend scope decision.
 
 ---
 
@@ -15,11 +15,8 @@ Scope decision: `services/payments/` is a meaningful module with its own body of
 This module turns an authorized cart into a settled charge and a ledger entry. It is the only
 part of the system that is allowed to move funds.
 
-## Files
-- `gateway.py` defines the Gateway interface and its provider implementations.
-- `ledger.py` stores the append-only double-entry ledger of what the business is owed and
-  has collected.
-- `reconcile.py` matches processor settlement reports against the ledger.
+## Commands
+- `pytest services/payments` runs the module's tests.
 
 ## Constraints
 - Charges must be idempotent per (order_id, attempt). The retry key passed
@@ -57,7 +54,7 @@ This service processes charges and maintains the ledger of what has been collect
 interact with this service to authorize a cart, capture a payment, and issue
 refunds. It is the only service that moves funds directly.
 
-## Quick start
+## How to use it
 
 ```python
 from payments import Gateway, PaymentRequest
@@ -69,8 +66,6 @@ result = gateway.charge(PaymentRequest(
     token="tok_abc",         # The card token comes from the payments edge.
     idempotency_key="ord_123_attempt_1"
 ))
-if result.settled:
-    # The charge settled, so proceed here.
 ```
 
 ## Concepts
@@ -102,92 +97,12 @@ Full signatures and behavior are in the interface comments in `gateway.py`.
 ```
 
 The README references the interface comments in `gateway.py`, so the
-single copy there stays authoritative. AGENTS.md explains the implementation
-details, such as why idempotency is required and how the ledger works. The
-README covers only what a caller needs.
+single copy there stays authoritative. AGENTS.md states why idempotency is
+required and why the ledger is the source of truth. The README covers only what
+a caller needs.
 
 ---
 
-## Example 3 — Frontend: a feature module AGENTS.md and scope decision
+## Example 3 — Frontend: a feature module scope decision
 
 Scope decision: `features/checkout/` is a feature module, so it gets one AGENTS.md at its root. `features/checkout/components/PriceRow/` is a leaf component folder, so it gets no file. If `PriceRow` has a non-obvious contract, that contract goes in its prop interface comment.
-
-```markdown
-# Checkout (feature)
-
-## What this is
-This module is the multi-step checkout flow. It manages flow state and the order of steps, and it delegates
-payment to the payments service and address validation to the address package.
-
-## Files
-- `machine.ts` defines the step state machine, which tracks the current step and the legal
-  transitions.
-- `CheckoutProvider.tsx` supplies flow state through context and defines the contract that
-  steps share.
-- `steps/` contains one component per step. A step component renders its step, and
-  `machine.ts` handles flow control.
-
-## Constraints
-- Tax cannot be shown until an address is validated (legal requirement in two
-  regions). This is why the Review step blocks on address state even though the
-  UI could render without it.
-
-## Cross-module decisions
-- "Checkout context shape": steps read flow state only from CheckoutProvider.
-  Code in this feature does not read it via props drilled from the page. The context type
-  is defined and commented at
-  CheckoutProvider. This section is the central note. Step files contain
-  `// see "Checkout context shape" in AGENTS.md`.
-
-## Extension rules
-- A new step is a component in steps/ plus a transition in machine.ts. Flow
-  logic stays in machine.ts.
-- Shared step state goes on the context.
-```
-
----
-
-## Example 4 — Frontend: checkout feature README.md
-
-This module's README.md is minimal because its readers already work in the codebase and need none of the orientation a shared library gives outside callers. A README.md here only exists because the context contents are non-obvious to developers onboarding to this part of the codebase.
-
-```markdown
-# Checkout Feature
-
-This feature is the multi-step checkout flow: cart → address → payment → review → confirmation.
-
-## How it works
-
-Wrap the checkout entry point with `<CheckoutProvider>`. Step components
-consume flow state from context. They take no flow props.
-
-```tsx
-import { CheckoutProvider, CheckoutFlow } from 'features/checkout'
-
-export function CheckoutPage() {
-  return (
-    <CheckoutProvider orderId={orderId}>
-      <CheckoutFlow />
-    </CheckoutProvider>
-  )
-}
-```
-
-## Concept: step isolation
-
-Each step component renders its own content and fires transitions via
-`useCheckoutMachine()`. Steps do not depend on each other. Adding a new step
-means a new component in `steps/` and a new transition in `machine.ts`.
-Existing steps stay unchanged.
-
-## Known constraints
-
-- Tax display is blocked until address validation completes. This is a legal
-  requirement, so don't try to work around it.
-- Flow state is in `CheckoutProvider`. Do not lift it to a parent or store
-  it externally. The machine enforces valid transitions, so bypassing it
-  produces inconsistent UI state.
-```
-
-The cross-module note about context contents is in AGENTS.md. The README
-only explains what a developer needs to use the feature correctly.

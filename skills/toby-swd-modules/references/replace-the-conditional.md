@@ -1,11 +1,5 @@
 # Replace the Growing Conditional
 
-A `switch` or `if` chain is a design smell in two forms. The first takes a new arm every time the domain gains a case. The second is the same branch decision copied across call sites. In both forms the module is not closed to modification, so adding the next case means editing shared code or several files at once.
-
-A conditional that has not changed in a year is not this smell. The options below apply to conditionals that keep growing.
-
-The options are ordered from the smallest change to the largest. Stop at the first option that fits. The code is illustrative, but the reasoning applies to other code.
-
 ---
 
 ## Option 1 — Remove the branch
@@ -125,7 +119,7 @@ class LegacyBankGateway implements Gateway {
 const gateway: Gateway = GATEWAYS[config.gatewayName];
 ```
 
-Each implementation is its own module, with its state and dependencies inside it. The two-gateway task in `strategy/references/examples.md` ends with this same design.
+Each implementation is its own module, with its state and dependencies inside it.
 
 The cost is one interface to keep stable, one class per case, and a selection site. Polymorphism is worth that cost when the case set is open and each case holds state the others do not share. Three one-line branches over a closed set do not qualify, because they belong on option 2.
 
@@ -160,7 +154,7 @@ It is the most complex option. The registration adds indirection that a reader h
 - **Status to component.** Replace a `switch (status)` in render with a `Record<Status, FC>`. Put the map above the component or in a sibling module.
 - **Variant prop that grew.** A `<Button variant="…">` whose `variant` gains values every quarter is option 2, with the tag passed as a prop. Move to compound components with `children`, or a map from variant to a style object.
 - **Field type to input.** A form that renders from a schema maps `field.type` to a component. A `switch (field.type)` inside JSX is the smell.
-- **Behavior split from presentation.** Each screen composes a headless hook that contains the state machine. `references/web.md` Example 4 shows it in full.
+- **Behavior split from presentation.** Each screen composes a headless hook that contains the state machine.
 - **Platform branch.** `Platform.OS === "ios"` checks scattered through components are the copied-decision case. Use `Platform.select({ ios, android })` at one module boundary, or `Foo.ios.tsx` and `Foo.android.tsx` files where the bundler picks the file, so the code has no branch.
 
 ## Backend forms
@@ -168,16 +162,3 @@ It is the most complex option. The registration adds indirection that a reader h
 - **Adapter interface.** `Gateway`, `StorageDriver`, and `Notifier` each have one interface and one implementation per provider. The composition root selects the implementation from config.
 - **Handler map by message type.** Use option 2 for a closed set of message types, and option 5 when handlers ship independently.
 - **Wire discriminated union.** A payload with a `type` tag is validated once at the edge, then dispatched with option 3 so the compiler tracks every case.
-
----
-
-## Cheat sheet
-
-| What you see | Option |
-|---|---|
-| Branch exists because the caller lacks a value the type could hold | 1 — move it onto the type |
-| Branch picks which function runs, bodies are one-liners, closed set | 2 — lookup map |
-| Branches read different fields, set is closed | 3 — discriminated union with `assertNever` |
-| Each case has its own client, policy, or private state, and the set is open | 4 — interface with implementations |
-| New cases ship in code you do not control | 5 — registry |
-| Conditional has been stable for a year | none — leave it |

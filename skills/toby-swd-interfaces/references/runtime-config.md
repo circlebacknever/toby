@@ -1,8 +1,8 @@
 # Runtime Configuration
 
-Deploy config is the set of values that change between environments: database URLs, service endpoints, credentials, log levels, pool sizes, feature-service handles. The build must not contain it. The 12-factor rule is to read it from the environment. The design question is where that read happens and what form the values take after it.
+Deploy config is the set of values that change between environments: database URLs, service endpoints, credentials, log levels, pool sizes, feature-service handles. The build must not contain it. The 12-factor rule is to read it from the environment.
 
-The wrong answer is `process.env.THING` scattered through the code. Each read is a hidden dependency in a module that otherwise looks pure. Every reader also repeats the same facts about `THING`: its name, that it is a string, that it holds a URL, its default. If one of those facts changes, every reader has to change.
+Do not read `process.env.THING` across the code. Each read is a hidden dependency in a module that otherwise looks pure. Every reader also repeats the same facts about `THING`: its name, that it is a string, that it holds a URL, its default. If one of those facts changes, every reader has to change.
 
 ---
 
@@ -50,7 +50,7 @@ import { config } from "./config";
 
 const db = new Database(config.databaseUrl);
 const logger = new Logger(config.logLevel);
-const gateway = GATEWAYS[config.gatewayName];   // GATEWAYS maps each gateway name to its implementation (data-driven dispatch, option 2 in toby-swd-modules).
+const gateway = GATEWAYS[config.gatewayName];   // GATEWAYS maps each gateway name to its implementation (option 4, polymorphism, in toby-swd-modules).
 
 const app = new App({ db, logger, gateway });
 app.listen();

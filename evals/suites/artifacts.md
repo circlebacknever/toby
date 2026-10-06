@@ -93,8 +93,8 @@ Agreed criteria:
 
 ## 3. Plan document
 
-Skill files: `skills/toby-feature-dev/SKILL.md` (the section "The plan
-document"), `skills/toby-feature-dev/references/examples.md`, and the Plan
+Skill files: `skills/toby-build/references/strategic.md` (the section "The
+plan document"), `skills/toby-build/references/examples.md`, and the Plan
 Format section of the guide
 
 The user approved writing a plan. Write the plan document.

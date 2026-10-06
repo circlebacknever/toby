@@ -18,7 +18,8 @@ Facts:
 - It reads exports from four banks: Chase, Monzo, Wise, and ING.
 - It matches a bank row to a ledger entry when the amounts are equal and the
   dates are within 2 days of each other.
-- Rows it cannot match go to `review.csv` for a person to check.
+- The parser writes each row it cannot match to `review.csv` for a person to
+  check.
 - It reads the accounting system through an API token with read-only scope.
 - A bank format is a parser in `parsers/<bank>.py`. Parsers must not make network
   calls, and CI fails any parser that imports `requests` or `httpx`.
@@ -36,8 +37,8 @@ Facts:
 - An alert fired at 14:09 and went to a Slack channel that was archived in July.
 - An engineer saw customer reports at 14:31 and renewed the certificate at 14:45.
 - Errors stopped at 14:47. No payment data was lost.
-- Two follow-ups are agreed: renew the certificate automatically, and send
-  payment alerts to the on-call pager.
+- The team agreed on two follow-ups. The certificate will renew automatically,
+  and payment alerts will page the on-call engineer.
 
 ## 3. Design options
 
@@ -46,8 +47,8 @@ user sessions. The decision has not been made.
 
 Facts:
 
-- Sessions are in a single Redis node, now at 71 percent of its memory, growing
-  about 3 percentage points a week.
+- Sessions are in a single Redis node. Its memory use is at 71 percent and
+  rises about 3 percentage points a week.
 - Option A: add a second Redis node and shard sessions across both. The team
   has not run sharded Redis before.
 - Option B: move sessions to the existing Postgres cluster, which has 40 percent
@@ -92,7 +93,7 @@ each turn follow the message.
    The other two date bugs were in the reports service, and both were fixed on
    Tuesday.
 4. "ok ran it with the flag, 861 matched. good?"
-   861 rows matched and 39 went to `review.csv`. Nobody has looked at the 39.
+   861 rows matched, and the parser wrote 39 to `review.csv`. Nobody has looked at the 39.
 5. "can we just auto-accept the review rows so I don't have to look at them"
    12 of the 39 rows have amounts that differ from the ledger by more than $1.
    Auto-accepting marks all 39 as reconciled in the report.

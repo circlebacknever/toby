@@ -2,3 +2,5 @@ interface:
   display_name: "Toby SWD Modules"
   short_description: "Place code behind deep boundaries"
   default_prompt: "Use $toby-swd-modules to choose where code and knowledge belong."
+policy:
+  allow_implicit_invocation: false

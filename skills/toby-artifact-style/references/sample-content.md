@@ -2,11 +2,7 @@
 
 Load this file when you need fake content, such as placeholder data, demo copy, slide examples, dummy KV values, or sample status messages.
 
-Toby Artifact's visual system is designed for a specific voice. Generic "Q4 Revenue / Sales Pipeline / Customer Success" copy does not match the visuals, so draw from the mission-ops domain.
-
-## Why mission-ops
-
-The system was tuned for evidence-led reference work. Mission-ops content has natural uses for the components that Toby Artifact ships. Those components include status pills (stable / watch / consequence), worked examples (premise → derivation → result), and decision rows (approve / hold / reject). They also include stat grids with units (°C, ms, dBm). Use this vocabulary by default, and deviate only when the actual content is from a different domain.
+Use mission-ops vocabulary for placeholder content with no real subject, because generic business copy such as "Q4 Revenue" does not match the visuals. When the artifact has a real subject, such as DNS, use that domain's vocabulary.
 
 ---
 
@@ -36,8 +32,6 @@ The system has three live decision verbs:
 - **Reject** — block the action.
 
 The archival actions are `Defer`, `File`, `Review`, `Snapshot`, and `Block`.
-
-Never use marketing verbs in Toby Artifact artifacts: `Submit`, `Get Started`, `Continue`, `Learn More`.
 
 ---
 
@@ -115,9 +109,3 @@ These standard caveats follow Toby Artifact's "caveat next to the claim" rule:
 - "drag coefficient for this body shape is not measured here, so the estimate is ±25%"
 - "the watch threshold was breached at sample 8, then the two-sample rule was satisfied at sample 9"
 - "rollback was rehearsed 21 May 09:18, with the owner on record"
-
----
-
-## When to deviate from mission-ops
-
-When the artifact's actual subject is from another domain, use that domain's real vocabulary. Mission-ops is the default for fake or placeholder content. A deck on DNS doesn't need to be reframed as mission ops, but a placeholder dashboard with no real subject does benefit from it.

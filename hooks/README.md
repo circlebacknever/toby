@@ -62,6 +62,12 @@ write hook fires after the write, so the agent gets the findings while it is
 still working on the file. The Stop hook fires after the reply, so the agent
 gets one pass to repair it.
 
+The repaired reply appears below the first draft in the same message. The
+Stop hook asks the agent to start the repair with a row of blue squares and a
+`## Toby rewrite` heading, so you can spot it while scrolling and search for it.
+The hook also prints a `systemMessage` that Claude Code shows you, which
+appears even when the agent leaves the divider out.
+
 The write hook needs `scripts/voice-check.py`. It looks in `TOBY_ROOT`, then in
 a checkout that holds the hook, then in the installed skill at
 `~/.claude/skills/toby-voice`. Installing with `--tool claude` puts the checker
@@ -72,9 +78,10 @@ deleted.
 ## What each one costs you
 
 The stop hook fires on literal strings and a 40-word sentence. The ceiling is
-25, and it fires at 40 on purpose, because a hook that argues about a 27-word
-sentence gets switched off. Its fixtures hold 24 ordinary replies that must pass
-silently, and that half matters more than the seeded breaks.
+25. The hook fires at 40 on purpose, because a hook that argues about a 27-word
+sentence gets switched off. Its fixtures hold 31 ordinary replies that must pass
+silently. A false positive on one of them fails the suite, because a hook that
+blocks replies with no breaks gets turned off.
 
 The write hook reports FIX and DECIDE findings. It exits 2 on either
 group. It runs the checker with `--no-read`, because printing the READ list

@@ -2,3 +2,5 @@ interface:
   display_name: "Toby Learning"
   short_description: "Teach any subject by making the learner do the next piece"
   default_prompt: "Use $toby-learning to teach me as we work through this so the lesson sticks."
+policy:
+  allow_implicit_invocation: false

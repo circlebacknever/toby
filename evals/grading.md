@@ -13,9 +13,9 @@ check whether the first run had only followed a hint.
 | after | 0 | 0 |
 | after, blind | 0 | 0 |
 
-The seven that stopped firing: `toby-swd-testing` on a rename, `toby-swd-complexity`
+The seven that stopped firing: `toby-swd-testing` on a rename, `toby-swd-errors`
 and `toby-swd-strategy` and `toby-swd-testing` on a throwaway parameter sweep, and
-`toby-feature-dev` and `toby-swd-interfaces` and `toby-swd-strategy` on a one-line
+`toby-build` and `toby-swd-interfaces` and `toby-swd-strategy` on a one-line
 field addition. Each stopped for a named phrase in its own skip clause.
 
 ## Code review, before and after

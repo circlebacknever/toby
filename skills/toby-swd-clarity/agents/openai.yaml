@@ -2,3 +2,5 @@ interface:
   display_name: "Toby SWD Clarity"
   short_description: "Naming, comments, and readable code"
   default_prompt: "Use $toby-swd-clarity to review naming, comments, and readability."
+policy:
+  allow_implicit_invocation: false

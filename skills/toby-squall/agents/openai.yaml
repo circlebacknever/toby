@@ -2,3 +2,5 @@ interface:
   display_name: "Toby Squall"
   short_description: "Widen examples into option sets"
   default_prompt: "Use $toby-squall to widen one example into a mapped option set."
+policy:
+  allow_implicit_invocation: false

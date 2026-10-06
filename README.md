@@ -173,18 +173,20 @@ The first five workflow skills are adapted from Anthropic skills. Toby kept the 
 
 - `toby-code-review` - tight findings for diffs and PRs.
 - `toby-explain` - explain a decision while the work keeps moving.
-- `toby-feature-dev` - ship a small change with evidence.
+- `toby-build` - ship a small change with evidence.
 - `toby-learning` - teach through your own contributions.
-- `toby-simplify-code` - tighten code, keep behavior.
+- `toby-refactor` - tighten code, keep behavior.
 
 The rest of the standalone skills are Toby-specific:
 
+- `toby-bug-fix` - reproduce a failure, fix its cause, and prove the fix with a run before and after.
+- `toby-optimize` - make working code faster from a measured baseline, one change per measurement.
 - `toby-squall` - turn one example of a problem into a map of potential solutions.
 - `toby-artifact-style` - apply the artifact design system.
 - `toby-voice` - fix output that wandered off voice.
 - `toby-game` - build and tune a playable thing.
 
-The `toby-swd-*` skills are the engineering method, with one skill for each habit.
+The `toby-swd-*` skills are the engineering method, with one skill for each habit. Claude Code, Copilot, and Codex leave six of them out of the skill list the model reads. They are `toby-swd-strategy`, `toby-swd-modules`, `toby-swd-interfaces`, `toby-swd-errors`, `toby-swd-clarity`, and `toby-swd-docs`. A skill that a request loads, such as `toby-build`, opens each of the six by path at the step that needs it.
 
 The SWD skills come from two books whose fans rarely agree. Toby read John Ousterhout's *A Philosophy of Software Design* and Robert C. Martin's *Clean Code* as source material, then kept the parts he trusts when he edits code.
 
@@ -199,7 +201,7 @@ When a local habit creates shallow interfaces, hides a contract, or lets tests s
 - `toby-swd-modules` - decide where code lives so each module hides its own mess and callers stay light.
 - `toby-swd-interfaces` - design the contract a caller sees, keeping it small for the work it does.
 - `toby-swd-testing` - write tests that pin behavior and catch regressions without freezing the implementation in place.
-- `toby-swd-complexity` - keep error handling and performance work deliberate, so complexity doesn't pile up unnoticed.
+- `toby-swd-errors` - keep error handling deliberate, so complexity doesn't pile up unnoticed. `toby-optimize` covers performance work.
 - `toby-swd-clarity` - name things well and keep code obvious on read, since reading happens far more than writing.
 - `toby-swd-docs` - keep the why and the who-it's-for in `AGENTS.md` and `README.md`, where the code can't say it.
 - `toby-swd-experiment` - spike mode: move fast to learn first, save the durable build for later.

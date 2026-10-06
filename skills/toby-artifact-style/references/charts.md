@@ -2,12 +2,6 @@
 
 Load this file when you build a chart, plot, or data visualization for a Toby Artifact Style artifact.
 
-## Tooling
-
-- Production charts in artifacts: Observable Plot, Vega-Lite, or D3.
-- Quick inline charts: Recharts, Chart.js, or hand-rolled SVG.
-- Apply the axis, label, and caveat rules from this file with any library.
-
 ## What every plot requires
 
 - **Title as a claim.** "p95 latency exceeds 200 ms after 14:00 UTC" passes. "Latency over time" fails.
@@ -20,16 +14,7 @@ Load this file when you build a chart, plot, or data visualization for a Toby Ar
 
 ## Chart palette — positional order
 
-Assign colors by series index.
-
-| Series index | Token | Hex |
-|---|---|---|
-| 1 | `--toby-blue-steel` | `#2f6e8a` |
-| 2 | `--toby-field-olive` | `#7d7e3a` |
-| 3 | `--toby-muted-violet` | `#7a4e85` |
-| 4 | `--toby-ochre` | `#8a5a1c` |
-| 5 | `--toby-sage-steel` | `#607a5f` |
-| 6 | `--toby-slate-blue` | `#344b6e` |
+Assign series colors in the order SKILL.md lists the chart palette.
 
 Red (`--toby-accent`, `#c44e3f`) is reserved for material consequence, such as a threshold breach, a failure, or a decision point. Never use red as a default series color.
 
@@ -83,10 +68,7 @@ Prefer direct labels at series endpoints (Tufte style).
 
 ## Uncertainty
 
-Always show uncertainty when it exists. Don't report a point estimate without an interval if the interval is known.
-
-- Pair point estimates with intervals: `0.73 ± 0.08` or `[0.65, 0.81]`.
-- Use uncertainty cones for forecasts, error bars for measured points, confidence bands for fitted curves.
+Use an uncertainty cone for a forecast, error bars for measured points, and a confidence band for a fitted curve.
 
 ## Sparklines
 

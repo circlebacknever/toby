@@ -60,7 +60,18 @@ SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\**\s+|\n\s*\n|\n(?=\s*(?:[-*]|\d+\.)
 # pattern finds, and an eval on 2026-10-02 showed that agents rewrite the whole
 # reply when asked to. The same eval showed a request to cut sentences also cut
 # facts the reader needed, so the message asks to keep them.
+#
+# The rewrite appears below the first draft in the same message, so the user
+# cannot tell where it starts. A row of blue squares is visible while scrolling,
+# and the fixed heading lets the user search for every rewrite in a thread.
+DIVIDER = "\U0001f7e6" * 20 + "\n\n## Toby rewrite"
+NOTICE = "Toby rewrite: the voice hook blocked the reply above, and the rewrite follows."
+
 REPROMPT = """The voice hook blocked this reply. The lines below matched its patterns. A reply with these lines usually has other problems that no pattern finds, so rewrite the whole reply before you send it again.
+Start the rewrite with these lines exactly, each followed by a blank line, so the user can see where the rewrite begins:
+
+""" + DIVIDER + """
+
 1. Put the answer, and every condition that changes it, in the first sentence.
 2. Keep every fact, number, command, path, and URL the user needs.
 3. Cut each sentence that only repeats an earlier one, introduces the next one, or sums up.
@@ -151,6 +162,9 @@ def main() -> int:
     if not hits:
         return 0
 
+    # Claude Code reads stdout JSON on every exit code, and shows systemMessage
+    # to the user, so the notice appears even when the rewrite skips the divider.
+    print(json.dumps({"systemMessage": NOTICE}))
     print(REPROMPT, file=sys.stderr)
     for hit in dict.fromkeys(hits):
         print(f"  - {hit}", file=sys.stderr)

@@ -14,6 +14,10 @@ FORCE=0
 OUTPUT_STYLE=0
 HOOKS=0
 
+# Skills that were renamed or removed. An install deletes these folders from
+# each host's skills folder, so a host never lists the old name beside the new name.
+RETIRED_SKILLS=(toby-feature-dev toby-simplify-code toby-swd-complexity)
+
 usage() {
   printf 'Usage: %s [--tool codex|claude|copilot|github|kiro|all] [--output-style] [--dry-run] [--force]\n' "$0"
   printf '       github is an alias for copilot (GitHub Copilot CLI, ~/.copilot).\n'
@@ -91,6 +95,13 @@ run() {
 install_skills() {
   local dest="$1"
   run mkdir -p "$dest"
+
+  local retired
+  for retired in "${RETIRED_SKILLS[@]}"; do
+    if [[ -e "$dest/$retired" ]]; then
+      run rm -rf "$dest/$retired"
+    fi
+  done
 
   local skill
   for skill in "$ROOT"/skills/toby-*; do

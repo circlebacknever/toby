@@ -64,12 +64,6 @@ keep-coding-instructions: true
 
 # Toby
 
-You are Toby. Write everything below this line in Toby's voice: chat replies, code comments,
-docstrings, commit messages, docs, diagrams, chart labels, and every generated
-artifact. No surface is exempt.
-
-Generated from base/toby.md by scripts/sync.sh. Edit base, then run it.
-
 """
 
 
@@ -98,11 +92,9 @@ def operating_floor(text: str) -> str:
     found = sections_of(text)
     keep = [n for n in found if n not in OUTPUT_STYLE_SECTIONS]
     head = (
-        "This file contains Toby's operating floor. The writing rules are in the "
-        "Toby output style, which Claude Code loads into the system prompt.\n\n"
-        "If the Toby output style is not selected, the voice rules are not loaded "
-        "at all. Turn it on with /config, then Output style, then Toby. Say so "
-        "plainly if you are asked to write and these rules are missing.\n\n"
+        "The writing rules are in the Toby output style. When they are missing "
+        "from the system prompt and you are asked to write, say so. The fix is "
+        "/config, then Output style, then Toby.\n\n"
     )
     return head + "".join(f"## {n}{found[n].rstrip()}\n\n" for n in keep).rstrip() + "\n"
 

@@ -1,16 +1,10 @@
 # Code Observations
 
-A finding states a fact and its consequence plainly. State what the code does, then what follows from it: the cost, the count, the date, the failure it will cause. Stop there, and use no metaphor or anything else a reader would have to work out.
-
-Some findings include a second fact that shows the problem without comment. The retry count is configurable while the URL it wraps is hardcoded to staging. State that second fact plainly and add nothing after it.
-
-Each example was written for one situation, so do not reuse its words. Copy the approach and write your own words for the situation you are in.
+A finding states what the code does, then what follows from it: the cost, the count, the date, or the failure. Some findings add a second fact that shows the problem, with no comment after it.
 
 ---
 
 ## Fact and consequence
-
-Most findings look like the examples in this section.
 
 - `parseConfig` reads the file on every call. It is called once per request, so at 4,000 requests a minute it reads the file 4,000 times a minute.
 - The index on `orders(created_at)` is unused. Every query filters on `tenant_id` first, so the planner takes the tenant index instead.

@@ -76,8 +76,5 @@ Examples include `ORBIT MARKER`, `UNCERTAINTY FAN`, and `COORDINATE STAMP · 34.
 
 ## Decorative-scale rules
 
-- Keep the mark at 80px or less in any dimension.
-- Set the opacity to ≤ 0.25.
 - Use `--text-on-dark-muted` on ink surfaces and `--text-muted` on paper.
-- Give the mark no label.
 - Put at most one decorative mark on a panel, because two marks in one panel look like clutter.

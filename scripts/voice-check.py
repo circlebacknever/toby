@@ -109,6 +109,7 @@ SLOGAN_NOTES = {
     "doubled verb": "delete one of the two verbs, rule 29",
     "intensifier with no contrast": "delete the word, or state the contrast it implies, Banned Constructions",
     "either with no or": "give the other half after `or`, or delete `either`, rule 29",
+    "closing offer": "end at the last fact, and ask only for a decision you need, Five Tests 5",
 }
 
 # READ_RULES lists the rules that the patterns in voice_rules.py do not check, in the

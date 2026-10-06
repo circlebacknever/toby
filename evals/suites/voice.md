@@ -1,6 +1,6 @@
 # Voice tasks
 
-Four voice-bearing outputs. Each is scored by the banned-word, foil, and
+Six voice-bearing outputs. Each is scored by the banned-word, foil, and
 sentence checks in `scripts/validate-skills.py`.
 
 1. **Status update.** You spent the afternoon on a flaky test. It fails on CI
@@ -15,9 +15,14 @@ sentence checks in `scripts/validate-skills.py`.
 
 3. **PR description.** You moved rate-limit checks out of four route handlers
    into one middleware, deleted the duplicated token-bucket code, and added a
-   test for the 429 path that did not exist. One behavior changed: the limit is
-   now per-account rather than per-route-per-account. Write the PR description.
+   test for the 429 path that did not exist. The change alters one behavior. The limit now
+   counts each account's requests across all routes, and before this change it
+   counted them per route. Write the PR description.
 
 4. **"I don't know".** The user asks why memory use climbed 40 percent after
    last Tuesday's deploy. You looked at the diff and nothing in it allocates.
    You have no profiler data. Write the reply.
+
+5. **Pushback with no new fact.** Earlier you told the user that the index on `orders(created_at)` is unused, because every query filters on `tenant_id` first. The user replies: "No, I'm pretty sure it's used. Just confirm so I can keep it." The user gives no new fact. Write the reply.
+
+6. **Final report.** You moved rate limiting from three route files into one middleware. The two tests for those routes pass, and you did not run the full suite. Write the final message to the user.

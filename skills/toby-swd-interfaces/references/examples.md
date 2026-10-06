@@ -1,8 +1,5 @@
 # Worked Examples
 
-The code below is original and illustrates the procedure. The reasoning
-applies in any language.
-
 ---
 
 ## Example 1 — Backend: the comment-as-test catching a shallow interface
@@ -39,8 +36,8 @@ class RateLimiter:
 ```
 
 The complete contract is four sentences and mentions none of its internals. Tokens,
-refill cadence, and the clock moved inside. The interface got smaller, and at the same time the
-module got deeper. Step 7 in `SKILL.md` asks whether the redesign hid
+refill cadence, and the clock moved inside. The interface got smaller while the
+module got deeper. Step 6 in `SKILL.md` asks whether the redesign hid
 anything the caller needs. If callers must show a retry-after hint, expose that one value
 (`allow` returns `RetryAfter | None`) and keep the bucket internal.
 
@@ -93,8 +90,7 @@ Task: an interface for a client to upload a file to storage.
 | C: `upload(source, key)` where source is bytes or a stream | One call | High | Same as B, plus large-file streaming | Deepest, covering current and near needs |
 
 C is a different decomposition. B's flaw (high memory use on large
-files) is the reason for it. It is the kind
-of synthesis the design-it-twice step is supposed to produce. The interface
+files) is the reason for it. The interface
 comment for C is short and mentions no internals, so it passes the test.
 
 A caller may need to know that the upload is durable when `upload`

@@ -14,8 +14,6 @@ Respond to the weak axis:
 
 - Strong on all three — confirm it is sound, then raise a counterargument it does not answer yet.
 - Supported but vague — sharpen it (below).
-- Asserted with no evidence — send them back to the source before you evaluate anything.
-- Ignores the inconvenient evidence — quote the passage it skips.
 - No reading yet — ask them only to notice details: "Skip interpreting for a second. What's one word in here that seems off, too strong, or out of place?"
 
 ## Sharpen a vague but defensible reading
@@ -24,7 +22,6 @@ The usual reading is true but vague, so the goal is to make it precise. Sharpen 
 
 - Substitution: "You said the ending is 'powerful.' If I swap in 'sad' or 'memorable,' is your sentence still true? If it is, the word says nothing specific yet. What does the ending do?"
 - The one word the reading depends on: "Your whole reading depends on one word. Which is it?"
-- Counter-claim test: "Could someone who read this the opposite way say the same sentence?"
 
 ## Claim, evidence, warrant
 
@@ -50,7 +47,7 @@ Teach "Steelman this" and "say the warrant" as moves, because the learner needs 
 ## The ladder here
 
 - Worked — think aloud through a close read or an argument, saying aloud the moves a skilled reader makes silently: "This word repeats three times, so I ask what changes each time. A different speaker says the third one, which reverses its meaning."
-- Completion — give the claim and the evidence, and blank the warrant: "Here's the claim and the quote. Write the sentence that connects them." Or give the thesis and blank one topic sentence. Blanking the warrant is the most valuable exercise in the set.
+- Completion — give the claim and the evidence, and blank the warrant: "Here's the claim and the quote. Write the sentence that connects them." Or give the thesis and blank one topic sentence.
 - Independent — set the passage and the question: "Write a thesis on what the river stands for, in one sentence someone could disagree with." 
 
 ## The close

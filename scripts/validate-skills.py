@@ -500,28 +500,56 @@ def check_ste_conformance(warnings: list[str]) -> None:
 # the largest body that measured useful, rounded up, and it fails rather than
 # warns because a body creeps past it one paragraph at a time. It was 5600 until
 # the sentence-test pass rewrote fragments as whole sentences, which added about
-# 7 percent to toby-feature-dev with no rule added.
+# 7 percent to the feature skill, now toby-build, with no rule added.
 BODY_TOKEN_CEILING = 6000
 
-# Skills that load together on one task. The total is what a turn actually pays.
+# Each entry skill with the method skills its body opens for one request. The
+# total is what a turn pays when every listed skill opens. A chain whose body
+# opens one method skill of several lists the largest, toby-swd-modules.
 ROUTING_GROUPS = {
-    "feature-change": [
-        "toby-swd-strategy", "toby-swd-modules", "toby-swd-interfaces",
-        "toby-swd-complexity", "toby-swd-clarity", "toby-swd-testing",
-        "toby-swd-docs",
+    "build-strategic": [
+        "toby-build", "toby-swd-strategy", "toby-swd-modules", "toby-swd-interfaces",
+        "toby-swd-errors", "toby-optimize", "toby-swd-testing", "toby-swd-docs",
+        "toby-swd-clarity", "toby-swd-environment",
     ],
-    "feature-dev": ["toby-feature-dev", "toby-swd-strategy", "toby-swd-testing"],
-    "review": ["toby-code-review", "toby-simplify-code"],
+    "build-tactical": ["toby-build", "toby-swd-strategy", "toby-swd-testing"],
+    "bug-fix": [
+        "toby-bug-fix", "toby-swd-testing", "toby-swd-strategy", "toby-swd-errors",
+        "toby-swd-environment",
+    ],
+    "optimize": ["toby-optimize", "toby-swd-interfaces", "toby-swd-testing", "toby-swd-environment"],
+    "refactor": [
+        "toby-refactor", "toby-swd-strategy", "toby-swd-modules", "toby-swd-interfaces",
+        "toby-swd-docs", "toby-swd-testing",
+    ],
+    "review": ["toby-code-review", "toby-swd-modules", "toby-swd-environment"],
+    "explain": ["toby-explain", "toby-swd-modules"],
+    "experiment": ["toby-swd-experiment", "toby-swd-environment", "toby-swd-testing"],
+    "prose": ["toby-voice", "toby-swd-docs"],
 }
 COLOAD_TOKEN_CEILING = 19000
 
-# These two never fire on their own. A request to make a game, or to brainstorm,
+# These three never fire on their own. A request to make a game, or to brainstorm,
 # reaches them only when the user names the skill or types its slash command.
-# The rule is written in two places that can drift apart, so both are checked: the
-# description the host tool reads when deciding, and the routing line in the
-# operating guide. toby-game had the clause in its description and no line in
-# the guide at all, which left the rule stated once and enforced nowhere.
+# The description states the rule for Kiro, which has no field that hides a
+# skill. Claude Code, Copilot, and Codex enforce it through the host fields.
+# Each skill needs the description clause and both host fields. toby-game once
+# had the clause and nothing else, which left the rule stated once and enforced
+# nowhere.
 INVOKE_ONLY_SKILLS = ["toby-game", "toby-squall", "toby-learning"]
+CODEX_HIDE_RE = re.compile(r"^policy:\s*\n(?:[ \t]+.*\n)*?[ \t]+allow_implicit_invocation:\s*false\b", re.M)
+
+
+def is_hidden(skill_dir: Path) -> bool:
+    """True when both host fields keep the skill out of the model's listing.
+
+    Claude Code and Copilot read `disable-model-invocation` in the frontmatter,
+    and Codex reads `policy.allow_implicit_invocation` in `agents/openai.yaml`.
+    """
+    meta = frontmatter((skill_dir / "SKILL.md").read_text())
+    yaml_path = skill_dir / "agents" / "openai.yaml"
+    codex = yaml_path.exists() and bool(CODEX_HIDE_RE.search(yaml_path.read_text()))
+    return meta.get("disable-model-invocation") == "true" and codex
 INVOKE_ONLY_DESCRIPTION_RE = re.compile(
     r"trigger only when the (?:user|creator) explicitly invokes", re.I
 )
@@ -539,10 +567,11 @@ def check_invoke_only(errors: list[str]) -> None:
                 f"{name} must fire only on explicit invocation, and its description "
                 "does not say so. Write \"Trigger only when the user explicitly invokes\"."
             )
-        if not re.search(rf"Use `{name}` only when the user invokes it by name", guide):
+        if not is_hidden(skill_md.parent):
             errors.append(
-                f"base/toby.md Skill Routing has no invoke-only line for {name}, "
-                "so the routing block does not hold the rule its description states."
+                f"{name} has no host fields, so nothing enforces the rule its "
+                "description states. Add "
+                "`disable-model-invocation: true` and `policy: allow_implicit_invocation: false`."
             )
         for pattern in (r"\bUse `" + name + r"` (?:for|when|whenever)\b",):
             if re.search(pattern, guide):
@@ -801,6 +830,49 @@ def check_buried_leads(warnings: list[str]) -> None:
             )
 
 
+SKILL_NAME_RE = re.compile(r"\btoby-[a-z0-9]+(?:-[a-z0-9]+)*")
+
+
+def check_skip_clause_targets(errors: list[str]) -> None:
+    """A skip clause sends the request to another skill, which must exist.
+
+    A rename leaves the old name in every description that pointed at it, and
+    the host then routes the skipped request to nothing.
+    """
+    known = {d.name for d in skill_dirs()}
+    for skill_dir in skill_dirs():
+        desc = description_text((skill_dir / "SKILL.md").read_text())
+        for sentence in re.split(r"(?<=[.!?])\s+", desc):
+            if not SKIP_CLAUSE_RE.search(sentence):
+                continue
+            for name in SKILL_NAME_RE.findall(sentence):
+                if name not in known:
+                    errors.append(
+                        f"{skill_dir.name} description skips to {name}, which has no folder in skills/"
+                    )
+
+
+def check_methods_opened(errors: list[str]) -> None:
+    """Every hidden method skill is opened by at least one entry skill's body.
+
+    A method skill has no description in the listing, so an entry body that
+    opens it by name is the only route to it.
+    """
+    dirs = skill_dirs()
+    hidden = {d.name for d in dirs if is_hidden(d)}
+    methods = sorted(hidden - set(INVOKE_ONLY_SKILLS))
+    entry_lines = [
+        line
+        for d in dirs
+        if d.name not in hidden
+        for line in body_of((d / "SKILL.md").read_text()).splitlines()
+        if re.search(r"\bopen", line, re.I)
+    ]
+    for name in methods:
+        if not any(f"`{name}`" in line for line in entry_lines):
+            errors.append(f"no entry skill body opens the method skill {name}, so nothing loads it")
+
+
 INSTALL_TARGETS = [
     Path.home() / ".codex" / "skills",
     Path.home() / ".claude" / "skills",
@@ -870,6 +942,8 @@ def main() -> int:
     check_reference_reachability(errors, warnings)
     check_description_backticks(errors)
     check_invoke_only(errors)
+    check_skip_clause_targets(errors)
+    check_methods_opened(errors)
     check_anti_triggers(warnings)
     check_buried_leads(warnings)
     if args.check_install:

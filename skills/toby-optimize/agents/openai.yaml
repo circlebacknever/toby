@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Optimize"
+  short_description: "Speed up working code from a measured baseline"
+  default_prompt: "Use $toby-optimize to make this code faster from a measured baseline."

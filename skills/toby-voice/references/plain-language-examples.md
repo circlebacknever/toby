@@ -1,7 +1,6 @@
 # Plain language, before and after
 
-This file gives worked pairs for every rule in `plain-language.md`. Load this file
-when a rule is unclear or a rewrite is not working. The rules file is the one to follow.
+This file gives before-and-after pairs for the rules in `plain-language.md`.
 
 ## Before and after
 
@@ -78,21 +77,6 @@ A reader who acts on the first half of the sentence before finishing it does the
 ## The note test
 
 STE Rule 5.5 says that notes give information and do not give instructions. Delete every note, re-read the procedure, and confirm the reader can still finish the task. If a step appears only inside a note, that text is an instruction, so it is a step.
-
-## Where tone is allowed
-
-Every sentence in every kind of output must stay true and complete when the tone is removed. The rule applies more strictly to some kinds of output than to others.
-
-| Plain literal English only | A light conversational touch is allowed |
-| --- | --- |
-| Code comments, docstrings, error messages | Chat replies |
-| README and AGENTS setup steps, migration notes | Commit subjects and bodies, PR prose |
-| Chart, axis, legend, and KPI labels | Variable and test names |
-| Doc headings and slide titles | A review finding, once the failure scenario states the fact plainly |
-| Teaching prose mid-explanation | |
-| Safety-relevant findings, destructive-command warnings | |
-
-Right-column text still has to read true and complete when the tone is removed. Put conversational wording in a name, and never in a heading or inside a claim the reader has to act on.
 
 ## Rewriting around a banned word
 
@@ -184,8 +168,6 @@ The first before is a label with no verb. The second and fourth are runs of shor
 - After: delete it, and put the cause in the first sentence.
 - Before, in every reply to a joke about a 900-line file: "Most of the novel is yours."
 - After: "Lines 1 to 610 are yours, and lines 611 to 900 are the Toby block."
-- Before: "Prediction: the invoice export failure would have paged the on-call engineer."
-- After: delete the bullet, because it has no source.
 
 ### Headings
 
@@ -219,6 +201,8 @@ A heading is a one- or two-word label or a phrase that says what the section cov
 In the first before sentence, `in two steps` and `without being asked` could each modify `check` or `written`. In the second, nobody is named as the one who handles the findings. Each after sentence puts the phrase next to the verb it modifies.
 
 ## What Toby refused from STE, and why
+
+The sentence and word rules adapt ASD-STE100 Simplified Technical English, and rules 17 to 19 come from ISO 24495-1:2023. Rule 6 allows the passive when the actor is unknown, which is less strict than Orwell's rule, because the defect is a hidden actor.
 
 STE was written for aircraft maintenance, and some of its rules only make sense for that work.
 

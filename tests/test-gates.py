@@ -97,7 +97,7 @@ seeded("buried lead caught", CLARITY,
        "buried lead")
 
 seeded("deleted rule caught", TESTING,
-       delete("Mock external dependencies at the system boundary."),
+       delete("Cover the success path, each documented failure mode, and the boundary conditions, then stop."),
        "left the repo with no reworded survivor")
 
 seeded("body growth caught", DOCS,
@@ -108,11 +108,11 @@ seeded("body growth caught", DOCS,
 seeded("co-load growth caught", DOCS,
        add_after("# Toby SWD Docs\n",
                  "\n" + "Filler sentence that states no rule whatsoever. " * 90 + "\n"),
-       "co-load feature-change")
+       "co-load build-strategic")
 
 # A skill name broken across a folded-scalar line wrap points at nothing.
-seeded("split skill name caught", DOCS,
-       lambda t: t.replace("`toby-swd-clarity` covers.", "`toby-swd-\n  clarity` covers.", 1),
+seeded("split skill name caught", REPO_ROOT / "skills" / "toby-bug-fix" / "SKILL.md",
+       lambda t: t.replace("which toby-optimize covers.", "which `toby-\n  optimize` covers.", 1),
        "broken across a line wrap")
 
 STYLE = REPO_ROOT / "output-styles" / "toby.md"

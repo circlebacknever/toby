@@ -2,13 +2,20 @@
 
 These examples are not for reuse, so copy the pattern and write new material for the current question.
 
+## By subject
+
+- For math, code, or science facts, state the result and walk through the reasoning to it.
+- For literature, history, usage, or translation, offer one reading with its evidence, and state the counterargument it has to answer.
+- For vocabulary or terminology, give each item one memory cue, and flag the few that are easy to confuse.
+- For speaking or writing a language, model the correct form as you use it. For a beginner, lead with input they can follow.
+
 ---
 
 ## New concept with no material shown yet
 
 The user asks what a function is in mathematics. No code or equation has been shown yet.
 
-→ `f(x) = x²` sends 3 to 9, and −3 to 9 as well. Two different inputs may share an output. A function has only one rule, which is that one input never has two outputs. Check `x² + y² = 1` at `x = 0`. y comes out to both 1 and −1, so one input produces two outputs and the circle fails the rule. To test any relation, pick an input and count its outputs.
+→ A function is a rule that gives each input exactly one output. `f(x) = x²` sends both 3 and −3 to 9, which is allowed, because two inputs may share an output. The circle `x² + y² = 1` fails, because `x = 0` gives both y = 1 and y = −1. To test any relation, pick an input and count its outputs.
 
 ---
 

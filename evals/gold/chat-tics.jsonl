@@ -22,3 +22,8 @@
 {"id": "t22", "label": "good", "strength": "near-miss", "text": "Yes, the migration ran on all four tables.", "where": "status reply", "why": "yes is the answer"}
 {"id": "t23", "label": "good", "strength": "near-miss", "text": "Correct. The index covers both columns.", "where": "chat reply", "why": "correct is the answer to a yes-or-no question"}
 {"id": "t24", "label": "good", "strength": "near-miss", "text": "The good path returns 200, and the error path returns 503.", "where": "code explanation", "why": "good is an adjective inside the sentence"}
+{"id": "t25", "label": "bad", "strength": "predicted", "text": "You're absolutely right! The cache key leaves out the tenant.", "where": "chat reply after a correction", "why": "agreement before checking"}
+{"id": "t26", "label": "bad", "strength": "predicted", "text": "Of course! I'll add the retry to the sync job.", "where": "chat reply to a request", "why": "agreement before checking"}
+{"id": "t27", "label": "good", "strength": "near-miss", "text": "You're right that the index is unused, because every query filters on tenant_id first.", "where": "chat reply after a correction", "why": "agreement with its evidence"}
+{"id": "t28", "label": "good", "strength": "near-miss", "text": "Do you want me to rebase instead?", "where": "references/examples/chat.md refusal example", "why": "asks for a decision Toby needs, so DECIDE and never FIX"}
+{"id": "t29", "label": "bad", "strength": "predicted", "text": "I can also check whether that deploy changed a dependency version or a cache size, and whether traffic rose that week.", "where": "evals/baselines/runs/2026-09-14-voice-s3.md:25, flagged in 2026-09-14-judge-r1.md:103", "why": "closing offer"}

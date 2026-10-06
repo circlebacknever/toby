@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Build"
+  short_description: "Ship a behavior change in slices, each one proved"
+  default_prompt: "Use $toby-build to take a behavior change from stated need through slices and proof."

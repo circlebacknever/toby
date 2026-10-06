@@ -78,7 +78,7 @@ Facts:
 
 ## 4. Error messages
 
-Skill file: `skills/toby-swd-complexity/SKILL.md`
+Skill file: `skills/toby-swd-errors/SKILL.md`
 
 Write the user-facing message and the log line for each failure. Return them as
 a table with the columns Failure, Message shown to the user, and Log line.

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD Errors"
+  short_description: "Decide how code handles a failure"
+  default_prompt: "Use $toby-swd-errors to decide how this code handles a failure."
+policy:
+  allow_implicit_invocation: false

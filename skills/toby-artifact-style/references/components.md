@@ -4,7 +4,7 @@ Load this file when you build any component for a Toby Artifact Style artifact. 
 
 ## Signature patterns
 
-When a request matches one of these patterns, USE it. These patterns give a Toby Artifact Style artifact its recognizable look.
+When a request matches one of these patterns, use it. These patterns give a Toby Artifact Style artifact its recognizable look.
 
 - **Callout / Alert / Toast** — This state-tinted panel uses the soft / tint / text family. It has a bold title above a body at opacity 0.88.
 - **StatusPill** — This pill is fully tinted by hue and shows live system state with a dot and a label.
@@ -13,7 +13,7 @@ When a request matches one of these patterns, USE it. These patterns give a Toby
 - **Worked Example** — This example has three rows in order: PREMISE (info-tinted), DERIVATION (watch-tinted), and RESULT (stable-tinted).
 - **Decision Row** — The row holds a title, meta text, and Approve / Hold / Reject buttons in matching semantic colors.
 - **Sparkline-in-table** — embed an 80–120px trace SVG in a table cell. Add adjacent columns for Last and Δ%.
-- **Code block** — This DARK-theme block has an ink-2 background, mono text, a line gutter, a copy button, and syntax classes (kw / num / str / com).
+- **Code block** — This dark-theme block has an ink-2 background, mono text, a line gutter, a copy button, and syntax classes (kw / num / str / com).
 - **Treeview** — Each level has a hairline rule down its left side. The selected row uses paper-2 with a 3px info inset.
 - **Annotation pin** — The pin is a numbered circle, a leader line, and a framed label, all in `--toby-info`.
 - **Equation block** — The block shows a centered mono formula with a 2px info-colored top accent.
@@ -23,7 +23,7 @@ When a request matches one of these patterns, USE it. These patterns give a Toby
 
 ## Full component vocabulary
 
-Beyond the signatures above, Toby Artifact ships ~60 components total.
+Build these components to the specs below when a page needs them.
 
 ### Layout & structure
 - **Topbar** — This 56px-tall header has a breadcrumb, an optional id stamp, and right-aligned actions.
@@ -33,7 +33,6 @@ Beyond the signatures above, Toby Artifact ships ~60 components total.
 - **Accordion** (covers Collapsible) — Only one section opens at a time by default, but passing `multi` lets multiple sections open.
 - **Toolbar** — The toolbar is an inline strip of mini-controls. `.toolbar__btn--on` fills with ink + `--text-on-dark`.
 - **Pagination** — It uses 32px mono cells with tabular numerals. Ellipses stay when the range overflows.
-- **Breadcrumb** — The breadcrumb is a trail of page links separated by slashes. Its last item is the current page and has no link styling.
 
 ### Form controls
 - **Button** — Its variants are `default` (paper), `primary` (ink), `ghost` (transparent), and `consequence` (accent). `--sm` sets a 28px height.
@@ -42,24 +41,19 @@ Beyond the signatures above, Toby Artifact ships ~60 components total.
 - **Number field** — The field has mono digits with tabular numerals and stacked +/− buttons on the right. The native browser spinners are hidden.
 - **OTP field** — The field has N mono slots (default 6) with an optional `groupAt` separator. Backspace moves to the previous slot.
 - **Checkbox** + **CheckboxGroup** — The group has a `row` modifier for inline layout.
-- **Radio** + **RadioGroup** — They are built the same way as Checkbox.
-- **Switch** — Switch is an alias of **Toggle**, so both names refer to one primitive.
-- **Toggle** — The toggle is a 36×20 track with a thumb. When on, the track is ink and the thumb is paper.
+- **Toggle** (covers Switch) — The toggle is a 36×20 track with a thumb. When on, the track is ink and the thumb is paper.
 - **Slider** — It shows a mono value with tabular numerals to the right of the label.
 - **ToggleGroup** — A ToggleGroup is a segmented control. `.tgrp__btn--on` fills with ink + white. Buttons use `white-space: nowrap`.
 - **Combobox** (covers **Select** and **Autocomplete**) — It is searchable by default, but `searchable={false}` gives a plain Select.
 - **Calendar** — Today gets a 2px `--toby-info` border, bold weight, and info text. The selected day fills with ink. Marked dates show a small red dot.
 - **DatePicker** — It is a Calendar inside a popover. Its trigger shows the selected date in ISO format in mono.
-- **Field / Label / Fieldset** — These are wrappers for form structure.
 
 ### Overlays & menus (consolidated)
 - **Dialog** (covers **Modal** and **AlertDialog**) — It shows a centred panel over a backdrop. `kind="alert"` adds a 4px red top hairline and a red title.
 - **Sheet** (covers **Drawer** and **Bottomsheet**) — `side="right" | "left" | "bottom"`. The bottom variant has a drag grip.
-- **Popover** — This click-anchored panel has 16px padding. It closes on a click outside it.
+- **Popover** — This click-anchored panel has 16px padding.
 - **Tooltip** — This dark ink panel appears only on hover. It has a caret and is always placed above the trigger.
-- **PreviewCard** — This hover card holds more than a tooltip but less than a popover.
 - **Menu** — This popover menu primitive has group labels, hint shortcuts (`⌘C`, `↵`), separators, and a `danger` variant.
-- **ContextMenu** — It is a wrapper around Menu for right-click.
 - **Menubar** — It is a horizontal strip with File / Edit / View. The `--open` state uses paper-2 and a 2px info underline.
 - **NavigationMenu** — It is like Menubar, but it has rich panels. Each panel gets a 2px info top border.
 - **Command palette** — It is a full-screen search with grouped items and a keyboard footer.
@@ -67,7 +61,6 @@ Beyond the signatures above, Toby Artifact ships ~60 components total.
 
 ### Display & feedback
 - **Avatar** — It shows initials only, with no faces and no abstract art. The sizes are sm (22), md (28), and lg (40). The `--ink` variant has a dark fill.
-- **Badge** — see Signature.
 - **Kbd** — It shows a mono keyboard glyph with a 2px bottom border, so it looks pressable.
 - **Spinner** — It is a 1.5px ring with a 720ms linear spin and no glow. The sizes are md (16) and lg (22).
 - **Skeleton** — It is a shimmer placeholder. Its kinds are `line` (12px), `title` (18px), and `block` (64px).
@@ -87,17 +80,6 @@ Beyond the signatures above, Toby Artifact ships ~60 components total.
 ## Consolidation rules
 
 Each problem has one primitive, which can have several names. Do not invent a separate component when an existing primitive already covers the case.
-
-| Names that map to one primitive | Primitive | Differentiator |
-|---|---|---|
-| Modal, AlertDialog, Dialog | `Dialog` | `kind="default" \| "alert"` |
-| Drawer, Bottomsheet, Sheet | `Sheet` | `side="right" \| "left" \| "bottom"` |
-| Select, Autocomplete, Combobox | `Combobox` | `searchable={true \| false}` |
-| Switch, Toggle | `Toggle` | (alias) |
-| Collapsible, Accordion | `Accordion` | `multi={true \| false}` |
-| Form-checkbox-list, Checkbox group | `CheckboxGroup` | wraps `Checkbox` |
-| Form-radio-list, Radio group | `RadioGroup` | wraps `Radio` |
-| ContextMenu, Menu, Menubar | `Menu` primitive | each wrapper uses a different trigger |
 
 ---
 
@@ -176,10 +158,10 @@ The same `--*-soft / --*-tint / --*-text` triple sets the colors for status pill
   display: flex; flex-direction: column; gap: 8px; position: relative; }
 .stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0;
   height: 2px; background: var(--stat-accent, transparent); }
-.stat:nth-child(4n+1) { --stat-accent: var(--toby-info); }
-.stat:nth-child(4n+2) { --stat-accent: var(--toby-stable); }
-.stat:nth-child(4n+3) { --stat-accent: var(--toby-watch); }
-.stat:nth-child(4n+4) { --stat-accent: var(--toby-slate-blue); }
+.stat:nth-child(4n+1) { --stat-accent: var(--toby-blue-steel); }
+.stat:nth-child(4n+2) { --stat-accent: var(--toby-muted-violet); }
+.stat:nth-child(4n+3) { --stat-accent: var(--toby-field-olive); }
+.stat:nth-child(4n+4) { --stat-accent: var(--toby-ochre); }
 .stat__label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
   color: var(--text-muted); font-weight: 600; }
 .stat__value { font-size: 28px; font-weight: 600; font-feature-settings: 'tnum';
@@ -291,7 +273,8 @@ The same `--*-soft / --*-tint / --*-text` triple sets the colors for status pill
 <div class="dec">
   <div class="dec__body">
     <div class="dec__title">Approve controlled release of M-01 v4.2?</div>
-    <div class="dec__meta">Owner · Mission ops · Sayo  ·  Confidence · High · CI 95%  ·  Cadence · two-sample rule</div>
+    <div class="dec__meta">Rollback owner · Mission ops · Sayo  ·  Confidence · High · CI 95%  ·  Cadence · two-sample rule</div>
+    <div class="dec__rationale">Rationale · both meters stayed inside the watch band for two samples</div>
   </div>
   <div class="dec__actions">
     <button class="dec__btn dec__btn--approve dec__btn--on">Approve</button>
@@ -308,6 +291,7 @@ The same `--*-soft / --*-tint / --*-text` triple sets the colors for status pill
 .dec__title { font-size: 14px; font-weight: 600; }
 .dec__meta { font-family: var(--font-mono); font-size: 11px;
   color: var(--text-muted); letter-spacing: 0.04em; line-height: 1.5; }
+.dec__rationale { font-size: 13px; margin-top: 8px; }
 .dec__actions { display: flex; flex-direction: column; gap: 8px; min-width: 120px; }
 .dec__btn { background: var(--surface-card); border: 1px solid var(--border-hairline);
   border-radius: 6px; padding: 8px 16px;
@@ -320,7 +304,7 @@ The same `--*-soft / --*-tint / --*-text` triple sets the colors for status pill
 .dec__btn--on.dec__btn--reject  { background: var(--toby-accent); color: var(--text-on-dark); }
 ```
 
-Use only the three listed verbs. The chosen verb's button fills with its semantic color. Each decision needs a rationale field and a named rollback owner.
+Use only the three listed verbs. The chosen verb's button fills with its semantic color. Each decision needs a rationale field and a rollback owner.
 
 ### Code block — dark theme
 
@@ -367,13 +351,3 @@ Use only the three listed verbs. The chosen verb's button fills with its semanti
   border: 1px solid var(--toby-info-tint); padding: 4px 10px;
   border-radius: var(--radius-sm); }
 ```
-
----
-
-## Quick rules summary
-
-- Numeric columns are always right-aligned, mono, with tabular numerals.
-- State-tinted components always use one color family, with a soft background, a tint border, a text foreground, and a left strip in the family's base color.
-- Selected items in lists use paper-2 with a 3px info inset, because paper-3 against paper-3 is invisible.
-- Focus rings are 2px info-teal outside rings at a 2px offset. They are never red.
-- A press state makes the background darker but does not move the control.

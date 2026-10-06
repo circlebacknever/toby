@@ -1,0 +1,4 @@
+interface:
+  display_name: "Toby Bug Fix"
+  short_description: "Find the cause of a bug and prove the fix"
+  default_prompt: "Use $toby-bug-fix to find the cause of this bug and prove the fix."

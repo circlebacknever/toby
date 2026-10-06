@@ -1,7 +1,5 @@
 # Worked Examples
 
-The code below is original. The reasoning applies to other code too.
-
 ---
 
 ## Example 1 — Backend: a precision comment on a function
@@ -13,21 +11,19 @@ def trim(text, start, end):
 
 The name and signature cannot answer the questions a caller has: is
 `end` inclusive? what happens if `start > end`? are these byte offsets or
-character indices? A developer who believes code documents itself would stop
-here, because the names look fine. The names are fine. The missing information
-cannot be expressed in code, so it goes in the interface comment:
+character indices? The missing information cannot be expressed in code, so it
+goes in the interface comment:
 
 ```python
 def trim(text, start, end):
-    """Return the slice of text from start to end.
+    """Return the slice of text from start to end, with end exclusive.
 
     Offsets count characters, so a multi-byte character counts as one.
-    The end offset is exclusive. Both offsets are clamped to [0, len(text)].
-    The result is empty when start >= end. The function does not change text."""
+    Both offsets are clamped to [0, len(text)].
+    The result is empty when start >= end."""
 ```
 
-The comment has six sentences and no internals. It answers every question a
-caller has. It is a precision (lower-level) comment, the half most often skipped.
+The comment has four sentences and no internals. It answers each question above.
 
 ---
 
@@ -38,11 +34,8 @@ block within a file. The names look "reasonably close," so readers do not questi
 them. A logical block number is eventually used where a physical one was
 required. The result is silent data corruption that took months to find.
 
-The consistency rule gives each name one purpose. Rename to `fileBlock` and `diskBlock`
-so the two cannot be confused at a glance. Better still, give them distinct
-types so they cannot be interchanged at all. The clarity fix here is also a
-correctness fix. Treat a confusable name as seriously as a value that can be
-confused.
+Rename to `fileBlock` and `diskBlock` so the two cannot be confused at a glance.
+Better still, give them distinct types so they cannot be interchanged at all.
 
 ---
 
@@ -84,32 +77,16 @@ return [data, err, l];   // caller does result[0], result[2]...
 
 This return value is the generic-container failure, because its values are
 positional and unlabeled, which hides their meaning.
-Return a named type, and comment the fields (data-structure-member comments,
-the category most often missed on frontend state):
+Return a union with one variant per state, and comment what the type cannot show:
 
 ```ts
-interface UserQuery {
-  user: User | null;   // This is null while loading and after a failed fetch.
-  error: ApiError | null;  // This is set only when the request fails. A 404 leaves it null.
-  loading: boolean;    // This is true from mount until the first response arrives.
-}
-return result;
+type UserQuery =
+  | { status: "loading" }
+  | { status: "ready"; user: User }
+  | { status: "missing" }                  // The server returned 404.
+  | { status: "failed"; error: ApiError }; // The request failed or returned 5xx.
 ```
 
-The types cannot say that a 404 leaves `error` null, or that `user` is null while
-loading. Without the field comments a caller cannot use `UserQuery`
-correctly. Good naming cannot supply that information.
-
----
-
-## Example 5 — Consistency: matching local handler names
-
-The codebase names handlers `handleSubmit`, `handleChange`, `handleRowClick`.
-A new component is added with `onSaveClicked` and `submitHandler`. Each is
-defensible in isolation. Together they break the pattern that lets a reader
-predict the next handler's name.
-
-Inspect the file, see the established
-`handleX` form, and match it. Introducing a new handler-naming scheme is
-worth it only with significant new information and a commit that converts every
-existing handler. Otherwise the half-and-half state is worse than either naming scheme alone.
+The union rules out a user and an error at the same time, so no comment has to
+list the valid combinations. The comments map each state to a server response,
+which the type cannot show.

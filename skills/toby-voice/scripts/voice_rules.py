@@ -131,6 +131,11 @@ TIC_PATTERNS = [
     (re.compile(r",\s+and\s+(?:both|all(?: three| four| of them)?|each(?: one)?)\s+"
                 r"(?:matters?|counts?|(?:is|are) important)\b", re.I),
      "importance flag on a count, so delete it and give the items"),
+    # "You're absolutely right!" and "Of course!" agree before checking.
+    # "You're right." with no adverb passes, because it can be the answer.
+    (re.compile(SENTENCE_START + r"(?:You(?:'re| are) (?:absolutely |totally |completely |so )right|"
+                r"Of course|Certainly|Absolutely|Sure thing)[.!]", re.M),
+     "agreement before checking, so open with the answer or the evidence"),
 ]
 
 
@@ -176,14 +181,12 @@ VOICE_SCAN_EXEMPT = {
     REPO_ROOT / "skills" / "toby-voice" / "references" / "toby.md",
     REPO_ROOT / "skills" / "toby-voice" / "references" / "plain-language.md",
     REPO_ROOT / "skills" / "toby-voice" / "references" / "plain-language-examples.md",
-    REPO_ROOT / "skills" / "toby-voice" / "references" / "examples" / "banned-writing-patterns.md",
     # A compressed copy of the guide that one eval arm loads in place of it.
     REPO_ROOT / "evals" / "arms" / "core.md",
     # The same reference files, as they sit in an installed toby-voice skill.
     REPO_ROOT / "references" / "toby.md",
     REPO_ROOT / "references" / "plain-language.md",
     REPO_ROOT / "references" / "plain-language-examples.md",
-    REPO_ROOT / "references" / "examples" / "banned-writing-patterns.md",
 }
 
 
@@ -426,7 +429,7 @@ PREDICTED_PATTERNS = [
     # "Consider this service code:" announces the code and says nothing about it.
     (re.compile(r"(?:^|(?<=[.!?]\s))Consider (?:this|the following)\b[^.:]{1,40}:", re.M),
      "sentence that announces the next one"),
-    # "The guardrail question" names step 7 of toby-swd-interfaces with a word
+    # "The guardrail question" names step 6 of toby-swd-interfaces with a word
     # its SKILL.md never uses. Twelve skill lines used it on 2026-10-02.
     (re.compile(r"\bguardrails?\b", re.I), "coined name"),
     # "The number that matters" flags importance without stating it.
@@ -523,6 +526,10 @@ PREDICTED_PATTERNS = [
     (re.compile(r",\s+and\s+(?:(?:the|a|an|this|that|these|those|no|each|every)\s+[\w-]+|it|they|[A-Z][\w.-]*)\s+"
                 r"(?:is|are|was|were|has|have|had|[a-z]+(?:s|ed))\b"),
      "two facts joined by and"),
+    # "Want me to also check the logs?" ends on an offer. "Do you want me to
+    # rebase instead?" can ask for a decision Toby needs, so a person decides.
+    (re.compile(r"\b(?:[Ww]ant me to|[Ww]ould you like me to|[Ss]hould I also|[Ii]f you(?:'d)? like, I can|I can also)\b"),
+     "closing offer"),
 ]
 # The guide bans `actually`, `really`, and `truly` when nothing in the
 # sentence states the contrast they imply. voice-check.py reads the whole

@@ -41,7 +41,7 @@ Place every box, every arrow bend, and every gap on an 8px grid.
 - Make each x, y, width, and height a multiple of 8. Round a size up to the next multiple of 8, never down.
 - When rounding adds space to a box, split the added space evenly between opposite sides.
 - On a pptx slide, one grid step is 0.0833in, which is 8px at 96 dpi.
-- Stroke widths and the 2px padding tolerance in the review stay as written.
+- Do not round stroke widths or the 2px padding tolerance to the grid.
 - The center of a box side falls on a 4px step when the box size is an odd multiple of 8. An arrow may attach at that point, but every bend and every shared line stays on the 8px grid.
 
 ## Text boxes

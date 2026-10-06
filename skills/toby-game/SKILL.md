@@ -1,28 +1,16 @@
 ---
 name: toby-game
-description: "Collaborate to build a single-file HTML simulation game or toy in Toby's style: a real system whose shortcuts the game states openly, deadpan comedy where there is a target, a paper-and-ink look across canvas, 3D, or DOM, and, when the game has an ending, an ending that reports what happened in the run. Trigger only when the creator explicitly invokes this skill by name or with the /toby-game slash command. Do not trigger on general requests to make a game, a sim, a toy, a visualizer, or a simulation. Do not trigger when a game is only mentioned in passing. The creator picks the genre, theme, and tone each run. The example games show the range the style already covers."
+description: >-
+  Collaborate with the user to build a single-file HTML simulation game or toy
+  in Toby's style. Trigger only when the user explicitly invokes this skill by
+  name or with the `/toby-game` slash command. Do not trigger on a general
+  request to make a game, a sim, a toy, a visualizer, or a simulation.
+disable-model-invocation: true
 ---
 
 # Toby Game
 
-This skill describes the style for a game built on your idea. The style means a real system underneath, jokes tied to the mechanics, a paper-and-ink look, and a run that follows a story arc. The game is one self-contained HTML file. Genre, theme, and tone are yours each time.
-
-## What this prevents
-
-This skill prevents feedback notes that you would otherwise have to give more than once:
-
-- "make it funnier" → Use the wider in-world register described in `references/comedy-and-narrative.md`.
-- "the jokes repeat" → Serialize the threads, escalate the beats, and draw content without replacement, as `references/comedy-and-narrative.md` describes.
-- "there's no story, it doesn't flow" → Build the run as an arc that introduces details early and brings them back later, as `references/comedy-and-narrative.md` describes.
-- "the feed flashes, a line every frame" → Fire a line only on a real change, and pace the lines, as `references/comedy-and-narrative.md` describes.
-- "feels random, feels unfair" → Tie outcomes to the player's choices, and show the gamble before the player takes it, as `references/gameplay.md` describes.
-- "it solved itself instantly, the answer is trivial" → Make the player earn the win through structure, as `references/gameplay.md` describes.
-- "the physics looks wrong, the hit doesn't match the screen" → Test collisions on the drawn positions, and use real motion, as `references/gameplay.md` describes.
-- "the sim blows up or drifts after a while" → Integrate so the sim cannot blow up, and assert that values stay finite, as `references/architecture.md` describes.
-- "it doesn't feel like a game" → Make the world tick on its own and respond to the player at once, as `references/gameplay.md` describes.
-- "the instructions are too long" → Teach one verb in one line, as `references/gameplay.md` describes.
-- "it breaks on mobile" → Move live controls on a phone, and never hide them, as `references/cross-device.md` describes.
-- "it looks generic" → Use paper, ink, one red, one light, and idle motion that never fully stops, as `references/visual-identity.md` describes.
+Build one self-contained HTML game with the creator, who picks the genre, theme, and tone each run. Toby's voice rules apply to chat with the creator. The game's own copy, meaning its cards, ticker, upgrade names, and end screen, uses the wider register in `references/comedy-and-narrative.md`.
 
 ## Opening move
 
@@ -39,19 +27,19 @@ Place the game on a few axes, propose one combination with a reason, then let th
 - **session length** — endless toy through bounded run with a graded ending
 - **render** — 2D canvas, 3D, or DOM
 
+Earlier games covered a particle field, an orbit sandbox, a traffic sim, a DOM card-swipe satire, a penalty duel, and a heist idle.
+
 ## The build
 
 Build the loop first, on placeholder art, before anything else. In that loop the sim ticks, something changes, and the player interferes in a way that matters. Confirm the one surprising thing shows. Then add the guidance from one reference at a time, and calibrate with bots. End each pass with a short status and the next dial to turn.
 
-## References
+## Known failures
 
-- `references/architecture.md` — the one-file skeleton and the core engineering decisions
-- `references/gameplay.md` — how it feels to play
-- `references/comedy-and-narrative.md` — the voice and the story
-- `references/visual-identity.md` — the look
-- `references/cross-device.md` — keeping the game live on desktop and phone
-- `references/calibration-and-testing.md` — balance measurement and correctness tests
+Each item is a note creators gave on earlier games. Build against all of them from the first pass, and read the reference each item gives before that part of the build.
 
-## The games behind it
-
-Read these for the range the style already covers. The games are Flux (a particle field), nbody (an orbit sandbox), and gridlock (a traffic sim). The others are denial-of-service (a DOM card-swipe satire), spot-kicks (a penalty duel), and raccoon-syndicate (a heist idle). These games are not bundled with the skill. The job is to build the next game in that range, on whatever subject you pick.
+- `references/gameplay.md`: tie outcomes to choices the player saw coming ("feels unfair"), make the win take structure ("it solved itself"), hit-test on drawn positions with real motion ("the physics looks wrong"), make the world tick and respond at once ("it doesn't feel like a game"), and teach one verb in one line ("the instructions are too long").
+- `references/comedy-and-narrative.md`: use the game's wider register ("make it funnier"), serialize threads and draw content without replacement ("the jokes repeat"), build the run as an arc with callbacks ("there's no story"), and fire a feed line only on a real change ("the feed flashes").
+- `references/architecture.md`: integrate so the sim cannot blow up, and assert that values stay finite ("the sim drifts").
+- `references/cross-device.md`: keep live controls on screen on a phone ("it breaks on mobile").
+- `references/visual-identity.md`: use paper, ink, one red, one light, and idle motion ("it looks generic").
+- `references/calibration-and-testing.md`: run bot bands and invariant tests before calling the game done.

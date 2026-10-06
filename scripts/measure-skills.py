@@ -7,6 +7,7 @@ same ruler before and after, which is what the plan needs it for.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -14,22 +15,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS = REPO_ROOT / "skills"
 
-# The routing groups that co-load in practice. base/toby.md Skill Routing sends
-# a normal feature change into the first one.
-ROUTING_GROUPS = {
-    "feature-change": [
-        "toby-swd-strategy",
-        "toby-swd-modules",
-        "toby-swd-interfaces",
-        "toby-swd-complexity",
-        "toby-swd-clarity",
-        "toby-swd-testing",
-        "toby-swd-docs",
-    ],
-    "review": ["toby-code-review", "toby-simplify-code"],
-    "feature-dev": ["toby-feature-dev", "toby-swd-strategy", "toby-swd-testing"],
-    "prose": ["toby-voice"],
-}
+# The entry chains from validate-skills.py, so the two scripts measure the same
+# groups against the same co-load ceiling.
+_spec = importlib.util.spec_from_file_location("validate_skills", REPO_ROOT / "scripts" / "validate-skills.py")
+_validate = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_validate)
+ROUTING_GROUPS = _validate.ROUTING_GROUPS
 
 
 def tokens(text: str) -> int:
@@ -75,7 +66,7 @@ def main() -> int:
     print(f"total body tokens: {sum(r['body'] for r in rows)}")
     print(f"total frontmatter tokens (always resident): {sum(r['frontmatter'] for r in rows)}")
     print()
-    print("co-load totals by routing group (bodies only, no references opened):")
+    print(f"co-load totals by entry chain (bodies only, no references opened, ceiling {_validate.COLOAD_TOKEN_CEILING}):")
     for group, members in ROUTING_GROUPS.items():
         missing = [m for m in members if m not in by_name]
         total = sum(by_name[m]["body"] for m in members if m in by_name)

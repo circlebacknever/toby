@@ -1,6 +1,6 @@
 # Toby Artifact copy
 
-Load this file when writing substantive copy for a Toby Artifact Style artifact: headings, paragraphs, captions, callouts, button text, and microcopy. Toby's global voice rules control register. This file covers evidence, units, claim structure, and artifact-copy discipline.
+This file gives an example for each copy test, the qualifier rules, and the rules for marketing layouts.
 
 ## The four tests
 
@@ -31,47 +31,9 @@ Apply this cut after the first three tests pass. If a reader who already knows t
 
 ## Sentence structure
 
-Do not invent contrasts, because `It's not X, it's Y` is filler whenever nobody claimed X. Write the positive form.
+A comparison of two options that both exist counts as content. Keep a comparison table, a rejected-alternative callout, or a "chose A over B because C" caption, because each refers to a real option.
 
-A comparison of two options that both exist counts as content. Keep a comparison table, a rejected-alternative callout, or a "chose A over B because C" caption, because each refers to a real option. The operating guide states the full rule.
-
----
-
-## Where the word list lives
-
-The operating guide contains the one banned-word list, with the replacement for each entry. It is always loaded, so the list is already in context. This file does not add or repeat any entry from that list.
-
----
-
-## Patterns to remove wherever they appear
-
-### Adjective stacks describing the work
-`powerful` `intuitive` `seamless` `beautifully simple` `elegant` `game-changing` `delightful` `polished` `refined` `robust` `modern` `sleek`
-
-### Throat-clearing openers
-`in today's fast-paced world` `we all know` `let's dive in` `it's no secret` `at the end of the day` `when it comes to`
-
-### Self-praise of the writing
-`cleanly` `clearly` `honestly` `no fluff` `in plain English` `just the facts` `simply put` `in a nutshell`
-
-The reader can judge the writing. Praising the writing puts a claim about the evidence in place of the evidence.
-
-### Reader-state assertions
-`you'll love` `you'll wonder how you ever` `you'll be amazed` `you'll find that`
-
-### Vague magnitude
-`a lot of` `many` `huge` `massive` `tons of` `plenty of` `quite a few`
-
-Replace each one with a number or a range, or delete it.
-
-### Hype suffixes
-`the right way` `done right` `in a beautiful way` `that just works` `made simple` `reimagined`
-
-### Inflated verbs
-`unlock` `transform` `supercharge` `revolutionize` `harness` `empower` `elevate` `accelerate` `streamline`
-
-### Mission-stating
-`on a mission to` `dedicated to` `passionate about` `committed to` `devoted to`
+Marketing adjectives, inflated verbs, mission statements, and vague amounts such as `a lot of` fail the cite, negation, or substitution test. Replace each with a number, a mechanism, or a measurement.
 
 ---
 
@@ -88,32 +50,13 @@ Match the qualifier to what is known about the claim. Don't hedge a known claim 
 
 ## Hard rules
 
-**Slide and chart titles state the claim.** Write the title as a plain, descriptive sentence, and use the body to explain, qualify, or show the work. "Cache reduces p95 by 41%" passes as a title, and "Performance" fails. A section heading in a document is a one- or two-word label, such as "Casing", or a phrase that says what the section covers. Neither one is a slogan, so leave out mirrored phrasing, clever claims, and any subtitle that restates the title.
-
-**Put each caveat next to the claim it qualifies.** Never put uncertainty in a footnote.
-
-**Every value gets a unit.** A bare `312` is a defect, but `312 ms` is correct.
-
-**State assumptions explicitly.** When a conclusion depends on an assumption, write the assumption as a sentence next to the conclusion, such as "This estimate assumes the traffic mix from May."
-
-**The clarity rules apply most strictly to labels.** An axis title, a legend entry, a KPI caption, a table header, and a slide heading are each subject to the three-word cap on noun stacks. `user session token refresh failures` stacks five words, so it becomes `failed token refreshes`. When the stack cannot be shortened, state the relation with a preposition: `resistance at the light connection`.
-
-**Use one name for each thing across the whole artifact.** A series called `p95 latency` in the chart is `p95 latency` in the legend, the caption, and the summary slide. A renamed series reads as a second series.
+**A subtitle never restates the title.** Leave mirrored phrasing and clever claims out of titles and headings.
 
 **A decision is a whole sentence that states the action and its reason.** "Approve the controlled release, because both meters stayed inside the watch band." A button label can be the verb alone, such as Approve or Hold.
 
-**Do not use first person** (we, I, our). **Do not use second person** (you, your) in most reference contexts.
+**Do not use first or second person in artifact copy**, except in a note that says a judgment depends on taste, such as "This looks wrong to me, because it resembles the cache-coherence bug from M-03."
 
-**Do not use emoji or exclamation points.**
-
----
-
-## Casing
-
-- Use UPPERCASE eyebrows (tracked +0.12em) for section labels.
-- Use sentence case for headings and body, and never use Title Case.
-- Write tokens in all-lowercase: `$toby-paper`, `--toby-ink`.
-- Set values, IDs, and coordinates in mono: `312 ms`, `R-04.2`, `34.05° N`.
+**Do not use exclamation points.**
 
 ---
 
@@ -125,25 +68,6 @@ Layouts with a hero, feature cards, and a CTA are allowed, but the copy inside t
 - **Feature card:** give a concrete behavior and the measurement that backs it. "In a test at 10⁴ events per second, the monitor detected a threshold breach within 50 ms."
 - **CTA verb:** state the next step. "Read the derivation." "Open the worked example." "Run the benchmark." Never write `Get started.` or `Start your journey.`
 - Testimonials, social-proof counts, and "as seen in" rows are not allowed unless the artifact exists to show those sources.
-
----
-
-## Toby voice boundary
-
-The global voice rules apply to artifact copy. This reference adds artifact constraints: the claim in the slide or chart title, units on values, citations beside claims, and no marketing copy.
-
-**Artifact copy stays evidence-led:**
-- Numbers have units, claims cite a source or mechanism, and slide and chart titles state the conclusion.
-- Use no marketing adjectives, throat-clearing, reader-state assertions, or invented contrasts.
-- A reference deck that teaches a concept keeps a serious tone when the concept requires one.
-
-**Where lighter phrasing is allowed:**
-- **Identifiers can be long and specific.** `priceIncludingCheckoutFee` is a correct name when the field holds a price that includes the checkout fee.
-- **State what nobody understands yet.** "The drop appeared in three independent runs, but nobody knows the cause yet." gives the reader more than a confident theory.
-- **State when a judgment is based on taste.** "This looks wrong to me, because it resembles the cache-coherence bug from M-03." is a valid note in an investigation artifact.
-- **Keep lighter phrasing out of the data.** A slide heading can be a plain sentence. An axis label, a KPI value, and a legend entry show only the quantity the reader came for.
-
-**The override.** When the user explicitly asks for a different register ("write this as a formal letter," "keep it strictly clinical"), follow that register.
 
 ---
 

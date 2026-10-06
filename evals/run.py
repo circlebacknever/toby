@@ -251,14 +251,14 @@ SUITES = {
         "file": "suites/voice.md",
         "scorer": "score-voice",
         "min_samples": 5,
-        "prompt": """Write four short pieces of prose in Toby's voice.
+        "prompt": """Write six short pieces of prose in Toby's voice.
 
 Setup, follow it exactly:
 1. Read {repo}/skills/toby-voice/SKILL.md
 2. Read {repo}/skills/toby-voice/references/toby.md — the rules file. Load it in full.
 3. Read {repo}/evals/suites/voice.md
 
-Write the four outputs to {repo}/evals/results/voice-<run>.md, in this format and
+Write the six outputs to {repo}/evals/results/voice-<run>.md, in this format and
 nothing else:
 
 ## 1
@@ -272,6 +272,12 @@ nothing else:
 
 ## 4
 <the I-don't-know reply>
+
+## 5
+<the pushback with no new fact>
+
+## 6
+<the final report>
 
 No preamble, no summary, no notes. Reply with just the word "done".""",
     },
@@ -527,14 +533,16 @@ Reply with just the word "done".""",
         "min_samples": 2,
         "prompt": """You are simulating a coding agent's skill-routing decision. Do no engineering work.
 
-Read {repo}/evals/baselines/descriptions-current.txt — 14 skills, each with a name
-and description. That is the entire routing surface a host tool sees.
+Read {repo}/evals/baselines/descriptions-current.txt, and use only its first
+section, headed "# Claude Code, Codex, Copilot: 11 skills". It lists 11 skills,
+each with a name and description. That is the entire routing surface those
+hosts show. Ignore the Kiro section below it.
 
-Read {repo}/evals/suites/triggering.md for the eight prompts. Read ONLY each
-scenario's blockquoted user prompt. Do NOT read the "Should load" lines before
-deciding.
+Read {repo}/evals/suites/triggering.md for the 32 prompts. Read ONLY each
+scenario's blockquoted user prompt. Do NOT read the "Should load" lines or the
+directive blocks before deciding.
 
-For each of P1-P4 and N1-N6, decide which skills you would load, receiving that
+For each of P1-P25 and N1-N7, decide which skills you would load, receiving that
 prompt cold with only the descriptions in front of you. Be realistic and slightly
 generous: if a description's trigger nouns match, that skill fires.
 
@@ -551,7 +559,7 @@ scoring, so do not total anything yourself and do not read the expected sets."""
         "prompt": """Follow a skill and report what it tells you to produce. Write no code and
 edit no file except the output named below.
 
-1. Read {repo}/skills/toby-feature-dev/SKILL.md in full.
+1. Read {repo}/skills/toby-build/SKILL.md in full.
 2. Read the two requests in {repo}/evals/suites/feature-dev.md, and read only
    the blockquoted request text. Do not read the Expected lines.
 

@@ -1,0 +1,42 @@
+# Databases and Data Access
+
+## N+1 queries
+
+A loop that touches a lazy relation runs one query per row. 50 orders with 5 line items each take 351 queries, but the profiler shows no single slow query. Pick the cheapest fix that removes the loop:
+
+1. Add eager-load hints to the query that loads the parent rows (`joinedload`, `selectinload`, `include`). 351 queries become 3.
+2. When a view always needs the same fields, add a repository method that returns a flat row type with exactly those fields from one query. A caller cannot trigger N+1 on a field that is not a relation.
+3. Add a denormalized read table, updated on write, only after a measurement shows the joined query is still too slow.
+
+## Transaction retry
+
+Retry deadlocks, serialization failures, and connection resets in one `WithRetry(ctx, db, fn)` wrapper with a bounded attempt count and jittered backoff. Callers then see only conflicts that persist. Two rules keep the retry correct:
+
+- `fn` makes no call outside the database, such as an email or an API request, because a retry repeats it. Run those calls after the commit.
+- `fn` reads the rows it computes from. A body that closes over rows read before `WithRetry` re-applies a stale computation on retry and commits a lost update with no error.
+
+## Bulk writes
+
+Send a loop of single-row statements as one statement, such as `UPDATE ... WHERE id = ANY(?)` or a multi-row `INSERT`. The bulk method splits batches above about 1,000 rows. Switch to `COPY` (Postgres) or `LOAD DATA INFILE` (MySQL) only after a measurement shows the bulk insert is the bottleneck.
+
+## Indexes
+
+Choose indexes when the table or the query is designed, and check each hot query with `EXPLAIN ANALYZE` before it ships.
+
+- Index each foreign key the code looks rows up by.
+- For `WHERE customer_id = ? AND status = ? ORDER BY created_at DESC`, use `(customer_id, status, created_at DESC)`. It also serves queries on its leading columns, but not a query on `status` alone.
+- When most queries ask for a small subset, such as open orders, use a partial index with a `WHERE` clause.
+- Add no index without a query that uses it, because every index slows every write.
+
+## Connections
+
+Hold a connection only for the queries. Open the transaction in a `with` scope, build the view data inside it, and render after it closes. Give the pool a size and a short acquire timeout, such as `pool_timeout=2`, so exhaustion returns "service unavailable" and never hangs. When an endpoint still holds connections too long, profile it for lazy loads and slow queries.
+
+## Concurrent writes
+
+`READ COMMITTED` lets two transactions read the same stock count and both sell the last unit. Pick one guard for each contended resource and use it everywhere:
+
+- Optimistic: `UPDATE ... SET version = version + 1 WHERE id = $1 AND version = $2`. When zero rows change, another writer won, so reload and decide. Use it when conflicts are rare.
+- Pessimistic: `SELECT ... FOR UPDATE`, then update. Use it under heavy contention, keep the transaction short, and lock rows in a fixed order so the lock does not cause a deadlock.
+
+`SERIALIZABLE` makes the database abort one of two conflicting transactions, which `WithRetry` then retries. Mixing optimistic and pessimistic access on one row reopens the race.

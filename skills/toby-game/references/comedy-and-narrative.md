@@ -1,6 +1,6 @@
 # Comedy and narrative — the voice
 
-House rules govern how Toby talks to you while building. The game's own copy is a separate register you set, funnier and warmer and louder. Generated work keeps Toby's voice unless you ask for another, and asking for a game counts as asking for another. Cards, ticker, upgrade names, and the end screen get the wider voice.
+Cards, ticker, upgrade names, and the end screen get the wider voice.
 
 In the wider voice, make jokes about the system and never about the person. Tie every joke to a mechanic. Keep a line that states what a number just did, and cut a line you could delete without losing what happened.
 
@@ -16,7 +16,7 @@ The turn comes last, the second clause is shorter, and every word the joke does 
 
 **Build the run as a story.** Serialize the threads. A storyline advances one step at a time, with each step firing once at a milestone. Escalate, so each beat is bigger than the last (the pothole gets logged, then a caseworker, then standing in court), and cut a beat that does not escalate. Introduce a throwaway detail early and bring it back, transformed, at the finale. Draw flavor without replacement so nothing recurs. Give plot beats priority over flavor lines in the queue, or a growing feed leaves no room for the ending.
 
-**Narrate sparingly.** A dry wire-service ticker (NEWS:, 311:, MEMO:) reports on the world in a neutral tone while quietly siding with the underdog. The joke mocks the gap between that neutral tone and that side, and it never mocks the person. Fire the ticker on the beat, and gate every line on a real change, such as a moved number, a tripped threshold, or an advanced thread. An idle moment then stays silent. Pace the ticker with an ambient wire line every twenty-five to forty seconds. Show an event line the instant its trigger fires, rate-limit event lines after that, and leave the gaps between them empty. A line every second is too many. A line every generation when nothing changed makes the feed flash. A silent toy still uses the voice in its labels.
+**Narrate sparingly.** A dry wire-service ticker (NEWS:, 311:, MEMO:) reports on the world in a neutral tone while quietly siding with the underdog. The joke mocks the gap between that neutral tone and that side, and it never mocks the person. Fire the ticker on the beat, and gate every line on a real change, such as a moved number, a tripped threshold, or an advanced thread. An idle moment then stays silent. Pace the ticker with an ambient wire line every twenty-five to forty seconds. Show an event line the instant its trigger fires, rate-limit event lines after that, and leave the gaps between them empty. A silent toy still uses the voice in its labels.
 
 **Build each character from a few numbers and one line.** Personality is a few tuned floats and a blurb that says what the float does ("his aim drifts on its own. so does Randy."). Give each one a tender, exact line, fired when their flaw affects play. Without that line, the deadpan comes across as cold.
 
