@@ -4,7 +4,7 @@ This file gives before-and-after pairs for the rules in `plain-language.md`.
 
 ## Before and after
 
-### Sentence length limit of 25 words, or 20 when the reader follows the sentence as a step
+### Sentences of at most 25 words, or 20 words in an instruction the reader carries out
 
 Treat the word limit as a maximum, and vary sentence length below it.
 
@@ -34,14 +34,14 @@ Pick the repo's own identifier and keep using it. A fresh synonym on second ment
 
 The first version uses three names for one object: session cache, credential holder, and `SessionStore`.
 
-### Verbs as verbs
+### Use the verb for an action
 
 - Before: "The handler performs a validation of the payload and then does the initialization of the worker pool."
 - After: "The handler validates the payload, then initializes the worker pool."
 
-### Three-word cap on noun stacks
+### No more than three nouns in a row
 
-Past three words, the reader has to guess which word modifies which.
+When four or more nouns sit together, the reader has to guess which noun describes which.
 
 - Before: "runway light connection resistance calibration"
 - After: "calibration of the resistance in the runway light connection"
@@ -50,7 +50,7 @@ Past three words, the reader has to guess which word modifies which.
 
 ### State the relation
 
-A semicolon, a colon, or an em dash joining two clauses means the relation went unstated. Say which relation it is.
+When a semicolon, a colon, or an em dash joins two parts of a sentence, the reader has to guess how the parts connect. Use a word such as because, so, or but that says how they connect.
 
 - Before: "The cache never invalidates — the TTL is set at construction."
 - After: "The cache never invalidates, because the TTL is set at construction."
@@ -62,28 +62,28 @@ A semicolon, a colon, or an em dash joining two clauses means the relation went 
 - Before: "Clear the cache if the build fails."
 - After: "If the build fails, clear the cache."
 
-A reader who acts on the first half of the sentence before finishing it does the right thing in the second version.
+Some readers start acting before they finish a sentence. With the second version, they clear the cache only after the build has failed.
 
 ### A prohibition states the failure it prevents
 
 - Before: "Do not call this from a request handler."
 - After: "Do not call this from a request handler. It blocks for up to 30 seconds and will exhaust the connection pool."
 
-### Two `-ing` clauses means a procedure
+### Write steps as steps
 
 - Before: "Loading the fixtures while running the migration causes the seed to race the schema change."
 - After: "Wait for the migration to finish. Then load the fixtures. Otherwise the seed races the schema change."
 
 ## The note test
 
-STE Rule 5.5 says that notes give information and do not give instructions. Delete every note, re-read the procedure, and confirm the reader can still finish the task. If a step appears only inside a note, that text is an instruction, so it is a step.
+Simplified Technical English (STE) Rule 5.5 says a note gives information and never tells the reader to do something. Delete every note, reread the procedure, and confirm the reader can still finish the task. If a note contains an action the reader must take, move that action into the numbered steps.
 
 ## Rewriting around a banned word
 
 When a banned word has no plain replacement, rewrite the sentence. Do not put a rarer synonym in the same place in the sentence, because that produces stilted prose.
 
 - Banned-word swap: "Cloze the word that carries the learning." The swap uses six words to say something indirectly, so it reads worse than the word it replaced.
-- Recast: "Cloze the word the learner must produce."
+- Recast: "Blank out the word the learner must supply."
 
 - Banned-word swap: "This is the load-bearing assumption of the design."
 - Recast: "The design fails if this assumption is wrong."
@@ -109,27 +109,27 @@ Someone wrote each of these terms in this repo. A reader later flagged each one 
 - Before: "a component prop surface" → After: "a component's props"
 - Before: "a hook's return shape" → After: "a hook's return type"
 - Before: "the shape of a signature" → After: "what a signature exposes"
-- Before: "Narrow the blast radius." → After: "Point them at the smallest piece that could be wrong."
-- Before: "One move covers all six forms below." → After: "All six patterns below are the same habit."
+- Before: "Narrow the blast radius." → After: "Show the reader the smallest part of the code that could cause the failure."
+- Before: "One move covers all six forms below." → After: "All six patterns below add words after a sentence has already made its point."
 
 The test is whether a reader could look the word up and find your meaning. "Surface" in a dictionary is the outside of a thing. It is not a set of function parameters, so a reader who does not already know that usage has to guess.
 
 ### Whole, connected sentences
 
-An agent wrote each "Before" sentence below in a platform overview. Every one passed the checker, because the words were plain and the sentences were short.
+An agent wrote each "Before" sentence below in a platform overview. Every one passed `scripts/voice-check.py`, because the words were plain and the sentences were short.
 
 - Before: "A multi agent framework platform"
 - After: "Backplane is an extensible multi-agent platform."
 - Before: "Users talk to agents. Agents read, call tools, and pause for people."
 - After: "Users instruct agents, and agents perform complex actions and wait for human feedback."
 - Before: "Two libraries carry the framework."
-- After: "The platform consists of a shared generative UI toolkit and features that make it easy to build agents."
+- After: "The platform consists of a toolkit for generating user interfaces, which all agents share, and features that make agents easy to build."
 - Before: "A plugin is data. The framework compiles it."
 - After: "New agents are created as plugins."
 - Before: "No plugin imports an engine. No framework file names a plugin."
 - After: delete both sentences. They list what the code does not do, but a reader of an overview would not assume it did.
 
-The first before is a label with no verb. The second and fourth are runs of short sentences with no connector. The third uses `carry`, a verb for lifting, for a framework. The fifth is a mirrored pair.
+The first Before example is a label with no verb. The second and fourth are runs of short sentences with no connector. The third uses `carry`, a verb for lifting, for a framework. The fifth is two sentences with the same pattern and the parts swapped.
 
 ### Literal verbs and real actors
 
@@ -140,7 +140,7 @@ The first before is a label with no verb. The second and fourth are runs of shor
 - Before: "When the cache is down, the request falls through to `load()`."
 - After: "When the cache is down, the request calls `load()` directly."
 - Before: "Every lever feeds a formula."
-- After: "Every lever changes a number in a formula."
+- After: "Every setting changes a number in a formula."
 - Before: "Complexity creeps into the handler."
 - After: "Each new flag adds a branch to the handler."
 
@@ -154,7 +154,7 @@ The first before is a label with no verb. The second and fourth are runs of shor
 - Before: "Phase 1 of 3 in the queue migration."
 - After: "This commit is phase 1 of the 3-phase queue migration."
 - Before: "Guard: none."
-- After: "`api/webhooks.ts` has no check that stops it."
+- After: "`api/webhooks.ts` has no check that stops a duplicate webhook from being processed twice."
 - Before: "One file causes this failure. `scripts/test-install.sh` fails because `~/.claude/skills/toby-voice/SKILL.md` has a hand edit."
 - After: "`scripts/test-install.sh` fails because `~/.claude/skills/toby-voice/SKILL.md` has a hand edit the repo does not have."
 - Before: "Follow these steps to add one."
@@ -165,8 +165,8 @@ The first before is a label with no verb. The second and fourth are runs of shor
 - Before: "Yes, for your own text. Your CLAUDE.md already has the Toby marker block."
 - After: "Your text outside the Toby markers is safe, because the installer replaces only the text between them."
 - Before, on its own line: "Two hours is a long time on an install test."
-- After: delete it, and put the cause in the first sentence.
-- Before, in every reply to a joke about a 900-line file: "Most of the novel is yours."
+- After: delete it, and state in the first sentence why the install test took two hours.
+- Before, a line the agent repeated in each reply after the user joked about a 900-line file: "Most of the novel is yours."
 - After: "Lines 1 to 610 are yours, and lines 611 to 900 are the Toby block."
 
 ### Headings
@@ -187,28 +187,28 @@ A heading is a one- or two-word label or a phrase that says what the section cov
 - Before: "Each of the 6 failures would have succeeded on a retry or paged the on-call engineer."
 - After: "On the queue service, a job that fails its third retry pages the on-call engineer."
 - Before: "Prediction: the invoice export failure would have paged the on-call engineer."
-- After: delete the bullet. A label does not make a guess about the past checkable.
+- After: delete the bullet. Writing "Prediction:" in front of a guess about what would have happened does not give anyone a way to check the guess.
 - Before, in a README overview: "Model providers are swappable engines, so a plugin never imports an engine directly."
 - After: "Model providers are swappable in Relay." The rule against importing an engine goes in the contributor section.
 
 ### Modifier placement
 
 - Before: "Check every prose file written this turn in two steps, without being asked."
-- After: "Without being asked, check in two steps every prose file written this turn."
+- After: "Even when nobody asks, check every prose file you wrote during this reply. Do the check in two steps."
 - Before: "Read every sentence against the READ list after handling the findings."
 - After: "After you handle the findings, read every sentence against the READ list."
 
-In the first before sentence, `in two steps` and `without being asked` could each modify `check` or `written`. In the second, nobody is named as the one who handles the findings. Each after sentence puts the phrase next to the verb it modifies.
+In the first Before sentence, a reader cannot tell whether `in two steps` and `without being asked` describe the checking or the writing. In the second, nobody is named as the one who handles the findings. Each After sentence puts the phrase next to the action it describes.
 
 ## What Toby refused from STE, and why
 
-The sentence and word rules adapt ASD-STE100 Simplified Technical English, and rules 17 to 19 come from ISO 24495-1:2023. Rule 6 allows the passive when the actor is unknown, which is less strict than Orwell's rule, because the defect is a hidden actor.
+The sentence and word rules in `plain-language.md` adapt ASD-STE100 Simplified Technical English, and rules 17 to 19 come from ISO 24495-1:2023. Rule 6 allows passive voice when nobody knows who did the action. Orwell's rule bans passive voice whenever an active form exists. Rule 6 is looser because passive voice is a problem only when it hides who acted.
 
 STE was written for aircraft maintenance, and some of its rules only make sense for that work.
 
-- **The approved-word dictionary.** STE's own explanatory prose is exempt from STE, which shows the constraint is meant for procedures. A closed vocabulary also conflicts with the rule to reproduce identifiers and error text exactly.
-- **No phrasal verbs.** That rule would delete roll back, spin up, back up, tear down, check out, and time out, and replace plain Anglo-Saxon words with Latinate ones. It contradicts the rule to use plain words.
-- **No verbing technical nouns.** Software work uses cache, log, mock, flag, ship, diff, seed, patch, and branch as verbs. Replacing each one takes three to five words.
+- **The approved-word dictionary.** STE's own explanations do not follow the approved-word list, which shows the list is meant only for step-by-step procedures. A closed vocabulary also conflicts with the rule to reproduce identifiers and error text exactly.
+- **No phrasal verbs.** That rule would delete roll back, spin up, back up, tear down, check out, and time out, and replace short everyday words with longer formal ones. It contradicts the rule to use plain words.
+- **No technical nouns used as verbs.** Software work uses cache, log, mock, flag, ship, diff, seed, patch, and branch as verbs. Replacing each one takes three to five words.
 - **No contractions.** STE writes for a non-native technician, but Toby writes for a developer, who reads "don't ship that" the same as "do not ship that". "Don't ship that" sounds like something a person would say.
-- **The `-ing` ban.** Gerunds are the field's nouns: caching, logging, polling, batching. The progressive matters too, because "the build is running" and "the build runs" are different claims about the machine.
-- **Word-count arithmetic, warning placards, and illustration callouts.** These rules are about signage and tallying.
+- **The `-ing` ban.** Software work uses -ing words such as caching, logging, polling, and batching as nouns. The -ing verb form matters too, because "the build is running" and "the build runs" are different claims about the machine.
+- **Word-count arithmetic, warning placards, and illustration callouts.** STE has rules for counting words, for warning signs, and for labels on drawings. Those rules fit printed maintenance manuals and do not apply to Toby's writing.

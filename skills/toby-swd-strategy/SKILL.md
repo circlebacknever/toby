@@ -14,12 +14,12 @@ Leave the design at least as good after your change as before it. Do not count w
 
 For anything beyond a one-line change, do not implement the first idea.
 
-- State the change in one sentence, with each near-future variant that the request, a ticket, or the code states. Leave out a variant you inferred.
-- Sketch at least two approaches that differ in where the complexity is: which module handles the hard part, what the interface exposes, and what callers must manage. Make the second approach the strongest option a competent engineer would pick. Pick the one with the simplest caller-side interface, even when its implementation is harder. This compares placements, so the one-candidate cheap path in `toby-swd-interfaces` applies only after the placement is settled.
+- State the change in one sentence. List each near-future variant, meaning a likely next change, that the request, a ticket, or the code states. Leave out a variant you inferred.
+- Sketch at least two approaches that differ in where the complexity is: which module handles the hard part, what the interface exposes, and what callers must manage. Make the second approach the strongest option a competent engineer would pick. Pick the one with the simplest caller-side interface, even when its implementation is harder. This step decides which module holds the hard part. The "Cheap path first" rule in `toby-swd-interfaces`, which allows a single interface design, applies only after that decision.
 - Check the near-future variants against the design. When a likely next change would force callers to change or add a special case, adjust the design now.
 - When those variants are new cases picked by a tag or type, design the dispatch now. Use a lookup map when the case bodies are small, and an interface with implementations when each case has its own state. `toby-swd-modules` lists the options.
 
-`toby-swd-modules` checks 3 and 7 state where complexity goes and when to split a function.
+In `toby-swd-modules`, check 3 ("Pull complexity downward") says where complexity goes, and check 7 ("Split or merge") says when to split a function.
 
 ## Existing code
 
@@ -33,7 +33,7 @@ After the change, find one flaw in the code you touched, such as an unclear name
 
 Take the tactical path only when one of these holds:
 
-- The user accepted the debt because the sound design would miss a hard external deadline.
+- The user accepted the shortcut and its later cleanup cost, because the sound design would miss a hard external deadline.
 - The sound refactor would change an interface that other teams or callers depend on, and coordinating that is out of scope.
 - The sound version needs information you do not have and cannot get.
 

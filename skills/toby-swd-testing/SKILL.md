@@ -11,13 +11,13 @@ description: >-
 
 # Toby SWD Testing
 
-Tests record the behavior callers rely on, checked through the public interface. A refactor, a new feature, or a bug fix leaves existing tests unchanged. Only a change to required behavior edits an existing test, so a test that needs an edit during a refactor checks internals. Assert call order only when that order is the observable contract.
+Tests record the behavior callers rely on, checked through the public interface. A refactor, a new feature, or a bug fix leaves existing tests unchanged. Edit an existing test only when the required behavior changes, so a test that needs an edit during a refactor checks internals. Assert call order only when that order is the observable contract.
 
 When a behavior is hard to test, the abstraction is too coarse. Extract a smaller module with a real interface and test through it. Do not expose internals only so a test can reach them.
 
 ## Names
 
-Name each test for the behavior it specifies, such as `expired token is rejected`, and never for a call, such as `calls paymentService.process`. When you cannot name the behavior, the boundary is wrong or the test mixes two behaviors.
+Name each test for the behavior it specifies, such as `expired token is rejected`, and never for a call, such as `calls paymentService.process`. When you cannot name the behavior, either the code under test is split in the wrong place or the test mixes two behaviors.
 
 ## Assertions
 
@@ -28,11 +28,11 @@ An assertion fails when the behavior under test changes, and never on a timestam
 - Use object subset matching when only a few fields matter.
 - Use full-object equality or a snapshot only when the whole structure is the contract, such as a config file, a response schema, or a serialization format.
 
-Read the diff before accepting a snapshot update, and confirm every change is intended, because accepting an unread update deletes the test.
+Read the diff before accepting a snapshot update, and confirm every change is intended. Accepting an unread update makes the snapshot match whatever the code now does, so the test stops checking anything.
 
 ## Coverage
 
-Cover the success path, each documented failure mode, and the boundary conditions, then stop. Keep one behavior per test, with as many asserts as that behavior needs. Default to named examples. Add a property test when the contract is a round trip, agreement with a simpler reference version, or an invariant.
+Cover the success path, each documented failure mode, and the boundary conditions, then stop. Keep one behavior per test, with as many asserts as that behavior needs. Default to tests with specific example inputs. Add a property test when the contract is a round trip, agreement with a simpler reference version, or an invariant.
 
 ## Independence
 
@@ -42,20 +42,20 @@ Each test shares no mutable state with other tests and passes in any order. Cont
 
 Write the test first in two cases:
 
-1. **A bug fix with defined durable behavior.** Reproduce the bug in a failing test before touching production code. Read the failure and confirm it shows the bug's wrong result. A failure from an import error, a missing fixture, or a typo proves only that the test is broken.
+1. **A bug fix where the correct behavior is defined and will stay required.** Reproduce the bug in a failing test before touching production code. Read the failure and confirm it shows the bug's wrong result. A failure from an import error, a missing fixture, or a typo proves only that the test is broken.
 2. **New behavior with a settled contract.** After the design pass settles the interface, write the test that defines the contract, then implement to it.
 
 Skip test-first while the design is open, and do the design pass first with `toby-swd-strategy` and `toby-swd-modules`. Also skip it when no harness exists, the change is docs or formatting, or the check needs unsafe external state. Say which case applied and how you verified.
 
 ## Prove a change
 
-A criterion counts as met after two runs of one named command, quoted under the criterion's own wording. The first run is against the code before the change, or with the new path disabled, and the second is after:
+An acceptance criterion counts as met after two runs of the same named command. Quote both results under the criterion's own wording. The first run is against the code before the change, or with the new path disabled, and the second is after:
 
     cancelling a shipped order returns 409 and leaves the order untouched
     before  test_cancel_rejects_shipped  FAIL  expected 409, got 200
     after   test_cancel_rejects_shipped  PASS
 
-Use the same form for every criterion in every slice, with the command written beside it. An `after` run with no `before` run proves only that the harness runs, so report that criterion unmet and state the missing run.
+Use the same form for every criterion in every slice, meaning each small step of the work, with the command written beside it. An `after` run with no `before` run proves only that the harness runs, so report that criterion unmet and state the missing run.
 
 ## Test doubles
 
@@ -80,7 +80,7 @@ Read a test you cannot classify until you understand it. When you delete or weak
 
 ## Existing tests
 
-Read the tests that cover the touched behavior before adding new ones. When coverage is thin, report the untested behavior as a risk, and state the characterization test that would cover it. When the user declines automated tests, record the verification they chose.
+Read the tests that cover the touched behavior before adding new ones. When coverage is thin, report the untested behavior as a risk, and state the characterization test that would cover it. A characterization test records what the code does today. When the user declines automated tests, record the verification they chose.
 
 ## Red flags
 

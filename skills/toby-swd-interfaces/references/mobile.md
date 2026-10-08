@@ -2,7 +2,7 @@
 
 ## Native bridge
 
-A wrapper that re-exports seven `RNBiometrics` methods needs a nine-sentence comment that sets the call order and lists iOS and Android quirks. Hide the protocol behind two calls:
+A wrapper that re-exports seven `RNBiometrics` methods needs a nine-sentence comment. The comment states the required order of calls and lists iOS and Android quirks. Hide that sequence of calls behind two methods:
 
 ```ts
 type BiometricsState =
@@ -22,11 +22,11 @@ interface Biometrics {
 
 > Reports whether biometric auth can be used on this device and prompts the user when needed. status returns the current capability. prompt displays the system biometric UI and returns a typed result. If a payload is supplied, the result includes a signature bound to a per-device key (created lazily on first use).
 
-Key lifecycle, the `Info.plist` entry, and lockout stay inside the module. The per-device signature stays in the comment, because the server can trust it only for that device. The same rule applies to a Swift or Kotlin bridge.
+Creating and deleting the signing key, the `Info.plist` entry, and lockout handling stay inside the module. The per-device signature stays in the comment, because the server can trust it only for that device. Design a Swift or Kotlin bridge the same way, with two calls, typed results, and the platform steps hidden inside.
 
 ## Route params
 
-Route params are serialized, persisted across reloads, and filled by deep links, so they are a screen's public contract. Pass identity only:
+Route params are serialized, persisted across reloads, and filled by deep links, so they are a screen's public contract. Pass only ids in route params:
 
 ```ts
 type RootStackParamList = {
@@ -52,11 +52,11 @@ interface FeedCache { load(): Promise<FeedItem[] | null>; save(items: FeedItem[]
 interface Session   { tokens(): Promise<Tokens | null>; save(t: Tokens): Promise<void>; clear(): Promise<void>; }
 ```
 
-`Session.save` writes to Keychain or Keystore, because AsyncStorage is not encrypted. `FeedCache` handles its version suffix and the size limit. Logout calls `Session.clear()` and `FeedCache.clear()` and keeps `UserPrefs`, so what logout clears is one decision in one file.
+`Session.save` writes to Keychain or Keystore, because AsyncStorage is not encrypted. `FeedCache` handles its version suffix and the size limit. Logout calls `Session.clear()` and `FeedCache.clear()` and keeps `UserPrefs`, so the list of data that logout clears is written in one file.
 
 ## Screen data hook
 
-A hook that returns `data`, `loading`, `error`, `isRefetching`, and `canX` flags needs rules such as "treat undefined as not allowed." Return one state per legal combination:
+A hook that returns `data`, `loading`, `error`, `isRefetching`, and `canX` flags needs rules such as "treat undefined as not allowed." Return one state per valid combination:
 
 ```ts
 type OrderScreenState =
@@ -65,4 +65,4 @@ type OrderScreenState =
   | { status: 'loaded'; order: Order; actions: OrderActions };
 ```
 
-`actions` holds only the actions the current user may perform, so no permission flag can disagree with its handler. Each action returns `Result`, so callers need no try/catch.
+`actions` holds only the actions the current user may perform. So the screen has no separate permission flag that could differ from what the handler allows. Each action returns `Result`, so callers need no try/catch.

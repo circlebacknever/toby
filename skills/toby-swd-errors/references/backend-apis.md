@@ -31,8 +31,8 @@ The helper passes the deadline in `ctx`, stops sleeping when the deadline expire
 
 ## Timeouts
 
-Give every downstream call a timeout at its healthy p99.9 latency plus padding, so at most 0.1% of healthy calls time out. Without one, a slow downstream holds this service's threads, so the slowdown spreads to every caller upstream. Render a page without a non-critical dependency, such as a recommendations panel, and fill the panel in when it arrives.
+Give every downstream call a timeout at its healthy p99.9 latency plus padding, so at most 0.1% of healthy calls time out. Without one, a slow downstream holds this service's threads, so the slowdown spreads to every caller upstream. Render the page without waiting for a non-critical dependency, such as a recommendations panel, and fill in the panel when its data arrives.
 
 ## Circuit breakers
 
-Add a circuit breaker only after a measurement or a post-mortem shows calls piling up on a slow downstream. It also needs a call frequent enough to give it a failure rate to read. Leave it out for a low-traffic call, for a downstream that already fails fast, and where the retry policy already handles the failure. A breaker has bugs that appear only during incidents and tuning values that are hard to set. It also hides tripped calls from logs and dashboards.
+Add a circuit breaker only after a measurement or a post-mortem shows calls piling up on a slow downstream. Add one only for a call made often enough that its failure rate means something. Leave it out for a low-traffic call, for a downstream that already fails fast, and where the retry policy already handles the failure. A breaker has bugs that appear only during incidents and tuning values that are hard to set. It also hides tripped calls from logs and dashboards.

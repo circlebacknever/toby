@@ -527,6 +527,126 @@ examples from different files. Mark which kinds this reader would find grating.
 
 Reply with just the word "done".""",
     },
+    "report": {
+        "file": "suites/report.md",
+        "scorer": "manual",
+        "min_samples": 12,
+        "prompt": """Write three chat replies as Toby, the way an agent with Toby installed would.
+
+Setup, follow it exactly:
+1. Read {repo}/base/toby.md in full. It is the operating guide every Toby session loads.
+2. Read {repo}/skills/toby-voice/SKILL.md and {repo}/skills/toby-voice/references/plain-language.md in full.
+3. Read {repo}/skills/toby-code-review/SKILL.md, which the review task routes to.
+4. Read {repo}/evals/suites/report.md for the three tasks. Use only the facts it gives.
+
+Write the three replies to {repo}/evals/results/report-<run>.md, in this format and nothing else:
+
+## 1
+<the final report>
+
+## 2
+<the review summary>
+
+## 3
+<the reply to "what does that mean?">
+
+No preamble, no summary, no notes. Reply with just the word "done".""",
+    },
+    "defaults-judge": {
+        "file": "suites/report.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """You are reading prose for one reader who cannot stand the default writing
+habits of AI assistants. Find every sentence that shows one of the habits below.
+Read no style guide and no rules file. Do not rewrite anything and do not grade kindly.
+
+Read every `.md` file in {folder}. Each file is one output, or a list of
+sentences. Judge each sentence on its own words.
+
+Fail a sentence for any of these habits, and give the habit's name:
+
+- slogan: a run of short sentences with no connecting word, two sentences or
+  bullets that mirror each other, a thing defined by one bare word, or a noun
+  phrase standing as a sentence. Examples: "A plugin is data. The framework
+  compiles it.", "Users talk to agents. Agents read, call tools, and pause for
+  people.", "A multi agent framework platform".
+- figurative: a verb or noun used for something it cannot literally do or be, or
+  an idiom. Examples: "Two libraries carry the framework.", "five sentences
+  wearing a hat", "lives in", "lands", "feeds", "sits on".
+- foil: a contrast with something nobody said, in any form, such as "X, not Y",
+  "not just", "rather than", "instead of", or "it's not X, it's Y". Examples:
+  "Copy the shape, not the words", "it is a real tension, not a free addition".
+- hedge: a hedge, sincerity word, or importance flag, such as honestly,
+  genuinely, arguably, crucially, it's worth noting, to be fair.
+- deferred: the answer held back by a setup sentence, a label, or a partial
+  first sentence. Examples: "Here's why.", "Short answer: yes.", "Two things
+  matter here:", "Yes, though not for the reason you think."
+- stock opener: a reply or paragraph that opens with praise or acknowledgement,
+  such as Great, Perfect, Good catch, Noted, Got it, Understood, You're right.
+- closing offer: an offer of more help or a check-in at the end, such as "Let me
+  know if you want me to...", "Happy to help further".
+- recap: a sentence that restates something the output already said, or sums it up.
+- dramatic: a punchline, an aphorism, a stakes word, or a build to a reveal.
+  Examples: "That's the whole trick.", "This is the damning part."
+- dash: an em dash or en dash joining clauses.
+- semicolon: a semicolon joining clauses.
+- colon reveal: a colon before a single reveal or answer, such as "The cause is
+  simple: CI runs in UTC."
+
+Do not fail a sentence for being long, for using a file path or code, or for a
+habit not on this list. These pass: a short social reply to thanks, such as "No
+problem.", and a standard software verb used in its usual sense, such as code
+that moves to another file, a feature that ships, or a script that branches.
+
+Write {out} with one section per file, in this format and nothing else:
+
+## <file name>
+- [<habit>] "<the sentence, quoted exactly>"
+
+Write "- none" under a file with no fails. Reply with just the word "done".""",
+    },
+    "readability-judge": {
+        "file": "suites/report.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """You are a capable adult who did not see any of the work behind the text you
+are about to read. You read each file once, the way a busy person reads a message
+from a coworker. Read no style guide and no rules file.
+
+Read every `.md` file in {folder}. Each file is one output, or a list of
+sentences.
+
+When a file is a list of separate sentences, each sentence comes from a longer
+document. Judge it as a reader who read that document up to this sentence, so a
+product, model, or file name the document would have introduced is known. Fail
+only what that reader would still trip on.
+
+For each file, do these steps in order.
+
+1. Write two or three plain sentences saying what you understood the file to
+   tell you, and what you would do next because of it. Write this before step 2.
+2. Quote every sentence that fails one of these tests, with the test's name and
+   one line on why:
+   - lost: you could not work out what the sentence means, or what you are
+     supposed to do.
+   - reread: you had to read it twice, or go back to an earlier sentence, to
+     follow it. Include a word like "It" or "That" whose meaning you had to
+     work out, a "because" or "so" that does not state a real cause or result,
+     and a sentence with so many clauses that you lost track.
+   - jargon: a label, id, abbreviation, or term that nothing in the text
+     explained and that a reader outside the work would not know. Do not fail a
+     file path, a command, or code that the reader is told to use.
+   - unnatural: a coworker explaining this out loud would never phrase it this
+     way. Write how a coworker would say it.
+{facts_step}
+Write {out} in this format and nothing else:
+
+## <file name>
+Understood: <your sentences from step 1>
+- [<test>] "<the sentence, quoted exactly>" | <why>
+{facts_format}
+Write "- none" under a file with no fails. Reply with just the word "done".""",
+    },
     "triggering": {
         "file": "suites/triggering.md",
         "scorer": "triggering",
@@ -728,8 +848,22 @@ def compare(suite: str, paths: list[Path]) -> int:
     return 0
 
 
-def prompt(suite: str) -> int:
-    print(SUITES[suite]["prompt"].format(repo=REPO_ROOT))
+# A judge reads a folder of blinded files and writes to a named output, so a
+# prompt can take those two values. The readability judge also takes the facts
+# step, which is left out when it reads a list of single sentences.
+FACTS_STEP = """3. After step 2, read {facts} for the facts the writer was given. Under each
+   file, list every place where your step 1 understanding was wrong or missing
+   something the facts say the reader needed.
+"""
+FACTS_FORMAT = "Misread:\n- <what you got wrong, or none>\n"
+
+
+def prompt(suite: str, repo: Path = REPO_ROOT, folder: str = "", out: str = "", facts: str = "") -> int:
+    print(SUITES[suite]["prompt"].format(
+        repo=repo, folder=folder, out=out,
+        facts_step=FACTS_STEP.format(facts=facts) if facts else "",
+        facts_format=FACTS_FORMAT if facts else "",
+    ))
     return 0
 
 
@@ -753,6 +887,10 @@ def main() -> int:
     sub.add_parser("list")
     p = sub.add_parser("prompt")
     p.add_argument("suite", choices=sorted(SUITES))
+    p.add_argument("--repo", type=Path, default=REPO_ROOT, help="read rules from this checkout")
+    p.add_argument("--folder", default="", help="the folder a judge reads")
+    p.add_argument("--out", default="", help="the file a judge writes")
+    p.add_argument("--facts", default="", help="the task file the readability judge checks against")
     c = sub.add_parser("compare")
     c.add_argument("suite", choices=sorted(SUITES))
     c.add_argument("files", nargs="+")
@@ -765,7 +903,7 @@ def main() -> int:
     if args.command == "list":
         return list_suites()
     if args.command == "prompt":
-        return prompt(args.suite)
+        return prompt(args.suite, args.repo, args.folder, args.out, args.facts)
     return compare(args.suite, [Path(f) for f in args.files])
 
 

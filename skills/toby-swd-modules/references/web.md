@@ -6,11 +6,11 @@ When each page fetches in `useEffect` with its own loading, error, and cancellat
 
 ## Shared behavior
 
-Share behavior as a function the component calls: a `use*` hook in React, a `create*` function in Solid, or a rune-based factory in Svelte 5. A higher-order component injects props a reader cannot see in the component's file, and three stacked wrappers hide its real interface.
+Share behavior as a function the component calls: a `use*` hook in React, a `create*` function in Solid, or a rune-based factory in Svelte 5. A higher-order component adds props that a reader cannot see in the component's file. When three such wrappers are stacked, the component's full list of props is hidden.
 
 ## Store slices
 
-A single global store that holds user, theme, cart, coupon, and notifications exposes its whole state layout to every component. Give each body of knowledge its own slice whose methods keep its invariants:
+A single global store that holds user, theme, cart, coupon, and notifications exposes its whole state layout to every component. Give each area of state, such as cart or auth, its own slice. Make that slice's methods enforce its rules, such as no duplicate items in the cart:
 
 ```tsx
 export const useCart = create<CartState>((set, get) => ({
@@ -26,7 +26,7 @@ export const useCart = create<CartState>((set, get) => ({
 export const useAuth = create<AuthState>((set) => ({ ... }));
 ```
 
-A wishlist gets a new slice and leaves the others unchanged. Slice by knowledge boundary such as auth, cart, and theme, because one slice per field makes every component import six. Zustand does not track a derived method, so read it through a selector that calls it, `useCart((s) => s.total())`. Selecting `s.total`, or calling `useCart.getState().total()` in render, does not subscribe and shows a stale value. Solid's `createStore` and Svelte's `derived` track the read.
+A wishlist gets a new slice and leaves the others unchanged. Split slices by area, such as auth, cart, and theme, because one slice per field would make every component import six slices. Zustand does not track a derived method, so read it through a selector that calls it, `useCart((s) => s.total())`. Selecting `s.total`, or calling `useCart.getState().total()` in render, does not subscribe and shows a stale value. Solid's `createStore` and Svelte's `derived` track the read.
 
 ## Headless components
 

@@ -21,26 +21,26 @@ Make working code faster or lighter, and keep only the changes a measurement sup
 2. Look for a better algorithm, a missing index, or a cache before code-level tuning.
 3. Change one thing, then run the same command again.
 4. Revert a change with no measured effect unless it also made the code simpler.
-5. When the path has a stated budget, measure its worst case under load.
+5. When the code path has a stated budget, such as a latency or memory limit, measure its worst case under load.
 
 ## Report
 Give the baseline, the result, the command, and what stays unmeasured, such as production load.
 
 ## Performance design
 
-Do the design before you measure, and measure before you optimize.
+Think about cost while you design. Once the code exists, measure it before you optimize it.
 
-**At design time, know what is expensive.** When a naturally efficient option is no more complex than a slow one, take it. A cheap operation repeated in a steady-state loop can exceed the budget. In such a loop, reuse memory over allocating fresh, and skip or defer work over blocking the loop to retry.
+**At design time, know what is expensive.** When a fast option is no more complex than a slow one, take the fast one. A cheap operation can exceed the budget when a loop that runs all the time repeats it. In such a loop, reuse memory and do not allocate fresh memory. Skip or defer work that cannot finish now, and do not block the loop to retry it.
 
-**Add complexity only on evidence.** Add performance complexity before a problem appears only when it is small and hidden behind the interface. When it is large or changes an interface, build the simple version and optimize after a problem appears. The exception is a path with a stated budget it must meet to be correct, such as a latency or memory limit, a frame deadline, a no-allocation policy, or a known hot path. Treat that budget as a design input from the start. Measure the path at its worst case under load, because the average can hide an exceeded limit.
+**Add complexity only on evidence.** Before a problem appears, add performance complexity only when it is small and the module's interface hides it from callers. When it is large or changes an interface, build the simple version and optimize after a problem appears. The exception is a path with a stated budget it must meet to be correct, such as a latency or memory limit, a frame deadline, a no-allocation policy, or a known hot path. Treat that budget as a design input from the start. Measure the path at its worst case under load, because the average can hide an exceeded limit.
 
-**When something is slow, measure, then redesign the critical path.** Build a measurement harness only for a stated budget or a measured problem. Never optimize on a guess about which line is slow. Writing in an idiom whose cost is known, such as allocation-free code, is design and needs no measurement. Record a baseline, change one thing, and re-measure. Revert a change with no measurable effect unless it also simplified the design. Try a fundamental fix first, such as a cache, a better algorithm, or a better data structure. Redesign the critical path in code only as the last resort.
+**When something is slow, measure before you change it.** Build a measurement harness only for a stated budget or a measured problem. Never optimize on a guess about which line is slow. Writing code in a style whose cost is already known, such as allocation-free code, counts as design and needs no measurement. Record a baseline, change one thing, and re-measure. Revert a change with no measurable effect unless it also simplified the design. Try a fix that changes the approach first, such as a cache, a better algorithm, or a better data structure. Redesign the critical path in code only as the last resort.
 
-For that redesign, write the smallest code the common case must run, ignoring the current structure, and rebuild toward it. Put one check at the top that sends every special case off the common path, and write the special-case code for simplicity over speed.
+For that redesign, first write the least code the common case needs, ignoring how the code is arranged today. Then change the existing code toward that version. Put one check at the top that sends every special case off the common path. Write the special-case code to be simple even when it runs slower.
 
 ## Brownfield Work
 
-Before adding a cache or batching path, find the existing ones nearby. When the same caching or batching repeats across call sites, report the copies at file:line and the consolidation that would remove them. Preserve caller-visible errors, timing, logs, metrics, and status codes unless the user approves a behavior change.
+Brownfield work means changing code that already exists. Before adding a cache or batching path, find the existing ones nearby. When the same caching or batching repeats across call sites, report the copies at file:line and the consolidation that would remove them. Preserve caller-visible errors, timing, logs, metrics, and status codes unless the user approves a behavior change.
 
 ## Red flags
 
@@ -49,9 +49,9 @@ Before adding a cache or batching path, find the existing ones nearby. When the 
 
 ## References
 
-Read the stack file that matches the code.
+Read the stack file that matches the code. A stack file is one of the references below, written for one platform such as web or mobile.
 
-- `references/caching.md` covers the measurement to take before adding a cache, what a cache costs, stampede tiers, and TTL policy. Open it before adding a cache.
+- `references/caching.md` covers the measurement to take before adding a cache, what a cache costs, stampede tiers, and TTL policy. A stampede is many requests reloading the same expired entry at once. Open it before adding a cache.
 - `references/examples.md` has a worked case of design-time performance.
 - `references/web.md` covers React, Solid, and Svelte memoization, virtualization, and render work.
 - `references/mobile.md` covers React Native lists, images, and bridge calls.

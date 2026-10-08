@@ -1,23 +1,23 @@
 # Toby Artifact geometry
 
-Load this file when you put a geometric mark on a slide, panel, or page. The mark can appear at content scale, where the mark IS the figure, or at decorative scale, where it forms a textured backdrop.
+Load this file when you put a geometric mark on a slide, panel, or page. A mark is used at one of two scales. At content scale, the mark is the figure the reader studies. At decorative scale, the mark is faint background texture.
 
 ## Two scales
 
 - **Content scale (120–220 px).** The mark shows part of the content, so pair it with a small UPPERCASE label that names it. The label is mandatory, because unlabeled geometry counts as decoration, which is not allowed at this scale.
 - **Decorative scale (40–80 px).** The mark adds texture, so set its opacity to ≤ 0.25 and give it no label.
 
-If you are sizing a mark between these two ranges, pick one of the two extremes.
+Do not size a mark between 80 px and 120 px. Pick a size inside one of the two ranges.
 
 ## Geometry beside a claim
 
-Place each mark next to the claim it clarifies. A slide with a geometric mark and no claim has no purpose, because the mark only annotates the claim.
+Place each mark next to the claim it clarifies. Do not put a mark on a slide that has no claim, because a mark only explains the claim beside it.
 
 ## Stroke and color
 
 - Draw marks with a 1px monochromatic stroke in `currentColor` or `--text-primary`.
-- Use no fills unless the marker is a solid dot, such as an anchor, a body at a focus, or a periapsis marker.
-- A single red dot (`--toby-accent`) is allowed when the dot marks the consequence anchor, such as periapsis, a threshold breach, or a decision point. Otherwise, draw the mark in ink only.
+- Draw marks as outlines with no fill. The only exception is a solid dot for one point, such as an anchor, a body at an orbit's focus, or periapsis.
+- A single red dot (`--toby-accent`) is allowed when the dot marks where the consequence happens, such as periapsis, a threshold breach, or a decision point. Otherwise, draw the mark in ink only.
 
 ---
 
@@ -27,7 +27,7 @@ Each mark has one purpose. Use a mark at content scale with its label, or at dec
 
 | Mark | Purpose |
 |---|---|
-| `orbit-marker` | Single anchored ellipse with a body at one focus. Identifies the subject of an orbit claim. |
+| `orbit-marker` | Single anchored ellipse with a body at one focus. Shows which body a claim about an orbit refers to. |
 | `evidence-field` | Scatter of dots within a bounded region. Marks where samples were taken. |
 | `threshold-rail` | Horizontal band defined by a min and a max. Shows watch / consequence boundaries beside a value. |
 | `coordinate-stamp` | Tagged anchor at a precise (x, y). The label is in a small framed chip beside the crosshair. |
@@ -35,7 +35,7 @@ Each mark has one purpose. Use a mark at content scale with its label, or at dec
 | `signal-rings` | Concentric arcs decaying outward. Use it to show attenuation, decay, or broadcast. |
 | `uncertainty-fan` | Cone widening with distance. Shows trajectory uncertainty after a perturbation. |
 | `uncertainty-halo` | Ring of decreasing density around a point. Shows position uncertainty without choosing a direction. |
-| `axis-bracket` | Span markers tagged with a value band. A bracket below an axis marks the interval as its own item. |
+| `axis-bracket` | Span markers tagged with a value band. A bracket below an axis marks one range of values on that axis. |
 | `route-trace` | Dashed path between two anchored points. Marks the trajectory. |
 | `radial-range` | Two concentric circles defining inner and outer radius. Pair with a label for the band. |
 | `phase-bands` | Horizontal stripes of equal width. Shows seasonal, diurnal, or threshold-banded phases. |
@@ -45,7 +45,7 @@ Each mark has one purpose. Use a mark at content scale with its label, or at dec
 | `model-envelope` | Smooth band around a trace. Shows the 1σ / 2σ envelope of a fit. |
 | `calibration-grid` | Subtle background grid for diagram alignment. Use it only behind dense plots. |
 | `matrix-grid` | Square ruled grid. Use it as a backdrop where rows / columns mean something. |
-| `orbital-lattice` | Concentric circles + radial spokes. Place it behind orbital diagrams to indicate the gravitational frame. |
+| `orbital-lattice` | Concentric circles + radial spokes. Place it behind an orbit diagram as a reference frame centered on the main body. |
 | `triangulation-mesh` | Triangle lattice. Place it behind ground-station coverage diagrams. |
 
 ---
@@ -60,7 +60,7 @@ Pick the mark for the structure of the subject. These defaults cover common subj
 - For an orbital subject, use `orbit-marker` at content scale and `orbital-lattice` as a decorative backdrop.
 - For a signal or transmission subject, use `signal-rings` for the emitter and `coordinate-fan` for sector coverage.
 
-Refuse these lazy defaults: `orbit-marker` for every artifact regardless of subject, `locator-reticle` as a decoration when no target needs locating, `calibration-grid` everywhere because it looks technical.
+Do not use `orbit-marker` for every artifact whatever the subject, `locator-reticle` as decoration when no target needs locating, or `calibration-grid` everywhere because it looks technical.
 
 If you cannot explain why the mark fits the subject's structure, pick a different mark.
 

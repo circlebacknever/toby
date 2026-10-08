@@ -4,7 +4,7 @@ Use these tokens when writing CSS for an HTML or React page.
 
 ## Spacing in multiples of 4
 
-Prefer named tokens. When no token matches exactly, pick the closest one, and never use a one-off value.
+Use the tokens below. When no token matches exactly, pick the closest one, and never use a one-off value.
 
 ```css
 --space-xs:     4px;   /* gap between tightly-coupled siblings */
@@ -92,14 +92,15 @@ Prefer named tokens. When no token matches exactly, pick the closest one, and ne
 
 - **Hover (paper):** The background changes to `--toby-paper-2`, but the foreground stays the same.
 - **Hover (dark):** The background lightens to `--ink-hover` (`#4a4e57`), but the text stays the same.
-- **Active / press:** The background turns darker (`--surface-pressed` / `--ink-pressed` / `--accent-pressed`), but the border stays. The control does not shrink or move.
+- **Active / press:** The background turns darker. The border stays the same. A paper control uses `--surface-pressed`, an ink control uses `--ink-pressed`, and a red control uses `--accent-pressed`. The control does not shrink or move.
 - **Focus:** Draw a 2px outside ring in `--toby-info` (teal) at a 2px offset. **Never use red.**
-- **Selected / current in lists/trees/menus:** Use a `--toby-paper-2` background with a 3px `--toby-info` inset on the left. Paper-3 against paper-3 is invisible, so never use paper-3 as a selection state.
+- **Selected or current item in a list, tree, or menu:** Use a `--toby-paper-2` background and a 3px `--toby-info` strip along the inside of the left edge. Paper-3 against paper-3 is invisible, so never use paper-3 to show a selection.
 
-Hover and base must differ by ≥ 3:1 contrast (WCAG 1.4.11).
+The hover color and the normal color must have a contrast ratio of at least 3:1, as WCAG 1.4.11 requires.
 
 ## Icons
 
-- Use Lucide where available. Inline SVG is acceptable for static artifacts. Use the app's icon library for coded frontends when one exists. Draw icons at 16–20px with a 1.5px stroke, square caps, and monochromatic `currentColor`.
-- Heroicons-outline, Tabler, and Phosphor-regular are acceptable fallback families. Material Icons and Carbon are too dense, so do not use them.
-- Keep the system to about 12 glyphs. If you need a 13th, use a text label.
+- Use Lucide where it is available. A static artifact can use inline SVG. When you build inside an app that has its own icon library, use that library. Draw icons at 16–20px with a 1.5px stroke, square caps, and monochromatic `currentColor`.
+- Heroicons-outline, Tabler, and Phosphor-regular are acceptable fallback families.
+- Do not use Material Icons or Carbon, because their icons are too detailed and too heavy for this style.
+- Use about 12 different icons at most in one artifact. If you need a 13th, use a text label.

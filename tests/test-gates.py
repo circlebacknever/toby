@@ -118,7 +118,7 @@ seeded("split skill name caught", REPO_ROOT / "skills" / "toby-bug-fix" / "SKILL
 STYLE = REPO_ROOT / "output-styles" / "toby.md"
 
 seeded("output style drift caught", STYLE,
-       lambda t: t.replace("Keep a sentence under 25 words.", "Keep a sentence short."),
+       lambda t: t.replace("Keep a sentence to 25 words or fewer.", "Keep a sentence short."),
        "drifted from base/toby.md")
 
 seeded("output style losing the coding flag caught", STYLE,

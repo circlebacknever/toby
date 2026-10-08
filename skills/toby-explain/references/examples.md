@@ -1,13 +1,13 @@
 # Worked Examples
 
-These examples are not for reuse, so copy the pattern and write new material for the current question.
+Do not reuse the wording of these examples. Follow how each answer is built, and write new content for the question in front of you.
 
 ## By subject
 
 - For math, code, or science facts, state the result and walk through the reasoning to it.
-- For literature, history, usage, or translation, offer one reading with its evidence, and state the counterargument it has to answer.
+- For literature, history, usage, or translation, give one interpretation and the evidence for it, and state the strongest objection to that interpretation.
 - For vocabulary or terminology, give each item one memory cue, and flag the few that are easy to confuse.
-- For speaking or writing a language, model the correct form as you use it. For a beginner, lead with input they can follow.
+- For speaking or writing a language, use the correct form in your own sentences, so the learner sees it in use. For a beginner, start with sentences they can already understand.
 
 ---
 
@@ -31,4 +31,4 @@ Mid-refactor, you just moved a range check from the controller into the reposito
 
 The user asks why the narrator keeps mentioning the color of the water.
 
-→ One reading is that the water changes with the narrator's mood. The water is flat right after the argument with her sister, and stormy again three pages later when she lies to her mother. This reading fails if the color ever shifts with no emotional beat nearby. Check the two mid-book mentions before you claim the reading holds all the way through.
+→ One reading is that the water changes with the narrator's mood. The water is flat right after the argument with her sister, and stormy again three pages later when she lies to her mother. This reading is wrong if the water changes color at a point where the narrator's mood does not change. Check the two mid-book mentions before you claim the reading holds all the way through.

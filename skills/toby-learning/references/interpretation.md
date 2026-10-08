@@ -18,16 +18,16 @@ Respond to the weak axis:
 
 ## Sharpen a vague but defensible reading
 
-The usual reading is true but vague, so the goal is to make it precise. Sharpen a reading by adding constraints. Say what the reading gets right before you narrow it, so the learner sees progress.
+A learner's first reading is usually true but vague, so the goal is to make it precise. Sharpen a reading by asking for details that rule out other readings. Say what the reading gets right before you narrow it, so the learner sees progress.
 
 - Substitution: "You said the ending is 'powerful.' If I swap in 'sad' or 'memorable,' is your sentence still true? If it is, the word says nothing specific yet. What does the ending do?"
 - The one word the reading depends on: "Your whole reading depends on one word. Which is it?"
 
 ## Claim, evidence, warrant
 
-Novice arguments fail at the connecting warrant, because the writer thinks the link is obvious. Make the learner state the warrant.
+Beginner arguments usually fail at the warrant, which is the reason the evidence supports the claim. The writer thinks that link is obvious. Make the learner state the warrant.
 
-- Warrant check — on any claim-plus-evidence with the link assumed, ask for the link: "You've got the claim and the quote. Why does that quote mean what you say it means?"
+- Warrant check — when the learner gives a claim and evidence and leaves out the link between them, ask for the link: "You've got the claim and the quote. Why does that quote mean what you say it means?"
 - Assumption check — "That argument only works if we assume X. Defend X, or find a reading that doesn't need it."
 - Diagnose a weak argument by its weak link: missing evidence, evidence present but unconnected, or a faulty warrant. Ask about that link.
 
@@ -36,13 +36,13 @@ Novice arguments fail at the connecting warrant, because the writer thinks the l
 The three tests of generation, discrimination, and a pause still apply, but the check forms change:
 
 - What in the text resists your reading?
-- Steelman the opposite interpretation.
+- Steelman the opposite interpretation, meaning make the strongest case you can for it.
 - Which line supports your claim, and what happens to it if that line is read the other way?
 - Find the weakest link in this argument, whether it is your own argument or one I give you.
 - What would the author have to believe for that to be true?
 - Give me the counterexample that would disprove your thesis.
 
-Teach "Steelman this" and "say the warrant" as moves, because the learner needs a verb to use.
+Teach "Steelman this" and "say the warrant" as named steps, because the learner needs a short instruction to give themselves.
 
 ## The ladder here
 
@@ -62,4 +62,4 @@ One re-testable prompt here is "re-defend the river thesis cold next week." It m
 
 ## Mixed subjects
 
-Choose the approach by the current sub-task, because a subject label misleads. In language, conjugation and vocabulary have right answers, while usage, register, and translation are defensible. Philosophy adds formal validity as an axis with close to one right answer. An argument can be formally invalid, which is closer to wrong than to unsupported. Check whether the inference follows, in addition to the three axes.
+Choose the approach by the current sub-task, because one subject can mix parts with right answers and parts that are defensible readings. In language, conjugation and vocabulary have right answers, while usage, register, and translation are defensible. Philosophy adds a fourth axis, formal validity, which has close to one right answer. An argument can be formally invalid, which is closer to wrong than to unsupported. Check whether the inference follows, in addition to the three axes.

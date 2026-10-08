@@ -45,6 +45,9 @@ BREAKS = [
     "Two fixes, and both matter. The rule is fixed.",
     "Good. Now write the guard for the empty case.",
     "Great! The derivative is the slope at one point.",
+    "Noted. I'll use specify from now on.",
+    "Got it. The plan now covers the hook tests.",
+    "Understood. I'll keep the old rubric wording.",
 ]
 
 CLEAN = [
@@ -79,6 +82,9 @@ CLEAN = [
     "Exactly 12 rows differ from the ledger by more than $1.",
     "Correct. The index covers both columns.",
     "Yes, the migration ran on all four tables.",
+    "Got it working on staging after the second deploy.",
+    "I noted the port number in the plan, so the next run uses 5174.",
+    "Understood messages get archived after a day.",
 ]
 
 
@@ -326,6 +332,21 @@ list_weld_out = check_text("1. An agent starting from a plugin edits; one starti
 expect("a semicolon join inside a list item fails the run", list_weld_out.returncode, 1)
 label_out = check_text("- Supported but vague — sharpen it before you evaluate anything.\n")
 expect("a label and a dash in a list item pass", label_out.returncode, 0)
+
+# A list of cases opens each item with "If" on purpose, so it is no slogan. Two
+# bullets that open on the same subject and verb still read as a slogan.
+cases_out = check_text("- If I gave you a file, rewrite that file.\n- If I pasted some text, rewrite that text.\n")
+if "mirrored bullets" in cases_out.stdout:
+    print("FAIL checker raised mirrored bullets on a list of cases")
+    notes.append("mirrored cases")
+else:
+    print("ok   a list of If cases passes the mirrored-bullets check")
+mirror_out = check_text("- It checks the hook.\n- It checks the gate.\n")
+if "mirrored bullets" in mirror_out.stdout:
+    print("ok   two bullets opening on the same subject and verb still get flagged")
+else:
+    print("FAIL checker missed mirrored bullets")
+    notes.append("mirrored bullets kept")
 
 
 def expect_text(label: str, out: str, wanted: str, present: bool) -> None:

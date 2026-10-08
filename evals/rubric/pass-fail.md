@@ -15,7 +15,7 @@ A sentence passes when all of these hold:
 - Its verbs mean what they say. A script reads a file, a check fails, and a
   request returns an error.
 - When two facts are related, a word like because, so, when, or but says how.
-- It stays under about 25 words, or it is a list that reads easily.
+- It has 25 words or fewer, or it is a list that reads easily.
 
 A grader must not fail any of these:
 
@@ -69,8 +69,8 @@ category.
    agent framework platform", "Users talk to agents. Agents read, call tools,
    and pause for people.", "Both pre-existing.", "Name it.", "Each status change
    inserts a row. The support page reads the rows in time order.". Two short
-   sentences about one process need a word that states the relation, such as
-   which, so, or then. A plan step, a review
+   sentences about one process need a word that states their relation, such
+   as and, so, or then, and "so" only marks a result. A plan step, a review
    finding, or a code comment written as a fragment fails, such as "Serves
    criterion 1." or `// null while loading`.
 2. **Clever.** A slogan, an aphorism, a mirrored pair, a one-word definition, a
@@ -108,10 +108,11 @@ category.
    fails too. Examples: "No plugin imports an engine. No framework file names a
    plugin.", "your local run's actual output", "Where those sizes are produced
    and stored is unknown for both approaches."
-8. **Tangled.** Over 25 words with clauses stacked up, or two clauses joined by
-   a dash or a semicolon. Two different facts joined by "and" also fail, and so
-   does a negated actor such as "no purge removes it" or "No test runs that
-   path". Examples: "During that day, `utilizationPct` reports the row as used
+8. **Tangled.** Over 25 words with clauses stacked up, more than one "which"
+   clause, or two clauses joined by a dash or a semicolon. A negated actor such
+   as "no purge removes it" or "No test runs that path" fails too. Two facts
+   about one process joined by "and" pass, as in "Each status change inserts a
+   row, and the support page reads the rows in time order". Examples: "During that day, `utilizationPct` reports the row as used
    up, and no purge removes it.", "`export_csv` has no login decorator, and the
    diff shows no other sign-in check."
 9. **Unclear relation.** A relation word whose other half is missing, such as
@@ -130,6 +131,15 @@ category.
    forward, in order to, furthermore, moreover, takeaway, `shape` for anything
    but geometry, and `named` or `actual` on a noun that has no unnamed or unreal
    version.
+11. **False link.** "because" or "so" joins two clauses that are not cause and
+   result. Example: "CI runs in UTC, so the test fails there about one run in
+   nine", where nothing shows UTC causes the one-in-nine rate.
+12. **Vague back-reference.** A sentence opens with "It", "This", or "That", and
+   the reader cannot tell which earlier thing it means. Example: "That puts the
+   check on the page, which it currently skips."
+13. **Internal label.** An id, label, or in-repo term that the reader was never
+   told, such as an eval row id, a rule number, or a gate name. Example: "The
+   six shared explain A2 fails don't come from any task."
 
 ## Not settled yet
 

@@ -1,14 +1,15 @@
 ---
 name: toby-swd-docs
 description: >-
-  Contains Toby's rules for a module's README.md and AGENTS.md. Entry skills
-  open this file by path. Do not load it from a user request alone.
+  Contains Toby's rules for a module's README.md and AGENTS.md. Other Toby
+  skills open this file by its path. Do not load it only because a user request
+  mentions docs.
 disable-model-invocation: true
 ---
 
 # Toby SWD Docs
 
-`AGENTS.md` in this skill means a file in the user's module tree, and never the operating guide.
+In this skill, `AGENTS.md` means an AGENTS.md file inside the user's project. That name never refers to the Toby operating guide.
 
 ## AGENTS.md
 
@@ -16,27 +17,34 @@ AGENTS.md is the entry point for an agent writing code in a module. Write it for
 
 ### Scope
 
-Create one at the root of a module, package, or feature that covers a distinct area of knowledge. Examples are a service, a domain package, a frontend feature, and a store module. Do not create one for a leaf folder, a single-file utility directory, or a folder that only groups files. Many small files go stale, and readers stop trusting them. When unsure, put the content in the nearest meaningful module root.
+Create one at the root of a module, package, or feature that covers a distinct area of knowledge. Examples are a service, a domain package, a frontend feature, and a store module. Do not create one for a leaf folder, a single-file utility directory, or a folder that only groups files. Many small files go stale, and readers stop trusting them. When unsure, put the content in the AGENTS.md at the nearest module root above the folder.
 
 ### Sections
 
 Use these headings in this order, and leave out a section that has no fact to state.
 
 1. **What this is.** Write one or two sentences on what the module does. Give the reason it exists only when the code or the user states it.
-2. **Commands.** Give the narrowest command that builds, tests, or lints this module, such as `pnpm test --filter notify`. Cite a file in a later section only when its job does not show in its name or code.
+2. **Commands.** Give the narrowest command that builds, tests, or lints this module, such as `pnpm test --filter notify`.
 3. **Constraints.** List the business, product, regulatory, or external constraints that force non-obvious code, with the outside reason for each.
-4. **Cross-module decisions.** Record once each decision that touches several modules and that no single module can contain. Each affected site gets a one-line pointer comment, such as `// see "Event ordering" in AGENTS.md`.
+4. **Cross-module decisions.** Record each decision that affects several modules once, because no single module is the right place for it. Each affected site gets a one-line pointer comment, such as `// see "Event ordering" in AGENTS.md`.
 5. **Extension rules.** State where new files go, the conventions and patterns to match, and which upstream or downstream modules a change affects.
 
 ### Content
 
 - Write only what the code, the docs, or the user's request states. Do not add a reason, a retry policy, an input, a return value, or a future case that none of those sources gives.
 - State each rule once, in the section where it applies.
+- Mention a specific file only when its name and code do not make its purpose plain.
 - Describe purpose, constraints, and structure, and leave implementation mechanics to code comments, so the file stays accurate through code changes.
 - Point to interface comments and external specs, and do not copy them.
 - Write what a file does with a verb such as stores or calls, and never that it knows something or lives somewhere.
 
-Update AGENTS.md when responsibility moves, a file's job changes, a cross-module dependency is added or removed, or a constraint changes. When a section cannot stay accurate at its detail level, make it shorter and more abstract.
+Update AGENTS.md in these cases:
+
+- A job moves from one file or module to another, or a file's job changes.
+- A dependency between modules is added or removed.
+- A constraint changes.
+
+When a section has too much detail to stay accurate as the code changes, cut the detail and describe the module in more general terms.
 
 ## README.md
 
@@ -69,6 +77,6 @@ Before finishing, check each file you wrote for these, and report each one that 
 
 ## Existing modules
 
-When work touches a meaningful module, check the nearest module root for an AGENTS.md. Check an existing file for accuracy before editing it. When responsibility moves, a public API changes, or a cross-module rule appears, update the nearest AGENTS.md when docs are in the task's scope. Otherwise report the line the change made stale, at file:line, as a risk.
+When work changes a module, check the nearest module root for an AGENTS.md. Check an existing file for accuracy before editing it. When docs are in scope, update the nearest AGENTS.md after a job moves between modules, a public API changes, or a cross-module rule appears. Otherwise report the line the change made stale, at file:line, as a risk.
 
 Open `references/examples.md` before writing a new AGENTS.md or README.md, or when deciding which folder gets one.

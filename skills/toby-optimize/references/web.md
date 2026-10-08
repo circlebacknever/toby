@@ -4,7 +4,7 @@ This file covers memoization, virtualization, and render work in React, Solid, a
 
 ## Memoization
 
-- Leave components unmemoized by default. Where the React Compiler runs, hand-written `useMemo` and `useCallback` are redundant. Solid and Svelte 5 track dependencies, so the question does not arise.
+- Leave components unmemoized by default. Where the React Compiler runs, hand-written `useMemo` and `useCallback` are redundant. Solid and Svelte 5 track dependencies, so they need no hand-written memoization.
 - Use `useMemo` for a computation a profile shows to be expensive, such as a fuzzy filter over thousands of items, and whose inputs change less often than the component renders.
 - Use `useCallback` only for a callback passed to a memoized child or used in another hook's dependency array.
 - Memoize an object prop only when the child that receives it is memoized.
@@ -24,4 +24,4 @@ A virtualization library brings scroll-position bugs, harder focus and sticky-ro
 
 ## Render work
 
-Before memoizing a filter-and-sort in render, sort the data and lowercase its search fields once when it loads. Debounce the filter input by about 100 ms. Then memoize the remaining filter only if a profile still shows it.
+Before memoizing a filter-and-sort in render, sort the data and lowercase its search fields once when it loads. Debounce the filter input by about 100 ms. Then memoize the remaining filter only if a profile still shows the filter as slow.

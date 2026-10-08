@@ -6,13 +6,13 @@ the code would have had if designed with the change in mind.
 
 ---
 
-## Example 2 — A new module's design pass
+## Example 1 — A new module's design pass
 
 Task: add retry logic to an HTTP client call.
 
 **Tactical:** wrap the call site in a `for` loop with a `sleep`, which works. Three
 weeks later a second call site needs retries, so the loop is copy-pasted with a
-slightly different backoff. Now there are two retry policies that drift.
+slightly different backoff. Now there are two retry policies, and their settings become more different over time.
 
 **Strategic — sketch two approaches first:**
 
@@ -30,7 +30,7 @@ transport is written once, and every call site gets retries from it.
 
 ---
 
-## Example 3 — Modifying existing code under a real deadline
+## Example 2 — Modifying existing code under a real deadline
 
 The existing `PaymentProcessor` hardcodes one gateway. The task, due tomorrow,
 is to support a second gateway for one customer.
@@ -53,4 +53,4 @@ def process(self, payment):
     return self._charge_via_legacy(payment)
 ```
 
-Under a deadline, label the shortcut and state the exit.
+Under a deadline, label the shortcut and state when and how to replace it.

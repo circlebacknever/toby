@@ -182,6 +182,7 @@ The rest of the standalone skills are Toby-specific:
 - `toby-bug-fix` - reproduce a failure, fix its cause, and prove the fix with a run before and after.
 - `toby-optimize` - make working code faster from a measured baseline, one change per measurement.
 - `toby-squall` - turn one example of a problem into a map of potential solutions.
+- `toby-plain` - rewrite the previous reply, or a file you name, in plain English. Run it yourself with `/toby-plain`.
 - `toby-artifact-style` - apply the artifact design system.
 - `toby-voice` - fix output that wandered off voice.
 - `toby-game` - build and tune a playable thing.

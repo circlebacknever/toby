@@ -2,7 +2,7 @@
 
 ## Base controller
 
-A `BaseController` with protected helpers and shared fields such as `currentUser` couples the base and every controller in both directions. A change to the base means reading every subclass. Turn each group of helpers into an injected collaborator:
+A `BaseController` with protected helpers and shared fields such as `currentUser` couples the base and every controller in both directions. A change to the base means reading every subclass. Move each group of helpers into its own class, and pass an instance of that class into each controller's constructor:
 
 ```java
 @RestController
@@ -19,7 +19,7 @@ public class OrderController {
 }
 ```
 
-Access logging, which every handler used to call, moves to a `HandlerInterceptor` or AOP advice that the dispatcher applies once.
+Move access logging, which every handler used to call, into one `HandlerInterceptor` or AOP advice that Spring runs on every request.
 
 ## Middleware chain
 
@@ -31,7 +31,7 @@ app.use(injectTenantContext()); // reads req.user, writes req.tenant
 app.use(audit());               // reads every field above
 ```
 
-This chain is temporal decomposition. Each step reads fields an earlier step wrote on `req`, so the request contract is the union of those fields and no module defines it. Make authentication, authorization, and tenancy named services that return typed values:
+This chain is temporal decomposition. Each step reads fields that an earlier step wrote on `req`. So a handler can expect on `req` whatever the earlier steps added. No module writes down that list. Make authentication, authorization, and tenant lookup separate services that return typed values:
 
 ```ts
 async getOrder(@Req() req: Request) {

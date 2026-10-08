@@ -4,18 +4,18 @@ This file gives an example for each copy test, the qualifier rules, and the rule
 
 ## The four tests
 
-Every sentence must pass the first three tests. The fourth test is applied afterward, and a sentence that fails it is cut.
+Every sentence must pass the first three tests. Run the fourth test after the first three, and cut each sentence that fails it.
 
 ### 1. Cite test
-Every claim, number, or comparison links to a source, a measurement, or a mechanism.
+Every claim, number, or comparison states its source, its measurement, or its mechanism.
 
 - Pass: "Median p95 latency dropped from 312 ms to 184 ms after the cache layer merged (commit 4f8c2a)."
 - Fail: "Performance improved significantly."
 
 ### 2. Negation test
-Write the negation of the claim. If nobody would write that negation, the original claim is empty.
+Write the negation of the claim. If nobody would write that negation, the original claim says nothing.
 
-- Fail: "The method is fast, reliable, and well-designed." Negation: "The method is slow, fragile, and arbitrary." Nobody writes that negation, so the original is empty.
+- Fail: "The method is fast, reliable, and well-designed." Negation: "The method is slow, fragile, and arbitrary." Nobody writes that negation, so the original says nothing.
 - Pass: "The method runs in O(n log n) for n ≤ 10⁶." The negation is a real claim someone could dispute.
 
 ### 3. Substitution test
@@ -31,7 +31,7 @@ Apply this cut after the first three tests pass. If a reader who already knows t
 
 ## Sentence structure
 
-A comparison of two options that both exist counts as content. Keep a comparison table, a rejected-alternative callout, or a "chose A over B because C" caption, because each refers to a real option.
+A comparison between two options that both exist passes these tests. Keep a comparison table, a rejected-alternative callout, or a "chose A over B because C" caption, because each refers to a real option.
 
 Marketing adjectives, inflated verbs, mission statements, and vague amounts such as `a lot of` fail the cite, negation, or substitution test. Replace each with a number, a mechanism, or a measurement.
 
@@ -39,18 +39,18 @@ Marketing adjectives, inflated verbs, mission statements, and vague amounts such
 
 ## Qualification rules
 
-Match the qualifier to what is known about the claim. Don't hedge a known claim or strip a qualifier from an uncertain one.
+Match how certain the wording sounds to how much is known about the claim. Don't hedge a known claim, and don't remove the uncertainty from an uncertain one.
 
 - **Known** → state the claim plainly, with no hedge.
 - **Approximate or bounded** → state the approximation or bound, such as "~150 ms", "between 0.4 and 0.6", or "lower bound of 12".
-- **Uncertain by amount** → pair the value with an interval, such as `0.73 ± 0.08, 95% CI` or `42 ± 3 ms (n=120)`.
+- **Uncertain by a known amount** → pair the value with an interval, such as `0.73 ± 0.08, 95% CI` or `42 ± 3 ms (n=120)`.
 - **Unknown or open** → say so in a sentence, such as "Nobody has measured the cold-start time."
 
 ---
 
 ## Hard rules
 
-**A subtitle never restates the title.** Leave mirrored phrasing and clever claims out of titles and headings.
+**A subtitle never restates the title.** Do not write a title or heading as two halves that mirror each other, and do not write a clever claim.
 
 **A decision is a whole sentence that states the action and its reason.** "Approve the controlled release, because both meters stayed inside the watch band." A button label can be the verb alone, such as Approve or Hold.
 
@@ -62,7 +62,7 @@ Match the qualifier to what is known about the claim. Don't hedge a known claim 
 
 ## Marketing layouts
 
-Layouts with a hero, feature cards, and a CTA are allowed, but the copy inside them must not be promotional.
+Layouts with a hero section, feature cards, and a call-to-action (CTA) button are allowed. The copy inside them must not be promotional.
 
 - **Hero headline:** state what the thing does. "This tool models p95 latency under burst load." passes. "Built for performance you'll love" fails.
 - **Feature card:** give a concrete behavior and the measurement that backs it. "In a test at 10⁴ events per second, the monitor detected a threshold breach within 50 ms."
@@ -76,7 +76,7 @@ Layouts with a hero, feature cards, and a CTA are allowed, but the copy inside t
 ### Before
 > Our powerful new dashboard delivers blazing-fast insights at scale, empowering you to unlock the full potential of your data. Built on a robust, modern stack, it's the dashboard you've always wanted.
 
-The paragraph fails all four tests, because it uses an adjective stack, inflated verbs, a reader-state assertion, vague magnitude, and mission-stating.
+The paragraph fails all four tests. The paragraph stacks adjectives, uses inflated verbs, tells the reader what they want, gives no amounts, and states a mission.
 
 ### After
 > The dashboard shows an alert when p95 latency stays above 200 ms for 60 seconds. It samples latency once per second. The data comes from production traces for the last 30 days, about 2.6 million requests.

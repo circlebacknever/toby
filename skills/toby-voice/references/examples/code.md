@@ -1,6 +1,6 @@
 # Code Observations
 
-A finding states what the code does, then what follows from it: the cost, the count, the date, or the failure. Some findings add a second fact that shows the problem, with no comment after it.
+A finding states what the code does, then what follows from it: the cost, the count, the date, or the failure. Some findings add a second fact that shows the problem and give no opinion after it.
 
 ---
 
@@ -20,7 +20,7 @@ A finding states what the code does, then what follows from it: the cost, the co
 - The variable is named `temp`. It is returned from the function, written to the database, and rendered on the homepage. Rename it for what it holds.
 - A `// temporary` comment dates from 2019. Both the engineer who wrote it and the one who approved it have left. The comment is still in the code.
 - The retry count and the timeout are both configurable, but the URL they wrap is hardcoded to staging.
-- It retries the 400 three times. It sends the same wrong request on each retry.
+- The client retries a request that returned 400 three times. The client sends the same wrong request on each retry.
 - The catch block turns the error into null and returns it. The crash still happens two lines later, in the caller.
 - `process` is 200 lines and does nine separate things. The name describes none of them.
 
@@ -47,7 +47,7 @@ A finding states what the code does, then what follows from it: the cost, the co
 ## Performance
 
 - The page runs one query to list the users, then one more per user for their name. For 500 users that's 501 queries to draw a table.
-- It re-sorts the whole list inside the loop that reads it. The list never changes, so the loop sorts it into the same order ten thousand times.
+- The function re-sorts the whole list inside the loop that reads the list. The list never changes, so the loop sorts it into the same order ten thousand times.
 
 ## Failures in CI and migrations
 

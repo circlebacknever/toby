@@ -8,72 +8,74 @@ disable-model-invocation: true
 
 # Toby SWD Interfaces
 
-The interface is everything a caller must know to use a module correctly. It includes the signature and the informal contract that only comments can state, which covers behavior, side effects, ordering constraints, and errors. Keep the interface much smaller than the functionality behind it. For a message-channel boundary, the "signature" is the message contract: the request and response types, what is preserved through serialization, and the delivery guarantees.
+The interface is everything a caller must know to use a module correctly. The interface includes the signature and the rules that only a comment can state. Those rules cover behavior, side effects, required call order, and errors. Keep the interface much smaller than the functionality behind it. A deep module hides a lot of work behind a small interface. A shallow module has an interface about as complex as the work behind it.
 
-Write the interface and its comment before the body. When you cannot write a short comment that mentions no internals, redesign the interface while it is still text.
+When two modules talk by sending messages, such as over a queue or between processes, the message format plays the role of the signature. That format includes the request and response types, which values survive serialization, and the delivery guarantees.
 
-## Bias toward somewhat general-purpose
+Write the interface and its comment before the body. When you cannot write a short comment that mentions no internals, redesign the interface before you write any code behind it.
 
-Build the functionality for current needs, and make the interface serve more than one use. A signature written for one caller forces the next caller to widen it. Ask these four questions early:
+## Make interfaces somewhat general-purpose
 
-- **What is the simplest interface that covers all your current needs?** Use fewer methods, each with broader semantics, so the interface stays small as needs grow.
+Build the functionality for current needs, and make the interface serve more than one use. When a signature fits only one caller, whoever writes the next caller has to change the signature. Ask these four questions early:
+
+- **What is the simplest interface that covers all your current needs?** Use fewer methods that each handle more cases, so the interface stays small as needs grow.
 - **In how many situations will this method be used?** A method serving one call site is a candidate for inlining or for redesign into something that serves more.
 - **Is this API easy to use for the common case today?** A `find(query)` is better than thirty `findByXAndYAndZ` only if `find(...)` is also easy to call for the common case.
 - **Does it keep one purpose?** An interface that serves unrelated purposes has become too general.
 
-Do not add parameters or extension points for needs nobody has named. Cover today's needs and one or two near-future variants you can name.
+Do not add parameters or extension points for needs nobody has named. Cover today's needs plus one or two specific changes you expect soon and can describe.
 
-Under interface segregation, each caller declares a type with only the methods it calls, and one deep provider implements every such type. `references/backend-apis.md` shows it in Go under "Go consumer interface".
+To follow the interface segregation principle, each caller declares its own interface type that lists only the methods it calls. One class or module provides all of those methods, so that class or module satisfies every caller's type. `references/backend-apis.md` shows an example in Go under "Go consumer interface".
 
-Each parameter forces every caller to answer a question. Before adding one, check whether the module can compute the value itself, and whether any caller could pick a better value. A default still makes the caller read it to know the behavior, so prefer a computed value or a narrower operation over a configurable one.
+Each parameter is one more value that every caller has to choose. Before adding one, check whether the module can compute the value itself, and whether any caller could pick a better value. Even a parameter with a default makes the person writing the call read it to know what the call does. So prefer a value the module computes, or a separate operation that does less, over a setting the caller passes.
 
 ## The procedure
 
-### 1. Decompose by knowledge
+### 1. Split by what each module hides
 
-State in one sentence what the module hides, such as "how user sessions are stored and validated". When that sentence is a sequence of steps, the boundary is wrong, and `toby-swd-modules` check 1 applies.
+State in one sentence what the module hides, such as "how user sessions are stored and validated". When that sentence lists steps in time order, the module is split in the wrong place. Follow check 1 in `toby-swd-modules` to fix the split.
 
-### 2. Triage
+### 2. Classify by cost
 
-Classify the interface by what getting it wrong would cost, judged from what you can already see:
+Classify the interface by how costly a bad design would be, based on the code and the request in front of you:
 
-- **Consequential**: exported or public, has or will have several callers, crosses a module/service/process boundary, is a shipped component's props, or encodes a contract costly to change later (persisted format, published API, anything other teams build on).
-- **Routine**: private, one caller, changed easily in one place, thin helper.
+- **Consequential**: the interface is exported or public, has or will have several callers, or is called across a module, service, or process boundary. The interface is also consequential when it is a released component's props, or when it fixes something costly to change later. Examples are a stored data format, a published API, or anything other teams build on.
+- **Routine**: the interface is a private, thin helper with one caller, and you can change it in one place.
 
 ### 3. The comment test
 
-For consequential or exported interfaces, write the interface comment before the body. For routine private helpers, run the same test mentally and leave no comment when the surrounding code already makes the contract obvious. A candidate passes when its complete contract meets all of these conditions:
+For consequential or exported interfaces, write the interface comment before the body. For routine private helpers, run the same test mentally and leave no comment when the surrounding code already makes the contract obvious. A proposed interface passes when its full comment meets all of these conditions:
 
-- Four sentences or fewer, plus one per argument whose units, bounds, or empty case the type cannot state.
-- Zero references to internal data structures, algorithms, or named internal steps.
+- The comment is four sentences or fewer, plus one more sentence for each argument whose units, allowed range, or empty value the type does not already show.
+- The comment mentions no internal data structure, algorithm, or internal step.
 - No words describing call order or protocol ("first", "then", "after", "you must call X before Y").
 - A competent caller could use it correctly from the comment alone, including the common error cases.
 
-Run the test on any query or command object the entry point takes, because a short entry-point comment can hide a complex parameter object. When that object crosses a serialization boundary, its comment states that it contains no functions, live references, or cycles.
+Also run the test on any query or command object that an entry point takes, such as a public function, an endpoint, or an RPC. A short comment on the entry point can hide a complicated parameter object. Some of these objects cross a serialization boundary, such as a network call, a worker or process boundary, a native bridge, or disk. The comment for such an object states that the object contains no functions, no references to live objects, and no circular references.
 
-### 4. Cheap path first, and when to escalate
+### 4. Start with one design, and when to try more
 
-For a routine interface, write one design, run the comment test once, and ship the design if it passes. Do not write a second candidate.
+For a routine interface, write one design, run the comment test once, and ship the design if it passes. Do not write a second design.
 
-Escalate to the design-it-twice loop in `references/design-it-twice.md` when the interface is consequential or a routine interface's first comment fails.
+The steps in `references/design-it-twice.md` compare two or three designs. Use them when the interface is consequential, or when a routine interface's first comment fails the test.
 
 ### 5. Keep modules deep, but expose what callers need
 
-Hide complexity, but keep any information the caller needs in the interface. That information includes tunable performance config, errors the caller must handle, durability or visibility guarantees, and ordering the caller depends on. Hiding any of these is a defect, because callers then cannot use the module correctly.
+Hide complexity, but keep any information the caller needs in the interface. That information includes performance settings the caller may tune and errors the caller must handle. The information also includes promises about when data is saved or becomes visible to other readers. Any order of results or events that the caller depends on belongs in the interface too. Hiding any of these is a defect, because callers then cannot use the module correctly.
 
 Keep the common case in the main signature, required and simple. Move advanced or rarely needed config to an options object with defaults that work. A caller doing the ordinary thing reads only the first two or three parameters.
 
-The module that defines a contract for outside input, such as a request, a message, or a deserialized payload, parses it into a typed value. Later code takes that type and repeats no check.
+Some input comes from outside the program, such as a request, a message, or a deserialized payload. The module that defines the contract for that input parses it into a typed value. Later code takes that type and repeats no check.
 
-Deploy-varying config, such as database URLs, credentials, and pool sizes, is a different kind from caller-facing parameters. One module reads it from the environment, validates it at startup, and passes typed values to the rest of the code. Open `references/runtime-config.md` when a change reads an environment variable or adds deploy config.
+Settings that change between deployments, such as database URLs, credentials, and connection pool sizes, are handled differently from function parameters. One module reads these settings from the environment, validates them at startup, and passes typed values to the rest of the code. Open `references/runtime-config.md` when a change reads an environment variable or adds deploy config.
 
 ### 6. Then implement
 
-When the implementation cannot provide a guarantee the interface states, or never uses a parameter the interface requires, change the interface and its comment. Don't widen the contract in the implementation without saying so.
+When the implementation cannot provide a guarantee the interface states, or never uses a parameter the interface requires, change the interface and its comment. Do not let the code accept or promise more than the interface comment states unless you update the comment to match.
 
 ## Brownfield Work
 
-Before changing an existing callable surface, run the comment test on the changed contract. Then list its callers in the repo and the behavior each relies on. Mark every one updated or deliberately out of scope before calling the change done. If a simpler interface would reduce caller burden, offer a migration path so call sites move over without silent breakage. Keep compatibility when the current surface is public, exported, persisted, or used across a service boundary unless the user approves the break.
+Before changing an existing interface, run the comment test on the new version. Then list its callers in the repo and the behavior each relies on. Mark every one updated or deliberately out of scope before calling the change done. If a simpler interface would mean less work for callers, propose a migration path. The path moves each call site over without breaking any of them unnoticed. Keep compatibility when the current surface is public, exported, persisted, or used across a service boundary unless the user approves the break.
 
 ## Red flags
 
@@ -81,18 +83,18 @@ Run this list against the finished interface before calling it done. If the inte
 
 - **Overexposure**: callers must understand rarely-used features to use common ones.
 - **Comment fails the test**: a complete comment for the entry point is long or describes internals.
-- **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax. Replace it with operations that name intent (`reserve`, `markPaid`) and enforce invariants. Keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it handled by another module. In that case the data is the contract, and the module that handles the behavior provides the depth.
-- **One method per caller variation**: a finder/handler/query method per combination of conditions, growing without bound. Replace the set with a value object or query parameter that lets one method replace the whole set.
+- **Accessors as the public surface**: an interface that is mostly per-field get/set exposes the data layout with extra syntax. Replace the getters and setters with methods named for what the caller wants done, such as `reserve` or `markPaid`, that check the rules the data must always satisfy. Keep the representation hidden behind the module boundary where the language allows. The exception is a record that exists deliberately as plain data, with the behavior over it handled by another module. In that case the fields are the interface, and the module that works on the data holds the logic.
+- **One method per caller variation**: each combination of conditions gets its own find, handler, or query method. The number of methods keeps growing. Replace them with one method that takes a query object or parameter describing the conditions.
 - **Fields valid only in some combinations**: a comment has to list which combinations of optional fields, such as `data`, `error`, and `loading`, can occur. Where the language has union or sealed types, replace the fields with one variant per state.
 
-A shallow module, information leakage, temporal decomposition, a pass-through method or variable, or a design pattern forced onto the problem is a module-structure problem. Run the matching red flag in `toby-swd-modules`.
+Some problems come from how code is split into modules. These are a shallow module, information leakage, temporal decomposition, a pass-through method or variable, and a design pattern used where it does not fit. Information leakage means one detail that several modules depend on. Temporal decomposition means modules split by the order their steps run. Check each problem against the matching red flag in `toby-swd-modules`.
 
 ## References
 
-Read the stack file for the interface you are designing, and open a subject file only when that subject is the contract.
+Read the reference file for the platform you are working in, such as web, mobile, or backend. Open a topic file, such as caching or runtime config, only when the interface you are designing is about that topic.
 
 - `references/examples.md` has a rate limiter, a `UserCard`, and a file upload redesigned through the comment test. Open it when a first comment fails.
-- `references/design-it-twice.md` has the design-it-twice loop, tie resolution, and how to ask a critic. Open it for a consequential interface or a failed first comment.
+- `references/design-it-twice.md` has the steps for comparing designs, how to choose between two designs that both pass, and how to ask a separate reviewer for a verdict. Open it for a consequential interface or a failed first comment.
 - `references/runtime-config.md` covers where deploy config enters, validation at startup, injecting typed values, and the composition root.
 - `references/web.md` covers React, Solid, and Svelte hook return types, component prop contracts, and headless hooks.
 - `references/mobile.md` covers React Native native bridges, route params, storage modules, and screen data hooks.

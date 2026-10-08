@@ -1,12 +1,12 @@
 # Caching
 
-This file covers the measurement to take before adding a cache, what a cache costs, stampede, and TTL policy. Open it before adding a cache.
+This file covers the measurement to take before adding a cache, what a cache costs, stampedes, and TTL policy. A stampede is many requests reloading the same expired entry at once. Open it before adding a cache.
 
 ## Before adding a cache
 
 1. Record the median, P95, and P99 of the hot path.
 2. Find which layer spends the time: a query, a downstream call, or serialization.
-3. Estimate the hit ratio from the access pattern. Below 50 percent rarely pays, because every miss adds a cache round trip to the slow path.
+3. Estimate the hit ratio from the access pattern. A hit ratio below 50 percent rarely saves time, because every miss adds a cache round trip to the slow path.
 4. Get the staleness budget from the product owner. An account balance needs fresh data, and a catalog can be minutes old.
 
 Write the decision as a note in this form:
@@ -21,14 +21,14 @@ Decision: cache, 5-minute TTL, repository-level
 Projected P95: 50ms on a miss, 5ms on a hit
 ```
 
-One 60-second profile cache missed 95 percent of reads, because users opened the page less than once a minute. It added about 2 ms to each read. Remove a cache whose hit rate stays low, or whose protected work is no longer slow.
+One 60-second profile cache missed 95 percent of reads, because users opened the page less than once a minute. It added about 2 ms to each read. Remove a cache whose hit rate stays low, or whose cached work is no longer slow.
 
 ## What a cache costs
 
 - Every write path must evict the right keys, and a path that skips the cache layer serves stale reads.
 - The cache server is a new dependency in the critical path, with its own outages.
-- After a cache restart every request misses, so the store must survive peak load alone.
-- A popular key that expires sends every concurrent miss to the store at once.
+- After a cache restart every request misses, so the data source behind the cache must survive peak load alone.
+- A popular key that expires sends every concurrent miss to the data source at once.
 - Tests need cached and uncached paths and a cache reset between cases.
 - Hit rate, miss rate, and miss-path latency need new metrics.
 
@@ -55,4 +55,4 @@ export const STALENESS = {
 } as const;
 ```
 
-A new cache uses one of these categories. Data that every read needs fresh gets no cache, because a 1-second TTL still serves stale reads under load and almost never hits.
+A new cache uses one of these categories. Do not cache data that every read needs fresh, because a 1-second TTL still serves stale reads under load and almost never hits.

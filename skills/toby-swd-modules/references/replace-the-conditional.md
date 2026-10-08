@@ -13,7 +13,7 @@ def display_name(user):
     return f"{user.first} {user.last}"
 ```
 
-Every caller that formats a name now depends on this branch. Each new user state, such as banned, system, or unverified, needs another arm here or a second copy elsewhere. The concept "deleted" has leaked into name formatting.
+Every caller that formats a name now depends on this branch. Each new user state, such as banned, system, or unverified, needs another branch here or a second copy of this check somewhere else. The concept "deleted" has leaked into name formatting.
 
 Move the branch onto the `User` type:
 
@@ -30,13 +30,13 @@ class User:
 
 The branch still exists, but only once, next to the data it reads, so callers do not see it. Adding a state changes one method.
 
-The same move removes null checks. A null object that responds to every call the real one does lets the common path run with no `if x is None`.
+The same move removes null checks. Replace `None` with a stand-in object that has the same methods as the real object. Then the normal code needs no `if x is None` check.
 
 ---
 
 ## Option 2 — Data-driven dispatch
 
-Replace branches that select a small behavior by a tag value with a lookup map.
+When each branch picks a small behavior based on the value of one field, such as `file.kind`, replace the branches with a lookup map.
 
 ```tsx
 function renderPreview(file: FileMeta): ReactNode {
@@ -64,7 +64,7 @@ function renderPreview(file: FileMeta): ReactNode {
 
 Adding a kind means adding one entry. `Record<FileKind, …>` makes a missing entry a compile error, so the set stays complete. The map needs no design pattern and no class.
 
-Keep it to one map. Two maps keyed on the same tag repeat the leak that one map removes.
+Keep it to one map. Two maps keyed on the same field copy the list of kinds into two places, which is the leakage that one map removes.
 
 ---
 
@@ -121,13 +121,13 @@ const gateway: Gateway = GATEWAYS[config.gatewayName];
 
 Each implementation is its own module, with its state and dependencies inside it.
 
-The cost is one interface to keep stable, one class per case, and a selection site. Polymorphism is worth that cost when the case set is open and each case holds state the others do not share. Three one-line branches over a closed set do not qualify, because they belong on option 2.
+The cost is one interface to keep stable, one class per case, and one place in the code that picks which class to use. Polymorphism is worth that cost when new cases keep being added and each case has state the others do not share. Three one-line branches over a fixed set of cases do not qualify. Use option 2 for them.
 
 ---
 
 ## Option 5 — Registry
 
-When a new case must be addable without editing any central file, the selection site itself has to be open. Each implementation registers itself.
+Sometimes someone must be able to add a case without editing any shared file. Then the code that picks the handler must accept new handlers while the program runs. Each implementation registers itself.
 
 ```ts
 const HANDLERS = new Map<string, MessageHandler>();
@@ -145,20 +145,20 @@ export function dispatch(message: InboundMessage): Promise<void> {
 
 Each handler module calls `registerHandler` at load, so the dispatcher never imports them. This fits a plugin API, or a set of adapters loaded by config at boot.
 
-It is the most complex option. The registration adds indirection that a reader has to trace. Load order also becomes something you can get wrong. Reserve it for an interface that is open to code you do not control.
+It is the most complex option. The registration adds indirection that a reader has to trace. Load order also becomes something you can get wrong. Use a registry only when code you do not control, such as third-party plugins, must add cases.
 
 ---
 
-## React and React Native forms
+## React and React Native examples
 
 - **Status to component.** Replace a `switch (status)` in render with a `Record<Status, FC>`. Put the map above the component or in a sibling module.
-- **Variant prop that grew.** A `<Button variant="…">` whose `variant` gains values every quarter is option 2, with the tag passed as a prop. Move to compound components with `children`, or a map from variant to a style object.
+- **Variant prop that grew.** A `<Button variant="…">` whose `variant` gains values every quarter is an option 2 case, where the prop value selects the behavior. Move to compound components with `children`, or a map from variant to a style object.
 - **Field type to input.** A form that renders from a schema maps `field.type` to a component. A `switch (field.type)` inside JSX is the smell.
-- **Behavior split from presentation.** Each screen composes a headless hook that contains the state machine.
-- **Platform branch.** `Platform.OS === "ios"` checks scattered through components are the copied-decision case. Use `Platform.select({ ios, android })` at one module boundary, or `Foo.ios.tsx` and `Foo.android.tsx` files where the bundler picks the file, so the code has no branch.
+- **Behavior split from presentation.** Put the state logic in a headless hook, and have each screen call that hook and render its own markup.
+- **Platform branch.** `Platform.OS === "ios"` checks spread through components are one decision copied into many files. Use `Platform.select({ ios, android })` in one module, or `Foo.ios.tsx` and `Foo.android.tsx` files where the bundler picks the file, so the code has no branch.
 
-## Backend forms
+## Backend examples
 
 - **Adapter interface.** `Gateway`, `StorageDriver`, and `Notifier` each have one interface and one implementation per provider. The composition root selects the implementation from config.
 - **Handler map by message type.** Use option 2 for a closed set of message types, and option 5 when handlers ship independently.
-- **Wire discriminated union.** A payload with a `type` tag is validated once at the edge, then dispatched with option 3 so the compiler tracks every case.
+- **Wire discriminated union.** A payload with a `type` tag is validated once where it enters the service, then dispatched with option 3 so the compiler checks that every case is handled.

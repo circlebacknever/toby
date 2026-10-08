@@ -16,7 +16,7 @@ Load this file when you build a chart, plot, or data visualization for a Toby Ar
 
 Assign series colors in the order SKILL.md lists the chart palette.
 
-Red (`--toby-accent`, `#c44e3f`) is reserved for material consequence, such as a threshold breach, a failure, or a decision point. Never use red as a default series color.
+Red (`--toby-accent`, `#c44e3f`) is reserved for a real consequence, such as a threshold breach, a failure, or a decision point. Never use red as a default series color.
 
 ## Allowed plot forms
 
@@ -41,7 +41,7 @@ Use only the plot forms below.
 - Gradient fills under lines.
 - Shadow drops on bars or markers.
 - Decorative chrome (chart frames, ornamental backgrounds).
-- Rainbow or viridis-as-categorical (use positional palette).
+- Rainbow scales, or viridis used to tell categories apart. Use the chart palette in its listed order.
 
 ## Direct labeling
 
@@ -53,7 +53,7 @@ Prefer direct labels at series endpoints (Tufte style).
 
 ## Grids and axes
 
-- Draw a hairline grid only when it helps the reader, using a 1px dashed line at ≤ 55% opacity in `--border-hairline` (`#c8c3b2`).
+- Draw a hairline grid only when it helps the reader read or compare values on the chart. Use a 1px dashed line at ≤ 55% opacity in `--border-hairline` (`#c8c3b2`).
 - Skip the grid entirely on small charts (sparklines, tile-sized small multiples).
 - Draw axis lines as 1px solid `--border-strong` (`#7d7967`).
 - Draw tick marks 4px long in the same color as the axis.
@@ -61,7 +61,7 @@ Prefer direct labels at series endpoints (Tufte style).
 
 ## Annotation
 
-- Draw a threshold line as 1px dashed `--toby-accent` when crossing it means consequence. Otherwise, draw it as 1px dashed `--text-muted`.
+- Draw a threshold line as 1px dashed `--toby-accent` when crossing the line is a consequence, such as a breach or a failure. Otherwise, draw it as 1px dashed `--text-muted`.
 - Fill confidence bands at 18% opacity in the series color.
 - Set an annotation label in mono if it references a value (`p95 = 312 ms`), and in sans otherwise.
 - For diagrams needing numbered callouts, use the **Annotation pin** pattern from `references/components.md`.
@@ -72,4 +72,4 @@ Use an uncertainty cone for a forecast, error bars for measured points, and a co
 
 ## Sparklines
 
-A sparkline is an inline trace SVG, 80–120px wide, sized to fit a table cell or KV value. See the `Sparkline in a table` snippet in `references/components.md` for the paste-ready pattern.
+A sparkline is a small inline SVG line chart, 80–120px wide, sized to fit a table cell or the value of a KV pair. See the `Sparkline in a table` snippet in `references/components.md` for the paste-ready pattern.

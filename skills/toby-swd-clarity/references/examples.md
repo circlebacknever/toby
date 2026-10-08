@@ -2,7 +2,7 @@
 
 ---
 
-## Example 1 — Backend: a precision comment on a function
+## Example 1: Backend, a precision comment on a function
 
 ```python
 def trim(text, start, end):
@@ -23,11 +23,11 @@ def trim(text, start, end):
     The result is empty when start >= end."""
 ```
 
-The comment has four sentences and no internals. It answers each question above.
+The comment has four sentences and says nothing about how the function works inside. It answers each question above.
 
 ---
 
-## Example 2 — Backend: the name-reuse bug, and the fix
+## Example 2: Backend, the name-reuse bug, and the fix
 
 A file-system module uses `block` for both a physical disk block and a logical
 block within a file. The names look "reasonably close," so readers do not question
@@ -39,7 +39,7 @@ Better still, give them distinct types so they cannot be interchanged at all.
 
 ---
 
-## Example 3 — Frontend: comments on event-driven code
+## Example 3: Frontend, comments on event-driven code
 
 ```tsx
 useEffect(() => {
@@ -48,9 +48,10 @@ useEffect(() => {
 ```
 
 A reader scanning the component linearly never sees what triggers
-`reconcileCart` or why it has those three dependencies. React effects are the modern form of
-event-driven invocation, which is the hidden-control-flow case.
-Document at the point of surprise:
+`reconcileCart` or why it has those three dependencies. A React effect runs when its
+dependencies change, so a reader cannot see when the effect runs by reading the code
+from top to bottom. `comments.md` calls this hidden control flow. Put the comment
+directly above the effect, where a reader first wonders why the effect runs:
 
 ```tsx
 // This effect runs when the cart contents, the applied coupon, or the
@@ -67,7 +68,7 @@ editor would otherwise delete and so reintroduce the bug.
 
 ---
 
-## Example 4 — Frontend: generic container and state-layout comments
+## Example 4: Frontend, an unlabeled array and comments on each state
 
 A hook returns an unlabeled array:
 
@@ -75,8 +76,8 @@ A hook returns an unlabeled array:
 return [data, err, l];   // caller does result[0], result[2]...
 ```
 
-This return value is the generic-container failure, because its values are
-positional and unlabeled, which hides their meaning.
+The caller has to remember what each position in the array holds, because the
+array has no labels. `comments.md` calls this a generic container.
 Return a union with one variant per state, and comment what the type cannot show:
 
 ```ts

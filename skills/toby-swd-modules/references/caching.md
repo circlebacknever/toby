@@ -10,7 +10,7 @@ def update_product(product_id: str, changes: dict) -> Product:
     return product
 ```
 
-Here each service builds keys, picks TTLs, serializes, and evicts, so every service repeats those decisions. A new listing endpoint has to repeat every eviction, and a missed one serves stale data. Put the cache inside the repository, or in a decorator around the store it composes:
+Here each service builds keys, picks TTLs, serializes, and evicts, so every service repeats those decisions. A new listing endpoint has to repeat every eviction, and a missed one serves stale data. Put the cache inside the repository, or in a decorator class that wraps the repository's data store:
 
 ```typescript
 class CachedProductsStore implements ProductsStore {
@@ -25,9 +25,11 @@ class CachedProductsStore implements ProductsStore {
 }
 ```
 
-A new derived view adds one entry to `evictDerivedFrom`, and a batch importer or admin tool that calls `save` evicts correctly with no extra code. The decorator has the same interface as the store, which is correct because it adds memoization and eviction. When it shrinks to forwarding calls, delete it and call the cache from the store. At high write volume, a worker that reads the change stream does the eviction, and still no caller keeps the key list.
+A new cached list built from products adds one entry to `evictDerivedFrom`. A batch importer or admin tool that calls `save` evicts correctly with no extra code. The decorator has the same interface as the store, and that is acceptable here because the decorator adds caching and eviction. When it shrinks to forwarding calls, delete it and call the cache from the store.
 
-Stampede locking also goes inside `getOrLoad`. A call site cannot choose well between waiting, serving stale data, and returning null. When call sites copy the lock, a bug in one copy disables caching for every key that call site reads.
+When writes are frequent, move eviction to a background worker that reads the database's change log. Callers still never keep a list of cache keys.
+
+The lock that stops many callers from loading the same missing cache key at once also goes inside `getOrLoad`. A call site cannot choose well between waiting, serving stale data, and returning null. When call sites copy the lock, a bug in one copy disables caching for every key that call site reads.
 
 ## Where to put the cache
 

@@ -16,11 +16,11 @@ function useProduct(id: string): ProductQuery & { refetch(): Promise<void>; muta
 
 > Returns the current query state for the product with this id. The status discriminator has one value for each of the four legal combinations (loading, success, error, stale). refetch triggers a fresh load. mutate updates locally and reconciles with the server.
 
-Solid signals and Svelte stores wrap the same union.
+In Solid, return the same union inside a signal, and in Svelte, return it inside a store.
 
 ## Component props
 
-A `Dialog` with twelve props, including `variant`, `initialFocus`, `closeOnEsc`, and `closeOnOverlayClick`, needs a comment that tells callers which combination is safe for a destructive action. When the call sites are three distinct intents, give each intent a component over one shared core:
+A `Dialog` with twelve props, including `variant`, `initialFocus`, `closeOnEsc`, and `closeOnOverlayClick`, needs a comment that tells callers which combination is safe for a destructive action. When the call sites use the dialog for three different purposes, make one component for each purpose. Build all three on one shared inner component:
 
 ```tsx
 <ConfirmDialog open={open} onClose={close} title="Save changes?" onConfirm={doSave} />
@@ -31,11 +31,11 @@ A `Dialog` with twelve props, including `variant`, `initialFocus`, `closeOnEsc`,
 
 > DestructiveConfirmDialog — Renders a destructive-action confirmation when open is true. Calls onConfirm if the user proceeds. Every other path counts as cancel and calls onClose, including esc and overlay click. Focus defaults to the cancel button.
 
-The destructive preset fixes the safe defaults, so no caller can build an unsafe variant. Three recurring prop combinations that are not distinct intents stay one component.
+`DestructiveConfirmDialog` locks in the safe settings, so no caller can build an unsafe version. If callers repeat three prop combinations but use them for the same purpose, keep one component.
 
 ## Headless hook
 
-A `useCombobox` that takes `isOpen`, `setIsOpen`, `highlightedIndex`, and their setters makes every caller own the state machine. Let the hook hold the state and return prop bundles:
+A `useCombobox` that takes `isOpen`, `setIsOpen`, `highlightedIndex`, and their setters makes every caller write and track the open, closed, and highlighted state itself. Keep that state inside the hook, and return prop bundles. A prop bundle is an object of props that the caller spreads onto one element:
 
 ```tsx
 function useCombobox<T>(opts: {

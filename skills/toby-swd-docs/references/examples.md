@@ -1,12 +1,12 @@
 # Worked Examples
 
-Reuse the structure and the scope decisions in your own modules. The examples cover a backend module with an AGENTS.md and a README.md, and a frontend scope decision.
+Copy how these files are organized, and copy how each example decides which folders get their own AGENTS.md or README.md. The examples cover a backend module with an AGENTS.md and a README.md, and a frontend scope decision.
 
 ---
 
-## Example 1 — Backend: a payments service AGENTS.md
+## Example 1: Backend payments service AGENTS.md
 
-Scope decision: `services/payments/` is a meaningful module with its own body of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` does not get its own, so its content moves up into this file.
+Scope decision: `services/payments/` is a module that covers a distinct area of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` gets no AGENTS.md, and anything an agent needs to know about `util/` goes in the payments AGENTS.md.
 
 ```markdown
 # Payments
@@ -43,7 +43,7 @@ The file has no function signatures and no algorithm descriptions, because those
 
 ---
 
-## Example 2 — Backend: payments service README.md
+## Example 2: Backend payments service README.md
 
 This README.md covers the same payments module for a developer who calls the service from outside.
 
@@ -96,13 +96,13 @@ Full signatures and behavior are in the interface comments in `gateway.py`.
   attempt will return the original failure.
 ```
 
-The README references the interface comments in `gateway.py`, so the
-single copy there stays authoritative. AGENTS.md states why idempotency is
+The README points to the interface comments in `gateway.py`, so the
+signatures are written down in one place for a maintainer to update. AGENTS.md states why idempotency is
 required and why the ledger is the source of truth. The README covers only what
 a caller needs.
 
 ---
 
-## Example 3 — Frontend: a feature module scope decision
+## Example 3: Frontend feature module scope decision
 
-Scope decision: `features/checkout/` is a feature module, so it gets one AGENTS.md at its root. `features/checkout/components/PriceRow/` is a leaf component folder, so it gets no file. If `PriceRow` has a non-obvious contract, that contract goes in its prop interface comment.
+Scope decision: `features/checkout/` is a feature module, so it gets one AGENTS.md at its root. `features/checkout/components/PriceRow/` holds one component and no subfolders, so it gets no AGENTS.md. If `PriceRow` expects something from callers that is not obvious, write it in the comment on its props type.

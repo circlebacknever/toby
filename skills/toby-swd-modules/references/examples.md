@@ -1,5 +1,7 @@
 # Worked Examples
 
+A deep module hides a lot of work behind a small interface. A shallow module has an interface about as complex as the work behind it.
+
 ---
 
 ## Example 1 — Backend: temporal decomposition, fixed by merging
@@ -9,7 +11,7 @@ the socket into a string. `RequestParser` parses the string into a
 structured request. The team describes the design as "first read, then parse",
 which is a sign of temporal decomposition.
 
-The defect is that the reader cannot know where the request ends without
+The defect is that `RequestReader` cannot know where the request ends without
 parsing the headers, because the length header determines body size. So both
 classes know the request format. That knowledge is a single design decision
 written in two modules, which is leakage. The parsing code is also duplicated. Callers also have to
@@ -18,27 +20,29 @@ invoke two objects in a fixed order.
 Checks 1, 2, and 7 give the fix.
 The knowledge is "the request wire format," which should be in one module. Merge into one `Request` module that reads and
 parses behind a single `Request.receive(socket)`. The format knowledge is now in
-one place, the inter-module string-passing interface disappears, and callers
+one place, the string that one class passed to the other is gone, and callers
 make one call. The merged module is deeper than either original.
 
 ---
 
 ## Example 2 — Backend: pull complexity downward
 
-A retrying transport needs a retry interval. The tactical move is to export
+A retrying transport needs a retry interval. The quick fix is to expose
 `retry_interval_ms` as a configuration parameter and let operators set it.
 
 Apply check 3 by asking whether the caller can pick a
 better value than the module can. For a retry interval, the caller almost never
 can, because the module measures the round-trip times but the operator is
-guessing. So the module should compute it by measuring observed response
-latency and using a multiple of it, adapting as conditions change. The parameter
-is removed from the interface. If a hard override is needed for some
+guessing. So the module should compute the interval itself. The module measures response
+latency, waits a multiple of that latency, and updates the interval as latency changes. The parameter
+is removed from the interface.
+
+If a hard override is needed for some
 environment, keep it as an optional argument with that computed value as the
 default. Callers in the common case then pass nothing.
 
-Check 3 in `SKILL.md` applies. This complexity is related to the transport's own
-job. Pulling it down is correct here because it simplifies every caller.
+This change follows check 3 in `SKILL.md`. The interval calculation is part of the transport's own
+job, and moving the calculation inside removes a setting from every caller.
 
 ---
 
@@ -50,8 +54,8 @@ component's props list includes `currentUser` though only the leaf uses it.
 
 `currentUser` is a pass-through variable (check 4). The intermediate
 components are forced to know about a value they have no use for. Adding the
-next such value means editing the whole chain again. Fix it with a shared object
-scoped to the endpoints, such as a `CurrentUserContext` provided near `App` and
+next such value means editing the whole chain again. Fix it with a value that only the
+top and bottom components touch, such as a `CurrentUserContext` provided near `App` and
 read in `AvatarMenu`. The prop is removed from the intermediates. Keep the context small
 and its value stable, because a context that collects unrelated values has the
 downsides of global state.
@@ -68,15 +72,17 @@ A team splits a list row into `<RowContainer>`, `<RowInner>`, `<RowText>`,
 `<RowMeta>`, and `<RowChrome>`. Each of the five components is a handful of
 lines. Only the component above each one uses it. None makes sense on its own.
 
-The subdivision cost (check 7, classitis) is five interfaces to
-learn, five files to switch between, and dependencies hidden across them. No
+Splitting the row this way costs five interfaces to
+learn, five files to switch between, and dependencies hidden across them. Check 7 and the
+classitis red flag cover this case. No
 boundary hides any information, because none contains a distinct piece of knowledge.
-All the relatedness signals favor merging, because the components share state,
+
+Every sign from check 1 that code belongs in one module points to a merge. The components share state,
 are always used together, and none can be understood alone. Merge them into one `<Row>` component. It is longer, but it
 is one coherent deep abstraction with a simple prop interface. Under check 8,
 that one component is better than five shallow ones.
 
 A counter-case shows when a split is correct. If `<Row>` also contained
-the logic for formatting currency across locales, that *is* a distinct body of
-knowledge with reuse elsewhere. Extract it as a general-purpose helper, and split
-on a knowledge boundary. A high line count alone does not justify a split.
+the logic for formatting currency across locales, that *is* a separate piece of
+knowledge that other code also needs. Extract it as a general-purpose helper, so that each
+piece hides one decision. A high line count alone does not justify a split.

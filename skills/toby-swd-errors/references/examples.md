@@ -22,8 +22,8 @@ def remove_session(store, sid):
     store.pop(sid, None)
 ```
 
-The error case is gone, so every call site can delete its handler. The function is also
-deeper. Check whether any caller needs to know the session was already
+The error case is gone, so every call site can delete its handler. The function also
+hides more work behind the same simple interface. Check whether any caller needs to know the session was already
 absent. If one rare caller does, give it a separate query and keep the common
 path exception-free.
 
@@ -32,7 +32,7 @@ path exception-free.
 ## Example 2 — Backend: aggregate, and know when to just crash
 
 A web server's per-URL handlers each call `get_param(name)`, which throws when a
-required parameter is missing. The tactical version wraps every `get_param` call
+required parameter is missing. The quick-patch version wraps every `get_param` call
 in its own try/except that returns a 400. That produces dozens of identical
 handlers.
 
@@ -63,5 +63,5 @@ the user.
 
 Surface the failure as part of the contract,
 with a result that distinguishes loaded-empty from failed. That result adds to
-the hook's interface. The hook accepts that cost on purpose, because callers
-need the distinction.
+the hook's interface. Add it on purpose, because callers need to tell an
+empty list from a failed request.

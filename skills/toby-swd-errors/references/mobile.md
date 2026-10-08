@@ -2,7 +2,7 @@
 
 ## Network errors
 
-Retry transient errors inside the API client, so a momentary drop reaches no screen:
+Retry transient errors inside the API client, so screens never see a momentary network drop:
 
 ```ts
 // api/transientErrors.ts
@@ -13,7 +13,7 @@ function isTransient(e: unknown): boolean {
 }
 ```
 
-Show sustained offline state once, as a banner in `App.tsx` driven by a `useOnlineState()` hook over `@react-native-community/netinfo`. A screen renders only the failure that survives the retries and is not caused by being offline, as a typed result from its data hook.
+Show sustained offline state once, as a banner in `App.tsx` driven by a `useOnlineState()` hook over `@react-native-community/netinfo`. A screen shows a failure only when it remains after the retries and being offline did not cause it. The screen gets that failure as a typed result from its data hook.
 
 ## Native module errors
 
@@ -26,4 +26,4 @@ type PaymentResult =
   | { status: 'failed'; reason: 'card_declined' | 'auth_required' | 'network_unavailable' | 'unknown' };
 ```
 
-The wrapper maps each platform's codes to one reason, retries network failures, and makes cancellation a status, so no failure path handles it.
+The wrapper maps each platform's codes to one reason and retries network failures. It returns cancellation as a status, so screens handle cancellation outside their failure paths.

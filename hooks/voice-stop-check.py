@@ -157,7 +157,7 @@ def main() -> int:
         words = sentence.split()
         if len(words) > SENTENCE_LIMIT:
             hits.append(f"the {len(words)}-word sentence starting {' '.join(words[:6])!r}: "
-                        "the ceiling is 25, so split it")
+                        "the ceiling is 25, so cut a clause, or split it into two sentences that each state their own subject")
 
     if not hits:
         return 0

@@ -2,7 +2,7 @@
 
 Load this file when you need fake content, such as placeholder data, demo copy, slide examples, dummy KV values, or sample status messages.
 
-Use mission-ops vocabulary for placeholder content with no real subject, because generic business copy such as "Q4 Revenue" does not match the visuals. When the artifact has a real subject, such as DNS, use that domain's vocabulary.
+When placeholder content has no real subject, use the spacecraft operations vocabulary below, because generic business copy such as "Q4 Revenue" clashes with the visuals. When the artifact has a real subject, such as DNS, use that domain's vocabulary.
 
 ---
 
@@ -14,7 +14,7 @@ Use mission-ops vocabulary for placeholder content with no real subject, because
 
 ## Mission / artifact identifiers
 
-- `M-01` through `M-05` — practice modules.
+- `M-01` through `M-05` are ids for the five sample topics under Domain clusters.
 - `v4.2`, `v3.9` — versions.
 - `R-04.2` — reference deck identifier.
 - `T+04:12 UTC`, `T+18`, `T+42` — mission elapsed time.
@@ -25,13 +25,13 @@ Use mission-ops vocabulary for placeholder content with no real subject, because
 
 ## Decision verbs
 
-The system has three live decision verbs:
+Decisions use only these three verbs:
 
 - **Approve** — proceed with the action.
 - **Hold** — defer the action and gather more evidence.
 - **Reject** — block the action.
 
-The archival actions are `Defer`, `File`, `Review`, `Snapshot`, and `Block`.
+`Defer`, `File`, `Review`, `Snapshot`, and `Block` are archive actions, so do not use them as decision verbs.
 
 ---
 
@@ -102,7 +102,7 @@ Copy and adapt these sentences when you need a quick demo paragraph or callout b
 
 ## Caveats to attach
 
-These standard caveats follow Toby Artifact's "caveat next to the claim" rule:
+Place each of these standard caveats next to the claim it qualifies, as SKILL.md requires:
 
 - "assumes a circular orbit and excludes J2 perturbations"
 - "debris flux is excluded above 900 km"

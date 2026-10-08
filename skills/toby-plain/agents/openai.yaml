@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby Plain"
+  short_description: "Rewrite the last reply in plain English"
+  default_prompt: "Use $toby-plain to rewrite the previous reply in plain everyday English."
+policy:
+  allow_implicit_invocation: false

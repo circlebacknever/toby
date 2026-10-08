@@ -4,7 +4,7 @@ This file covers N+1 queries, bulk writes, indexes, and connection pools. Open i
 
 ## N+1 queries
 
-A loop that touches a lazy relation runs one query per row. 50 orders with 5 line items each take 351 queries, but the profiler shows no single slow query. Pick the cheapest fix that removes the loop:
+A loop that reads a lazy relation, which the ORM loads only when code first reads it, runs one query per row. 50 orders with 5 line items each take 351 queries, but the profiler shows no single slow query. Pick the cheapest fix that removes the loop:
 
 1. Add eager-load hints to the query that loads the parent rows (`joinedload`, `selectinload`, `include`). 351 queries become 3.
 2. When a view always needs the same fields, add a repository method that returns a flat row type with exactly those fields from one query. A caller cannot trigger N+1 on a field that is not a relation.
@@ -12,7 +12,7 @@ A loop that touches a lazy relation runs one query per row. 50 orders with 5 lin
 
 ## Bulk writes
 
-Send a loop of single-row statements as one statement, such as `UPDATE ... WHERE id = ANY(?)` or a multi-row `INSERT`. The bulk method splits batches above about 1,000 rows. Switch to `COPY` (Postgres) or `LOAD DATA INFILE` (MySQL) only after a measurement shows the bulk insert is the bottleneck.
+Send a loop of single-row statements as one statement, such as `UPDATE ... WHERE id = ANY(?)` or a multi-row `INSERT`. The bulk write splits its input into batches of about 1,000 rows. Switch to `COPY` (Postgres) or `LOAD DATA INFILE` (MySQL) only after a measurement shows the bulk insert is the bottleneck.
 
 ## Indexes
 
@@ -25,4 +25,4 @@ Choose indexes when the table or the query is designed, and check each hot query
 
 ## Connections
 
-Hold a connection only for the queries. Open the transaction in a `with` scope, build the view data inside it, and render after it closes. Give the pool a size and a short acquire timeout, such as `pool_timeout=2`, so exhaustion returns "service unavailable" and never hangs. When an endpoint still holds connections too long, profile it for lazy loads and slow queries.
+Hold a connection only for the queries. Open the transaction in a `with` scope, build the view data inside it, and render after it closes. Give the pool a size and a short acquire timeout, such as `pool_timeout=2`. Then a request returns "service unavailable" when every pooled connection is in use, and never hangs. When an endpoint still holds connections too long, profile it for lazy loads and slow queries.

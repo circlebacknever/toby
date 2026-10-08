@@ -2,7 +2,7 @@
 
 ## ORM in services
 
-When services call the ORM directly, each one handles session scope, lazy loading, filter syntax, and objects that fail after their session closes. A switch of ORM or a new read replica then edits every service. Keep all of it in the repository, which returns plain domain objects, so the service calls `orders.confirm(order_id)`.
+When services call the ORM directly, each one handles session scope, lazy loading, filter syntax, and objects that fail after their session closes. Switching ORMs or adding a read replica then means editing every service. Keep all of that ORM handling in the repository, which returns plain domain objects, so the service calls `orders.confirm(order_id)`.
 
 ## One type for three audiences
 
@@ -16,7 +16,7 @@ type User struct {
 }
 ```
 
-This `User` struct is the database row, the JSON DTO, and the domain entity at once. Every consumer then depends on the schema, the wire format, and the hashing scheme. Give each audience its own type in the package that makes that decision:
+This `User` struct is the database row, the JSON DTO, and the domain entity at once. Every consumer then depends on the schema, the wire format, and the hashing scheme. Give each audience its own type, and put each type in the package that makes that type's decisions. Here the row type goes in the store package, the domain type in `auth`, and the JSON type in the API package:
 
 ```go
 // auth/internal/store/user_row.go
@@ -33,4 +33,4 @@ A column change stays inside `internal/store`, and a JSON change needs no migrat
 
 ## Read models
 
-Split a read model from the write model only when a query result differs sharply from the entity, such as a report or a dashboard. Otherwise keep one model.
+Use a separate type for reads only when a query returns data very different from the stored entity, such as a report or a dashboard. Otherwise use one type for reads and writes.

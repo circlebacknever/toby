@@ -7,7 +7,7 @@ These examples cut four kinds of feature into slices. All four use one invented 
 Request: "let people cancel an order from the account page."
 
 1. Observable — a POST to `/orders/:id/cancel` on an order the caller owns returns the order with status `cancelled`. Source — the user said "cancel an order". Check — the criterion is unmet if `test_cancel_returns_cancelled_order` finds that the status stays `open`.
-2. Observable — cancelling an order already shipped returns 409 and leaves the order untouched. Source — the user said "no cancelling once it's out the door". `api/orders.ts:88` supports it with the shipped-state guard that the refund path already runs. Check — the criterion is unmet if `test_cancel_rejects_shipped` finds that the order changed.
+2. Observable — cancelling an order already shipped returns 409 and leaves the order untouched. Source — the user said "no cancelling once it's out the door". The shipped-state check that the refund path already runs, at `api/orders.ts:88`, supports this criterion. Check — the criterion is unmet if `test_cancel_rejects_shipped` finds that the order changed.
 3. Observable — cancelling someone else's order returns 404. Source — the request says nothing about this case, but `api/orders.ts:31` has the ownership check every other order route runs. Check — the criterion is unmet if `test_cancel_scopes_to_owner` gets any 2xx.
 4. Stays working — the order list still returns shipped and open orders unchanged. Source — `tests/orders/list.test.ts` defines the current list output. Check — the criterion is unmet if the `orders_list` suite finds any changed row.
 
@@ -15,7 +15,7 @@ Slices: there is one slice, `an open order can be cancelled from the account pag
 
 Wiring: `api/routes.ts:142` registers the route with `router.post('/orders/:id/cancel', cancelOrder)`.
 
-Stops: show the criteria in one line and keep working. The strategic triggers do not apply, because the boundary already exists even though the route is new. The sibling feature is the set of other order routes in `api/orders.ts`, which run the ownership check at `api/orders.ts:31`.
+Stops: show the criteria in one line and keep working. The strategic triggers do not apply. The route is new, but the orders module and its API boundary already exist. The sibling feature is the set of other order routes in `api/orders.ts`, which run the ownership check at `api/orders.ts:31`.
 
 ## 2. Two entry points — a flow crossing two screens
 
@@ -26,19 +26,19 @@ Request: "users should be able to invite a teammate and see the invite pending."
 3. Observable — opening a used or expired link shows an expired state and creates no account. Source — in the follow-up about resent links, the user said "once I resend, the first link should be scrap". Check — the criterion is unmet if `test_expired_link_creates_no_account` finds that an account exists afterwards.
 4. Stays working — the members list still renders for an org with no pending invites. Source — `tests/members/list.test.ts` defines the current list output. Check — the criterion is unmet if the `members_list` suite finds any changed row.
 
-Slices: first `invite shows up as pending`, then `the invite email opens the accept screen`. Criteria 1 and 4 are observed at the members screen, and criteria 2 and 3 at the mail and the accept route.
+Slices: first `invite shows up as pending`, then `the invite email opens the accept screen`. Criteria 1 and 4 are observed at the members screen, and criteria 2 and 3 in the invite email and at the accept route.
 
 Wiring: slice one connects at `screens/Members.tsx:210` through `<InviteForm onSubmit={createInvite} />`, and slice two connects at `jobs/index.ts:17` through the `invite.created` subscription.
 
-Stops: this flow crosses two screens, which is a strategic trigger, so show the criteria and wait, then write a plan file. The first slice ends at a point where the user has a question to answer. The pending row shows the address, but what the second slice does depends on whether it also shows the inviter and the expiry. So stop there.
+Stops: this flow crosses two screens, which is a strategic trigger, so show the criteria and wait, then write a plan file. The first slice ends at a point where the user has a question to answer. The pending row shows the address. What the second slice builds depends on whether that row should also show the inviter and the expiry. So stop there.
 
-Slice one has no value to a user without slice two. An invite that creates a row and mails nobody is half-built behavior that a user can trigger. So the `invites.form` flag defaults off, and slice one is observed with the flag on. The flag is switched on for users when slice two's send ships. The last checkbox in slice two deletes the flag.
+Slice one has no value to a user without slice two. An invite that creates a row and mails nobody is half-built behavior that a user can trigger. So the `invites.form` flag defaults off, and slice one is observed with the flag on. The flag is switched on for users when slice two, which sends the email, ships. The last checkbox item in slice two is to delete the flag.
 
 ## 3. Greenfield — a subsystem with no sibling
 
 Request: "we need usage metering so we can bill by seat next quarter."
 
-The user first asked for "a quick PoC of the metering dashboard", which was experiment mode. This example starts after they chose a layout, so the layout stays and its code is replaced.
+The user first asked for "a quick PoC of the metering dashboard", which was experiment mode. This example starts after the user chose a layout in that experiment. The new code keeps the layout and replaces the experiment's code.
 
 This subsystem has no sibling in the repo, because the repo has no metering module, no counter storage, and no billing screen or endpoint. This work is greenfield, which is a strategic trigger.
 
@@ -46,15 +46,15 @@ This subsystem has no sibling in the repo, because the repo has no metering modu
 2. Observable — a seat added and removed inside one day counts once for that day. Source — the user said "someone joining and leaving shouldn't double-bill them". Check — the criterion is unmet if `test_seat_churn_counts_once` finds a count of two.
 3. Observable — a workspace with no activity still returns a row, with a count of zero. Source — `billing/invoice.ts:52` throws on a gap. Check — the criterion is unmet if `test_idle_workspace_returns_zero` finds a missing row.
 
-Before the second file exists, greenfield work adds these steps:
+Because this work is greenfield, do these steps before you create a second new file:
 
 - The nearest conventions the repo already has are `billing/` for money-adjacent modules and the `jobs/` daily aggregate pattern that `jobs/revenue_rollup.ts` uses. Extend those two, and don't invent a third layout.
-- The boundary is written once, per toby-swd-modules and toby-swd-interfaces. The module exposes `seatCountForDay(workspace, date)` and defines the storage layout that the function reads, so callers never read or write rows directly.
-- The user chooses the name. Today `seat`, `member`, and `active user` mean the same thing, but one of them is about to appear on an invoice.
+- Design the module's boundary once, following toby-swd-modules and toby-swd-interfaces. The module exposes `seatCountForDay(workspace, date)` and defines the storage layout that the function reads, so callers never read or write rows directly.
+- The user chooses which word to use for a billed person. Today `seat`, `member`, and `active user` mean the same thing, but one of them is about to appear on an invoice.
 
 Slices: first `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI gives slice one an entry point a user can run, so slice one is not a layer cut.
 
-Stops: a persisted format and money are both strategic triggers, so the design lines come before the plan lists any file.
+Stops: a persisted format and money are both strategic triggers, so write the design lines before the plan lists any file.
 
 ## 4. Changing behavior that already ships
 
@@ -62,17 +62,17 @@ Request: "the search should match on SKU as well as product name."
 
 1. Observable — searching a full SKU returns that product first. Source — the user said "the search should match on SKU as well". Check — the criterion is unmet if `test_full_sku_ranks_first` finds any name match ranked above it.
 2. Observable — searching a product name returns what it returned before, in the same order. Source — `tests/search/ranking.test.ts` defines the current order. Check — the criterion is unmet if that suite finds any ordering change.
-3. Observable — a query matching a name and a different product's SKU returns the name match first. Source — the ambiguity pass on "match on SKU as well" produced it, so it ships marked `assumed`. Check — the criterion is unmet if `test_name_match_outranks_foreign_sku` finds the SKU match first.
+3. Observable — a query matching a name and a different product's SKU returns the name match first. Source — the Ambiguity step, applied to "match on SKU as well", produced it, so it ships marked `assumed`. Check — the criterion is unmet if `test_name_match_outranks_foreign_sku` finds the SKU match first.
 
 Slices: there is one slice, `search matches a full SKU`. The baseline run matters more than usual here, because criterion 2 is a claim about what `search_ranking` printed before the first edit. Run it and quote it.
 
-Wiring: no new wiring is needed. The change is inside a code path that callers already call, so the existing call site at `search/query.ts:60` meets the fourth slice condition.
+Wiring: no new wiring is needed. The change is inside a code path that callers already call, so the existing call site at `search/query.ts:60` meets the fourth slice condition. That condition says the slice is reachable from outside its own module.
 
-Stops: show the criteria only. Criterion 3 came out of the ambiguity pass, because "match on SKU as well" has a second reading where SKU matches outrank names. One edit undoes that choice, so criterion 3 ships marked `assumed`. The chosen reading ranks name matches first, so the SKU-first reading is dropped. If the user wanted the other reading, the ordering clause in `rankResults` changes.
+Stops: show the criteria only. Criterion 3 came out of the Ambiguity step, because "match on SKU as well" has a second reading where SKU matches outrank names. One edit undoes that choice, so criterion 3 ships marked `assumed`. The chosen reading ranks name matches first, so the SKU-first reading is dropped. If the user wanted the other reading, the ordering clause in `rankResults` changes.
 
 # A plan the user can approve
 
-The plan below covers slice one of the invite flow, in the operating guide's plan format.
+The plan below covers slice one of the invite flow, in the operating guide's plan format. The operating guide is the Toby instructions file that every session loads.
 
 ```markdown
 # Toby's plan for team invites

@@ -136,6 +136,10 @@ TIC_PATTERNS = [
     (re.compile(SENTENCE_START + r"(?:You(?:'re| are) (?:absolutely |totally |completely |so )right|"
                 r"Of course|Certainly|Absolutely|Sure thing)[.!]", re.M),
      "agreement before checking, so open with the answer or the evidence"),
+    # "Noted." and "Got it." acknowledge a correction and say nothing. The user
+    # flagged "Noted" on 2026-10-08, so a reply opens with the change itself.
+    (re.compile(SENTENCE_START + r"(?:Noted|Got it|Understood)[.!]", re.M),
+     "stock acknowledgement, so open with the change or the next step"),
 ]
 
 
@@ -654,7 +658,9 @@ def slogan_findings(text: str) -> list[tuple[int, str, str]]:
         words = WORD_RE.findall(body)
         plain = (len(sentences_in(body)) == 1 and body.endswith(".") and ":" not in body
                  and "**" not in body and 2 <= len(words) <= 10)
-        if (plain and previous and previous[1] and words[0].lower() not in ("a", "an", "the")
+        # A list of cases that each open with "If" or "When" is parallel on
+        # purpose, as in "If I gave you a file, rewrite that file."
+        if (plain and previous and previous[1] and words[0].lower() not in ("a", "an", "the", "if", "when")
                 and [w.lower() for w in words[:2]] == [w.lower() for w in previous[0][:2]]):
             found.append((number, "mirrored bullets", body))
         previous = (words, plain)

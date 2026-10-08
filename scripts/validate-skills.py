@@ -399,7 +399,7 @@ def check_voice_compliance(errors: list[str], warnings: list[str]) -> None:
         for _word, pattern in sense_re:
             for match in pattern.finditer(text):
                 warnings.append(
-                    f"check sense of {match.group(0)!r} (banned as intensifier or significance flag): "
+                    f"check sense of {match.group(0)!r} (banned when it only intensifies or says something matters): "
                     f"{rel}:{line_for_offset(text, match.start())}"
                 )
         for pattern in CONTRAST_PATTERNS:
@@ -529,14 +529,14 @@ ROUTING_GROUPS = {
 }
 COLOAD_TOKEN_CEILING = 19000
 
-# These three never fire on their own. A request to make a game, or to brainstorm,
+# These four never fire on their own. A request to make a game, to brainstorm, or to reword a reply,
 # reaches them only when the user names the skill or types its slash command.
 # The description states the rule for Kiro, which has no field that hides a
 # skill. Claude Code, Copilot, and Codex enforce it through the host fields.
 # Each skill needs the description clause and both host fields. toby-game once
 # had the clause and nothing else, which left the rule stated once and enforced
 # nowhere.
-INVOKE_ONLY_SKILLS = ["toby-game", "toby-squall", "toby-learning"]
+INVOKE_ONLY_SKILLS = ["toby-game", "toby-squall", "toby-learning", "toby-plain"]
 CODEX_HIDE_RE = re.compile(r"^policy:\s*\n(?:[ \t]+.*\n)*?[ \t]+allow_implicit_invocation:\s*false\b", re.M)
 
 
@@ -618,6 +618,7 @@ IMPERATIVES = {
     "update", "document", "describe", "raise", "hunt", "quote", "collapse",
     "watch", "weigh", "gate", "trust", "batch", "cache", "log",
     "lead", "place", "recover", "collaborate", "ship", "reorder", "teach",
+    "talk", "join", "allow",
     "build", "cut", "sketch", "reduce", "turn", "pin", "brief",
 }
 

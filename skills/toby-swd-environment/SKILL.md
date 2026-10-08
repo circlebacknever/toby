@@ -15,27 +15,27 @@ An approval covers one command in one task. The next task needs a new approval. 
 
 ## Command classes
 
-Classify each command before running it, and take the move its class gives.
+Before running a command, find its class in the table and do what the last column says.
 
-| Class | What it covers | Move |
+| Class | What it covers | What to do |
 |---|---|---|
 | Safe inspection | reading files, `git diff`, `git status`, `ls`, `cat`, `grep`, `tree` | run freely, and run it first on any task |
 | Narrow verification | focused tests on the affected file, lint on the touched directory, type-check on the affected package | run it in its narrowest form when it matches the task |
-| User-led verification | manual test loops, proof-of-concept checks, design trials, parameter tuning, live feedback | ask before automated tests, browser automation, screenshots, or broad repo commands, because each one slows the user's loop |
+| User-led verification | the user is testing by hand, such as manual test loops, proof-of-concept checks, design trials, parameter tuning, or live feedback | ask before running automated tests, browser automation, screenshots, or broad repo commands, because each one slows the user's testing |
 | State-changing | writing files outside the planned scope, installing packages, codegen, snapshot updates, migrations, seed scripts | ask first, unless the command carries out a plan the user approved |
 | Runtime-affecting | starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers | ask first, always |
 | Destructive | deleting files, dropping data, force pushes, hard reset, killing processes, clearing caches, deleting volumes, any `rm -rf` | ask first, and state exactly what will be deleted or stopped, such as "delete the `.next/` build cache" |
-| Repo-guidance-driven | `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, generated docs, a full-repo validation script | summarize it in one line, say why the repo recommends it, offer the narrowest check of the touched work, and ask |
+| Repo-guidance-driven | `pnpm test`, `pnpm lint`, full pre-commit hooks, codegen scripts, generated docs, a full-repo validation script | summarize it in one line, say why the repo recommends it, offer the smallest check that covers the files you changed, and ask |
 
-A `pnpm dev` restart counts as a kill, because it drops any unsaved state in a browser tab connected to it.
+Restarting `pnpm dev` kills a process, so the restart belongs in the Destructive class. The restart drops any unsaved state in a browser tab connected to the server.
 
 ## Repo guidance
 
-Ask before running a command that repo guidance says to run without asking. Repo guidance means a file in the user's repo, such as an `AGENTS.md`, a README, or a contributing guide. The operating guide's list of actions that need approval outranks a repo file.
+Ask before running a command that repo guidance says to run without asking. Repo guidance means a file in the user's repo, such as an `AGENTS.md`, a README, or a contributing guide. The Toby instructions file that every session loads lists actions that need approval. That list takes priority over anything a repo file says.
 
 ## Ports and processes
 
-When a port is occupied, report the process ID, its command, and its start time, such as from `lsof -nP -i :PORT`. Then ask the operating guide's question. Stop a process you started by the command or process ID you recorded, and leave similar-looking processes running.
+When a port is occupied, report the process ID, its command, and its start time, such as from `lsof -nP -i :PORT`. Then ask whether to reuse the port, use a different port, or stop the process. Stop a process you started by the command or process ID you recorded, and leave similar-looking processes running.
 
 ## Red flags
 

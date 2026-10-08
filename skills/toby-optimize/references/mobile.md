@@ -12,4 +12,4 @@ Request an image at the size it is drawn. A 4 MB photo decodes to tens of megaby
 
 ## Bridge calls
 
-Each JS-to-native call costs a few milliseconds, so a loop of 500 `getContact(id)` calls takes seconds. Add one native method that returns the whole list, even under the New Architecture.
+Each JS-to-native call costs a few milliseconds, so a loop of 500 `getContact(id)` calls takes seconds. Add one native method that returns the whole list, even under React Native's New Architecture.

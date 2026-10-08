@@ -24,7 +24,7 @@ FIX     A rule with no judgement in it. A banned word is banned. A dash welding
         two clauses is a weld. Do not argue with these, and do not call them
         false positives. Rewrite the sentence.
 
-DECIDE  A rule a machine cannot settle. `shape` is banned as a significance flag
+DECIDE  A rule a machine cannot settle. `shape` is banned when it only says something matters
         and fine as a noun for an actual shape. The check prints the sentence so
         you can answer for that sentence. Most of these are real. Read each one
         and say which it is, and never dismiss the group.
@@ -62,7 +62,7 @@ CLOSING_OFFER_RE = re.compile(
 SLOGAN_NOTES = {
     "heading written as a claim": "use a one- or two-word label, or a phrase saying what the section covers, rule 23",
     "noun phrase with no verb": "write a sentence that names the thing and says what it does, rule 22",
-    "clipped run of short sentences": "join the claims with a connector such as and, so, because, or which, rule 24",
+    "clipped run of short sentences": "join the claims with the connector that states their relation, such as and, so, or because, rule 24",
     "mirrored pair": "say what the thing does in one plain sentence, or delete the pair, rule 24",
     "chained pair": "the second sentence restarts on the last word of the first, so join them, rule 24",
     "one-word definition": "say what the thing does, rule 24",
@@ -89,7 +89,7 @@ SLOGAN_NOTES = {
     "opening phrase that frames the evidence": "delete the phrase and state the claim, Banned Constructions",
     "relation word with its other half missing": "say what the trade is for, or delete the relation word, Banned Constructions",
     "negated actor": "make the thing that acts the subject, as in `purgeable` does not return the row, Banned Constructions",
-    "two facts joined by and": "write two sentences, or add the word that states how the facts relate, rule 2",
+    "two facts joined by and": "check that both facts belong to one process, and write two sentences when they do not, rule 24",
     "bare `that` as an object": "say the noun after `that`, rule 9",
     "rider after a complete claim": "delete the clause, because the sentence before it already said this, Banned Constructions",
     "heading joins two clauses": "write a one- or two-word label, or a phrase that says what the section covers, rule 23",
@@ -122,13 +122,13 @@ READ_RULES = [
     "Each sentence gives an answer, a reason, a step, a risk, or a decision. Delete a sentence that introduces, repeats, or reacts. (rule 32)",
     "The first sentence states the answer and every condition that changes it, and nothing follows the last fact. (rules 17 and 30)",
     "Each verb has its dictionary meaning, so code runs, reads, writes, calls, returns, or stores. Rewrite every metaphor. (rules 26 and 27)",
-    "A reader could look up each word and find your meaning. Rewrite each coined term and each piece of jargon. (rules 13, 14, and 15)",
+    "A reader could look up each word and find your meaning. Rewrite each coined term and each piece of jargon, and explain each internal label such as an eval id or a rule number. (rules 10, 13, 14, and 15)",
     "A sentence says what a thing is or does. Cut every contrast with something nobody said, whatever words it uses. (rules 25 and 28)",
     "Cut an adjective on a noun that has no other kind, such as actual output or a named audit. (Banned Constructions section)",
-    "Every join between two clauses, including a join made with a colon, has a word that states the relation. (rules 7 and 24)",
+    "Every join between two clauses has a word that states the true relation, so `because` marks only a cause and `so` only a result. A colon only introduces a list of three or more items. (rules 7 and 24)",
     "A relation word has both halves, so `in exchange` says for what. Put `only` before a small number. (Banned Constructions section)",
-    "Split two facts joined by `and` into two sentences. In a negated sentence, make the thing that acts the subject. (Banned Constructions section)",
-    "Put a noun after `this` and `that`. Give each thing one name from first mention to last. (rules 9 and 10)",
+    "Two facts joined by `and` belong to one process, or they become two sentences. In a negated sentence, make the thing that acts the subject. (Banned Constructions section)",
+    "Put a noun after `this` and `that`, and open a sentence with a bare `It` only when one earlier noun could be its target. Give each thing one name from first mention to last. (rules 9 and 10)",
     "Name the actor when a passive hides who acted. (rule 6)",
     "Cut an opening phrase that frames the evidence, a method told before its finding, an aphorism, and a withheld answer. (Banned Constructions section)",
     "In a chat reply, change the opening, length, or layout when all three match the last two replies. (Replies section)",
@@ -353,7 +353,7 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
         for word in tiers["sense"]:
             for m in re.finditer(rf"(?<![A-Za-z]){re.escape(word)}(?![A-Za-z])", text, re.I):
                 note = SENSE_NOTES.get(m.group(0).lower(),
-                                       "banned as a significance flag, fine as a plain noun. Which is it here?")
+                                       "banned when it only says something matters, fine as a plain noun. Which is it here?")
                 add(decide, f"sense-scoped {m.group(0)!r}", m.start(), note)
     for m in v.INTENSIFIER_RE.finditer(text):
         sentence = sentence_at(text, m.start())
@@ -377,7 +377,7 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
             trimmed = " ".join(sentence.split())[:200]
             if count > 35:
                 fix.append(Finding(label, "fix", number, f"sentence runs {count} words", trimmed,
-                                   "split it, the ceiling is 25, rule 1"))
+                                   "cut a clause, or split it into two sentences that each state their own subject. The ceiling is 25, rule 1"))
             elif count > 25:
                 decide.append(Finding(label, "decide", number, f"sentence runs {count} words", trimmed,
                                       "over the 25 ceiling. Cut a clause, or say why it earns the length"))
