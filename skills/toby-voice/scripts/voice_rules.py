@@ -334,10 +334,6 @@ def sentences_in(body: str) -> list[str]:
 # every other check in this file, because each word was plain and each sentence
 # short. A short sentence is often right, so no check here can settle one of
 # these. Each hit is a question for the writer.
-SHORT_SENTENCE = 6
-MIRROR_LIMIT = 10
-# Opening words that repeat in ordinary prose without making a mirrored pair.
-MIRROR_EXEMPT = {"the", "a", "an", "it", "this", "i", "then", "if", "when"}
 WORD_RE = re.compile(r"[A-Za-z0-9][\w'-]*")
 # "A plugin is data." and "Plugins are data." define a thing by one bare word.
 DEFINITION_RE = re.compile(
@@ -615,8 +611,7 @@ def slogan_findings(text: str) -> list[tuple[int, str, str]]:
     """Return (line, form, excerpt) for each slogan form in text from prose_only.
 
     The forms are a heading written as a claim, a noun phrase with no verb, a
-    label with a period, a label with no value, a clipped run of short
-    sentences, a mirrored pair, mirrored bullets, a chained pair, a one-word
+    label with a period, a label with no value, a chained pair, a one-word
     definition, a setup sentence, a sentence about the document, litotes, and an
     abstract noun given a person's action. voice-check.py maps each form to the
     rule to apply.
@@ -648,22 +643,6 @@ def slogan_findings(text: str) -> list[tuple[int, str, str]]:
                 found.append((number, "bullet restates its heading", " ".join(stripped.split())))
         elif stripped and not item:
             heading_words = set()
-    previous: tuple[list[str], bool] | None = None
-    for number, line in enumerate(lines, 1):
-        item = LIST_ITEM_RE.match(line)
-        if not item:
-            previous = None
-            continue
-        body = " ".join(item.group(1).split())
-        words = WORD_RE.findall(body)
-        plain = (len(sentences_in(body)) == 1 and body.endswith(".") and ":" not in body
-                 and "**" not in body and 2 <= len(words) <= 10)
-        # A list of cases that each open with "If" or "When" is parallel on
-        # purpose, as in "If I gave you a file, rewrite that file."
-        if (plain and previous and previous[1] and words[0].lower() not in ("a", "an", "the", "if", "when")
-                and [w.lower() for w in words[:2]] == [w.lower() for w in previous[0][:2]]):
-            found.append((number, "mirrored bullets", body))
-        previous = (words, plain)
     for number, line in enumerate(text.splitlines(), 1):
         heading = HEADING_RE.match(line.strip())
         if not heading:
@@ -692,20 +671,11 @@ def slogan_findings(text: str) -> list[tuple[int, str, str]]:
             and not any(VERB_HINT_RE.match(word) for word in WORD_RE.findall(paragraph)[1:-1])
         ):
             found.append((number, "noun phrase with no verb", paragraph))
-        reported_run = False
         for first, second in zip(sentences, sentences[1:]):
             a, b = WORD_RE.findall(first), WORD_RE.findall(second)
             if not a or not b:
                 continue
             pair = f"{first} {second}"
-            # One report per paragraph, because a run of five short sentences
-            # needs one rewrite and not four findings.
-            if not reported_run and len(a) <= SHORT_SENTENCE and len(b) <= SHORT_SENTENCE:
-                found.append((number, "clipped run of short sentences", pair))
-                reported_run = True
-            opener = a[0].lower()
-            if opener == b[0].lower() and opener not in MIRROR_EXEMPT and len(a) <= MIRROR_LIMIT and len(b) <= MIRROR_LIMIT:
-                found.append((number, "mirrored pair", pair))
             last, lead = a[-1].lower().rstrip("s"), b[0].lower().rstrip("s")
             if last == lead and len(last) > 3:
                 found.append((number, "chained pair", pair))

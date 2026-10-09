@@ -62,13 +62,10 @@ CLOSING_OFFER_RE = re.compile(
 SLOGAN_NOTES = {
     "heading written as a claim": "use a one- or two-word label, or a phrase saying what the section covers, rule 23",
     "noun phrase with no verb": "write a sentence that names the thing and says what it does, rule 22",
-    "clipped run of short sentences": "join the claims with the connector that states their relation, such as and, so, or because, rule 24",
-    "mirrored pair": "say what the thing does in one plain sentence, or delete the pair, rule 24",
     "chained pair": "the second sentence restarts on the last word of the first, so join them, rule 24",
     "one-word definition": "say what the thing does, rule 24",
     "label with a period": "give it a subject and a verb, rule 29",
     "label with no value": "write a sentence that names what is missing and where you looked, rule 29",
-    "mirrored bullets": "join the bullets into one sentence, or say how they differ, rule 24",
     "setup sentence before the fact": "name the file, the cause, or the change in this sentence, rule 30",
     "sentence about the document": "delete it and give the content, rule 21",
     "litotes": "state it in positive form: not uncommon is common, rule 28",
@@ -120,7 +117,7 @@ SLOGAN_NOTES = {
 READ_RULES = [
     "Each fact comes from the user, a file you read, or a command you ran, and it keeps its qualifier. (rules 31 and 32)",
     "Each sentence gives an answer, a reason, a step, a risk, or a decision. Delete a sentence that introduces, repeats, or reacts. (rule 32)",
-    "The first sentence states the answer and every condition that changes it, and nothing follows the last fact. (rules 17 and 30)",
+    "The first sentence states the answer, each condition that changes it comes right after, and nothing follows the last fact. (rules 17 and 30)",
     "Each verb has its dictionary meaning, so code runs, reads, writes, calls, returns, or stores. Rewrite every metaphor. (rules 26 and 27)",
     "A reader could look up each word and find your meaning. Rewrite each coined term and each piece of jargon, and explain each internal label such as an eval id or a rule number. (rules 10, 13, 14, and 15)",
     "A sentence says what a thing is or does. Cut every contrast with something nobody said, whatever words it uses. (rules 25 and 28)",
@@ -131,7 +128,7 @@ READ_RULES = [
     "Put a noun after `this` and `that`, and open a sentence with a bare `It` only when one earlier noun could be its target. Give each thing one name from first mention to last. (rules 9 and 10)",
     "Name the actor when a passive hides who acted. (rule 6)",
     "Cut an opening phrase that frames the evidence, a method told before its finding, an aphorism, and a withheld answer. (Banned Constructions section)",
-    "In a chat reply, change the opening, length, or layout when all three match the last two replies. (Replies section)",
+    "When the user must decide something, the first sentence asks, with at most three options and one recommended. (Replies section)",
     "Put each modifier next to the word it modifies. When a trailing phrase could attach to more than one verb, move it to the front. Give an opening phrase a subject. (rule 33)",
 ]
 

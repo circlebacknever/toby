@@ -42,4 +42,4 @@ Check the fix against each entry before the report.
 
 ## Final response
 
-Lead with the cause in one sentence, with its file and line. Then give the fix, the runs before and after, and what stays unverified.
+Lead with the cause in one sentence, with its file and line. Then list the fix, the runs before and after, and what stays unverified.

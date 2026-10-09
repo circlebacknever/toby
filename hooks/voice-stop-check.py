@@ -72,12 +72,13 @@ Start the rewrite with these lines exactly, each followed by a blank line, so th
 
 """ + DIVIDER + """
 
-1. Put the answer, and every condition that changes it, in the first sentence.
-2. Keep every fact, number, command, path, and URL the user needs.
-3. Cut each sentence that only repeats an earlier one, introduces the next one, or sums up.
-4. Check each count and number against the facts in the reply.
-5. Define each term the user has not seen, or replace it with a plain word.
-6. Fix every matched line:"""
+1. Put the answer in the first sentence, and each condition that changes it right after.
+2. Put steps, options, and separate findings in a list.
+3. Keep every fact, number, command, path, and URL the user needs.
+4. Cut each sentence that only repeats an earlier one, introduces the next one, or sums up.
+5. Check each count and number against the facts in the reply.
+6. Define each term the user has not seen, or replace it with a plain word.
+7. Fix every matched line:"""
 
 # Fenced code, inline code, and quoted text are not Toby's prose. A reply quotes
 # a sentence to report on it, such as a sentence the user flagged, and the rules

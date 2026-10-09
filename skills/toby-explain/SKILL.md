@@ -16,7 +16,7 @@ Answer the question in your first sentence. Give the reason in your second sente
 
 ## Length
 
-Use two or three sentences. A list item counts as a sentence, so five bullets are five sentences. Write more only when the user asked for depth, or when leaving a part out would make the answer wrong.
+Use two or three sentences, or a short list when the answer has separate parts. Write more only when the user asked for depth, or when leaving a part out would make the answer wrong.
 
 Keep each sentence to 25 words or fewer. Use "because" only for a real cause, and "so" only for a result.
 

@@ -1,6 +1,6 @@
 # Criteria
 
-In tactical work, write the three parts below on one line in chat. In strategic work, give each part its own line. After an experiment, start from the behavior the user picked. When a part is missing, ask the user for it or drop the criterion. `references/examples.md` has criteria written this way for four requests.
+Give each of the three parts below its own line. After an experiment, start from the behavior the user picked. When a part is missing, ask the user for it or drop the criterion. `references/examples.md` has criteria written this way for four requests.
 
 - **Observable**: what the user or caller sees at the entry point they use, such as a route, a CLI command, a screen, a queue consumer, or an exported function. State the action and the starting state. When a reader could check the line only by reading the diff, rewrite it or cut it.
 - **Source**: the user's sentence or ticket line the criterion came from, quoted, or the repo fact at path:line that requires it. A claim about the repo with no path:line is your own preference. Cite a repo fact only when the request says nothing about that behavior.

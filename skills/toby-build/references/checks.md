@@ -39,7 +39,7 @@ Check the finished work against each problem below. Fix what you can before the 
 
 ## Final response
 
-After the lead line, write only what the user needs to act on:
+After the lead line, ask each question whose answer changes what gets built, with the answer you will use if the user says nothing. Ask each question before the work it affects whenever you can. Then write only what the user needs to act on:
 
 1. Each criterion in its pre-code wording, marked met or unmet, with the check that proved it or what is missing. When nothing could run, say so once and give each criterion's check. For multi-slice work, mark each slice done or not done.
 2. The structure chosen and the main alternative rejected, one line each, or the `Structure: follows <path:line>` line. Say where the plan is.
@@ -48,5 +48,4 @@ After the lead line, write only what the user needs to act on:
 Then add these, leaving out each one that has nothing in it:
 
 - Each step you could not run, with what blocked it.
-- Each question whose answer changes what gets built, on its own line, with the answer you will use if the user says nothing. Ask it before the work it affects whenever you can.
 - Each problem you saw and left alone, one line each at file:line. Leave out a follow-up for a problem you did not see in the code.

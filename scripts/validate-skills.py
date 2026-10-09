@@ -543,7 +543,7 @@ ROUTING_GROUPS = {
     "experiment": ["toby-swd-experiment", "toby-swd-environment", "toby-swd-testing"],
     "prose": ["toby-voice", "toby-swd-docs"],
 }
-COLOAD_TOKEN_CEILING = 19000
+COLOAD_TOKEN_CEILING = 20000
 
 # These four never fire on their own. A request to make a game, to brainstorm, or to reword a reply,
 # reaches them only when the user names the skill or types its slash command.

@@ -27,7 +27,7 @@ Make working code faster or lighter, and keep only the changes a measurement sup
 Open `toby-swd-hardening` for limits and `toby-swd-observability` for metrics when the change adds a cache, a queue, a worker pool, or parallel calls.
 
 ## Report
-Give the baseline, the result, the command, the other options you did not try, and what stays unmeasured, such as production load.
+List the baseline, the result, the command, the options you did not try, and what stays unmeasured, such as production load.
 
 ## Performance design
 

@@ -58,4 +58,4 @@ Make one cleanup pass, and stop when the next change would not reduce a count. T
 
 ## Final response
 
-Lead with what got simpler and the number each change reduced. Name each edge case that no test covers. List each change you left out for lack of a covering test. List each problem you left alone and each follow-up at file:line, one per line.
+Lead with what got simpler and the number each change reduced. List each edge case that no test covers. List each change you left out for lack of a covering test. List each problem you left alone and each follow-up at file:line, one per line.

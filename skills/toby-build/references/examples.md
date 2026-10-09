@@ -6,9 +6,15 @@ These examples cut four kinds of feature into slices. All four use one invented 
 
 Request: "let people cancel an order from the account page."
 
-1. **Observable**: on the account page, clicking Cancel on an open order shows that order as `cancelled` without a reload. **Source**: the user said "cancel an order from the account page". **Check**: the criterion is unmet if the `e2e/orders.spec.ts` test "cancel from account page" finds the status still `open`, or if the existing `orders_list` suite fails.
-2. **Observable**: a POST to `/orders/:id/cancel` on an order already shipped returns 409 and leaves the order untouched. **Source**: the user said "no cancelling once it's out the door". The shipped-state check that the refund path already runs, at `api/orders.ts:88`, supports this criterion. **Check**: the criterion is unmet if `test_cancel_rejects_shipped` finds that the order changed.
-3. **Observable**: cancelling someone else's order returns 404. **Source**: the request says nothing about this case, but `api/orders.ts:31` has the ownership check every other order route runs. **Check**: the criterion is unmet if `test_cancel_scopes_to_owner` gets any 2xx.
+1. **Observable**: on the account page, clicking Cancel on an open order shows that order as `cancelled` without a reload.
+   - **Source**: the user said "cancel an order from the account page".
+   - **Check**: the criterion is unmet if the `e2e/orders.spec.ts` test "cancel from account page" finds the status still `open`, or if the existing `orders_list` suite fails.
+2. **Observable**: a POST to `/orders/:id/cancel` on an order already shipped returns 409 and leaves the order untouched.
+   - **Source**: the user said "no cancelling once it's out the door". The shipped-state check that the refund path already runs, at `api/orders.ts:88`, supports this criterion.
+   - **Check**: the criterion is unmet if `test_cancel_rejects_shipped` finds that the order changed.
+3. **Observable**: cancelling someone else's order returns 404.
+   - **Source**: the request says nothing about this case, but `api/orders.ts:31` has the ownership check every other order route runs.
+   - **Check**: the criterion is unmet if `test_cancel_scopes_to_owner` gets any 2xx.
 
 Slices: there is one slice, `an open order can be cancelled from the account page`. Criterion 1 is observed on the account page. Criteria 2 and 3 are observed at the cancel route. Only the account page calls that route, so the route belongs to the same slice.
 
@@ -20,16 +26,24 @@ Stops: show each criterion on one line and keep working. None of the items in st
 
 Request: "users should be able to invite a teammate and see the invite pending."
 
-1. **Observable**: submitting an email on the members screen shows that address in a Pending list without a reload. **Source**: the user said "see the invite pending". **Check**: the criterion is unmet if `pnpm e2e invites.spec.ts -g "invite shows up as pending"` finds the address missing or needing a reload.
-2. **Observable**: the invited address receives one invite email with a link that opens the accept screen. **Source**: the user said "invite a teammate". **Check**: the criterion is unmet if `test_invite_email_link_opens_accept` finds zero or two emails.
-3. **Observable**: opening a used or expired link shows an expired state and creates no account. **Source**: in the follow-up about resent links, the user said "once I resend, the first link should be scrap". **Check**: the criterion is unmet if `test_expired_link_creates_no_account` finds that an account exists afterwards.
-4. **Observable**: the members list still renders for an org with no pending invites. **Source**: `tests/members/list.test.ts` defines the current list output. **Check**: the criterion is unmet if any existing test in `pnpm test members` fails or had to change.
+1. **Observable**: submitting an email on the members screen shows that address in a Pending list without a reload.
+   - **Source**: the user said "see the invite pending".
+   - **Check**: the criterion is unmet if `pnpm e2e invites.spec.ts -g "invite shows up as pending"` finds the address missing or needing a reload.
+2. **Observable**: the invited address receives one invite email with a link that opens the accept screen.
+   - **Source**: the user said "invite a teammate".
+   - **Check**: the criterion is unmet if `test_invite_email_link_opens_accept` finds zero or two emails.
+3. **Observable**: opening a used or expired link shows an expired state and creates no account.
+   - **Source**: in the follow-up about resent links, the user said "once I resend, the first link should be scrap".
+   - **Check**: the criterion is unmet if `test_expired_link_creates_no_account` finds that an account exists afterwards.
+4. **Observable**: the members list still renders for an org with no pending invites.
+   - **Source**: `tests/members/list.test.ts` defines the current list output.
+   - **Check**: the criterion is unmet if any existing test in `pnpm test members` fails or had to change.
 
 Slices: first `invite shows up as pending`, then `the invite email opens the accept screen`. Criteria 1 and 4 are observed at the members screen, and criteria 2 and 3 in the invite email and at the accept route. The email and the screen its link opens are one flow, so they share the second slice.
 
 Wiring: slice one connects at `screens/Members.tsx:210` through `<InviteForm onSubmit={createInvite} />`, and slice two connects at `jobs/index.ts:17` through the `invite.created` subscription.
 
-Stops: this flow crosses two screens, so the work is strategic. At stop 1, show the criteria, ask whether to write the plan at `docs/plans/members/team-invites/`, and wait for a yes. What the second slice builds depends on whether the pending row should also show the inviter and the expiry. So at stop 3, after the first slice, ask that question.
+Stops: this flow crosses two screens, so the work is strategic. At stop 1, ask whether to write the plan at `docs/plans/members/team-invites/`, show the criteria, and wait for a yes. What the second slice builds depends on whether the pending row should also show the inviter and the expiry. So at stop 3, after the first slice, ask that question.
 
 Slice one has no value to a user without slice two. Main deploys on every merge, so slice one reaches users before slice two exists. An invite that creates a row and mails nobody is half-built behavior that a user can trigger. Slice one therefore ships behind the release flag `team-invites`, which is off by default, and its checks run with the flag on. The flag turns on for users after slice two sends the email, and the last step of slice two removes the flag. `toby-swd-plan`'s `references/example.md` has the plan for this feature.
 
@@ -41,9 +55,15 @@ The user first asked for "a quick PoC of the metering dashboard", which was expe
 
 This subsystem has no sibling in the repo, because the repo has no metering module, no counter storage, and no billing screen or endpoint. A new subsystem with nothing similar in the repo makes the work strategic.
 
-1. **Observable**: an admin opening the usage page for a workspace sees the seat count as of the last completed day. **Source**: the user said "so we can bill by seat". **Check**: the criterion is unmet if `test_usage_page_shows_completed_day_count` finds that the page shows a partial day.
-2. **Observable**: a seat added and removed inside one day counts once for that day. **Source**: the user said "someone joining and leaving shouldn't double-bill them". **Check**: the criterion is unmet if `test_seat_churn_counts_once` finds a count of two.
-3. **Observable**: a workspace with no activity still returns a row, with a count of zero. **Source**: `billing/invoice.ts:52` throws on a gap. **Check**: the criterion is unmet if `test_idle_workspace_returns_zero` finds a missing row.
+1. **Observable**: an admin opening the usage page for a workspace sees the seat count as of the last completed day.
+   - **Source**: the user said "so we can bill by seat".
+   - **Check**: the criterion is unmet if `test_usage_page_shows_completed_day_count` finds that the page shows a partial day.
+2. **Observable**: a seat added and removed inside one day counts once for that day.
+   - **Source**: the user said "someone joining and leaving shouldn't double-bill them".
+   - **Check**: the criterion is unmet if `test_seat_churn_counts_once` finds a count of two.
+3. **Observable**: a workspace with no activity still returns a row, with a count of zero.
+   - **Source**: `billing/invoice.ts:52` throws on a gap.
+   - **Check**: the criterion is unmet if `test_idle_workspace_returns_zero` finds a missing row.
 
 Because this work is greenfield, do these steps before you create a second new file:
 
@@ -59,8 +79,12 @@ Stops: a persisted format and money each make the work strategic, so write the d
 
 Request: "the search should match on SKU as well as product name."
 
-1. **Observable**: searching a full SKU returns that product first. **Source**: the user said "the search should match on SKU as well". **Check**: the criterion is unmet if `test_full_sku_ranks_first` finds any name match ranked above it, or if the existing `search_ranking` suite finds any ordering change.
-2. **Observable**: a query matching a name and a different product's SKU returns the name match first. **Source**: the second reading of "match on SKU as well", handled as `references/ambiguity.md` describes, so it ships marked `assumed`. **Check**: the criterion is unmet if `test_name_match_outranks_foreign_sku` finds the SKU match first.
+1. **Observable**: searching a full SKU returns that product first.
+   - **Source**: the user said "the search should match on SKU as well".
+   - **Check**: the criterion is unmet if `test_full_sku_ranks_first` finds any name match ranked above it, or if the existing `search_ranking` suite finds any ordering change.
+2. **Observable**: a query matching a name and a different product's SKU returns the name match first.
+   - **Source**: the second reading of "match on SKU as well", handled as `references/ambiguity.md` describes, so it ships marked `assumed`.
+   - **Check**: the criterion is unmet if `test_name_match_outranks_foreign_sku` finds the SKU match first.
 
 Slices: there is one slice, `search matches a full SKU`. The baseline run matters more than usual here, because criterion 1's Check compares the `search_ranking` output with its output before the first edit. Run it and quote it.
 

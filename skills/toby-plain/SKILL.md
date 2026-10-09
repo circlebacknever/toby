@@ -14,8 +14,6 @@ argument-hint: "[optional file path or note]"
 
 I ran this because I don't understand what you just said. Maybe the words were too technical, or maybe there was so much of it that I lost the point. Say it again so I can follow it.
 
-This works in any conversation. It could be a code project, a lesson, a document, or a normal chat.
-
 ## What to rewrite
 
 Rewrite the file or the text I point to. If I don't point to anything, rewrite your last reply.
@@ -26,14 +24,20 @@ Put the rewrite in the chat. Don't change the file unless I ask you to, because 
 
 ## How to say it
 
-Talk to me like a friend who knows the subject well.
+Lay out the rewrite in this order:
 
-- Tell me what's going on first, in a sentence or two. Then tell me what it means for me. Then tell me if I need to do or decide anything.
-- Use the words I'd use. When you need a technical word, tell me what it means in everyday words. For example, a cache is a saved copy the app reuses so it doesn't have to fetch the same thing twice.
+1. If I need to decide something, ask that first, give at most three options, and recommend one.
+2. Say what's going on and what it means for me, in one to three sentences.
+3. Put steps, options, and separate problems in a list, with one idea in each item.
+4. End with my next step, if I have one.
+
+Then check the words:
+
+- Use the words I'd use, with no metaphors or idioms. When you need a technical word, tell me what it means in everyday words. For example, a cache is a saved copy the app reuses so it doesn't have to fetch the same thing twice.
 - Keep a technical word only if I'll see it again or have to type it. Explain it the first time it comes up.
 - If you mention something that only exists here, like a file, a function, or a term from this lesson, tell me what it is. If you won't explain it, leave it out.
 - Skip labels like finding numbers, rule numbers, and severity tags, unless I need them to find something.
-- Keep sentences short, with one idea in each. Use a list only for steps or for separate problems.
+- Keep sentences short, with one idea in each, and keep each paragraph to three sentences or fewer.
 - Call each thing by the same name the whole way through. If you call it "the cache" once, don't call it "the store" later.
 - If an idea is abstract, give me an example from what I'm working on or learning.
 

@@ -26,7 +26,7 @@ The voice checker cites these rules by number. Rules 7, 8, 10, 13 to 17, 22 to 2
 
 ## Structure
 
-17. Lead with the answer, and put every condition that changes it in the same sentence.
+17. Lead with the answer, and put each condition that changes it right after.
 18. Put each instruction at the point in the steps where the reader needs to do it.
 19. Include what this reader needs for this task, and cut the rest.
 20. When you tell the reader not to do something, say what goes wrong if they do it, as in "Do not call this from a request handler. It blocks for 30 seconds and exhausts the connection pool."
@@ -36,13 +36,13 @@ The voice checker cites these rules by number. Rules 7, 8, 10, 13 to 17, 22 to 2
 
 22. Open a doc, a slide, or a paragraph with a whole sentence that says what the thing is and does.
 23. Write a section heading as a one- or two-word label or a plain phrase. Write a slide or chart title as a plain sentence.
-24. Join related claims with a connector, and use "and" for two facts about one process. Use "which" to start at most one clause in a sentence. Avoid a run of very short sentences, two sentences with matching structure, and a term defined by one word, because each one reads as a slogan.
+24. Use "and" to join two facts about one process. Use "which" to start at most one clause in a sentence. Avoid a term defined by one word, because it reads as a slogan.
 25. Leave out what a thing does not do unless a reader would assume it does. Put each fact only in the document whose reader needs it.
 26. Use each verb in its literal sense. `land`, `live in`, `sit in`, `feed`, `fall through`, and `rest on` describe physical things.
 27. Give each verb an actor that can perform it.
 28. Say what is true in positive form. Write `common` in place of `not uncommon`.
 29. Keep the subject, the verb, and the articles.
-30. When a sentence says that something follows, such as "Run this command", put that thing in the same sentence.
+30. When a sentence says that something follows, such as "Run this command", put that thing in the same sentence or in the list right after it.
 31. State only facts you were given or checked.
 32. Make every sentence give the reader an answer, a reason, a step, a risk, or a decision, and base it on something you read, ran, or were told.
 33. Put each describing word or phrase next to the word it describes. After an opening phrase such as "After running the tests,", name the person or thing that ran them.

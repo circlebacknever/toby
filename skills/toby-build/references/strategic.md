@@ -16,7 +16,7 @@ Greenfield means the repo has no similar feature. Before you create a second new
 
 ## Stops
 
-Stop 3 comes at the end of each plan group, as the Plan Format section of the operating guide requires. Open with what the user can now do, using the slice's name. Then say what proved it and what the next slice does, and wait for the user's yes. When the next slice depends on a decision, ask for it in the same message. Ask the same way about a criterion that turned out wrong, or an item from step 1's strategic list that reading the code missed.
+Stop 3 comes at the end of each plan group, as the Plan Format section of the operating guide requires. Open with what the user can now do, using the slice's name. Then list what proved it and what the next slice does, and wait for the user's yes. When the next slice depends on a decision, open with that question. Ask the same way about a criterion that turned out wrong, or an item from step 1's strategic list that reading the code missed.
 
 ## The design lines
 

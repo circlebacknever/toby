@@ -22,7 +22,7 @@ To open a skill, read `../<name>/SKILL.md` relative to this skill's folder. Befo
 
 ## 1. Size the work
 
-Say in one line whether the work is tactical or strategic. The work is strategic when any of these apply:
+Say in one line whether the work needs a written plan. It needs one, and is strategic, when any of these apply:
 
 - a new module or boundary
 - an API that code outside this deploy calls, such as a mobile app, a partner's server, or a package's users
@@ -64,7 +64,7 @@ A slice ships only when these hold:
 - It is correct on its own, or hidden by a flag that is off by default. Open `toby-swd-flags` for a release flag, kill switch, or experiment flag.
 - A user or caller reaches it from outside its module. Give the path:line of the wiring, such as the registered route or the render site.
 
-At stop 1, show the criteria under `What done means for [task]`, then the slice names. Tactical work continues in the same reply. For strategic work, give the plan's path, ask whether to write the plan there, and wait for a yes. Never write "assuming yes, proceeding" past a stop.
+At stop 1 of strategic work, first ask whether to write the plan at its path. Then show the criteria under `What done means for [task]` and the slice names, and wait for a yes. Tactical work shows the same list and continues in the same reply. Never write "assuming yes, proceeding" past a stop.
 
 ## 5. Design
 
@@ -78,7 +78,7 @@ Open `toby-swd-architecture` and follow its "Default structure" when the change 
 - Open `toby-swd-hardening` and `toby-swd-observability` for a new entry point, job, consumer, or outbound call, or a new write or failure path in a handler. Open both for a request about logging, metrics, alerts, or hardening.
 - Open `toby-swd-twelve-factor` for a new process, worker, scheduler, or scheduled job, a new config value or secret, or a new backing service.
 
-State the structure chosen, the alternative rejected, any new signature, the one function that computes each new rule, and any refactor that runs first. A `Structure: follows <path:line>` line replaces the structure chosen and the alternative rejected. When the design depends on a guess about how a library behaves, read the library's installed code. When you cannot, ask the user before the first edit.
+List the structure chosen, the alternative rejected, any new signature, the one function that computes each new rule, and any refactor that runs first. A `Structure: follows <path:line>` line replaces the structure chosen and the alternative rejected. When the design depends on a guess about how a library behaves, read the library's installed code. When you cannot, ask the user before the first edit.
 
 Before writing the plan or the first edit, read "Don't build" in `references/checks.md`.
 

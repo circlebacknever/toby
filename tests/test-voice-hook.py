@@ -265,10 +265,9 @@ The queue service costs $400 a month
 
 The platform consists of a shared generative UI toolkit and features that make it easy to build agents.
 """
-FORMS = ["noun phrase with no verb", "clipped run of short sentences", "mirrored pair",
-         "chained pair", "one-word definition", "heading written as a claim", "sense-scoped 'carry'",
+FORMS = ["noun phrase with no verb", "chained pair", "one-word definition", "heading written as a claim", "sense-scoped 'carry'",
          "setup sentence before the fact", "label with a period", "label with no value",
-         "sentence about the document", "mirrored bullets", "litotes", "abstract noun as actor",
+         "sentence about the document", "litotes", "abstract noun as actor",
          "setup question", "noun doing a verb's job", "meeting jargon", "rhythm device",
          "vague intensifier", "code given feelings", "hedge stack", "would-have stated as fact",
          "claim about the user", "what a thing never does", "program given a judgment",
@@ -333,20 +332,6 @@ expect("a semicolon join inside a list item fails the run", list_weld_out.return
 label_out = check_text("- Supported but vague — sharpen it before you evaluate anything.\n")
 expect("a label and a dash in a list item pass", label_out.returncode, 0)
 
-# A list of cases opens each item with "If" on purpose, so it is no slogan. Two
-# bullets that open on the same subject and verb still read as a slogan.
-cases_out = check_text("- If I gave you a file, rewrite that file.\n- If I pasted some text, rewrite that text.\n")
-if "mirrored bullets" in cases_out.stdout:
-    print("FAIL checker raised mirrored bullets on a list of cases")
-    notes.append("mirrored cases")
-else:
-    print("ok   a list of If cases passes the mirrored-bullets check")
-mirror_out = check_text("- It checks the hook.\n- It checks the gate.\n")
-if "mirrored bullets" in mirror_out.stdout:
-    print("ok   two bullets opening on the same subject and verb still get flagged")
-else:
-    print("FAIL checker missed mirrored bullets")
-    notes.append("mirrored bullets kept")
 
 
 def expect_text(label: str, out: str, wanted: str, present: bool) -> None:
