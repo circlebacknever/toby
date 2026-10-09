@@ -61,7 +61,7 @@ async function placeOrder(req: NewOrder, uow: UnitOfWork) {
 }
 ```
 
-Each repository method joins the transaction that `uow.run` started, or opens its own transaction when no `uow.run` call is active. `insert`'s comment shrinks to "Inserts the order and returns it with its assigned id." When the transaction must cover a controller action, the controller wraps the service call in `uow.run`. A caller that must not publish an event before commit calls `UnitOfWork.isActive()`.
+Each repository method joins the transaction that `uow.run` started, or opens its own transaction when no `uow.run` call is active. `insert`'s comment shrinks to one sentence, which says it inserts the order and returns it with its assigned id. When the transaction must cover a controller action, the controller wraps the service call in `uow.run`. A caller that must not publish an event before commit calls `UnitOfWork.isActive()`.
 
 ## Migrations
 

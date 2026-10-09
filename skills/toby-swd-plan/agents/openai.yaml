@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD Plan"
+  short_description: "Write a plan as vertical slices with checks that can fail"
+  default_prompt: "Use $toby-swd-plan to cut the work into slices and write a plan whose checks can fail."
+policy:
+  allow_implicit_invocation: false

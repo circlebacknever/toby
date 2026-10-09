@@ -15,15 +15,15 @@ Make changed code simpler to read and keep behavior identical.
 
 ## Defaults
 
-- Make only the cleanups you are sure of, because a missed cleanup costs less than a large, noisy diff or a behavior change nobody notices. When you are unsure, leave the code as it is.
-- Call a change an improvement only when you can count what it reduced. Before you touch anything, say which number goes down: lines, branches, state variables, duplicated blocks, or misleading names. "Clearer," "tidier," and "more idiomatic" state no number, so they do not count.
+- Make only the cleanups you are sure of, because a missed cleanup costs less than a large, noisy diff or a behavior change nobody notices.
+- Call a change an improvement only when you can count what it reduced. Before any edit, say which number goes down: lines, branches, state variables, duplicated blocks, misleading names, or files a change to one rule must edit. "Clearer," "tidier," and "more idiomatic" state no number, so they do not count.
 - "Nothing worth simplifying" is a complete answer. Do not ship a rewrite to have something to show.
 
 ## Pick the scope
-Pick one scope from the request, say it in one line, and open only the files it lists. Each skill in the list is at `../<skill>/SKILL.md` relative to this skill's folder.
+Pick one scope from the request, say it in one line, and open only the files it lists. Each skill in the list is at `../<skill>/SKILL.md` relative to this skill's folder. When the user asks for a plan, also open `toby-swd-plan` before you write the plan. A refactor plan replaces that skill's slice and fail-first rules. Each group is one move that leaves the tests green, and its check passes before and after the work.
 - Names, comments, or docstrings only: open `toby-swd-clarity`.
-- A local cleanup inside changed code: open `references/cleanup.md` and `toby-code-review`'s `references/smells.md`.
-- A split, merge, move, or extraction across files: open `toby-swd-strategy`, then `toby-swd-modules`. Open `toby-swd-interfaces` when a signature changes, and `toby-swd-docs` when module structure changes.
+- A local cleanup inside changed code: open `references/cleanup.md` and `references/smells.md`.
+- A split, merge, move, or extraction across files: open `toby-swd-architecture` for where each part goes, then `toby-swd-modules`. Open `toby-swd-strategy` first only when the request does not say which code moves, such as "split this module". Open `toby-swd-extensibility` when the change replaces a growing conditional or an inheritance tree. Open `toby-swd-interfaces` when a signature changes, and `toby-swd-docs` when module structure changes.
 - An error check for a condition that cannot occur: open `toby-swd-errors`.
 The Behavior drift rules below, which keep behavior the same, apply to every scope.
 
@@ -48,7 +48,7 @@ Check this edge for each class of change:
 
 ## Out of scope
 
-In a local cleanup, do not move code between modules, change a signature, or change a public return type, because callers see each of those. Report a red flag from `toby-swd-modules`, `toby-swd-interfaces`, `toby-swd-errors`, or `toby-optimize` with the skill that handles it, and note any other larger cleanup as a follow-up.
+In a local cleanup, do not move code between modules, change a signature, or change a public return type, because callers see each of those. Report a red flag from `toby-swd-modules`, `toby-swd-extensibility`, `toby-swd-interfaces`, `toby-swd-errors`, or `toby-optimize` with the skill that handles it, and note any other larger cleanup as a follow-up.
 
 If you spot a real bug or a security issue while cleaning up, don't fix it here, because the fix is a behavior change. Flag it only when you can state the input that triggers it and why the existing guards do not catch it. Then recommend a review pass.
 
@@ -58,4 +58,4 @@ Make one cleanup pass, and stop when the next change would not reduce a count. T
 
 ## Final response
 
-Lead with what got simpler and the number each change reduced. For every change, state in a short phrase the edge case you checked, and the test that covers it or why the edge cannot occur. List each change you left out for lack of a covering test, with the edge that needs one. List each smell or red flag you left alone with the skill that handles it, and each follow-up, one per line.
+Lead with what got simpler and the number each change reduced. Name each edge case that no test covers. List each change you left out for lack of a covering test. List each problem you left alone and each follow-up at file:line, one per line.

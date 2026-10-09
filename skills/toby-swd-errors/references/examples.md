@@ -27,6 +27,10 @@ hides more work behind the same simple interface. Check whether any caller needs
 absent. If one rare caller does, give it a separate query and keep the common
 path exception-free.
 
+Apply the same redefinition to other operations. "Delete this variable, fail
+if absent" becomes "ensure this variable no longer exists." "Throw if an index
+is out of range" becomes "return the overlap, empty if none."
+
 ---
 
 ## Example 2 — Backend: aggregate, and know when to just crash

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD Hardening"
+  short_description: "Harden code that runs in production"
+  default_prompt: "Use $toby-swd-hardening to check new production code for limits, retries, queues, dual writes, and deploys."
+policy:
+  allow_implicit_invocation: false

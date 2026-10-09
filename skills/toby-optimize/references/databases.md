@@ -16,7 +16,7 @@ Send a loop of single-row statements as one statement, such as `UPDATE ... WHERE
 
 ## Indexes
 
-Choose indexes when the table or the query is designed, and check each hot query with `EXPLAIN ANALYZE` before it ships.
+Choose indexes when the table or the query is designed, and check each hot query with `EXPLAIN ANALYZE` before it ships. Build a new index on a table that takes writes with `CREATE INDEX CONCURRENTLY`, in a migration outside a transaction. Run `EXPLAIN ANALYZE` on a write, such as an `UPDATE` or `DELETE`, only between `BEGIN` and `ROLLBACK`, because it executes the statement.
 
 - Index each foreign key the code looks rows up by.
 - For `WHERE customer_id = ? AND status = ? ORDER BY created_at DESC`, use `(customer_id, status, created_at DESC)`. It also serves queries on its leading columns, but not a query on `status` alone.
@@ -25,4 +25,4 @@ Choose indexes when the table or the query is designed, and check each hot query
 
 ## Connections
 
-Hold a connection only for the queries. Open the transaction in a `with` scope, build the view data inside it, and render after it closes. Give the pool a size and a short acquire timeout, such as `pool_timeout=2`. Then a request returns "service unavailable" when every pooled connection is in use, and never hangs. When an endpoint still holds connections too long, profile it for lazy loads and slow queries.
+Hold a connection only for the queries. Open the transaction in a `with` scope, build the view data inside it, and render after it closes. Size the pool and give it a short acquire timeout, as the Bounds section of `toby-swd-hardening` says. Then a request returns "service unavailable" when every pooled connection is in use, and never hangs. When an endpoint still holds connections too long, profile it for lazy loads and slow queries.

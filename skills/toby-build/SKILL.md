@@ -1,173 +1,112 @@
 ---
 name: toby-build
 description: >-
-  Changes what code does in the smallest step that leaves the design at least as
-  good as before. It proves each change with one check run before the edit and
-  again after it. Use it when the user asks to add, build, implement, wire up,
-  or finish a behavior. The behavior can be a feature, a ticket, an endpoint, a
-  method, a screen, a job, or a flag. Skip it for wrong output, which
-  toby-bug-fix covers, and for slow code, which toby-optimize covers. Skip it
-  when behavior stays the same, which toby-refactor covers, and for a throwaway,
-  which toby-swd-experiment covers. Skip it for a one-file edit that copies a
-  pattern already in that file.
+  Changes what code does, in slices the user can review one at a time. It
+  proves each slice with a check run before and after the edit, and leaves the
+  design at least as good as before. Use it when the user asks to
+  add, build, implement, wire up, or finish a behavior, such as a feature, a
+  ticket, an endpoint, a method, a screen, a job, a flag, a new status, or logs
+  and metrics. Skip it for wrong output, which toby-bug-fix covers, and for
+  slow code, which toby-optimize covers. Skip it when behavior stays the same,
+  which toby-refactor covers, and for a throwaway, which toby-swd-experiment
+  covers. Skip it for a one-file edit that copies a pattern already in that
+  file. Use it for a one-file edit that adds a case to a type, kind, or status
+  branch, or changes a money or permissions rule.
 ---
 
 # Toby Build
 
-Build the requested change in slices, which are small parts the user can review one at a time. The user should never first see the change as a finished diff across nine files. A small answer is a valid result, such as "The repo already does this at file:line" or "This needs one decision before any code."
+When the repo already does what the user asked, say so at file:line and stop.
 
-## The running order
+To open a skill, read `../<name>/SKILL.md` relative to this skill's folder. Before any command that does more than read files or print state, open `toby-swd-environment`. When the work needs a value that only a trial run can settle, such as a batch size, open `toby-swd-experiment` for that value.
 
-Work in this order. Pick the mode and size the work. Read the existing code, which is the discovery step. Write the acceptance criteria and cut the work into slices.
+## 1. Size the work
 
-Make stop 1, where the user sees the criteria. Design the change, write the plan, and make stop 2, where the user approves the plan. Then build a slice, prove it, make stop 3, and write the handoff, which is the final report.
-
-## Method skills
-Each name below is another skill, stored at `../<name>/SKILL.md` relative to this skill's folder. Open that file by path when you reach the step listed beside it.
-- Before the design pass, open `toby-swd-strategy`.
-- When the design adds or changes a signature, open `toby-swd-interfaces`.
-- When the design adds a module, moves code, or gives a module a new job, open `toby-swd-modules`, and fix each of its red flags in the design before the plan.
-- When a criterion has a failure case, a retry, a timeout, or validation, open `toby-swd-errors`.
-- When a criterion states a time or memory budget, or the design adds a cache, a batch, or a queue for speed, open `toby-optimize`.
-- Before the first edit of a behavior change, open `toby-swd-testing`.
-- When module structure or a public API changes, open `toby-swd-docs`.
-- Before you run any command that does more than read files or print state, open `toby-swd-environment`.
-- Before the handoff, open `toby-swd-clarity` when the diff adds a public name or an interface comment.
-
-## Pick the mode first
-
-- **Experiment** for an experiment request. Use `toby-swd-experiment` and write no criteria or slices. Stop for the user only where that skill says to stop. Say in one line what would have to happen before the code could be kept as durable work.
-- **Durable implementation** for everything else. The rest of this file covers it.
-
-When the user picks a behavior at the end of an experiment, write the criteria from what they picked. Run the discovery step on any experiment code you keep, with the same care you give new code. When durable work needs a value that you cannot find by reading the code, use `toby-swd-experiment` for that one question. Then come back to this skill with the answer.
-
-## Size the work before discovery
-
-Size the work as strategic or tactical, and say which in one line. The table below shows what each step of the work requires at that size.
-
-**Strategic** applies when the change involves any of these triggers:
+Say in one line whether the work is tactical or strategic. The work is strategic when any of these apply:
 
 - a new module or boundary
-- a public API, an event, or a persisted format
-- a migration
-- auth, permissions, billing, money, or privacy
+- an API that code outside this deploy calls, such as a mobile app, a partner's server, or a package's users
+- an event, or a persisted format
+- a migration, unless it only adds a table or adds a column that is nullable or has a default
+- a new or changed rule for auth, permissions, billing, money, or privacy
 - a behavior that three or more call sites depend on
 - a UI workflow that crosses more than one screen
-- greenfield work, where the repo has no similar feature and no convention to follow
+- a new subsystem with nothing similar in the repo, such as a data store or service
+- work the user expects to take more than one session
 
-A trigger counts when the change creates a contract or alters one, and a contract is something that other code or people depend on. A change that only adds an optional part to an existing contract stays tactical. An example is an optional parameter with a default added to an exported function. Changing what the function returns, or what its callers must handle, is a trigger.
+A change that only adds an optional part, such as a parameter with a default or a response field, stays tactical. So does reusing a check the repo already runs, such as an owner filter. Removing, renaming, or retyping a field, or changing what an exported function returns or what its callers must handle, makes the work strategic.
 
-**Tactical** applies otherwise, which covers most work.
+When one of these turns up partway through, switch to strategic, say so, and stay strategic.
 
-When the request is a one-file edit following a pattern already in that file, skip this skill. Make the edit and say what you changed.
+Tactical work is one slice, with its criteria and design in chat. For strategic work, open `references/strategic.md`.
 
-| Gate | Tactical | Strategic |
-|---|---|---|
-| Acceptance criteria | one line, in chat | the three-line form below, one per behavior |
-| Discovery | the file that implements the behavior, and its test | those two plus the two in `references/strategic.md`, with the most similar existing feature read end to end |
-| Slices | one | named, one task group each |
-| Stop 1, the criteria | show them and keep moving | show them and wait |
-| Stop 2, the plan | none | a written file, approved before the first edit |
-| Stop 3, a slice boundary | none | only where the next slice depends on the answer |
-| The Check line | write the command | run it against today's code and quote the output |
+## 2. Read the code
 
-If you find a strategic trigger partway through the work, switch the work to strategic and say so in one line. Never switch strategic work back to tactical. A change that looked tactical and turned out to touch permissions was strategic the whole time.
+Before designing, read the file that implements the behavior today and the test that covers it. When no test covers it, say where you searched, such as "No test in `tests/orders/` covers `cancelOrder`."
 
-For strategic work, open `references/strategic.md`. That file lists the extra discovery items, how to cut the work into slices, and stops 2 and 3. That file also covers the design lines, the plan document, and how to resume half-built work.
+Cite a path:line for each claim about how the code behaves, or list the claim as an assumption. Before adding a helper, module, component, hook, or error type, search the repo for one. Cite the closest match, or the search that found nothing.
 
-## Discover before designing
+## 3. Write the criteria
 
-Find the discovery items the sizing table requires before designing, and keep reading while any is missing:
+Before any code, open `references/criteria.md` and write one criterion per behavior the request names. In strategic work, add one for a nearby behavior that must keep working. In tactical work, the criterion's Check also lists the existing tests that must keep passing.
 
-- The file that implements this behavior today.
-- The test covering the behavior about to change, or one sentence that states where you searched, such as "No test in `tests/orders/` covers `cancelOrder`."
+For strategic work, open `toby-swd-e2e` before you write the Check lines.
 
-Cite a path:line for every claim about how the code behaves, or add the claim to the criteria list as an assumption. That rule also applies to claims in a summary from a search agent or any other sub-agent. Before adding a helper, module, component, hook, or error type, search the repo for the operation. Cite the closest match at path:line, and say why it doesn't fit. When you find nothing, quote the search you ran, including the pattern.
+Reread the request for a second reasonable reading. Open `references/ambiguity.md` when the two readings would build different behavior, or when the literal request leaves the user's problem unsolved.
 
-## Evidence for each criterion
+## 4. Cut slices and stop
 
-Write each criterion as the three lines below before any code. For tactical work, write all three on one line in chat. Also add a separate Stays-working criterion for a nearby behavior that the change must leave unchanged. When a criterion is missing a line, ask the user for it or drop the criterion. Write one criterion per behavior the request names, and stop there.
+For strategic work, open `toby-swd-plan` before you name the slices.
 
-- **Observable** — what the user or caller sees at the entry point they use, after they take an action from a stated starting state. An entry point is where something outside the changed module arrives: an HTTP request, a CLI invocation, a screen someone opens, a queue message, or an exported symbol another module calls. If a reader can check a line only by reading the diff, the line adds nothing, so rewrite it or cut it.
-- **Source** — quote the user sentence or ticket line the criterion came from, or cite at path:line the repo fact that requires it. A claim about the repo with no path:line counts as your own preference. Cite a repo fact as the source only when the request says nothing about that behavior.
-- **Check** — write the command that shows the criterion holds, and the result that would mean it is unmet, because a check that cannot fail proves nothing. When the run needs something you cannot get, such as an approval-gated command, a credential, an external service, or a device, mark the criterion `unverified`. State the blocker on the same line before stop 1. A check you could have run and skipped leaves the criterion unmet.
+A slice ships only when these hold:
 
-Reuse the vocabulary in the schema, the routes, and the UI. Ask the user before giving a concept a second name or naming a new product concept. Users and docs keep using an invented product word after the code that introduced it is gone.
+- It leaves the system working.
+- It is correct on its own, or hidden by a flag that is off by default. Open `toby-swd-flags` for a release flag, kill switch, or experiment flag.
+- A user or caller reaches it from outside its module. Give the path:line of the wiring, such as the registered route or the render site.
 
-**Criteria are fixed text once coding starts.** If you change a criterion so it covers more, mention the change in the next report. Dropping or narrowing a criterion changes what the user asked for, so give the reason and the new wording, and wait for a yes before the next edit.
+At stop 1, show the criteria under `What done means for [task]`, then the slice names. Tactical work continues in the same reply. For strategic work, give the plan's path, ask whether to write the plan there, and wait for a yes. Never write "assuming yes, proceeding" past a stop.
 
-## Ambiguity
+## 5. Design
 
-When doing what the request says would not solve the problem the user described, say so before any code. A feature can match the request's words and still leave the problem unsolved.
+Open `toby-swd-architecture` and follow its "Default structure" when the change adds or moves a business rule, a write, or an outbound call. For every change, open `toby-swd-strategy` and run its design pass. Open `toby-swd-campfire` and answer its "Before the first edit" list. Then open each skill whose condition holds:
 
-Read the request again and look for a second reasonable way to understand it. Two readings that produce different observable behavior mean the request is ambiguous. Record in the criteria list whether you found a second reading. Choose the next step by what a wrong guess would cost.
+- Open `toby-swd-modules` for a new module or boundary.
+- Open `toby-swd-interfaces` for a new or changed signature, including a parameter added with a default. Skip it for a field added beside fields of the same kind, and copy their format.
+- Open `toby-swd-extensibility` when the design branches on a type, kind, status, or provider, or adds an implementation or a subclass.
+- Open `toby-swd-errors` for a failure case, a retry, a timeout, or validation.
+- Open `toby-optimize` for a stated time or memory budget, or a cache, batch, or queue added for speed.
+- Open `toby-swd-hardening` and `toby-swd-observability` for a new entry point, job, consumer, or outbound call, or a new write or failure path in a handler. Open both for a request about logging, metrics, alerts, or hardening.
+- Open `toby-swd-twelve-factor` for a new process, worker, scheduler, or scheduled job, a new config value or secret, or a new backing service.
 
-- **Ask before any code** when the code built from a wrong guess would write data, change a public contract or a stored format, or move money. Ask first also when that code would touch permissions, ship a user-visible string, call an external system, or cost more to undo than to make. Send one message with at most three questions, both readings side by side, and your recommendation.
-- **Ship it marked `assumed`** when a wrong guess costs one edit to undo. Take the reading that matches how this repo already behaves, and record the reading taken, the reading dropped, and what changes if the user wanted the other one. Do not write `assumed: standard behavior`, because it states neither reading and leaves the question open.
-- **Ship the part that can be undone, marked `blocked`,** when nobody is available to answer. Record the question verbatim and stop where the irreversible part starts. Never mark a question blocked before asking it.
+State the structure chosen, the alternative rejected, any new signature, the one function that computes each new rule, and any refactor that runs first. A `Structure: follows <path:line>` line replaces the structure chosen and the alternative rejected. When the design depends on a guess about how a library behaves, read the library's installed code. When you cannot, ask the user before the first edit.
 
-Do not ask a question the repo or the user already answered.
+Before writing the plan or the first edit, read "Don't build" in `references/checks.md`.
 
-## Cut the work into slices
+## 6. Write the plan and stop
 
-Tactical work is one slice and has to meet only the four conditions below before it ships.
+For strategic work, write the plan. At stop 2, the user approves the plan before the first edit.
 
-A slice ships when all four hold:
+## 7. Build one slice at a time
 
-- It leaves the system working. Run the command that covers the touched area, using the before-and-after runs the "Prove the slice" section describes.
-- The user can observe its result without reading the diff, through a request they can send, a screen they can open, or a command they can run.
-- It is correct on its own. Half-built behavior a user can reach is a defect. So when a slice depends on a later one, ship it behind a feature flag that is off by default, or hold it until the later slice ships. Observe a flagged slice with the flag on. State the flag, how to turn it on, and the later slice that removes it.
-- It is reachable from outside its own module. Give the path and line of the wiring, meaning the code that connects the slice to the rest of the system: the registered route, the render site, the caller of the exported symbol, the CLI subcommand, or the event subscription.
+Before the first edit, open `toby-swd-testing`.
 
-## Checkpoints
+- Build one criterion at a time.
+- Read the installed source for each library function, config field, env var, CLI flag, prop, or error type the change uses and did not define. Skip one the repo already calls at a path:line you can cite.
+- When the code needs a different module, boundary, or signature than the design states, stop, edit the design, and say what changed.
+- Open `toby-swd-docs` when module structure changes or the change alters an API that a README or AGENTS.md describes.
 
-The sizing table says which of these three stops you must make. The operating guide is the Toby instructions file that every session loads. Its stops before commands that change the user's machine still apply at either size, and so do the stops in `toby-swd-environment`.
+## 8. Prove the slice
 
-1. **The criteria, before the first edit.** Show the list under the heading `What done means for [task]`, then the slice cut by name. When the sizing table also requires stop 2, say so here. A yes from the user at this stop also tells you to write the plan.
+Run each criterion's check before and after the change, as "Prove a change" in `toby-swd-testing` describes.
 
-Stops 2 and 3 are in `references/strategic.md`.
+Run the change the way a user would and quote what came back. A test that drives the entry point as the `toby-swd-e2e` table says replaces that run, so open that skill and quote the test.
 
-Never write "assuming yes, proceeding" and keep going past a stop. Doing that removes every checkpoint in this skill.
+Then run "After the tests pass" in `toby-swd-campfire`.
 
-## Design before the plan
+## 9. Check the finished work
 
-Run the `toby-swd-strategy` design pass after stop 1 and before the plan.
-
-When the design needs a refactor first, put it first in the plan as its own step, with its cost.
-
-Tactical work states the structure chosen, the alternative rejected, and any new signature in chat before the first edit. For strategic work, write the design lines that `references/strategic.md` lists.
-
-## Build one slice at a time
-
-- Build one criterion at a time. Write its test first, watch it fail, make it pass, and run it, unless `toby-swd-testing` gives a case for skipping test-first. In that case, state the case, check the criterion by hand, and quote the output.
-- When the code needs a different module, boundary, or signature than the design states, stop, edit the design, and say what changed before continuing.
-- Confirm every symbol this change didn't define against the installed source or the pinned manifest. A symbol can be a library function, config field, env var, CLI flag, component prop, or error type. Skip the check when this repo already calls the symbol somewhere you can cite at path:line. The version in the lockfile is the one that runs, so do not trust docs for a later version.
-- Re-read a file before editing it a second time when any other edit or command ran since you last read it.
-- When the change alters an existing callable, list its callers as the Brownfield Work section of `toby-swd-interfaces` describes, and put the list in the handoff.
-- Commit a refactor separately, before the feature code that uses it.
-
-## Prove the slice before starting the next
-
-Prove each criterion by running its check before the change and again after it, as the Prove a change section of `toby-swd-testing` describes.
-
-- A green type-check, a lint pass, or an existing suite that never runs the changed lines proves only that the repo still builds, as it did before.
-- Run the change the way a user would and quote what came back. When that needs an approval-gated command, write out the command and ask for approval. Label each verification step run-by-me or for-you, and give the user only steps you could not run, each with what blocked you.
-
-## Don't build
-
-`references/checks.md` lists the seven things that get built without anyone asking for them. Build none of them unless a criterion requires one and that criterion's Source line quotes the user or the ticket. Read the seven before writing the plan's out-of-scope line, or before the first edit where there is no plan. Never write a criterion yourself to allow one of them, because the list exists to prevent that.
-
-## Red flags
-
-Before writing the handoff, check the finished work against all eight entries in `references/checks.md`. List every red flag that applied in the handoff, at file:line and under its entry name. Include the ones you fixed on the spot. When no flag applied, say so after reading all eight.
+Before the handoff, check the work against every red flag in `references/checks.md`. Open `toby-swd-clarity` when the diff adds a public name or an interface comment.
 
 ## Final response
 
-Lead with the behavior that now exists, stated the way the user would observe it. State any unmet or unverified criterion in the first line, with its status and what is missing.
-
-Always write these two sections before the operating guide's final-message list:
-
-1. List each criterion in its pre-code wording, marked met, unmet, or unverified, with the check that proved it or what is missing. For multi-slice work, list each slice by name, marked done or not-done, with its evidence.
-2. Give the structure chosen and the alternative rejected, in one line each. Say where the plan is, and list any step that ran differently from the approved wording.
-
-Then give the operating guide's final-message list. Phrase each assumption that is still open as a question the user can answer in one word. List the questions this run could not resolve. List what you found and left alone, one line each, with the skill that covers each item. A missing section tells the user you checked it and found nothing.
+Lead with the behavior that now exists, as the user sees it, and any criterion left unmet or unverified. Then write the sections at the end of `references/checks.md`.

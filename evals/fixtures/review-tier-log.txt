@@ -1,0 +1,80 @@
+$ git log -p -U8 --since=2026-06-01 -- billing/pricing.py billing/invoice.py
+commit ff9f5b8fa6e6f7e9b80e5f8c781af5f0d7cd6285
+Author: Dana Ruiz <dana@example.com>
+Date:   Tue Oct 6 10:12:00 2026 -0700
+
+    Add platinum tier
+    
+    BILL-412: Platinum customers get 20% off every order.
+
+diff --git a/billing/pricing.py b/billing/pricing.py
+index 92d328d..f366b25 100644
+--- a/billing/pricing.py
++++ b/billing/pricing.py
+@@ -7,14 +7,16 @@ from billing.tiers import Tier
+ def discount_rate(tier: Tier) -> Decimal:
+     match tier:
+         case "basic":
+             return Decimal("0")
+         case "silver":
+             return Decimal("0.05")
+         case "gold":
+             return Decimal("0.10")
++        case "platinum":
++            return Decimal("0.20")
+         case _:
+             assert_never(tier)
+ 
+ 
+ def price_after_discount(subtotal: Decimal, tier: Tier) -> Decimal:
+     return subtotal * (1 - discount_rate(tier))
+
+commit c749a0b6b830855175cdb7dfc693a6156ee1f239
+Author: Sam Okafor <sam@example.com>
+Date:   Tue Aug 4 14:20:00 2026 -0700
+
+    Add gold tier
+    
+    BILL-301: Gold customers get 10% off every order.
+
+diff --git a/billing/invoice.py b/billing/invoice.py
+index 6cf380c..3996105 100644
+--- a/billing/invoice.py
++++ b/billing/invoice.py
+@@ -1,13 +1,15 @@
+ from billing.tiers import Tier
+ 
+ 
+ def tier_label(tier: Tier) -> str:
+     match tier:
+         case "silver":
+             return "Silver member"
++        case "gold":
++            return "Gold member"
+         case _:
+             return "Standard"
+ 
+ 
+ def invoice_header(account) -> str:
+     return f"{account.name} ({tier_label(account.tier)})"
+diff --git a/billing/pricing.py b/billing/pricing.py
+index aaad305..92d328d 100644
+--- a/billing/pricing.py
++++ b/billing/pricing.py
+@@ -5,14 +5,16 @@ from billing.tiers import Tier
+ 
+ 
+ def discount_rate(tier: Tier) -> Decimal:
+     match tier:
+         case "basic":
+             return Decimal("0")
+         case "silver":
+             return Decimal("0.05")
++        case "gold":
++            return Decimal("0.10")
+         case _:
+             assert_never(tier)
+ 
+ 
+ def price_after_discount(subtotal: Decimal, tier: Tier) -> Decimal:
+     return subtotal * (1 - discount_rate(tier))

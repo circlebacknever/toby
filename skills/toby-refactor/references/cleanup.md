@@ -7,15 +7,15 @@ This file lists what a local cleanup looks for, what is not a simplification, an
 **Over-built code where simpler code does the same job.**
 
 - Repeated setup or branches that encode one rule, where defining them once removes lines.
-- A long conditional where an early return or a named predicate shows intent.
+- A long conditional where an early return or a predicate function shows intent.
 - A clever one-liner, nested ternary, or dense chain that packs several branches or side effects into one expression and makes debugging worse.
 - A private wrapper with a single caller that only renames another call, and adds no type, no clearer name, and no useful boundary.
 - A comment that repeats what the code plainly says, or a name that describes the code's history and hides its purpose.
 - A try/catch, guard, or branch for a condition the types or an earlier check already rule out, when you can quote that proof from the code. A check on input from outside the program stays.
 
-**A design smell from the catalog in `toby-code-review`'s `references/smells.md`.**
+**Code that matches a question in `references/smells.md`.**
 
-- When code matches an entry in that catalog, fix it in this pass if the fix stays inside one module and changes no public signature, such as a dead function, a magic number, or a comment the diff made wrong. Leave any other match, and report it with its file:line. Route it to `toby-swd-interfaces` when the fix changes a signature, or to `toby-swd-modules` when it moves code between modules.
+- Fix it in this pass when the fix stays inside one module and changes no public signature, such as a dead function, a magic number, or a comment the diff made wrong. Leave any other match, and report it with its file:line. Route it to `toby-swd-interfaces` when the fix changes a signature, or to `toby-swd-modules` when it moves code between modules.
 
 **Code that ignores a pattern this repo already uses.**
 

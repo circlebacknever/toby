@@ -171,7 +171,7 @@ A skill points at the guide by calling it "the operating guide" and never by a f
 
 The first five workflow skills are adapted from Anthropic skills. Toby kept the workflow, rewrote the instructions, and packaged them as `toby-*` names:
 
-- `toby-code-review` - tight findings for diffs and PRs.
+- `toby-code-review` - real issues in a diff or PR, each with reproduction steps and one fix, or "No issues found."
 - `toby-explain` - explain a decision while the work keeps moving.
 - `toby-build` - ship a small change with evidence.
 - `toby-learning` - teach through your own contributions.
@@ -187,7 +187,7 @@ The rest of the standalone skills are Toby-specific:
 - `toby-voice` - fix output that wandered off voice.
 - `toby-game` - build and tune a playable thing.
 
-The `toby-swd-*` skills are the engineering method, with one skill for each habit. Claude Code, Copilot, and Codex leave six of them out of the skill list the model reads. They are `toby-swd-strategy`, `toby-swd-modules`, `toby-swd-interfaces`, `toby-swd-errors`, `toby-swd-clarity`, and `toby-swd-docs`. A skill that a request loads, such as `toby-build`, opens each of the six by path at the step that needs it.
+The `toby-swd-*` skills are the engineering method, with one skill for each habit. A request can start `toby-swd-environment`, `toby-swd-testing`, or `toby-swd-experiment`. Claude Code, Copilot, and Codex leave the rest out of the skill list the model reads. A skill that a request loads, such as `toby-build`, opens each of those by path at the step that needs it.
 
 The SWD skills come from two books whose fans rarely agree. Toby read John Ousterhout's *A Philosophy of Software Design* and Robert C. Martin's *Clean Code* as source material, then kept the parts he trusts when he edits code.
 
@@ -197,12 +197,23 @@ Martin contributes the local habits Toby still wants: names, readable flow, beha
 
 When a local habit creates shallow interfaces, hides a contract, or lets tests steer design into a dead end, Toby picks the boundary rule. He settles the module boundaries before anyone argues about function length.
 
+Neither book says much about code that runs in production. The architecture, hardening, twelve-factor, observability, flags, and end-to-end skills come from running services.
+
 - `toby-swd-environment` - treat the user's machine as the user's, so look around and ask before touching processes, ports, or data.
 - `toby-swd-strategy` - weigh how today's change constrains every change after it, so the codebase stays easy to work in.
+- `toby-swd-architecture` - put each part of a feature in its place: the handler parses and responds, one function holds each rule, and one module writes each table.
 - `toby-swd-modules` - decide where code lives so each module hides its own mess and callers stay light.
+- `toby-swd-extensibility` - make the next case cheap to add once you know it is coming, and turn SOLID into checks.
 - `toby-swd-interfaces` - design the contract a caller sees, keeping it small for the work it does.
 - `toby-swd-testing` - write tests that pin behavior and catch regressions without freezing the implementation in place.
+- `toby-swd-e2e` - prove each slice through the entry point its user reaches, and the whole feature with one test that walks through every slice.
+- `toby-swd-campfire` - make the change easy before making it, then check the finished diff and leave the files it touched better than they were.
+- `toby-swd-plan` - cut work into slices, and write a long plan as a folder with one file per slice and checks that can fail.
 - `toby-swd-errors` - keep error handling deliberate, so complexity doesn't pile up unnoticed. `toby-optimize` covers performance work.
+- `toby-swd-observability` - structured logs, metrics, and traces that the on-call engineer can read at 3 a.m.
+- `toby-swd-hardening` - input bounds, idempotent writes, timeouts, poison messages, and deploys where two releases run at once.
+- `toby-swd-twelve-factor` - config from the environment, stateless processes, graceful shutdown, and the other factors a diff can break.
+- `toby-swd-flags` - feature flags with one check site, tests for both paths, and a removal step.
 - `toby-swd-clarity` - name things well and keep code obvious on read, since reading happens far more than writing.
 - `toby-swd-docs` - keep the why and the who-it's-for in `AGENTS.md` and `README.md`, where the code can't say it.
 - `toby-swd-experiment` - spike mode: move fast to learn first, save the durable build for later.

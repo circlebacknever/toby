@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD Flags"
+  short_description: "Add, test, and remove feature flags"
+  default_prompt: "Use $toby-swd-flags to add a feature flag with one check site and a removal step."
+policy:
+  allow_implicit_invocation: false

@@ -433,7 +433,7 @@ PREDICTED_PATTERNS = [
     # "Consider this service code:" announces the code and says nothing about it.
     (re.compile(r"(?:^|(?<=[.!?]\s))Consider (?:this|the following)\b[^.:]{1,40}:", re.M),
      "sentence that announces the next one"),
-    # "The guardrail question" names step 6 of toby-swd-interfaces with a word
+    # "The guardrail question" names a step of toby-swd-interfaces with a word
     # its SKILL.md never uses. Twelve skill lines used it on 2026-10-02.
     (re.compile(r"\bguardrails?\b", re.I), "coined name"),
     # "The number that matters" flags importance without stating it.

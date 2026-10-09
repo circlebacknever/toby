@@ -1,0 +1,100 @@
+a design smell finding has four lines
+a design smell matching an entry in references smells md only when the entry s criteria can be quoted against the code
+a fix that deletes a method an interface requires or a method a caller uses breaks the code so the finding is wrong
+a new or changed public interface whose comment relies on call order words first then after references internals or is longer than four sentences
+a one line change note only when the diff s intent isn t plain from the diff
+a question for the author only when the answer needs information the code can t give such as runtime config an external service or product intent
+a repo rule break only when the rule can be quoted at path line
+a review with no findings is a complete report
+a smell finding needs no runtime consequence because a smell costs future readers and future changes
+a structural change such as a moved or split module a changed public api or a cross module decision that leaves an existing agents md or readme stale
+add at most two pointers
+after the change find one flaw in the code you touched such as an unclear name a dead branch a wrong comment or duplicated logic
+an example is the account page returns last month s balance to a logged in user on first load api account ts 42 describe only the effects that the triggering input can cause as it moves through the code
+apply each pass s own evidence rules and keep its findings separate so the fourth pass gets the same attention as the first
+ask before anything broader and state the command and why
+ask the author about it as a question or drop the finding
+ask these questions of each new or changed module and signature
+asks to review check or audit a diff a pr a commit a branch or the
+before the report recheck every finding
+bugs and regressions find what breaks and for whom including a changed public contract persisted format permission or workflow
+check every acceptance criterion against the diff
+check every plan step against what the diff contains
+check the fix against the diff before writing it
+check the plan s design section against the diff
+cleanup candidates at most two each written as cleanup candidate file line
+code that s correct but over built awkwardly named or non idiomatic
+compliance check the change against what was agreed
+default to the current diff when no scope is given
+design ask what the change cost the next person to touch this code and which document it left wrong
+does the change break a solid principle
+examples are the same decision coded in two modules a call order the caller must follow and a data layout two files rely on with no shared definition
+fill all four lines from the file or drop the finding
+findings ordered by harm across all passes
+fires when this line states the input or state that triggers the failure and the real caller route input or test that supplies it
+fix it when the fix is small local and supports the change and otherwise report it as a follow up
+for a longer report write these sections in order and drop any section that s empty
+for a pr read its title and description before the diff
+guard this line quotes the check that should stop the failure and says why the check misses
+if one of those cases covers the code say nothing
+if the code doesn t match an entry in references smells md the fix is behavior preserving cleanup and out of scope here
+if the code stops at a failed request describe only the failed request
+if you cannot show which caller route or test supplies the triggering input the failure is a guess
+if you find one say why it still does not stop the failure
+in the report say which findings depend on reading alone
+it needs no runtime consequence
+leave off severity labels such as p1 or p2
+let the consequence line show the harm
+list a pre existing problem under residual risk only when it affects the change
+method length on its own
+never invent a finding to show effort and never add you might consider to an empty result
+otherwise add one pointer at the end written as cleanup candidate file line with no severity and no argument
+otherwise use the three evidence lines with the consequence line stating what the next change will cost
+proof sources are local guidance files nearby code the repo s own skill md files and its conventions and config files
+push them up to that caller or remove them with option 1 under replace the growing conditional
+references solid md maps solid to these checks
+report a bug fix that has no regression test
+report a diff with nothing wrong in one line
+report a test asserting on internals that a behavior preserving refactor would break
+report an error that the code catches and hides when a caller needs to see it
+report only a finding that fills the three evidence lines below and drop every other one because a false positive costs the reader more than a missed minor issue
+report only the findings the recheck confirms
+report problems and do not fix them
+report the break under the matching entry in references smells md and write the principle s name in the finding
+reports the proven risks in a change and edits nothing
+residual risk which covers pre existing problems that affect the change what was not run and which findings depend on reading alone
+run the changed code before writing findings using only commands that toby swd environment lists as safe to run without asking
+search for a check that would prevent the failure and prove your finding wrong
+skip this pass when no acceptance criteria or plan file exists
+state the fix in plain engineering words and never name a toby skill or a skill only term in the report such as reactive pass or comment test
+style nits a formatter or linter catches
+substitute breaks its contract
+test changed arithmetic and changed conditions with the inputs a quick read misses
+that line says there are no findings states any residual risk and says why that risk stayed unverified
+that section allows a small local cleanup inside a file a criterion already mentions reported on its own line
+the entry names are standard smell names that a reader can look up
+the one exception is the cleanup of a single flaw that the existing code section of toby swd strategy allows
+then paste what came back into the consequence line
+they are the entry name from references smells md the file line the code that meets the entry s fires when criterion and the fix
+toby swd modules lists the options
+use negative values zero empty values and the values just above and below every boundary
+use the skills yourself to decide the fix toby swd interfaces for a contract toby swd modules for where code belongs and how much a module hides behind its interface toby swd errors for an error path toby optimize for a cache toby swd testing for coverage toby swd clarity for a name or a comment and toby swd strategy for a design that got worse
+use the smell format when an entry in references smells md matches
+what hidden dependency did it create
+what special case did this diff add and which caller now has to know about it
+when a finding s fix depends on one of those skills open its skill md by path
+when no check exists write one sentence that says so and lists where you looked such as the router and api middleware have no check that stops it before writing this line assume the code is right and you are wrong
+when nothing in the diff meets a criterion report that criterion as the finding quoted in the wording it had before coding started
+when the code would confuse a reader find the closest entry in references smells md and read that entry s list of cases where the smell is acceptable
+when the diff builds a module boundary or signature differently from that section with no note recording the change report it
+when the diff implements a plan step differently from its approved wording with no note recording the change report that step
+when the guard could be in a file you cannot read such as authentication middleware or settings ask the author a question and report no finding
+when the repo s guidance requires tests also report any other new behavior that no test checks
+when you cannot count it cite the function name
+where acceptance criteria or a plan file exist for this work check three things and report what failed
+work out each line number by counting from the starting line in the diff s hunk header
+write a compliance finding as the criterion plan step or design line quoted in its agreed wording and the diff s file line that departs from it
+write each finding as three labelled lines filled from the file you are reviewing
+write every finding so a reader without these skills can act on it because the author often does not have the toby skills installed
+write the fix from the entry s fix line applied to this code
+writing a hunch as might possibly does not prove it

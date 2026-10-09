@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD Extensibility"
+  short_description: "Make the next case cheap to add"
+  default_prompt: "Use $toby-swd-extensibility to decide how new cases plug into existing code."
+policy:
+  allow_implicit_invocation: false

@@ -508,21 +508,37 @@ BODY_TOKEN_CEILING = 6000
 # opens one method skill of several lists the largest, toby-swd-modules.
 ROUTING_GROUPS = {
     "build-strategic": [
-        "toby-build", "toby-swd-strategy", "toby-swd-modules", "toby-swd-interfaces",
-        "toby-swd-errors", "toby-optimize", "toby-swd-testing", "toby-swd-docs",
-        "toby-swd-clarity", "toby-swd-environment",
+        "toby-build", "toby-swd-strategy", "toby-swd-architecture", "toby-swd-modules",
+        "toby-swd-extensibility", "toby-swd-interfaces", "toby-swd-errors", "toby-optimize",
+        "toby-swd-testing", "toby-swd-e2e", "toby-swd-campfire", "toby-swd-plan",
+        "toby-swd-docs", "toby-swd-clarity", "toby-swd-environment",
     ],
-    "build-tactical": ["toby-build", "toby-swd-strategy", "toby-swd-testing"],
-    "bug-fix": [
-        "toby-bug-fix", "toby-swd-testing", "toby-swd-strategy", "toby-swd-errors",
+    # A build that adds an entry point, a job, or a consumer. It opens the
+    # production skills in place of optimize and extensibility.
+    "build-service": [
+        "toby-build", "toby-swd-strategy", "toby-swd-architecture", "toby-swd-modules",
+        "toby-swd-interfaces", "toby-swd-errors", "toby-swd-testing", "toby-swd-e2e",
+        "toby-swd-campfire", "toby-swd-plan", "toby-swd-observability", "toby-swd-hardening",
+        "toby-swd-twelve-factor", "toby-swd-flags", "toby-swd-docs", "toby-swd-clarity",
         "toby-swd-environment",
     ],
-    "optimize": ["toby-optimize", "toby-swd-interfaces", "toby-swd-testing", "toby-swd-environment"],
-    "refactor": [
-        "toby-refactor", "toby-swd-strategy", "toby-swd-modules", "toby-swd-interfaces",
-        "toby-swd-docs", "toby-swd-testing",
+    "build-tactical": [
+        "toby-build", "toby-swd-strategy", "toby-swd-architecture", "toby-swd-testing",
+        "toby-swd-campfire",
     ],
-    "review": ["toby-code-review", "toby-swd-modules", "toby-swd-environment"],
+    "bug-fix": [
+        "toby-bug-fix", "toby-swd-testing", "toby-swd-strategy", "toby-swd-architecture",
+        "toby-swd-errors", "toby-swd-campfire", "toby-swd-observability", "toby-swd-environment",
+    ],
+    "optimize": [
+        "toby-optimize", "toby-swd-interfaces", "toby-swd-testing", "toby-swd-hardening",
+        "toby-swd-observability", "toby-swd-environment",
+    ],
+    "refactor": [
+        "toby-refactor", "toby-swd-strategy", "toby-swd-architecture", "toby-swd-modules",
+        "toby-swd-extensibility", "toby-swd-interfaces", "toby-swd-docs", "toby-swd-testing",
+    ],
+    "review": ["toby-code-review", "toby-swd-architecture", "toby-swd-environment"],
     "explain": ["toby-explain", "toby-swd-modules"],
     "experiment": ["toby-swd-experiment", "toby-swd-environment", "toby-swd-testing"],
     "prose": ["toby-voice", "toby-swd-docs"],

@@ -11,13 +11,17 @@ description: >-
 
 # Toby SWD Testing
 
-Tests record the behavior callers rely on, checked through the public interface. A refactor, a new feature, or a bug fix leaves existing tests unchanged. Edit an existing test only when the required behavior changes, so a test that needs an edit during a refactor checks internals. Assert call order only when that order is the observable contract.
+Tests record the behavior callers rely on, checked through the public interface. Edit an existing test only when the required behavior changes. A test that needs an edit during a refactor is checking internals. Assert call order only when that order is the observable contract.
 
 When a behavior is hard to test, the abstraction is too coarse. Extract a smaller module with a real interface and test through it. Do not expose internals only so a test can reach them.
 
+## Failing and flaky tests
+
+Open `references/failing-tests.md` to classify a failing test before you edit, skip, or delete it, and when a test fails only some of the time.
+
 ## Names
 
-Name each test for the behavior it specifies, such as `expired token is rejected`, and never for a call, such as `calls paymentService.process`. When you cannot name the behavior, either the code under test is split in the wrong place or the test mixes two behaviors.
+Name each test for the behavior it specifies, such as `expired token is rejected`, and never for a call, such as `calls paymentService.process`.
 
 ## Assertions
 
@@ -28,15 +32,17 @@ An assertion fails when the behavior under test changes, and never on a timestam
 - Use object subset matching when only a few fields matter.
 - Use full-object equality or a snapshot only when the whole structure is the contract, such as a config file, a response schema, or a serialization format.
 
-Read the diff before accepting a snapshot update, and confirm every change is intended. Accepting an unread update makes the snapshot match whatever the code now does, so the test stops checking anything.
+Read the diff before accepting a snapshot update, and confirm every change is intended.
 
 ## Coverage
 
 Cover the success path, each documented failure mode, and the boundary conditions, then stop. Keep one behavior per test, with as many asserts as that behavior needs. Default to tests with specific example inputs. Add a property test when the contract is a round trip, agreement with a simpler reference version, or an invariant.
 
+Check whether a test drives each entry point the change adds, such as a route, command, screen, queue consumer, or job. When none does, open `toby-swd-e2e`, which says when to add one.
+
 ## Independence
 
-Each test shares no mutable state with other tests and passes in any order. Control time and IO, seed randomness, and assert results so the test checks itself. When a result depends on a library or platform version, record the version. When the system must give the same output across runs or machines, test that determinism as part of the contract.
+Each test shares no mutable state with other tests and passes in any order. Control time and IO, seed randomness, and assert results so the test checks itself.
 
 ## Test-first
 
@@ -55,28 +61,19 @@ An acceptance criterion counts as met after two runs of the same named command. 
     before  test_cancel_rejects_shipped  FAIL  expected 409, got 200
     after   test_cancel_rejects_shipped  PASS
 
-Use the same form for every criterion in every slice, meaning each small step of the work, with the command written beside it. An `after` run with no `before` run proves only that the harness runs, so report that criterion unmet and state the missing run.
+Use the same form for every criterion in every slice, as `toby-swd-plan` defines a slice, with the command written beside it. An `after` run with no `before` run proves only that the harness runs, so report that criterion unmet and state the missing run.
 
 ## Test doubles
 
 Use the highest-fidelity dependency that is fast and deterministic:
 
-1. **Real implementation** when it is fast and in-process, such as domain objects, an in-memory database, or a validator.
+1. **Real implementation** when it runs fast on the test machine, such as domain objects, a validator, or the repo's test database. When the repo has none, or a test needs engine behavior such as `select_for_update`, run the production engine locally or in a container.
 2. **Fake**, a hand-written stand-in with realistic behavior, when the real thing is slow, external, or hard to set up.
-3. **Mock** only a dependency whose calls another system sees, such as a third-party API, payment, email, or a message bus. Mock or fake time, randomness, and failures that are hard to trigger. Put each mock on an adapter class you own, which wraps the third-party client. Test against the application's own database with the real implementation or a fake.
+3. **Mock** only a dependency whose calls another system sees, such as a third-party API, payment, email, or a message bus. Mock or fake time, randomness, and hard-to-trigger failures.
 
-Across a process, sandbox, or hardware boundary, fake the channel or simulate the environment, and test each side against the contract. Assert a state such as "the order is paid", and do not assert a call log such as "process called once with amount=42".
+Assert a state such as "the order is paid", or what another system received, such as exactly one Slack post. Never assert an internal call log such as "process called once with amount=42".
 
-## Failing tests
-
-Classify a failing test before changing it:
-
-1. **The behavior is still valid, and production broke it.** Fix the production code.
-2. **The behavior changed on purpose.** Update the test to describe the new behavior.
-3. **The behavior is obsolete.** Remove the test and say why in the commit message.
-4. **The test is bad**, because it is coupled to internals, asserts incidental data, or checks something its name does not claim. Rewrite it to protect the same behavior through a better interface.
-
-Read a test you cannot classify until you understand it. When you delete or weaken a test, report its name, the behavior it protected, why it is obsolete, and what replaces it.
+Open `references/dependencies.md` before you mock a third-party provider or swap the database engine, or when a test depends on another process, version, or machine.
 
 ## Existing tests
 
@@ -86,10 +83,6 @@ Read the tests that cover the touched behavior before adding new ones. When cove
 
 Before calling coverage done, check for each of these:
 
-- A test fails on a correct refactor or is named for a call.
-- A large snapshot was updated without review.
 - An expected value was copied from the code's output, so the test passes with the bug in place. Work it out from the spec or by hand.
-- A flaky test was rerun until it passed. Look for the cause in async waits first, then concurrency, then test order. Replace a fixed sleep with a wait on the event, or a poll with a timeout, and check the code under test for a race.
 - A test exists only to hit a line.
-- A test was deleted to make the suite pass before it was classified.
-- A bug fix has no regression test.
+- A flaky test was rerun until it passed.

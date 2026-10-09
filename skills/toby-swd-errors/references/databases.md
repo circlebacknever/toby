@@ -2,9 +2,10 @@
 
 ## Transaction retry
 
-Retry deadlocks, serialization failures, and connection resets in one `WithRetry(ctx, db, fn)` wrapper with a bounded attempt count and jittered backoff. Callers then see only conflicts that persist. Two rules keep the retry correct:
+Add one `WithRetry(ctx, db, fn)` wrapper only when a transaction runs at `SERIALIZABLE` or `REPEATABLE READ`, or when logs or tests show deadlocks. The wrapper retries deadlocks, serialization failures, and connection resets with a bounded attempt count and jittered backoff. Callers then see only conflicts that persist. Leave it out when a caller above already retries the whole operation, such as a webhook sender, a job queue, or the next scheduled run. These rules keep the retry correct:
 
-- `fn` makes no call outside the database, such as an email or an API request, because a retry repeats it. Run those calls after the commit.
+- Retry a connection reset that happened before COMMIT was sent. After COMMIT is sent, the server may have committed, so retry only when `fn` inserts a row under an idempotency key that the caller sends. When that retry fails on the key's unique constraint, return the first result.
+- `fn` makes no call outside the database, such as an email or an API request, because a retry repeats it. Run those calls after the commit, as `toby-swd-hardening`'s `references/messages.md` describes for dual writes.
 - `fn` reads the rows it computes from. When `fn` uses rows read before `WithRetry` started, each retry repeats the calculation on old data. The commit then overwrites another writer's change and reports no error.
 
 ## Concurrent writes

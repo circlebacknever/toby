@@ -65,13 +65,32 @@ SCENARIOS = {
     "review my changes": ["toby-code-review"],
     "a throwaway spike": ["toby-swd-experiment"],
     "one method on a repository": ["toby-build", "toby-swd-interfaces", "toby-swd-errors", "toby-swd-testing"],
-    "split a module": ["toby-refactor", "toby-swd-strategy", "toby-swd-modules", "toby-swd-docs"],
-    "a feature, tactical": ["toby-build", "toby-swd-strategy", "toby-swd-testing"],
-    "a feature, strategic": [
-        "toby-build", "toby-build/references/strategic.md", "toby-swd-strategy", "toby-swd-modules",
-        "toby-swd-interfaces", "toby-swd-errors", "toby-swd-testing", "toby-swd-docs",
+    "split a module": [
+        "toby-refactor", "toby-swd-strategy", "toby-swd-architecture", "toby-swd-modules", "toby-swd-docs",
     ],
-    "a bug fix": ["toby-bug-fix", "toby-swd-testing"],
+    "a feature, tactical": [
+        "toby-build", "toby-swd-strategy", "toby-swd-architecture", "toby-swd-testing", "toby-swd-campfire",
+    ],
+    "a feature, strategic": [
+        "toby-build", "toby-build/references/strategic.md", "toby-build/references/criteria.md",
+        "toby-swd-strategy", "toby-swd-architecture", "toby-swd-modules", "toby-swd-interfaces",
+        "toby-swd-errors", "toby-swd-testing", "toby-swd-e2e", "toby-swd-campfire", "toby-swd-plan",
+        "toby-swd-docs",
+    ],
+    "a new endpoint": [
+        "toby-build", "toby-build/references/strategic.md", "toby-build/references/criteria.md",
+        "toby-swd-strategy", "toby-swd-architecture", "toby-swd-interfaces", "toby-swd-errors",
+        "toby-swd-testing", "toby-swd-e2e", "toby-swd-campfire", "toby-swd-plan",
+        "toby-swd-observability", "toby-swd-hardening",
+    ],
+    "a new worker or job": [
+        "toby-build", "toby-swd-strategy", "toby-swd-architecture", "toby-swd-testing", "toby-swd-e2e",
+        "toby-swd-campfire", "toby-swd-observability", "toby-swd-hardening", "toby-swd-twelve-factor",
+    ],
+    "a new case in a switch": [
+        "toby-build", "toby-swd-strategy", "toby-swd-extensibility", "toby-swd-testing", "toby-swd-campfire",
+    ],
+    "a bug fix": ["toby-bug-fix", "toby-swd-testing", "toby-swd-campfire", "toby-swd-architecture"],
     "make it faster": ["toby-optimize", "toby-swd-environment"],
     "learning, invoked": ["toby-learning"],
     "a visual artifact": ["toby-artifact-style"],

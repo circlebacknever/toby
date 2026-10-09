@@ -1,4 +1,4 @@
 interface:
   display_name: "Toby Code Review"
-  short_description: "Concise findings for diffs and PRs"
+  short_description: "Real issues in a diff, with steps and one fix"
   default_prompt: "Use $toby-code-review to review my current diff for real bugs and risks."

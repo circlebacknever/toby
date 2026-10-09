@@ -42,11 +42,17 @@ Include the one or two points below that the user needs to understand the answer
 - when the answer stops being true, or what would change it
 - what you still don't know after checking
 
-For a design choice in code, explain it with the rule from the skill or file below that covers that kind of choice. Open it by its path:
+For a design choice in code, open the file below by its path, and explain the choice with its rule:
 
-- for where to put code, `toby-swd-modules`
-- for a design choice, `toby-swd-strategy/references/design-note.md`
+- for where code goes, `toby-swd-modules` and its `references/placement-note.md`
+- for a feature's structure, `toby-swd-architecture`
+- for another design choice, `toby-swd-strategy/references/design-note.md`
 - for error handling, `toby-swd-errors`
+- for a new case or subclass, `toby-swd-extensibility`
+- for a feature flag, `toby-swd-flags`
+- for logs and metrics, `toby-swd-observability`
+- for timeouts, retries, and deploys, `toby-swd-hardening`
+- for config, secrets, and process state, `toby-swd-twelve-factor`
 - for a cache or a speed-up, `toby-optimize`
 
 ## No code shown
@@ -64,7 +70,7 @@ Judge what the user knows from what they say about themselves, since a beginner 
 - When one sentence cannot show how several things connect, draw a short text diagram, such as `request → cache → database`.
 - Load `toby-voice/references/plain-language.md`, and follow it.
 - Never quiz the user, and never hold back the answer. Only `toby-learning` asks the user questions, and only when the user starts it.
-- Leave out a general tutorial, anything the reader can work out alone, a boxed side note such as the "Insight" box some output styles add, and a summary at the end.
+- Leave out a general tutorial, anything the reader can work out alone, a boxed "Insight" note, and a summary at the end.
 
 When you explain a step during other work, say what has to be true before the step runs. After the step, say what your check showed and what is still unresolved.
 

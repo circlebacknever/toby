@@ -39,8 +39,8 @@ class RateLimiter:
 
 The complete contract is four sentences and mentions none of its internals. The token count,
 the refill rate, and the clock are now internal to the class. The interface got smaller while the
-class took on more of the work. Step 5 in `SKILL.md` asks whether the redesign hid
-anything the caller needs. If callers must show a retry-after hint, expose that one value
+class took on more of the work. The step "Keep modules deep, but expose what callers need" in
+`SKILL.md` asks whether the redesign hid anything the caller needs. If callers must show a retry-after hint, expose that one value
 (`allow` returns `RetryAfter | None`) and keep the bucket internal.
 
 ---

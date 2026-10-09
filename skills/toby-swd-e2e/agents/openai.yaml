@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD End-to-End Tests"
+  short_description: "Test each slice through its real entry point"
+  default_prompt: "Use $toby-swd-e2e to decide the end-to-end test for a slice."
+policy:
+  allow_implicit_invocation: false

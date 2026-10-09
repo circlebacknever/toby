@@ -1,24 +1,52 @@
-# Catalogs
+# Checks
 
-## Don't build — seven entries
+Read "Don't build" before writing the plan or the first edit. Read "Red flags" and "Final response" before the handoff.
 
-When one of these ships anyway, state the entry and the criterion that allowed it.
+## Don't build
 
-- **The one-caller config option** is a setting, hook, or extension point that exactly one call site reads. A later slice removes a slice flag. This option stays in the code with a default. Its value never changes from the default, so the setting adds a code path that nobody uses.
-- **The wrapper over one instance** is a new module, layer, or adapter in front of a single implementation. Extend the interface you already have, as toby-swd-interfaces describes, and wait for a second implementation. The second implementation shows you what the two have in common. A module with two or more callers passes this entry. So does a module the design pass approved because it hides a lot behind a small interface, such as a storage layout or an external API.
-- **Handling for a ruled-out condition** is error handling for a state that the types or an earlier check already exclude.
-- **The adjacent feature, and the adjacent bug** are a feature the request implies but does not ask for, and a defect you found while working on the request. Changes made "while I was in there" turn a two-file diff into a nine-file diff. List each as a follow-up and stop. The one exception is the cleanup of a single flaw that the Existing code section of toby-swd-strategy allows. That section allows a small local cleanup inside a file a criterion already mentions, reported on its own line.
-- **The uninvited migration** is a migration, rename, or reorganization that no criterion asked for. It appears unrequested in somebody else's review, so the reviewer has to decide whether to trust it. A refactor stated in the plan's design block and approved with the plan passes this entry.
-- **Unmeasured optimization** is performance work with no measurement behind it. Without a starting measurement, a claim such as 40% faster has no recorded number to compare against.
-- **The dependency nobody approved** is a new dependency added without approval. Adding it makes a decision for the user about their lockfile, build, and security review.
+Build none of these unless a criterion requires it and that criterion's Source quotes the user or the ticket. Never write a criterion yourself to allow one. When one ships anyway, state the entry and the criterion that allowed it.
 
-## Red flags — eight entries
+- A setting, hook, or extension point that one call site reads and nobody changes from its default. A release flag that a later slice removes does not count.
+- An interface or adapter with one implementation whose methods only forward calls. Extend the interface you already have, as `toby-swd-interfaces` describes, and wait for a second implementation, which shows what the two have in common. Moving a rule into the module that reads and writes its data is allowed, such as a discount rule moved out of a view into the pricing module.
+- Error handling for a state that the types or an earlier check already rule out.
+- A feature the request implies but does not ask for, or a defect you found while building. List each as a follow-up, and leave it out of the change.
+- A migration, rename, or reorganization that no criterion asks for.
+- A metric, alert, or shutdown hook that no similar entry point in the repo has. List it as a follow-up.
+- Performance work with no baseline. A claim such as 40% faster needs a number from before the change.
+- A package the user has not approved.
 
-- **A check that never ran the changed lines** is a criterion reported met by a command that never reached the changed lines, or a test that nobody has seen fail.
-- **Unreachable code** means the unit tests pass, but the route was never registered.
-- **An unchecked caller or symbol** means a signature changed and nobody checked all its callers. This entry also covers a call to an external symbol when nobody opened its installed source or cited an existing call site.
-- **A criterion or design decision changed without asking** is a criterion that came to cover less during long work because nobody reread it, or a design decision made without asking because asking felt slow.
-- **Code ahead of its plan** is an edit written before the step covering it was approved. It also covers a step that ran differently from its approved wording with no edit to the plan.
-- **The placeholder in a production path** is a TODO, a hardcoded return in place of real work, an unimplemented branch, a swallowed error, or a fixture the runtime reads.
-- **Partial work reported whole** is a multi-slice feature handed over as done, with the remaining work moved to a closing note that begins "the rest is just wiring".
-- **An untraced file** is a file in the diff that no criterion and no reported cleanup accounts for. This entry also covers an assumption stated mid-run but missing from the handoff.
+These items are part of the change:
+
+- the checks that the `toby-swd-hardening` table lists for code this change adds
+- the outcome log that `toby-swd-observability` requires for a new entry point
+- a refactor that `toby-swd-campfire` allows and that you stated before the first edit
+- a fix for what the design check in `toby-swd-architecture` finds, reported on its own line
+
+## Red flags
+
+Check the finished work against each problem below. Fix what you can before the handoff. Report each problem still in the work at file:line, in plain words.
+
+- The handoff reports a criterion met, but its check never reached the changed lines, or nobody saw its test fail. A green type-check, a lint pass, or a suite that skips the changed lines proves only that the repo still builds.
+- The unit tests pass, but nothing registers the route.
+- A signature changed, and nobody listed its callers, as "Brownfield Work" in `toby-swd-interfaces` describes.
+- The change uses a symbol that nobody read in the installed source, as step 7 of `toby-build` requires. Docs for a later version than the lockfile pins do not count.
+- A criterion covers less than its approved wording, or a design decision went ahead without the user's yes.
+- An edit came before the user approved its step, or a step ran differently from its approved wording and nobody edited the plan. A design-check fix that you add to the plan before you make it is allowed. Report that fix at the next stop.
+- Production code contains a placeholder, such as a TODO, a hardcoded return in place of real work, an unimplemented branch, a swallowed error, or a fixture the runtime reads.
+- The handoff calls a feature done and moves its unbuilt slices to a closing note, such as "the rest is just wiring".
+- A file changed, and neither a criterion nor a reported cleanup explains it.
+- The handoff leaves out an assumption stated mid-run.
+
+## Final response
+
+After the lead line, write only what the user needs to act on:
+
+1. Each criterion in its pre-code wording, marked met or unmet, with the check that proved it or what is missing. When nothing could run, say so once and give each criterion's check. For multi-slice work, mark each slice done or not done.
+2. The structure chosen and the main alternative rejected, one line each, or the `Structure: follows <path:line>` line. Say where the plan is.
+3. For work with more than one slice, the whole-feature test, with its run before the last slice and its run after it.
+
+Then add these, leaving out each one that has nothing in it:
+
+- Each step you could not run, with what blocked it.
+- Each question whose answer changes what gets built, on its own line, with the answer you will use if the user says nothing. Ask it before the work it affects whenever you can.
+- Each problem you saw and left alone, one line each at file:line. Leave out a follow-up for a problem you did not see in the code.

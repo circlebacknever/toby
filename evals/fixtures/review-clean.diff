@@ -1,0 +1,145 @@
+diff --git a/billing/receipts.py b/billing/receipts.py
+index c2a7da2..9e54eb9 100644
+--- a/billing/receipts.py
++++ b/billing/receipts.py
+@@ -1,15 +1,42 @@
+ from typing import assert_never
+ 
+ from billing.models import OrderStatus
++from billing.money import format_amount
+ 
+ 
+ def status_label(status: OrderStatus) -> str:
+     match status:
+         case "paid":
+             return "Paid"
+         case "pending":
+             return "Awaiting payment"
+         case "refunded":
+             return "Refunded"
+         case _:
+             assert_never(status)
++
++
++def render_receipt(order, *, currency, locale, footer):
++    """Return the plain-text receipt for an order in any status.
++
++    The second line names the status, so a pending order's receipt says it is
++    awaiting payment. Amounts use the order's currency and the account's locale.
++    The tax line shows order.tax_cents, the tax charged. An empty footer adds no
++    line. The total line always shows order.total_cents, the amount charged.
++    """
++    lines = [f"Receipt for order {order.id}", status_label(order.status), ""]
++
++    for item in order.items.all():
++        amount = item.unit_cents * item.quantity
++        lines.append(f"{item.name} x{item.quantity}  {format_amount(amount, currency, locale)}")
++
++    for discount in order.discounts.all():
++        lines.append(f"Discount {discount.code}  -{format_amount(discount.cents_off, currency, locale)}")
++
++    lines.append(f"Tax  {format_amount(order.tax_cents, currency, locale)}")
++
++    lines.append("")
++    lines.append(f"Total  {format_amount(order.total_cents, currency, locale)}")
++    if footer:
++        lines.append(footer)
++    return "\n".join(lines)
+diff --git a/billing/urls.py b/billing/urls.py
+index bf627a5..515cf7e 100644
+--- a/billing/urls.py
++++ b/billing/urls.py
+@@ -1,7 +1,8 @@
+ from django.urls import path
+ 
+ from billing import views
+ 
+ urlpatterns = [
+     path("orders/<int:order_id>/invoice", views.invoice_view, name="invoice"),
++    path("orders/<int:order_id>/receipt", views.receipt_view, name="receipt"),
+ ]
+diff --git a/billing/views.py b/billing/views.py
+index d122d4f..1086208 100644
+--- a/billing/views.py
++++ b/billing/views.py
+@@ -1,9 +1,21 @@
+ from django.http import HttpResponse
+ from django.shortcuts import get_object_or_404, render
+ 
+ from billing.models import Order
++from billing.receipts import render_receipt
+ 
+ 
+ def invoice_view(request, order_id):
+     order = get_object_or_404(Order, id=order_id, account=request.account)
+     return render(request, "invoice.html", {"order": order})
++
++
++def receipt_view(request, order_id):
++    order = get_object_or_404(Order, id=order_id, account=request.account)
++    text = render_receipt(
++        order,
++        currency=order.currency,
++        locale=request.account.locale,
++        footer=request.account.receipt_footer,
++    )
++    return HttpResponse(text, content_type="text/plain; charset=utf-8")
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 0249422..f024961 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -1,13 +1,25 @@
+ import pytest
+ 
+ from billing.tests.factories import make_account, make_order
+ 
+ 
+ @pytest.fixture
+ def account(db):
+     return make_account("Acme", receipt_footer="")
+ 
+ 
+ @pytest.fixture
+ def paid_order(account):
+     return make_order(account, status="paid", items=[("Widget", 2000, 2)], tax_cents=180, total_cents=4180)
++
++
++@pytest.fixture
++def account_client(client, account):
++    client.force_login(account.owner)
++    return client
++
++
++@pytest.fixture
++def other_account_client(client, db):
++    client.force_login(make_account("Globex").owner)
++    return client
+diff --git a/tests/test_receipts.py b/tests/test_receipts.py
+new file mode 100644
+index 0000000..973a087
+--- /dev/null
++++ b/tests/test_receipts.py
+@@ -0,0 +1,23 @@
++from billing.receipts import render_receipt
++
++
++def test_receipt_total_is_the_amount_charged(paid_order):
++    text = render_receipt(paid_order, currency="USD", locale="en_US", footer="")
++    assert text.splitlines()[-1] == "Total  $41.80"
++
++
++def test_receipt_ends_with_the_account_footer(paid_order):
++    text = render_receipt(paid_order, currency="USD", locale="en_US", footer="Thanks!")
++    assert text.splitlines()[-1] == "Thanks!"
++
++
++def test_receipt_page_returns_the_receipt_as_text(account_client, paid_order):
++    response = account_client.get(f"/orders/{paid_order.id}/receipt")
++    assert response.status_code == 200
++    assert response["Content-Type"] == "text/plain; charset=utf-8"
++    assert response.content.decode().startswith(f"Receipt for order {paid_order.id}")
++
++
++def test_receipt_page_of_another_account_is_404(other_account_client, paid_order):
++    response = other_account_client.get(f"/orders/{paid_order.id}/receipt")
++    assert response.status_code == 404

@@ -2,13 +2,13 @@
 
 ## HTTP retries
 
-Retry in one client wrapper, and pick the handling from the status class:
+When step 2 of `toby-swd-errors` calls for a retry, put it in one client wrapper, and pick the handling from the status class:
 
 | Status | Handling |
 |---|---|
 | 4xx except 408 and 429 | Surface. Do not retry. |
 | 408 | Retry on a fresh connection. |
-| 429 | Back off, and honor `Retry-After` (seconds or an HTTP date). |
+| 429 | Retry at the `Retry-After` time (seconds or an HTTP date), or after a backoff when the header is missing. When that time falls after the caller's deadline, throw a transient error and skip the retry. |
 | 5xx except 501 | Retry with backoff when the request is safe to repeat. |
 | 501 | Surface. Do not retry. |
 
@@ -20,9 +20,9 @@ One helper wraps every RPC and reads the status code:
 
 | Code | Retry? |
 |---|---|
-| `UNAVAILABLE` | Yes, with backoff. |
-| `DEADLINE_EXCEEDED` | Only with a fresh, larger deadline. |
-| `RESOURCE_EXHAUSTED` | Only when the server signals throttling. |
+| `UNAVAILABLE` | Yes, with backoff, when the RPC is safe to repeat. |
+| `DEADLINE_EXCEEDED` | Only with a fresh, larger deadline, when the RPC is safe to repeat. |
+| `RESOURCE_EXHAUSTED` | Only when the server signals throttling and the RPC is safe to repeat. |
 | `ABORTED` | Re-read state and retry the whole transaction. |
 | `INTERNAL` | No, because it signals a broken invariant. |
 | `INVALID_ARGUMENT`, `NOT_FOUND`, `PERMISSION_DENIED`, and every other code | No. |
@@ -31,7 +31,7 @@ The helper passes the deadline in `ctx`, stops sleeping when the deadline expire
 
 ## Timeouts
 
-Give every downstream call a timeout at its healthy p99.9 latency plus padding, so at most 0.1% of healthy calls time out. Without one, a slow downstream holds this service's threads, so the slowdown spreads to every caller upstream. Render the page without waiting for a non-critical dependency, such as a recommendations panel, and fill in the panel when its data arrives.
+Set each timeout at the call's healthy p99.9 latency plus padding, so at most 0.1% of healthy calls time out. For a call with no latency history, such as a new provider, use the timeout the repo's other outbound clients use. With no other client to copy, use a few seconds for a chat webhook. Log the call's duration, and tune the value from those logs. Without a timeout, a slow downstream holds this service's threads, so the slowdown spreads to every caller upstream. Render the page without waiting for a non-critical dependency, such as a recommendations panel, and fill in the panel when its data arrives.
 
 ## Circuit breakers
 

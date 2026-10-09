@@ -1,6 +1,6 @@
 # Design it twice
 
-This file has the steps for writing and comparing two or three interface designs. The file also covers how to choose between designs that both pass the comment test, and how to ask a separate reviewer for a verdict. Open it when an interface is consequential or a routine interface's first comment fails.
+This file has the steps for writing and comparing two or three interface designs. The file also covers how to choose between designs that both pass the comment test, and how to ask a separate reviewer for a verdict. Open it when a first comment fails the test, or for a consequential interface that is new or changes what callers rely on.
 
 ## The loop
 

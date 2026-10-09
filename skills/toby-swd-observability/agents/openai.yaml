@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD Observability"
+  short_description: "Add structured logs, metrics, and traces"
+  default_prompt: "Use $toby-swd-observability to add logs, metrics, and traces to production code."
+policy:
+  allow_implicit_invocation: false

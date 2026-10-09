@@ -1,0 +1,59 @@
+From ff9f5b8fa6e6f7e9b80e5f8c781af5f0d7cd6285 Mon Sep 17 00:00:00 2001
+From: Dana Ruiz <dana@example.com>
+Date: Tue, 6 Oct 2026 10:12:00 -0700
+Subject: [PATCH] Add platinum tier
+
+BILL-412: Platinum customers get 20% off every order.
+---
+ billing/pricing.py    | 2 ++
+ billing/tiers.py      | 2 +-
+ tests/test_pricing.py | 4 ++++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/billing/pricing.py b/billing/pricing.py
+index 92d328d..f366b25 100644
+--- a/billing/pricing.py
++++ b/billing/pricing.py
+@@ -7,14 +7,16 @@ from billing.tiers import Tier
+ def discount_rate(tier: Tier) -> Decimal:
+     match tier:
+         case "basic":
+             return Decimal("0")
+         case "silver":
+             return Decimal("0.05")
+         case "gold":
+             return Decimal("0.10")
++        case "platinum":
++            return Decimal("0.20")
+         case _:
+             assert_never(tier)
+ 
+ 
+ def price_after_discount(subtotal: Decimal, tier: Tier) -> Decimal:
+     return subtotal * (1 - discount_rate(tier))
+diff --git a/billing/tiers.py b/billing/tiers.py
+index 12e5b6b..a1b1135 100644
+--- a/billing/tiers.py
++++ b/billing/tiers.py
+@@ -1,3 +1,3 @@
+ from typing import Literal
+ 
+-Tier = Literal["basic", "silver", "gold"]
++Tier = Literal["basic", "silver", "gold", "platinum"]
+diff --git a/tests/test_pricing.py b/tests/test_pricing.py
+index 8337017..6d8e63c 100644
+--- a/tests/test_pricing.py
++++ b/tests/test_pricing.py
+@@ -8,8 +8,12 @@ def test_basic_pays_full_price():
+ 
+ 
+ def test_silver_gets_five_percent_off():
+     assert price_after_discount(Decimal("100"), "silver") == Decimal("95.00")
+ 
+ 
+ def test_gold_gets_ten_percent_off():
+     assert price_after_discount(Decimal("100"), "gold") == Decimal("90.00")
++
++
++def test_platinum_gets_twenty_percent_off():
++    assert price_after_discount(Decimal("100"), "platinum") == Decimal("80.00")

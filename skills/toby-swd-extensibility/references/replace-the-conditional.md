@@ -2,7 +2,7 @@
 
 ---
 
-## Option 1 — Remove the branch
+## Option 1. Move the branch onto the type
 
 A new requirement says that deleted users render as "[deleted]".
 
@@ -34,7 +34,7 @@ The same move removes null checks. Replace `None` with a stand-in object that ha
 
 ---
 
-## Option 2 — Data-driven dispatch
+## Option 2. Data-driven dispatch
 
 When each branch picks a small behavior based on the value of one field, such as `file.kind`, replace the branches with a lookup map.
 
@@ -64,11 +64,11 @@ function renderPreview(file: FileMeta): ReactNode {
 
 Adding a kind means adding one entry. `Record<FileKind, …>` makes a missing entry a compile error, so the set stays complete. The map needs no design pattern and no class.
 
-Keep it to one map. Two maps keyed on the same field copy the list of kinds into two places, which is the leakage that one map removes.
+When a second map on `kind` computes something else, such as an icon, type it as `Record<FileKind, …>` too. The compiler then reports a missing kind in both maps.
 
 ---
 
-## Option 3 — Discriminated union with an exhaustive switch
+## Option 3. Discriminated union with an exhaustive switch
 
 When the branches read different fields, the map does not fit. Keep the switch and let the type make it exhaustive.
 
@@ -98,7 +98,7 @@ Use this over option 2 when each branch reads different fields. Use option 2 whe
 
 ---
 
-## Option 4 — Polymorphism
+## Option 4. Polymorphism
 
 When each case has its own behavior, private state, or dependencies, a map of functions is the wrong container. Give each case an object behind a shared interface.
 
@@ -125,7 +125,7 @@ The cost is one interface to keep stable, one class per case, and one place in t
 
 ---
 
-## Option 5 — Registry
+## Option 5. Registry
 
 Sometimes someone must be able to add a case without editing any shared file. Then the code that picks the handler must accept new handlers while the program runs. Each implementation registers itself.
 

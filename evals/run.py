@@ -378,9 +378,9 @@ through". It failed a PR bullet that opens on its verb, such as "Adds a test for
 the 429 path", and a commit subject with no article. Those two are correct.
 A second judge passed "reach a 429", "no cause to point at", and "Relay treats
 each model provider as a swappable engine" as borderline. Fail all three. A
-review finding written with the review skill's labels Consequence, Fires when,
-and Guard is the required format, so do not fail the label itself. Fail the text
-after a label when it is not a sentence.
+review issue written with the review skill's labels Reproduce and Fix is the
+required format, so do not fail the label itself. Fail the text after a label
+when it is not a sentence.
 
 Write {repo}/evals/results/judge-<run>.md with these sections and nothing else.
 
@@ -500,9 +500,9 @@ through". It failed a PR bullet that opens on its verb, such as "Adds a test for
 the 429 path", and a commit subject with no article. Those two are correct.
 A second judge passed "reach a 429", "no cause to point at", and "Relay treats
 each model provider as a swappable engine" as borderline. Fail all three. A
-review finding written with the review skill's labels Consequence, Fires when,
-and Guard is the required format, so do not fail the label itself. Fail the text
-after a label when it is not a sentence.
+review issue written with the review skill's labels Reproduce and Fix is the
+required format, so do not fail the label itself. Fail the text after a label
+when it is not a sentence.
 
 Write {repo}/evals/results/holdout-judge-<run>.md with these sections and nothing else.
 
@@ -729,7 +729,7 @@ and nothing else.""",
         "min_samples": 1,
         "prompt": """Review a diff. Follow the review skill exactly.
 
-1. Read {repo}/skills/toby-code-review/SKILL.md and its references/smells.md.
+1. Read {repo}/skills/toby-code-review/SKILL.md.
 2. The change under review is {repo}/evals/fixtures/export.diff.
 3. The agreed acceptance criteria are {repo}/evals/fixtures/criteria.md. No plan
    file exists for this work.
@@ -738,7 +738,7 @@ The code is not runnable here — there is only the diff and the criteria. Say s
 where the skill asks you to run something.
 
 Write the review to {repo}/evals/results/review-<run>.md, in the format the
-skill's Final report section specifies. Nothing else in the file.""",
+skill's Report section specifies. Nothing else in the file.""",
     },
 }
 

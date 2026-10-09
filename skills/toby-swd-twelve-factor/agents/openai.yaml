@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD Twelve-Factor"
+  short_description: "Check a process, config value, or backing service against twelve-factor"
+  default_prompt: "Use $toby-swd-twelve-factor to check a new process, config value, or backing service against the twelve factors."
+policy:
+  allow_implicit_invocation: false

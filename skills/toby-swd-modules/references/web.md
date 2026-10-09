@@ -2,7 +2,7 @@
 
 ## Server state
 
-When each page fetches in `useEffect` with its own loading, error, and cancellation code, a change to error handling edits every page. Use TanStack Query or SWR, which handle caching, deduping, retry, and refetch on focus, and keep components to rendering. Write your own fetch layer only for a stated reason.
+When each page fetches in `useEffect` with its own loading, error, and cancellation code, a change to error handling edits every page. Use TanStack Query or SWR, which handle caching, deduping, retry, and refetch on focus, and keep components to rendering. When a page refetches after an input changes, such as a sort, put the input in the cache key or ignore the earlier response. Write your own fetch layer only for a stated reason.
 
 ## Shared behavior
 
