@@ -9,9 +9,9 @@ Classify a failing test before changing it:
 1. **The behavior is still valid, and production broke it.** Fix the production code.
 2. **The behavior changed on purpose.** Update the test to describe the new behavior.
 3. **The behavior is obsolete.** Remove the test and say why in the commit message.
-4. **The test is bad**, because it is coupled to internals, asserts incidental data, or checks something its name does not claim. Rewrite it to protect the same behavior through a better interface.
+4. **The test is bad**, because it is coupled to internals, asserts incidental data, or checks something its name doesn't claim. Rewrite it to protect the same behavior through a better interface.
 
-Read a test you cannot classify until you understand it. When you delete or weaken a test, report its name, the behavior it protected, why it is obsolete, and what replaces it.
+Read a test you can't classify until you understand it. When you delete or weaken a test, report its name, the behavior it protected, why it is obsolete, and what replaces it.
 
 When a test was deleted to make the suite pass before anyone classified it, restore the test and classify it.
 

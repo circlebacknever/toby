@@ -28,9 +28,9 @@ class User:
         return f"{self.first} {self.last}"
 ```
 
-The branch still exists, but only once, next to the data it reads, so callers do not see it. Adding a state changes one method.
+The branch still exists, but only once, next to the data it reads, so callers don't see it. Adding a state changes one method.
 
-The same move removes null checks. Replace `None` with a stand-in object that has the same methods as the real object. Then the normal code needs no `if x is None` check.
+The same move removes null checks. Replace `None` with a stand-in object that has the same methods as the real object. Then the normal code doesn't need an `if x is None` check.
 
 ---
 
@@ -62,7 +62,7 @@ function renderPreview(file: FileMeta): ReactNode {
 }
 ```
 
-Adding a kind means adding one entry. `Record<FileKind, …>` makes a missing entry a compile error, so the set stays complete. The map needs no design pattern and no class.
+Adding a kind means adding one entry. `Record<FileKind, …>` makes a missing entry a compile error, so the set stays complete. The map doesn't need a design pattern or a class.
 
 When a second map on `kind` computes something else, such as an icon, type it as `Record<FileKind, …>` too. The compiler then reports a missing kind in both maps.
 
@@ -70,7 +70,7 @@ When a second map on `kind` computes something else, such as an icon, type it as
 
 ## Option 3. Discriminated union with an exhaustive switch
 
-When the branches read different fields, the map does not fit. Keep the switch and let the type make it exhaustive.
+When the branches read different fields, the map doesn't fit. Keep the switch and let the type make it exhaustive.
 
 ```ts
 type DomainEvent =
@@ -121,7 +121,7 @@ const gateway: Gateway = GATEWAYS[config.gatewayName];
 
 Each implementation is its own module, with its state and dependencies inside it.
 
-The cost is one interface to keep stable, one class per case, and one place in the code that picks which class to use. Polymorphism is worth that cost when new cases keep being added and each case has state the others do not share. Three one-line branches over a fixed set of cases do not qualify. Use option 2 for them.
+The cost is one interface to keep stable, one class per case, and one place in the code that picks which class to use. Polymorphism is worth that cost when new cases keep being added and each case has state the others don't share. Three one-line branches over a fixed set of cases don't qualify. Use option 2 for them.
 
 ---
 
@@ -145,7 +145,7 @@ export function dispatch(message: InboundMessage): Promise<void> {
 
 Each handler module calls `registerHandler` at load, so the dispatcher never imports them. This fits a plugin API, or a set of adapters loaded by config at boot.
 
-It is the most complex option. The registration adds indirection that a reader has to trace. Load order also becomes something you can get wrong. Use a registry only when code you do not control, such as third-party plugins, must add cases.
+It is the most complex option. The registration adds indirection that a reader has to trace. Load order also becomes something you can get wrong. Use a registry only when code you don't control, such as third-party plugins, must add cases.
 
 ---
 
@@ -155,7 +155,7 @@ It is the most complex option. The registration adds indirection that a reader h
 - **Variant prop that grew.** A `<Button variant="…">` whose `variant` gains values every quarter is an option 2 case, where the prop value selects the behavior. Move to compound components with `children`, or a map from variant to a style object.
 - **Field type to input.** A form that renders from a schema maps `field.type` to a component. A `switch (field.type)` inside JSX is the smell.
 - **Behavior split from presentation.** Put the state logic in a headless hook, and have each screen call that hook and render its own markup.
-- **Platform branch.** `Platform.OS === "ios"` checks spread through components are one decision copied into many files. Use `Platform.select({ ios, android })` in one module, or `Foo.ios.tsx` and `Foo.android.tsx` files where the bundler picks the file, so the code has no branch.
+- **Platform branch.** `Platform.OS === "ios"` checks spread through components are one decision copied into many files. Use `Platform.select({ ios, android })` in one module, or `Foo.ios.tsx` and `Foo.android.tsx` files where the bundler picks the file, so the code doesn't branch.
 
 ## Backend examples
 

@@ -2,7 +2,7 @@
 
 Load this file when you need fake content, such as placeholder data, demo copy, slide examples, dummy KV values, or sample status messages.
 
-When placeholder content has no real subject, use the spacecraft operations vocabulary below, because generic business copy such as "Q4 Revenue" clashes with the visuals. When the artifact has a real subject, such as DNS, use that domain's vocabulary.
+When placeholder content lacks a real subject, use the spacecraft operations vocabulary below, because generic business copy such as "Q4 Revenue" clashes with the visuals. When the artifact has a real subject, such as DNS, use that domain's vocabulary.
 
 ---
 
@@ -31,7 +31,7 @@ Decisions use only these three verbs:
 - **Hold** — defer the action and gather more evidence.
 - **Reject** — block the action.
 
-`Defer`, `File`, `Review`, `Snapshot`, and `Block` are archive actions, so do not use them as decision verbs.
+`Defer`, `File`, `Review`, `Snapshot`, and `Block` are archive actions, so don't use them as decision verbs.
 
 ---
 
@@ -91,7 +91,7 @@ viability score · build pass rate · caveat freshness · rollback rehearsed · 
 Copy and adapt these sentences when you need a quick demo paragraph or callout body.
 
 - "Drift posterior is trending high, so defer the decision until the two-sample rule passes."
-- "Retry volume is 18% above baseline, but the two-sample rule has not tripped yet."
+- "Retry volume is 18% above baseline, but the two-sample rule hasn't tripped yet."
 - "Crossing 900 km enters the LEO debris-flux watch band. Defer the next decision until the debris model is updated."
 - "Approve the controlled release, with Sayo (mission ops) on record as the rollback owner."
 - "Pass length is shrinking by 0.2 min per day."
@@ -106,6 +106,6 @@ Place each of these standard caveats next to the claim it qualifies, as SKILL.md
 
 - "assumes a circular orbit and excludes J2 perturbations"
 - "debris flux is excluded above 900 km"
-- "drag coefficient for this body shape is not measured here, so the estimate is ±25%"
+- "drag coefficient for this body shape isn't measured here, so the estimate is ±25%"
 - "the watch threshold was breached at sample 8, then the two-sample rule was satisfied at sample 9"
 - "rollback was rehearsed 21 May 09:18, with the owner on record"

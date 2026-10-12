@@ -3,7 +3,7 @@ name: toby-plain
 description: >-
   Rewrites the previous reply, or a file the user points to, in plain everyday
   English. Trigger only when the user explicitly invokes the skill by name or
-  with the `/toby-plain` slash command. Do not trigger on "explain this", "I
+  with the `/toby-plain` slash command. Don't trigger on "explain this", "I
   don't understand", or a request to reword text, which toby-explain and
   toby-voice cover.
 disable-model-invocation: true
@@ -45,7 +45,7 @@ Then check the words:
 
 Keep every warning, every number, and every question I still need to answer from the original. Cut anything repeated, and cut how you worked it out unless I need that to follow along.
 
-Do not add any new facts, and do not run any new checks. The rewrite says the same thing as the original, in words I can follow.
+Don't add any new facts, and don't run any new checks. The rewrite says the same thing as the original, in words I can follow.
 
 If the original was confusing because it skipped a step or contradicted itself, tell me that plainly, and tell me which part is missing.
 

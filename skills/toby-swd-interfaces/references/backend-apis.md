@@ -12,7 +12,7 @@ GET /api/users?filter=<url-encoded JSON>&page_token=...&page_size=50
 
 The filter has its own schema that defines each field. That schema has a version number separate from the endpoint's. The opaque token lets the server change its paging strategy without a client change.
 
-The server still tells the caller when the caller has paged too far, by returning the expired-token status. So the caller does not mistake the limit for a temporary error. A URL allows only a few KB. When the filter is too long for a URL, send the same object as the body of `POST /api/users/search`. Responses to that POST cannot be cached the way GET responses can.
+The server still tells the caller when the caller has paged too far, by returning the expired-token status. So the caller doesn't mistake the limit for a temporary error. A URL allows only a few KB. When the filter is too long for a URL, send the same object as the body of `POST /api/users/search`. Responses to that POST can't be cached the way GET responses can.
 
 ## Service method with flags
 
@@ -34,7 +34,7 @@ public record PlaceOrderCommand(UUID userId, UUID cartId, UUID paymentMethodId,
                                 ShippingOption shipping, String idempotencyKey) {}
 ```
 
-A dry run becomes its own `quoteOrder(cmd)` operation. The `skipTaxValidation` flag is removed, because tax exemption is a setting on the user's organization. The service looks that setting up from `userId`. The comment promises atomicity, so the implementation provides it with a saga, an outbox, or two-phase commit. When the implementation cannot make the order and the charge succeed or fail together, add an in-progress status to `OrderResult`. A retry that sends the same `idempotencyKey` returns the first result, so a caller can re-send a call that timed out without a double charge.
+A dry run becomes its own `quoteOrder(cmd)` operation. The `skipTaxValidation` flag is removed, because tax exemption is a setting on the user's organization. The service looks that setting up from `userId`. The comment promises atomicity, so the implementation provides it with a saga, an outbox, or two-phase commit. When the implementation can't make the order and the charge succeed or fail together, add an in-progress status to `OrderResult`. A retry that sends the same `idempotencyKey` returns the first result, so a caller can re-send a call that timed out without a double charge.
 
 ## Go consumer interface
 
@@ -53,7 +53,7 @@ func Checkout(u userLookup, orderID string) error { ... }
 
 ## gRPC update messages
 
-An `UpdateUser` with 25 optional fields needs a paragraph of comment. The paragraph explains how proto3 tells an unset field from a field set to its default value. The paragraph also explains how `field_mask` works and two side effects the caller cannot see. Give each kind of change its own RPC:
+An `UpdateUser` with 25 optional fields needs a paragraph of comment. The paragraph explains how proto3 tells an unset field from a field set to its default value. The paragraph also explains how `field_mask` works and two side effects the caller can't see. Give each kind of change its own RPC:
 
 ```proto
 message ChangeUserEmailRequest { string user_id = 1; string new_email = 2; }

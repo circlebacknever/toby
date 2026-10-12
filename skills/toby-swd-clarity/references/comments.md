@@ -4,16 +4,16 @@ This file has the rules for interface, precision, and intuition comments, and th
 
 ## Comments
 
-Write an interface comment at the entry point that states behavior, arguments, return value, side effects, exceptions, and caller preconditions, with no internals. If the interface comment cannot be complete without describing how the code works inside, change the design, as `toby-swd-interfaces` describes.
+Write an interface comment at the entry point that states behavior, arguments, return value, side effects, exceptions, and caller preconditions, with no internals. If the interface comment can't be complete without describing how the code works inside, change the design, as `toby-swd-interfaces` describes.
 
-Every other comment must add something the code does not show, either more precise detail or the reason behind the code. There are two kinds:
+Every other comment must add something the code doesn't show, either more precise detail or the reason behind the code. There are two kinds:
 
-- **Precision**, on fields, arguments, and return values, adds what the name and type cannot say, such as units, inclusive or exclusive bounds, what null or empty means, ownership, and invariants. A field whose name and type state the whole contract gets no comment.
-- **Intuition**, inside code, says why the code exists, what a block does as a whole, or why a non-obvious approach was chosen. For a bug fix whose purpose is not obvious, say why and cite the tracker.
+- **Precision**, on fields, arguments, and return values, adds what the name and type can't say, such as units, inclusive or exclusive bounds, what null or empty means, ownership, and invariants. A field whose name and type state the whole contract doesn't get a comment.
+- **Intuition**, inside code, says why the code exists, what a block does as a whole, or why a non-obvious approach was chosen. For a bug fix whose purpose isn't obvious, say why and cite the tracker.
 
 A field comment is a whole sentence too, such as `// This is null while the request is loading or after it fails.`
 
-Delete a comment that restates the adjacent code or the name. Delete commented-out code, and leave change history to git. Document each decision once, in the place a reader looks first. At a call site, point to the called method's comment and do not explain it again. Write a decision that affects several modules in the AGENTS.md of the module that contains them, as `toby-swd-docs` describes. At each affected place in the code, add a comment that points to that AGENTS.md section.
+Delete a comment that restates the adjacent code or the name. Delete commented-out code, and leave change history to git. Document each decision once, in the place a reader looks first. At a call site, point to the called method's comment and don't explain it again. Write a decision that affects several modules in the AGENTS.md of the module that contains them, as `toby-swd-docs` describes. At each affected place in the code, add a comment that points to that AGENTS.md section.
 
 Keep secrets, credentials, tokens, and personal data out of logs, diagnostics, and source.
 

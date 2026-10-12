@@ -42,7 +42,7 @@ Tactical work is one slice, with its criteria and design in chat. For strategic 
 
 ## 2. Read the code
 
-Before designing, read the file that implements the behavior today and the test that covers it. When no test covers it, say where you searched, such as "No test in `tests/orders/` covers `cancelOrder`."
+Before designing, read the file that implements the behavior today and the test that covers it. When you don't find a test for it, say where you searched, such as "`tests/orders/` doesn't have a test for `cancelOrder`."
 
 Cite a path:line for each claim about how the code behaves, or list the claim as an assumption. Before adding a helper, module, component, hook, or error type, search the repo for one. Cite the closest match, or the search that found nothing.
 
@@ -78,7 +78,7 @@ Open `toby-swd-architecture` and follow its "Default structure" when the change 
 - Open `toby-swd-hardening` and `toby-swd-observability` for a new entry point, job, consumer, or outbound call, or a new write or failure path in a handler. Open both for a request about logging, metrics, alerts, or hardening.
 - Open `toby-swd-twelve-factor` for a new process, worker, scheduler, or scheduled job, a new config value or secret, or a new backing service.
 
-List the structure chosen, the alternative rejected, any new signature, the one function that computes each new rule, and any refactor that runs first. A `Structure: follows <path:line>` line replaces the structure chosen and the alternative rejected. When the design depends on a guess about how a library behaves, read the library's installed code. When you cannot, ask the user before the first edit.
+List the structure chosen, the alternative rejected, any new signature, the one function that computes each new rule, and any refactor that runs first. A `Structure: follows <path:line>` line replaces the structure chosen and the alternative rejected. When the design depends on a guess about how a library behaves, read the library's installed code. When you can't, ask the user before the first edit.
 
 Before writing the plan or the first edit, read "Don't build" in `references/checks.md`.
 
@@ -91,7 +91,7 @@ For strategic work, write the plan. At stop 2, the user approves the plan before
 Before the first edit, open `toby-swd-testing`.
 
 - Build one criterion at a time.
-- Read the installed source for each library function, config field, env var, CLI flag, prop, or error type the change uses and did not define. Skip one the repo already calls at a path:line you can cite.
+- Read the installed source for each library function, config field, env var, CLI flag, prop, or error type the change uses and didn't define. Skip one the repo already calls at a path:line you can cite.
 - When the code needs a different module, boundary, or signature than the design states, stop, edit the design, and say what changed.
 - Open `toby-swd-docs` when module structure changes or the change alters an API that a README or AGENTS.md describes.
 

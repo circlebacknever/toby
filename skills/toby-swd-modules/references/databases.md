@@ -31,7 +31,7 @@ type User struct { ID, Email string; Status UserStatus }
 type UserDTO struct { ... }   // the JSON format
 ```
 
-A column change stays inside `internal/store`, and a JSON change needs no migration. When all three types would hold the same fields, keep one struct with `db` and `json` tags.
+A column change stays inside `internal/store`, and a JSON change doesn't need a migration. When all three types would hold the same fields, keep one struct with `db` and `json` tags.
 
 In Django and Rails the model is the row type and the domain type. Add only the JSON type, such as a DRF serializer.
 

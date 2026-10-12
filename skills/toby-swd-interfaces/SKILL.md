@@ -2,7 +2,7 @@
 name: toby-swd-interfaces
 description: >-
   Contains Toby's procedure for designing a callable surface before its body.
-  Entry skills open this file by path. Do not load it from a user request alone.
+  Entry skills open this file by path. Don't load it from a user request alone.
 disable-model-invocation: true
 ---
 
@@ -25,12 +25,12 @@ Classify the interface by how costly a bad design would be:
 
 An interface passes when its full comment meets all of these conditions:
 
-- The comment is four sentences or fewer, plus one more sentence for each argument whose units, allowed range, or empty value the type does not already show.
+- The comment is four sentences or fewer, plus one more sentence for each argument whose units, allowed range, or empty value the type doesn't already show.
 - The comment mentions no internal data structure, algorithm, or internal step.
-- The comment has no words that describe call order or protocol, such as "first", "then", "after", or "you must call X before Y".
+- The comment doesn't use words that describe call order or protocol, such as "first", "then", "after", or "you must call X before Y".
 - A competent caller could use it correctly from the comment alone, including the common error cases.
 
-For a routine private helper, run the test mentally, and leave no comment when the surrounding code already makes the contract obvious.
+For a routine private helper, run the test mentally, and don't leave a comment when the surrounding code already makes the contract obvious.
 
 Also run the test on any query or command object that an entry point takes, such as a public function, an endpoint, or an RPC.
 

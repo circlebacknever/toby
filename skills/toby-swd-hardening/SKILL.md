@@ -2,7 +2,7 @@
 name: toby-swd-hardening
 description: >-
   Contains Toby's checks that production code survives bad input, retries,
-  outages, and deploys. Entry skills open this file by path. Do not trigger it
+  outages, and deploys. Entry skills open this file by path. Don't trigger it
   from a user request alone.
 disable-model-invocation: true
 ---
@@ -27,13 +27,13 @@ Check new production code against the list for its kind. State the checks that a
 
 ## Bounds
 
-Give each input to an endpoint or a consumer a limit at the boundary. A body limit in the framework or the proxy counts, such as Express `json()` at 100 kB or Django's `DATA_UPLOAD_MAX_MEMORY_SIZE`. Add limits for list length, page size, and uploads the framework does not cap. Reject input over a limit with an error the caller can read.
+Give each input to an endpoint or a consumer a limit at the boundary. A body limit in the framework or the proxy counts, such as Express `json()` at 100 kB or Django's `DATA_UPLOAD_MAX_MEMORY_SIZE`. Add limits for list length, page size, and uploads the framework doesn't cap. Reject input over a limit with an error the caller can read.
 
 In every kind of code, limit each pool, worker count, cache, and fan-out of parallel calls. Size a database pool so its size times the processes on every instance, doubled during a rolling deploy, stays under the database's connection limit. Give a database pool a size and a short acquire timeout, such as SQLAlchemy `pool_timeout=2` or node-postgres `connectionTimeoutMillis: 2000`, because node-postgres waits forever by default.
 
 ## Auth
 
-Check authentication and authorization on the server for each new entry point, with the repo's middleware. Check that the caller may act on the record it names, such as by looking up the order within the caller's account. When a check fails or throws, deny the request. For an entry point that requires sign-in, test that a signed-out request is denied. When the entry point reads or changes an account's records, seed records for two accounts. Test that the caller cannot read or change the other account's record.
+Check authentication and authorization on the server for each new entry point, with the repo's middleware. Check that the caller may act on the record it names, such as by looking up the order within the caller's account. When a check fails or throws, deny the request. For an entry point that requires sign-in, test that a signed-out request is denied. When the entry point reads or changes an account's records, seed records for two accounts. Test that the caller can't read or change the other account's record.
 
 Limit failed attempts per account and per IP on each endpoint that checks a password, a one-time code, or a reset token, as `references/logins.md` says. Add other rate limits only where the repo already has one you can cite at path:line. Also limit sends per IP and per recipient on a new endpoint that emails or texts an address a signed-out caller enters.
 
@@ -61,7 +61,7 @@ In a test, send the same message twice and check for one effect.
 
 Make the write conditional, or lock the row, when the write depends on a value read from its row. Such writes include a ticket claim, a counter, and a status change allowed only from certain statuses. Skip this check when only one request or job run can reach the row at a time.
 
-An example of a conditional write is `UPDATE tickets SET agent_id = $1 WHERE id = $2 AND agent_id IS NULL`. Zero changed rows means the ticket already has an agent or does not exist. Re-read the row, and return success when the caller already holds the ticket. `toby-swd-errors`'s `references/databases.md` covers the choice.
+An example of a conditional write is `UPDATE tickets SET agent_id = $1 WHERE id = $2 AND agent_id IS NULL`. Zero changed rows means the ticket already has an agent or doesn't exist. Re-read the row, and return success when the caller already holds the ticket. `toby-swd-errors`'s `references/databases.md` covers the choice.
 
 Test the operation directly, below the entry point. Load the row twice, run the first write, then run the second with a different value, and assert that the first value stays. A test that sends two claims in sequence passes even when the read and the write are separate statements.
 

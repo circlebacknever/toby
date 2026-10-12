@@ -16,27 +16,27 @@ Make changed code simpler to read and keep behavior identical.
 ## Defaults
 
 - Make only the cleanups you are sure of, because a missed cleanup costs less than a large, noisy diff or a behavior change nobody notices.
-- Call a change an improvement only when you can count what it reduced. Before any edit, say which number goes down: lines, branches, state variables, duplicated blocks, misleading names, or files a change to one rule must edit. "Clearer," "tidier," and "more idiomatic" state no number, so they do not count.
-- "Nothing worth simplifying" is a complete answer. Do not ship a rewrite to have something to show.
+- Call a change an improvement only when you can count what it reduced. Before any edit, say which number goes down: lines, branches, state variables, duplicated blocks, misleading names, or files a change to one rule must edit. "Clearer," "tidier," and "more idiomatic" state no number, so they don't count.
+- "Nothing worth simplifying" is a complete answer. Don't ship a rewrite to have something to show.
 
 ## Pick the scope
 Pick one scope from the request, say it in one line, and open only the files it lists. Each skill in the list is at `../<skill>/SKILL.md` relative to this skill's folder. When the user asks for a plan, also open `toby-swd-plan` before you write the plan. A refactor plan replaces that skill's slice and fail-first rules. Each group is one move that leaves the tests green, and its check passes before and after the work.
 - Names, comments, or docstrings only: open `toby-swd-clarity`.
 - A local cleanup inside changed code: open `references/cleanup.md` and `references/smells.md`.
-- A split, merge, move, or extraction across files: open `toby-swd-architecture` for where each part goes, then `toby-swd-modules`. Open `toby-swd-strategy` first only when the request does not say which code moves, such as "split this module". Open `toby-swd-extensibility` when the change replaces a growing conditional or an inheritance tree. Open `toby-swd-interfaces` when a signature changes, and `toby-swd-docs` when module structure changes.
-- An error check for a condition that cannot occur: open `toby-swd-errors`.
+- A split, merge, move, or extraction across files: open `toby-swd-architecture` for where each part goes, then `toby-swd-modules`. Open `toby-swd-strategy` first only when the request doesn't say which code moves, such as "split this module". Open `toby-swd-extensibility` when the change replaces a growing conditional or an inheritance tree. Open `toby-swd-interfaces` when a signature changes, and `toby-swd-docs` when module structure changes.
+- An error check for a condition that can't occur: open `toby-swd-errors`.
 The Behavior drift rules below, which keep behavior the same, apply to every scope.
 
 ## Behavior drift
 
 Ship a change only when a passing test asserts the touched behavior. A mechanical change can also ship without that test when you show why the edge case for that change can't occur.
 
-Mechanical means a pure rename, a dead-code deletion, or a swap. For a swap, you must prove that the edge case listed below for its kind of change can't happen. Quote why ("can't be null, typed string, no | null"). When no test covers a change and you cannot prove its edge case away, do not make the change. Note the edge case that needs a test.
+Mechanical means a pure rename, a dead-code deletion, or a swap. For a swap, you must prove that the edge case listed below for its kind of change can't happen. Quote why ("can't be null, typed string, no | null"). When the tests don't cover a change and you can't prove its edge case away, don't make the change. Note the edge case that needs a test.
 
 Check this edge for each class of change:
 
 - For an idiom swap, null, undefined, and empty handling match. Iteration order, short-circuiting, and laziness stay the same. The code throws the same exception type.
-- For a library substitution, error type and message, ordering and stability, locale and timezone, and precision all match. A change in performance class (linear to quadratic, sync to async) is a behavior change, so do not make that substitution.
+- For a library substitution, error type and message, ordering and stability, locale and timezone, and precision all match. A change in performance class (linear to quadratic, sync to async) is a behavior change, so don't make that substitution.
 - For reuse of a repo pattern, the helper's defaults match the inline code: timeouts, retries, logging, caching, and what it throws.
 - For an early return or predicate extraction, the same side effects run before the return, and the extracted predicate has none of its own.
 
@@ -48,14 +48,14 @@ Check this edge for each class of change:
 
 ## Out of scope
 
-In a local cleanup, do not move code between modules, change a signature, or change a public return type, because callers see each of those. Report a red flag from `toby-swd-modules`, `toby-swd-extensibility`, `toby-swd-interfaces`, `toby-swd-errors`, or `toby-optimize` with the skill that handles it, and note any other larger cleanup as a follow-up.
+In a local cleanup, don't move code between modules, change a signature, or change a public return type, because callers see each of those. Report a red flag from `toby-swd-modules`, `toby-swd-extensibility`, `toby-swd-interfaces`, `toby-swd-errors`, or `toby-optimize` with the skill that handles it, and note any other larger cleanup as a follow-up.
 
-If you spot a real bug or a security issue while cleaning up, don't fix it here, because the fix is a behavior change. Flag it only when you can state the input that triggers it and why the existing guards do not catch it. Then recommend a review pass.
+If you spot a real bug or a security issue while cleaning up, don't fix it here, because the fix is a behavior change. Flag it only when you can state the input that triggers it and why the existing guards don't catch it. Then recommend a review pass.
 
 ## Process
 
-Make one cleanup pass, and stop when the next change would not reduce a count. Then verify each change as Behavior drift describes.
+Make one cleanup pass, and stop when the next change wouldn't reduce a count. Then verify each change as Behavior drift describes.
 
 ## Final response
 
-Lead with what got simpler and the number each change reduced. List each edge case that no test covers. List each change you left out for lack of a covering test. List each problem you left alone and each follow-up at file:line, one per line.
+Lead with what got simpler and the number each change reduced. List each edge case that the tests don't cover. List each change you left out for lack of a covering test. List each problem you left alone and each follow-up at file:line, one per line.

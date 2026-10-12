@@ -2,7 +2,7 @@
 
 ## Get-or-load
 
-A cache with separate `get`, `set`, and `delete` methods needs a seven-sentence comment. Each caller must handle two requests that miss the same cache key at the same moment. Each caller must also convert values to JSON and allow for expiry times that are not exact. Make the only read method one that loads and caches the value when the value is missing:
+A cache with separate `get`, `set`, and `delete` methods needs a seven-sentence comment. Each caller must handle two requests that miss the same cache key at the same moment. Each caller must also convert values to JSON and allow for expiry times that aren't exact. Make the only read method one that loads and caches the value when the value is missing:
 
 ```ts
 interface Cache {
@@ -56,4 +56,4 @@ What `getOrLoad` does when the cache server is down is part of its contract, so 
  */
 ```
 
-Callers then need no error handling for cache outages. The metrics show the outage, and during the outage every read goes to the database or other backing store. Sometimes the caller must decide whether to read without the cache, as with financial data. In that case, return `Result<T, CacheUnavailable>`. A third choice is stale-while-revalidate, which returns the old cached value while it loads a new one. A stale-while-revalidate comment states the oldest data a caller can get.
+Callers then don't need error handling for cache outages. The metrics show the outage, and during the outage every read goes to the database or other backing store. Sometimes the caller must decide whether to read without the cache, as with financial data. In that case, return `Result<T, CacheUnavailable>`. A third choice is stale-while-revalidate, which returns the old cached value while it loads a new one. A stale-while-revalidate comment states the oldest data a caller can get.

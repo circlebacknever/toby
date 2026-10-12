@@ -2,7 +2,7 @@
 name: toby-swd-docs
 description: >-
   Contains Toby's rules for a module's README.md and AGENTS.md. Other Toby
-  skills open this file by its path. Do not load it only because a user request
+  skills open this file by its path. Don't load it only because a user request
   mentions docs.
 disable-model-invocation: true
 ---
@@ -17,11 +17,11 @@ AGENTS.md is the entry point for an agent writing code in a module. Write it for
 
 ### Scope
 
-Create one only when the user asks or the repo keeps one at each module root. Put it at the root of a module, package, or feature that covers a distinct area of knowledge. Examples are a service, a domain package, a frontend feature, and a store module. Do not create one for a leaf folder, a single-file utility directory, or a folder that only groups files. Many small files go stale, and readers stop trusting them. When unsure, put the content in the AGENTS.md at the nearest module root above the folder.
+Create one only when the user asks or the repo keeps one at each module root. Put it at the root of a module, package, or feature that covers a distinct area of knowledge. Examples are a service, a domain package, a frontend feature, and a store module. Don't create one for a leaf folder, a single-file utility directory, or a folder that only groups files. Many small files go stale, and readers stop trusting them. When unsure, put the content in the AGENTS.md at the nearest module root above the folder.
 
 ### Sections
 
-Use these headings in this order, and leave out a section that has no fact to state.
+Use these headings in this order, and leave out a section that doesn't have a fact to state.
 
 1. **What this is.** Write one or two sentences on what the module does. Give the reason it exists only when the code or the user states it.
 2. **Commands.** Give the narrowest command that builds, tests, or lints this module, such as `pnpm test --filter notify`.
@@ -31,11 +31,11 @@ Use these headings in this order, and leave out a section that has no fact to st
 
 ### Content
 
-- Write only what the code, the docs, or the user's request states. Do not add a reason, a retry policy, an input, a return value, or a future case that none of those sources gives.
+- Write only what the code, the docs, or the user's request states. Don't add a reason, a retry policy, an input, a return value, or a future case that none of those sources gives.
 - State each rule once, in the section where it applies.
-- Mention a specific file only when its name and code do not make its purpose plain.
+- Mention a specific file only when its name and code don't make its purpose plain.
 - Describe purpose, constraints, and structure, and leave implementation mechanics to code comments, so the file stays accurate through code changes.
-- Point to interface comments and external specs, and do not copy them.
+- Point to interface comments and external specs, and don't copy them.
 - Write what a file does with a verb such as stores or calls, and never that it knows something or lives somewhere.
 
 Update AGENTS.md in these cases:
@@ -51,8 +51,8 @@ When a section has too much detail to stay accurate as the code changes, cut the
 A README.md is for a human who calls or maintains the module. Create one only for a package, service, or feature folder the change adds, or when the user asks for docs. In both cases, create it only when one of these holds:
 
 - The module has a public API that humans call directly.
-- The module's purpose is not clear from its name and structure.
-- Correct use depends on initialization order, required configuration, or a known gotcha the API does not protect against.
+- The module's purpose isn't clear from its name and structure.
+- Correct use depends on initialization order, required configuration, or a known gotcha the API doesn't protect against.
 - It is a package, library, service, or standalone feature that a human has to learn from scratch.
 
 Leave internals, implementation reasons, version history, and copies of interface comments out of it. Use these sections in order:
@@ -60,8 +60,8 @@ Leave internals, implementation reasons, version history, and copies of interfac
 1. **What this is.** Write one or two sentences on the problem it solves and who it is for.
 2. **How to use it.** Give the minimal working example for the common case, before any environment setup.
 3. **Concepts.** List the abstractions a caller works with.
-4. **Public API**, when the code does not make it plain. Cover only the public API, and link to generated docs when they exist. When the interface splits common calls from advanced ones, keep that split.
-5. **Known gotchas.** List what breaks for a user who does not know it, such as ordering, required environment, and edge cases the API does not protect against.
+4. **Public API**, when the code doesn't make it plain. Cover only the public API, and link to generated docs when they exist. When the interface splits common calls from advanced ones, keep that split.
+5. **Known gotchas.** List what breaks for a user who doesn't know it, such as ordering, required environment, and edge cases the API doesn't protect against.
 
 Update the README.md when the public API changes, a constraint is added, or a user reports confusion that the README.md should have prevented.
 

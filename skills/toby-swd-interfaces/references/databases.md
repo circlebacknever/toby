@@ -20,14 +20,14 @@ class UsersRepository:
 
 > update_profile — Applies the profile changes to the user with this id and returns the updated user. The update is atomic. Returns NotFound if no such user exists. Returns ValidationFailed with field-level reasons if any change is invalid.
 
-`deactivate` writes the audit log and revokes sessions in the same transaction, so the caller does not coordinate them. If a repository comment has to mention a session, connection, or cursor, callers are still exposed to the database driver. The repository then hides too little.
+`deactivate` writes the audit log and revokes sessions in the same transaction, so the caller doesn't coordinate them. If a repository comment has to mention a session, connection, or cursor, callers are still exposed to the database driver. The repository then hides too little.
 
 ## Query object
 
 Three candidates for one search method:
 
 - `find(Map<String, Object> filters)` lists the accepted map keys only in a comment, and a value of the wrong type fails only at runtime.
-- `find(UUID orgId, boolean active, ...)` uses null to skip a filter, cannot skip `active`, and changes every call site when a filter is added.
+- `find(UUID orgId, boolean active, ...)` uses null to skip a filter, can't skip `active`, and changes every call site when a filter is added.
 - `find(UserQuery q)` passes the comment test:
 
 ```java
@@ -61,7 +61,7 @@ async function placeOrder(req: NewOrder, uow: UnitOfWork) {
 }
 ```
 
-Each repository method joins the transaction that `uow.run` started, or opens its own transaction when no `uow.run` call is active. `insert`'s comment shrinks to one sentence, which says it inserts the order and returns it with its assigned id. When the transaction must cover a controller action, the controller wraps the service call in `uow.run`. A caller that must not publish an event before commit calls `UnitOfWork.isActive()`.
+Each repository method joins the transaction that `uow.run` started, or opens its own transaction when the code isn't inside a `uow.run` call. `insert`'s comment shrinks to one sentence, which says it inserts the order and returns it with its assigned id. When the transaction must cover a controller action, the controller wraps the service call in `uow.run`. A caller that must not publish an event before commit calls `UnitOfWork.isActive()`.
 
 ## Migrations
 

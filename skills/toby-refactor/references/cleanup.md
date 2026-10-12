@@ -1,6 +1,6 @@
 # Cleanup
 
-This file lists what a local cleanup looks for, what is not a simplification, and how to pick between an idiom and local style. Open it when the scope is a local cleanup inside changed code.
+This file lists what a local cleanup looks for, what isn't a simplification, and how to pick between an idiom and local style. Open it when the scope is a local cleanup inside changed code.
 
 ## What to look for
 
@@ -34,7 +34,7 @@ This file lists what a local cleanup looks for, what is not a simplification, an
 Leave these alone, because none of them reduces a count:
 
 - Reordering for taste.
-- A rename that does not fix a misleading name.
+- A rename that doesn't fix a misleading name.
 - Swapping one construct for another of equal length and clarity.
 - Splitting or merging expressions with no debugging gain.
 - Splitting a function for its length alone.

@@ -602,7 +602,7 @@ def check_invoke_only(errors: list[str]) -> None:
 # not fire them. Reading only the first form reported three skills as having no
 # anti-trigger while they had the strictest ones in the repo.
 SKIP_CLAUSE_RE = re.compile(
-    r"\bskip (?:it|this skill)\b|\bdo not trigger\b|\btrigger only when\b|\bonly when the user invokes\b",
+    r"\bskip (?:it|this skill)\b|\b(?:do not|don't) trigger\b|\btrigger only when\b|\bonly when the user invokes\b",
     re.I,
 )
 

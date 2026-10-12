@@ -6,8 +6,8 @@ This file covers data that two releases share. During a rolling deploy, the prev
 - Ship code that reads a new value in an existing field, such as a new enum member, one release before code that writes it.
 - When a cached value's format changes, change its cache key, such as `user:v2:{id}`. Ship code that evicts both keys on every write one release before the code that reads the new key. Give both keys a TTL. A single instance that stops before the new release starts can change the cache key in one release. The TTL bounds stale reads after a rollback.
 - Build an index concurrently where the database supports it, such as `CREATE INDEX CONCURRENTLY` in Postgres, in a migration that runs outside a transaction.
-- Run a backfill in batches outside the migration's transaction, so it holds no long lock on the table.
-- Skip the two bullets above for a table this change creates. Skip them too when the user or the repo shows the production table stays under a few thousand rows. On such a table, a plain `CREATE INDEX` and one `UPDATE` inside the migration lock it for milliseconds. When the production row count is unknown, apply both bullets, because a dev database's row count does not show it.
+- Run a backfill in batches outside the migration's transaction, so it doesn't hold a long lock on the table.
+- Skip the two bullets above for a table this change creates. Skip them too when the user or the repo shows the production table stays under a few thousand rows. On such a table, a plain `CREATE INDEX` and one `UPDATE` inside the migration lock it for milliseconds. When the production row count is unknown, apply both bullets, because a dev database's row count doesn't show it.
 
 ## Breaking schema changes
 

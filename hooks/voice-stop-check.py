@@ -144,21 +144,21 @@ def main() -> int:
     hits = []
     for pattern, reason in v.REPLY_PATTERNS:
         for match in pattern.finditer(reply):
-            hits.append(f"{match.group(0).strip()!r}: {reason}")
+            hits.append(f"{match.group(0).strip()!r}: broken pattern: {reason}. {v.explain(reason)}")
 
     for frame, pattern in v.FIGURATIVE_RE:
         for match in pattern.finditer(reply):
-            hits.append(f"{match.group(0)!r}: figurative frame, say what the thing is")
+            hits.append(f"{match.group(0)!r}: broken pattern: figurative frame. {v.explain('figurative frame')}")
 
     for term, pattern in v.COINED_RE:
         for match in pattern.finditer(reply):
-            hits.append(f"{match.group(0)!r}: invented term, {v.COINED_TERMS[term]}")
+            hits.append(f"{match.group(0)!r}: broken pattern: coined term. {v.explain('coined term')}")
 
     for sentence in SENTENCE_SPLIT_RE.split(reply):
         words = sentence.split()
         if len(words) > SENTENCE_LIMIT:
             hits.append(f"the {len(words)}-word sentence starting {' '.join(words[:6])!r}: "
-                        "the ceiling is 25, so cut a clause, or split it into two sentences that each state their own subject")
+                        f"broken pattern: sentence over 25 words. {v.explain('sentence over 25 words')}")
 
     if not hits:
         return 0

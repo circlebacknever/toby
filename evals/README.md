@@ -16,7 +16,7 @@ only part safe to wire into CI. A gate that gets worse fails the run. A gate tha
 gets better is recorded on purpose with `evals/run.py record`, which makes the
 improvement permanent.
 
-**Model suites** need a subagent to write something, so they cannot gate. They
+**Model suites** need a subagent to write something, so they can't gate. They
 record a distribution and never a score. Five samples of the voice suite on
 byte-identical inputs scored 1, 1, 4, 4, and 11. A single run of it proves
 nothing, and two runs of it once produced a confident wrong answer that five
@@ -57,7 +57,7 @@ was gone.
 or stdin. It splits findings into FIX and DECIDE. A FIX finding needs no
 judgement and makes the run exit 1. The checker prints each DECIDE sentence,
 and a DECIDE finding never fails the run. The checker then prints READ, the
-rules the patterns do not check. `tests/test-voice-recall.py` counts how many
+rules the patterns don't check. `tests/test-voice-recall.py` counts how many
 gold sentences the patterns catch. Pass it `evals/gold/chat-tics.jsonl` to run
 the chat-tic rows. Those rows are in their own file so that the counts other
 files cite for `labels.jsonl` stay correct. Pass it `evals/gold/repo-review.jsonl`
@@ -94,7 +94,7 @@ the ranges overlap.
 | `content` | slogans, claim headings, deck titles, contributor rules, and six chat turns in a row, where register drifts | `scripts/voice-check.py` on each output, then the `content-judge` suite | 5 |
 | `content-judge` | every distracting sentence across the `content` and `voice` results, what passed, and the sentence types the writers produce | a person, reading the judge's file | 1 |
 | `holdout` | the same kinds of output on a product, an incident, and a chat session no rule was tuned against, so a change that only fixes the `content` suite shows up as no change here | a blind `holdout-judge` run over both conditions | 5 |
-| `holdout-judge` | distracting sentences across renamed `holdout` files, where the names do not say which rules wrote each file | a person, with the name key kept outside the repo | 1 |
+| `holdout-judge` | distracting sentences across renamed `holdout` files, where the names don't say which rules wrote each file | a person, with the name key kept outside the repo | 1 |
 | `review` | whether a review catches three seeded defects and reports them the way the skill specifies | a person, against `suites/review.md` | 1 |
 | `feature-dev` | whether the process a request gets matches its size | a person, against `suites/feature-dev.md` | 1 |
 | `learning` | whether a beginner gets taught in steps without a wall of text | a person, against `suites/learning.md` | 1 |
@@ -124,7 +124,7 @@ counted a correct firing on N1 as a false fire.
 Extract plus Self Review: 5, 4. **The duplicated operating guide stays because
 it is the status quo, and for no stronger reason.** Anyone reopening that
 question needs a lower-variance measure first, because more samples from this
-suite will not separate the arms.
+suite won't separate the arms.
 
 `baselines/feature-dev.json` — a copy change and a seat-limit feature run
 through the skill. The skill sized the copy change as tactical and declined it
@@ -182,16 +182,16 @@ triangle, the outline a drag coefficient belongs to. The sense-scoped rule bans
 warnings so the count catches a tenth one, which would be a new abstraction
 and not another triangle.
 
-## What the voice scorer cannot see
+## What the voice scorer can't see
 
 It counts banned words, invented foils, sentence length, and clause welds. It
-does not read register. On the sample that scored 11, two flagged foils were
+doesn't read register. On the sample that scored 11, two flagged foils were
 distinctions the writer needed: "per-account, where it was per-route-per-account"
-describes a real behavior change. Wording that breaks no rule but does not
+describes a real behavior change. Wording that breaks no rule but doesn't
 sound like Toby passes every check in the file. A category noun stands
 where a concrete one belongs, and `move`, `form`, and `frame` do the work
 `habit` and `sentence` should do. That failure is found by reading, and the suite
-does not find it.
+doesn't find it.
 
 ## Adding a case
 

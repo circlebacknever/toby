@@ -13,7 +13,7 @@ description: >-
 
 Tests record the behavior callers rely on, checked through the public interface. Edit an existing test only when the required behavior changes. A test that needs an edit during a refactor is checking internals. Assert call order only when that order is the observable contract.
 
-When a behavior is hard to test, the abstraction is too coarse. Extract a smaller module with a real interface and test through it. Do not expose internals only so a test can reach them.
+When a behavior is hard to test, the abstraction is too coarse. Extract a smaller module with a real interface and test through it. Don't expose internals only so a test can reach them.
 
 ## Failing and flaky tests
 
@@ -51,7 +51,7 @@ Write the test first in two cases:
 1. **A bug fix where the correct behavior is defined and will stay required.** Reproduce the bug in a failing test before touching production code. Read the failure and confirm it shows the bug's wrong result. A failure from an import error, a missing fixture, or a typo proves only that the test is broken.
 2. **New behavior with a settled contract.** After the design pass settles the interface, write the test that defines the contract, then implement to it.
 
-Skip test-first while the design is open, and do the design pass first with `toby-swd-strategy` and `toby-swd-modules`. Also skip it when no harness exists, the change is docs or formatting, or the check needs unsafe external state. Say which case applied and how you verified.
+Skip test-first while the design is open, and do the design pass first with `toby-swd-strategy` and `toby-swd-modules`. Also skip it when the repo doesn't have a harness, the change is docs or formatting, or the check needs unsafe external state. Say which case applied and how you verified.
 
 ## Prove a change
 

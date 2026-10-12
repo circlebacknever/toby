@@ -45,7 +45,7 @@ Wiring: slice one connects at `screens/Members.tsx:210` through `<InviteForm onS
 
 Stops: this flow crosses two screens, so the work is strategic. At stop 1, ask whether to write the plan at `docs/plans/members/team-invites/`, show the criteria, and wait for a yes. What the second slice builds depends on whether the pending row should also show the inviter and the expiry. So at stop 3, after the first slice, ask that question.
 
-Slice one has no value to a user without slice two. Main deploys on every merge, so slice one reaches users before slice two exists. An invite that creates a row and mails nobody is half-built behavior that a user can trigger. Slice one therefore ships behind the release flag `team-invites`, which is off by default, and its checks run with the flag on. The flag turns on for users after slice two sends the email, and the last step of slice two removes the flag. `toby-swd-plan`'s `references/example.md` has the plan for this feature.
+Slice one doesn't give a user any value without slice two. Main deploys on every merge, so slice one reaches users before slice two exists. An invite that creates a row and mails nobody is half-built behavior that a user can trigger. Slice one therefore ships behind the release flag `team-invites`, which is off by default, and its checks run with the flag on. The flag turns on for users after slice two sends the email, and the last step of slice two removes the flag. `toby-swd-plan`'s `references/example.md` has the plan for this feature.
 
 ## 3. Greenfield, a subsystem with no sibling
 
@@ -53,7 +53,7 @@ Request: "we need usage metering so we can bill by seat next quarter."
 
 The user first asked for "a quick PoC of the metering dashboard", which was experiment mode. This example starts after the user chose a layout in that experiment. The new code keeps the layout and replaces the experiment's code.
 
-This subsystem has no sibling in the repo, because the repo has no metering module, no counter storage, and no billing screen or endpoint. A new subsystem with nothing similar in the repo makes the work strategic.
+This subsystem doesn't have a sibling in the repo, because the repo doesn't have a metering module, counter storage, or a billing screen or endpoint. A new subsystem with nothing similar in the repo makes the work strategic.
 
 1. **Observable**: an admin opening the usage page for a workspace sees the seat count as of the last completed day.
    - **Source**: the user said "so we can bill by seat".
@@ -71,7 +71,7 @@ Because this work is greenfield, do these steps before you create a second new f
 - Design the module's boundary once, following `toby-swd-modules` and `toby-swd-interfaces`. The module exposes `seatCountForDay(workspace, date)` and defines the storage layout that the function reads, so callers never read or write rows directly.
 - The user chooses which word to use for a billed person. Today `seat`, `member`, and `active user` mean the same thing, but one of them is about to appear on an invoice.
 
-Slices: first `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI gives slice one an entry point a user can run, so slice one is not a layer cut.
+Slices: first `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI gives slice one an entry point a user can run, so slice one isn't a layer cut.
 
 Stops: a persisted format and money each make the work strategic, so write the design lines before the plan lists any file.
 

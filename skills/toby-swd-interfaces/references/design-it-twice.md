@@ -6,7 +6,7 @@ This file has the steps for writing and comparing two or three interface designs
 
 1. Write one possible design as function signatures with their interface comments and empty function bodies. Each comment says what the function does and leaves out how it does it.
 2. Run the comment test.
-3. If it fails, state what failed ("the comment had to describe the retry buffer"). Then write the next design so that it divides the work differently and no longer has that flaw. A rename does not count.
+3. If it fails, state what failed ("the comment had to describe the retry buffer"). Then write the next design so that it divides the work differently and no longer has that flaw. A rename doesn't count.
 4. Stop when one design passes for a routine interface, when two designs pass for a consequential interface, or when you have written three designs. Never write more than three designs.
 
 If none of the three designs passes, show the user the best one and say which comment-test condition it fails.

@@ -9,9 +9,9 @@ def trim(text, start, end):
     ...
 ```
 
-The name and signature cannot answer the questions a caller has: is
+The name and signature can't answer the questions a caller has: is
 `end` inclusive? what happens if `start > end`? are these byte offsets or
-character indices? The missing information cannot be expressed in code, so it
+character indices? The missing information can't be expressed in code, so it
 goes in the interface comment:
 
 ```python
@@ -30,12 +30,12 @@ The comment has four sentences and says nothing about how the function works ins
 ## Example 2: Backend, the name-reuse bug, and the fix
 
 A file-system module uses `block` for both a physical disk block and a logical
-block within a file. The names look "reasonably close," so readers do not question
+block within a file. The names look "reasonably close," so readers don't question
 them. A logical block number is eventually used where a physical one was
 required. The result is silent data corruption that took months to find.
 
-Rename to `fileBlock` and `diskBlock` so the two cannot be confused at a glance.
-Better still, give them distinct types so they cannot be interchanged at all.
+Rename to `fileBlock` and `diskBlock` so the two can't be confused at a glance.
+Better still, give them distinct types so they can't be interchanged at all.
 
 ---
 
@@ -49,7 +49,7 @@ useEffect(() => {
 
 A reader scanning the component linearly never sees what triggers
 `reconcileCart` or why it has those three dependencies. A React effect runs when its
-dependencies change, so a reader cannot see when the effect runs by reading the code
+dependencies change, so a reader can't see when the effect runs by reading the code
 from top to bottom. `comments.md` calls this hidden control flow. Put the comment
 directly above the effect, where a reader first wonders why the effect runs:
 
@@ -77,8 +77,8 @@ return [data, err, l];   // caller does result[0], result[2]...
 ```
 
 The caller has to remember what each position in the array holds, because the
-array has no labels. `comments.md` calls this a generic container.
-Return a union with one variant per state, and comment what the type cannot show:
+array doesn't have labels. `comments.md` calls this a generic container.
+Return a union with one variant per state, and comment what the type can't show:
 
 ```ts
 type UserQuery =
@@ -90,4 +90,4 @@ type UserQuery =
 
 The union rules out a user and an error at the same time, so no comment has to
 list the valid combinations. The comments map each state to a server response,
-which the type cannot show.
+which the type can't show.

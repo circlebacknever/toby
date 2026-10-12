@@ -2,7 +2,7 @@
 name: toby-swd-twelve-factor
 description: >-
   Contains Toby's twelve-factor checks for new processes, config, secrets, and
-  backing services. Entry skills open this file by path. Do not trigger it from
+  backing services. Entry skills open this file by path. Don't trigger it from
   a user request alone.
 disable-model-invocation: true
 ---
@@ -17,7 +17,7 @@ Declare every package in the manifest and the lockfile. Call a system tool, such
 
 ## Config
 
-Read each value that changes between deploys from the environment, and fail at startup when a required value is missing or malformed. When the repo has a config module, read the value through it, and search the diff for `os.environ`, `process.env`, and `import.meta.env` outside it. Otherwise read it at startup, with the same call the repo uses for its other values. Write a config module only in a new service or when the user asks, as `references/config.md` describes. Do not branch on the environment's name, such as `NODE_ENV === "production"`, in application code. Every `VITE_*`, `NEXT_PUBLIC_*`, and `EXPO_PUBLIC_*` value is compiled into the client bundle, so put no secret there.
+Read each value that changes between deploys from the environment, and fail at startup when a required value is missing or malformed. When the repo has a config module, read the value through it, and search the diff for `os.environ`, `process.env`, and `import.meta.env` outside it. Otherwise read it at startup, with the same call the repo uses for its other values. Write a config module only in a new service or when the user asks, as `references/config.md` describes. Don't branch on the environment's name, such as `NODE_ENV === "production"`, in application code. Every `VITE_*`, `NEXT_PUBLIC_*`, and `EXPO_PUBLIC_*` value is compiled into the client bundle, so put no secret there.
 
 ## Backing services
 

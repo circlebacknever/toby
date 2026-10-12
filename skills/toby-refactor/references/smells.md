@@ -8,9 +8,9 @@ Ask each question below of the changed code. Before you fix or report a match, r
 
 **Does one function mix calls to helpers with low-level code written inline?** For example, `place_order()` calls `reserve_stock()` and `charge()`, then builds an SQL string for the receipt. The code is fine when the function is low-level all the way through, such as a parser or a numeric loop. Length alone is no reason to split a function. Fix: move that code into a function at the level of the calls around it.
 
-**Does a comment next to changed code still describe the old code?** The comment is fine when it states something the diff did not change, such as a unit or an invariant that still holds. Fix: rewrite the comment to say what the code does now.
+**Does a comment next to changed code still describe the old code?** The comment is fine when it states something the diff didn't change, such as a unit or an invariant that still holds. Fix: rewrite the comment to say what the code does now.
 
-**Did the change make a comment elsewhere false?** Search the callers and the docs for the behavior the diff changed, such as a return type, an error, or an invariant. Report it only with the file:line, the quoted comment, and one sentence on how the diff makes it false. A comment you only suspect is out of date does not count. Fix: correct that comment.
+**Did the change make a comment elsewhere false?** Search the callers and the docs for the behavior the diff changed, such as a return type, an error, or an invariant. Report it only with the file:line, the quoted comment, and one sentence on how the diff makes it false. A comment you only suspect is out of date doesn't count. Fix: correct that comment.
 
 **Does nothing call a function or class anymore?** Search for the name as a string before you decide. The code is fine when it is exported or public, or when something reaches it through reflection, dependency injection, dynamic dispatch, or a test harness. Fix: delete it.
 

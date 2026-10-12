@@ -2,7 +2,7 @@
 
 Deploy config is the set of values that change between environments. Examples are database URLs, service endpoints, credentials, log levels, pool sizes, and connections to the feature flag service. The build must not contain it. The Twelve-Factor App guidelines say to read these values from environment variables.
 
-Do not read `process.env.THING` across the code. Each read is a hidden dependency in a module that otherwise looks pure. Every reader also repeats the same facts about `THING`: its name, that it is a string, that it holds a URL, its default. If one of those facts changes, every reader has to change.
+Don't read `process.env.THING` across the code. Each read is a hidden dependency in a module that otherwise looks pure. Every reader also repeats the same facts about `THING`: its name, that it is a string, that it holds a URL, its default. If one of those facts changes, every reader has to change.
 
 ---
 
@@ -10,7 +10,7 @@ Do not read `process.env.THING` across the code. Each read is a hidden dependenc
 
 1. **One module reads the environment.** In a new service, or a repo that has a config module, `process.env` and `import.meta.env` appear in exactly one file. Everything else imports values from it.
 2. **Parse and validate at startup.** That module turns raw strings into a typed, frozen object with `zod`, `envalid`, or a hand-written parser. A missing or malformed variable stops boot with a message that includes the variable's name. Without this check, an unexplained `undefined` shows up later in code several calls away, while the service is handling traffic.
-3. **Import the typed values.** Code imports the typed config object, such as Django's `settings` or the `config` object below. Build each client once, at module scope or at startup. When a client opens connections as it is built, such as psycopg_pool's `ConnectionPool`, build it in each worker after the fork, and check out one connection per request. Build it on first use or in gunicorn's `post_fork` hook. Pass a value or a client in as an argument only when a test cannot patch it, as the Composition root rule in `toby-swd-architecture` says.
+3. **Import the typed values.** Code imports the typed config object, such as Django's `settings` or the `config` object below. Build each client once, at module scope or at startup. When a client opens connections as it is built, such as psycopg_pool's `ConnectionPool`, build it in each worker after the fork, and check out one connection per request. Build it on first use or in gunicorn's `post_fork` hook. Pass a value or a client in as an argument only when a test can't patch it, as the Composition root rule in `toby-swd-architecture` says.
 4. **Keep the interface to a few typed fields.** The config module hides the variable names, parsing, coercion, defaults, validation, and the work of keeping secrets out of logs.
 
 ---

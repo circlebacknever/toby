@@ -2,7 +2,7 @@
 name: toby-swd-campfire
 description: >-
   Contains Toby's refactor before a change and the design check after it. Entry
-  skills open this file by path. Do not trigger it from a user request alone.
+  skills open this file by path. Don't trigger it from a user request alone.
 disable-model-invocation: true
 ---
 

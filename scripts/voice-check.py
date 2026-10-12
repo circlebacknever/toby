@@ -18,7 +18,9 @@ the patterns were written from those sentences, and nobody has measured the
 patterns on new text. So a run with no findings
 means the patterns matched nothing, and the draft still needs the READ pass.
 
-Output comes in three groups, because each one needs different handling.
+Output comes in four groups, because each one needs different handling. Each
+finding names a broken writing pattern, such as `negated actor`, and quotes the
+sentence that has it.
 
 FIX     A rule with no judgement in it. A banned word is banned. A dash welding
         two clauses is a weld. Do not argue with these, and do not call them
@@ -29,7 +31,11 @@ DECIDE  A rule a machine cannot settle. `shape` is banned when it only says some
         you can answer for that sentence. Most of these are real. Read each one
         and say which it is, and never dismiss the group.
 
-READ    The rules the patterns do not check. After you fix the findings, read every
+PATTERNS  Each broken pattern that a FIX or DECIDE finding names, printed
+        once, with what the pattern is and why it makes a sentence hard to read.
+        The notes are in PATTERN_NOTES in voice_rules.py and suggest no rewrite.
+
+READ    The broken patterns that the checks cannot find. After you fix the findings, read every
         sentence of the draft against each rule in this list, and rewrite each
         sentence that fails. Every run prints this list, even a run with no
         findings.
@@ -58,84 +64,72 @@ CLOSING_OFFER_RE = re.compile(
     r"\b(hope this helps|let me know if|feel free|don'?t hesitate|happy to help|reach out)\b", re.I
 )
 
-# What to do about each slogan form, with the plain-language rule behind it.
-SLOGAN_NOTES = {
-    "heading written as a claim": "use a one- or two-word label, or a phrase saying what the section covers, rule 23",
-    "noun phrase with no verb": "write a sentence that names the thing and says what it does, rule 22",
-    "chained pair": "the second sentence restarts on the last word of the first, so join them, rule 24",
-    "one-word definition": "say what the thing does, rule 24",
-    "label with a period": "give it a subject and a verb, rule 29",
-    "label with no value": "write a sentence that names what is missing and where you looked, rule 29",
-    "setup sentence before the fact": "name the file, the cause, or the change in this sentence, rule 30",
-    "sentence about the document": "delete it and give the content, rule 21",
-    "litotes": "state it in positive form: not uncommon is common, rule 28",
-    "abstract noun as actor": "name the person or program that acts, or describe the state, rule 27",
-    "setup question": "delete the question and state the result, rule 30",
-    "noun doing a verb's job": "use the verb: provides the ability to is can, rule 11",
-    "meeting jargon": "say the plain thing: the ask is the request, rule 15",
-    "rhythm device": "state the claim once, without the balanced frame, rule 24",
-    "vague intensifier": "delete the intensifier, or give the number, rule 3",
-    "code given feelings": "say what the tool printed or did, rule 27",
-    "hedge stack": "keep one hedge and name the unknown, or none, rule 3",
-    "would-have stated as fact": "delete it, even with a Prediction label, and state what the system does now, rule 31",
-    "claim about the user": "say only what the user said or did, rule 31",
-    "what a thing never does": "leave it out unless this document's reader would assume it, rule 25",
-    "program given a judgment": "state the fact about the thing, such as providers are swappable, rule 27",
-    "bullet restates its heading": "give the bullet a fact the heading does not state, or delete it, rule 23",
-    "empty qualifier": "delete the adjective when the noun has no other kind, Banned Constructions",
-    "opening phrase that frames the evidence": "delete the phrase and state the claim, Banned Constructions",
-    "relation word with its other half missing": "say what the trade is for, or delete the relation word, Banned Constructions",
-    "negated actor": "make the thing that acts the subject, as in `purgeable` does not return the row, Banned Constructions",
-    "two facts joined by and": "check that both facts belong to one process, and write two sentences when they do not, rule 24",
-    "bare `that` as an object": "say the noun after `that`, rule 9",
-    "rider after a complete claim": "delete the clause, because the sentence before it already said this, Banned Constructions",
-    "heading joins two clauses": "write a one- or two-word label, or a phrase that says what the section covers, rule 23",
-    "grade before the answer": "delete the grade and open with the answer, unless the word is the answer, rule 30",
-    "count before the items": "delete the count and give the items, rule 30",
-    "dramatic word": "delete the word, or state the consequence in numbers, Banned Constructions",
-    "cleft for emphasis": "drop `is what` and let the subject act: the rule forces, rule 24",
-    "reflexive for emphasis": "delete `itself` unless it marks a contrast someone made, rule 3",
-    "deferred antecedent": "put the noun where `this:` is, Banned Constructions",
-    "punchline closer": "delete it, the reply ends at the last fact, rule 30",
-    "code given senses": "say what the program reads or matches, rule 27",
-    "sentence that announces the next one": "say what the reader should look for in the code, rule 32",
-    "coined name": "use the name the source skill uses, such as the step number, rule 10",
-    "importance flag": "delete the flag and state the fact, Banned Constructions",
-    "picture word": "say where it is: is in, is loaded from, rule 26",
-    "fragment": "give the sentence a subject and a verb, rule 29",
-    "doubled verb": "delete one of the two verbs, rule 29",
-    "intensifier with no contrast": "delete the word, or state the contrast it implies, Banned Constructions",
-    "either with no or": "give the other half after `or`, or delete `either`, rule 29",
-    "closing offer": "end at the last fact, and ask only for a decision you need, Five Tests 5",
-}
-
-# READ_RULES lists the rules that the patterns in voice_rules.py do not check, in the
-# order the READ group prints them. Each entry ends with its rule number in
-# references/plain-language.md, or with the guide section that states it.
+# READ_RULES lists the broken patterns that the checks in voice_rules.py cannot
+# find, in the order the READ group prints them. Each entry is the pattern's
+# label, what the pattern is, and why it makes a sentence hard to read.
 # tests/test-voice-recall.py marks with `none` each gold sentence that the
-# patterns miss.
+# checks miss.
 READ_RULES = [
-    "Each fact comes from the user, a file you read, or a command you ran, and it keeps its qualifier. (rules 31 and 32)",
-    "Each sentence gives an answer, a reason, a step, a risk, or a decision. Delete a sentence that introduces, repeats, or reacts. (rule 32)",
-    "The first sentence states the answer, each condition that changes it comes right after, and nothing follows the last fact. (rules 17 and 30)",
-    "Each verb has its dictionary meaning, so code runs, reads, writes, calls, returns, or stores. Rewrite every metaphor. (rules 26 and 27)",
-    "A reader could look up each word and find your meaning. Rewrite each coined term and each piece of jargon, and explain each internal label such as an eval id or a rule number. (rules 10, 13, 14, and 15)",
-    "A sentence says what a thing is or does. Cut every contrast with something nobody said, whatever words it uses. (rules 25 and 28)",
-    "Cut an adjective on a noun that has no other kind, such as actual output or a named audit. (Banned Constructions section)",
-    "Every join between two clauses has a word that states the true relation, so `because` marks only a cause and `so` only a result. A colon only introduces a list of three or more items. (rules 7 and 24)",
-    "A relation word has both halves, so `in exchange` says for what. Put `only` before a small number. (Banned Constructions section)",
-    "Two facts joined by `and` belong to one process, or they become two sentences. In a negated sentence, make the thing that acts the subject. (Banned Constructions section)",
-    "Put a noun after `this` and `that`, and open a sentence with a bare `It` only when one earlier noun could be its target. Give each thing one name from first mention to last. (rules 9 and 10)",
-    "Name the actor when a passive hides who acted. (rule 6)",
-    "Cut an opening phrase that frames the evidence, a method told before its finding, an aphorism, and a withheld answer. (Banned Constructions section)",
-    "When the user must decide something, the first sentence asks, with at most three options and one recommended. (Replies section)",
-    "Put each modifier next to the word it modifies. When a trailing phrase could attach to more than one verb, move it to the front. Give an opening phrase a subject. (rule 33)",
+    ("unsourced fact",
+     "A fact didn't come from the user, a file you read, or a command you ran, or it lost its qualifier.",
+     "The reader can't tell what was measured, or under what conditions."),
+    ("sentence with no job",
+     "The sentence introduces, repeats, or reacts, and gives no answer, reason, step, risk, or decision.",
+     "The reader reads it and learns nothing."),
+    ("buried answer",
+     "The answer is missing from the first sentence, a condition is far from the claim it changes, "
+     "or text follows the last fact.",
+     "The reader has to search for the point."),
+    ("metaphor",
+     "A word is used outside its dictionary meaning, such as text that holds an answer or a rule that lives somewhere.",
+     "Code runs, reads, writes, calls, returns, and stores, so the reader has to translate the picture."),
+    ("unexplained word",
+     "A coined term, a piece of jargon, or an internal label such as an eval id or a rule number "
+     "appears with no explanation.",
+     "The reader can't look the word up."),
+    ("invented contrast",
+     "The sentence contrasts the thing with a claim nobody made, in any wording.",
+     "The reader has to process a claim nobody made."),
+    ("empty qualifier",
+     "An adjective fits every noun of its kind, such as actual output or a named audit.",
+     "The adjective adds a word and no meaning."),
+    ("wrong join",
+     "A join between clauses misstates the relation, such as `because` with no cause, "
+     "or a colon before fewer than three items.",
+     "The reader follows a relation that is false."),
+    ("half relation",
+     "A relation word such as `in exchange` has no second half, or a small number has no `only` before it.",
+     "The reader waits for a part the sentence never gives."),
+    ("unrelated facts joined",
+     "`And` joins two facts from different processes.",
+     "The reader looks for a link between the facts, and there is none."),
+    ("negated actor",
+     "`No` plus a noun does an action anywhere in the sentence, as in \"what no widget shows\".",
+     "The reader has to picture the action and then cancel it."),
+    ("double negation",
+     "Two negations limit the same clause, as in \"only what no widget shows better\".",
+     "The reader has to undo both negations to find what is allowed, and a rewrite can change which case is allowed."),
+    ("unclear reference",
+     "`This`, `that`, or a bare `It` could point to more than one noun, or one thing has two names.",
+     "The reader has to guess which thing is meant."),
+    ("hidden actor",
+     "A passive verb hides who acted.",
+     "The reader can't tell which person or program did it."),
+    ("delayed point",
+     "An opening phrase frames the evidence, the method comes before the finding, "
+     "the sentence is an aphorism, or the answer is withheld.",
+     "The reader waits for the point."),
+    ("late decision",
+     "The user must decide, and the question is missing from the first sentence, "
+     "offers more than three options, or recommends none.",
+     "The reader can't find what they need to answer."),
+    ("misplaced modifier",
+     "A modifier is far from the word it modifies, or a trailing phrase could attach to two verbs.",
+     "The reader attaches the phrase to the wrong word."),
+    ("comparison with no baseline",
+     "A word such as `better` or `faster` compares with nothing named, as in \"shows better\".",
+     "The reader can't tell what the thing beats."),
 ]
-
-
-# Sense-scoped words whose legal meaning is narrower than "fine as a plain noun".
-CARRY_NOTE = "legal only for moving an object or an arithmetic carry. Write contains, has, includes, or states, rule 26"
-SENSE_NOTES = {word: CARRY_NOTE for word in ("carry", "carries", "carried", "carrying")}
 
 
 def sentence_at(text: str, offset: int) -> str:
@@ -169,10 +163,10 @@ class Finding(NamedTuple):
     line: int
     rule: str
     sentence: str
-    note: str
+    pattern: str
 
     def text(self) -> str:
-        return f"{self.source}:{self.line}  {self.rule}\n      {self.sentence}\n      -> {self.note}"
+        return f"{self.source}:{self.line}  broken pattern: {self.rule}\n      {self.sentence}"
 
 
 NUMBER_WORDS = {w: i for i, w in enumerate(
@@ -231,10 +225,11 @@ def sentence_count_findings(raw: str, label: str) -> list[Finding]:
                 break
         if counts and claimed not in counts:
             line = v.line_for_offset(raw, match.start())
-            found.append(Finding(label, "decide", line, "sentence count does not match the comment",
+            actual = " or ".join(map(str, sorted(set(counts))))
+            found.append(Finding(label, "decide", line,
+                                 f"sentence count does not match the comment, which has {actual} sentences",
                                  sentence_at(v.prose_only(raw), match.start()),
-                                 f"the comment above has {' or '.join(map(str, sorted(set(counts))))} sentences, "
-                                 "so correct the number, rule 31"))
+                                 "sentence count does not match the comment"))
     return found
 
 
@@ -249,8 +244,7 @@ def code_only_findings(written: str, label: str) -> list[Finding]:
                 continue
             rest = CODE_SPAN_RE.sub(" ", sentence)
             if not [w for w in v.WORD_RE.findall(rest) if w.lower() not in ("and", "or")]:
-                found.append(Finding(label, "decide", number, "fragment", sentence[:200],
-                                     "give the sentence a subject and a verb, rule 29"))
+                found.append(Finding(label, "decide", number, "fragment", sentence[:200], "fragment"))
     return found
 
 
@@ -277,8 +271,7 @@ def undefined_term_findings(text: str, label: str) -> list[Finding]:
         if term not in others:
             found.append(Finding(label, "decide", v.line_for_offset(text, match.start()),
                                  f"term the skill never defines {match.group(1)!r}",
-                                 sentence_at(text, match.start()),
-                                 "use the name SKILL.md uses, or define the term where it first appears, rule 10"))
+                                 sentence_at(text, match.start()), "term the skill never defines"))
     return found
 
 
@@ -288,15 +281,15 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
     fix: list[Finding] = []
     decide: list[Finding] = []
 
-    def add(bucket, rule, offset, note):
+    def add(bucket, rule, offset, pattern):
         line = v.line_for_offset(text, offset)
         name = "fix" if bucket is fix else "decide"
-        bucket.append(Finding(label, name, line, rule, sentence_at(text, offset), note))
+        bucket.append(Finding(label, name, line, rule, sentence_at(text, offset), pattern))
 
     if not defining:
         for word in tiers["hard"]:
             for m in re.finditer(rf"(?<![A-Za-z]){re.escape(word)}(?![A-Za-z])", text, re.I):
-                add(fix, f"banned word {m.group(0)!r}", m.start(), "cut it, or rewrite the sentence around it")
+                add(fix, f"banned word {m.group(0)!r}", m.start(), "banned word")
         # One foil finding per line, because the older CONTRAST_PATTERNS and
         # FOIL_PATTERNS both match a sentence such as "a real tension, not a free
         # addition", and it needs one rewrite.
@@ -307,18 +300,18 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
                 line = v.line_for_offset(text, m.start())
                 if line not in foil_lines:
                     foil_lines.add(line)
-                    add(fix, f"{rule} {m.group(0).strip()!r}", m.start(), "state the thing directly, rule 25")
+                    add(fix, f"{rule} {m.group(0).strip()!r}", m.start(), "invented foil")
         for term, pattern in v.COINED_RE:
             for m in pattern.finditer(text):
-                add(fix, f"coined term {m.group(0)!r}", m.start(), f"{v.COINED_TERMS[term]}, rule 14")
+                add(fix, f"coined term {m.group(0)!r}", m.start(), "coined term")
         for frame, pattern in v.FIGURATIVE_RE:
             for m in pattern.finditer(text):
-                add(fix, f"figurative frame {m.group(0)!r}", m.start(), "say what the thing is, no metaphor")
+                add(fix, f"figurative frame {m.group(0)!r}", m.start(), "figurative frame")
         for m in CLOSING_OFFER_RE.finditer(text):
-            add(fix, f"closing offer {m.group(0)!r}", m.start(), "delete it, the reply ends at the answer")
+            add(fix, f"closing offer {m.group(0)!r}", m.start(), "closing offer")
         for pattern, reason in v.TIC_PATTERNS:
             for m in pattern.finditer(text):
-                add(fix, f"chat tic {m.group(0).strip()!r}", m.start(), f"{reason}, rule 32")
+                add(fix, f"{reason} {m.group(0).strip()!r}", m.start(), reason)
         # The mechanical checks read the line as written. prose_only blanks
         # inline code, which would make "`a.json`. Set" look like a stray period.
         written = raw
@@ -326,7 +319,7 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
             written = block.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), written)
         for pattern, reason in v.MECHANICAL_PATTERNS:
             for m in pattern.finditer(written):
-                add(fix, reason, m.start(), "repair the line, it is wrong on every reading")
+                add(fix, reason, m.start(), reason)
         decide.extend(code_only_findings(written, label))
         decide.extend(sentence_count_findings(raw, label))
         decide.extend(undefined_term_findings(text, label))
@@ -344,27 +337,26 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
         if text.count('"', line_start, m.start()) % 2 == 1:
             continue
         if v.is_prose_line(line_text) or (v.LIST_ITEM_RE.match(line_text) and ";" in m.group(0)):
-            add(fix, "clause weld", m.start(), "name the relation: because, so, after, rule 7")
+            add(fix, "clause weld", m.start(), "clause weld")
 
     if not defining:
         for word in tiers["sense"]:
             for m in re.finditer(rf"(?<![A-Za-z]){re.escape(word)}(?![A-Za-z])", text, re.I):
-                note = SENSE_NOTES.get(m.group(0).lower(),
-                                       "banned when it only says something matters, fine as a plain noun. Which is it here?")
-                add(decide, f"sense-scoped {m.group(0)!r}", m.start(), note)
+                pattern = "carry as a metaphor" if m.group(0).lower().startswith("carr") else "sense-scoped word"
+                shown = f"sense-scoped {m.group(0)!r}"
+                add(decide, shown if pattern == "sense-scoped word" else f"{pattern} ({shown})", m.start(), pattern)
     for m in v.INTENSIFIER_RE.finditer(text):
         sentence = sentence_at(text, m.start())
         if not v.CONTRAST_RE.search(sentence):
             decide.append(Finding(label, "decide", v.line_for_offset(text, m.start()), "intensifier with no contrast",
-                                  sentence, SLOGAN_NOTES["intensifier with no contrast"]))
+                                  sentence, "intensifier with no contrast"))
     for m in BARE_PRONOUN_RE.finditer(text):
-        add(decide, f"bare {m.group(1).lower()!r}", m.start(),
-            "say the noun after it unless the reference is unmistakable, rule 9")
+        add(decide, f"bare this or that {m.group(1).lower()!r}", m.start(), "bare this or that")
     for number, form, excerpt in v.slogan_findings(text):
         # The guide lists the dramatic words to ban them, like the banned words.
         if defining and form == "dramatic word":
             continue
-        decide.append(Finding(label, "decide", number, form, excerpt[:200], SLOGAN_NOTES[form]))
+        decide.append(Finding(label, "decide", number, form, excerpt[:200], form))
 
     for number, line in enumerate(text.splitlines(), 1):
         if not v.is_prose_line(line):
@@ -374,30 +366,45 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
             trimmed = " ".join(sentence.split())[:200]
             if count > 35:
                 fix.append(Finding(label, "fix", number, f"sentence runs {count} words", trimmed,
-                                   "cut a clause, or split it into two sentences that each state their own subject. The ceiling is 25, rule 1"))
+                                   "sentence over 35 words"))
             elif count > 25:
                 decide.append(Finding(label, "decide", number, f"sentence runs {count} words", trimmed,
-                                      "over the 25 ceiling. Cut a clause, or say why it earns the length"))
+                                      "sentence over 25 words"))
     return fix + decide
 
 
 def print_read_list() -> None:
-    print(f"READ  ({len(READ_RULES)}) — the patterns do not check these rules. "
-          "Read every sentence against each one.\n")
-    for number, rule in enumerate(READ_RULES, 1):
-        print(f"  {number:>2}. {rule}")
+    print(f"READ  ({len(READ_RULES)}) — each label below is a broken writing pattern that the checker can't find. "
+          "Read every sentence of the draft, and rewrite each sentence that has one of these patterns.\n")
+    for number, (pattern, what, why) in enumerate(READ_RULES, 1):
+        print(f"  {number:>2}. {pattern}\n      What it is: {what}\n      Why it is hard to read: {why}")
     print()
+
+
+def print_patterns(found: list[Finding]) -> None:
+    """Print each broken pattern that a finding names, once, with what it is and why it is hard to read."""
+    patterns = list(dict.fromkeys(f.pattern for f in found))
+    if not patterns:
+        return
+    print(f"PATTERNS  ({len(patterns)}) — each label in the findings above is a broken writing pattern. "
+          "This list says what each pattern is and why it makes a sentence hard to read. "
+          "The checker suggests no rewrite, so write one that removes the problem the reason states.\n")
+    for pattern in patterns:
+        what, why = v.PATTERN_NOTES[pattern]
+        print(f"  {pattern}\n      What it is: {what}\n      Why it is hard to read: {why}\n")
 
 
 def review(sources: list[tuple[str, str]], found: list[Finding]) -> None:
     """Print every prose sentence in order, with its findings under it.
 
     The FIX and DECIDE groups show the sentences a pattern matched. This mode
-    shows all of them, because rules 1 to 15 in the READ list need a person to
+    shows all of them, because the patterns in the READ list need a person to
     read each sentence and answer for it.
     """
     print_read_list()
-    print("REVIEW — read each sentence below against those 15 rules, and rewrite each one that fails.\n")
+    print(f"REVIEW — read each sentence below against those {len(READ_RULES)} broken patterns, "
+          "and rewrite each sentence that has one. A FIX or DECIDE line under a sentence names a broken "
+          "pattern that the checker found in it, and the PATTERNS list at the end explains each one.\n")
     by_line: dict[tuple[str, int], list[Finding]] = {}
     for finding in found:
         by_line.setdefault((finding.source, finding.line), []).append(finding)
@@ -415,8 +422,9 @@ def review(sources: list[tuple[str, str]], found: list[Finding]) -> None:
                 count += 1
                 print(f"  {label}:{number}  {count:>3}. {' '.join(sentence.split())[:300]}")
             for finding in by_line.pop((label, number), []):
-                print(f"        {finding.bucket.upper()}  {finding.rule} -> {finding.note}")
+                print(f"        {finding.bucket.upper()}  {finding.rule}")
         print()
+    print_patterns(found)
 
 
 def targets(args: list[str]) -> list[tuple[str, str]]:
@@ -458,20 +466,25 @@ def main() -> int:
         return 1 if all_fix else 0
 
     if all_fix:
-        print(f"FIX  ({len(all_fix)}) — no judgement in these, rewrite them\n")
+        print(f"FIX  ({len(all_fix)}) — each finding names a broken writing pattern and quotes the sentence that has it. "
+              "Rewrite every sentence in this group.\n")
         for finding in all_fix:
             print(f"  {finding.text()}\n")
     if args.fix_only:
         if not all_fix:
             print("No FIX findings.")
+        print_patterns(all_fix)
         return 1 if all_fix else 0
     if all_decide:
-        print(f"DECIDE  ({len(all_decide)}) — read each sentence and answer for that sentence\n")
+        print(f"DECIDE  ({len(all_decide)}) — each finding names a broken writing pattern that the checker "
+              "may have matched by mistake. Read each sentence. Rewrite it when it has the pattern, "
+              "and say why it's fine when it doesn't.\n")
         for finding in all_decide:
             print(f"  {finding.text()}\n")
-        print("  Most of these are real. Do not dismiss the group.\n")
+        print("  Most of these are real. Don't dismiss the group.\n")
+    print_patterns(all_fix + all_decide)
     if not all_fix and not all_decide:
-        print("The patterns matched nothing. The rules below still need a read.\n")
+        print("The patterns matched nothing. The broken patterns below still need a read.\n")
     if not args.no_read:
         print_read_list()
     return 1 if all_fix else 0

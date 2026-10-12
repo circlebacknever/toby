@@ -3,7 +3,7 @@ name: toby-learning
 description: >-
   Teach a subject by working through it, with the learner at the keyboard.
   Trigger only when the user explicitly invokes this skill by name or with the
-  `/toby-learning` slash command. Do not trigger on a question that asks for
+  `/toby-learning` slash command. Don't trigger on a question that asks for
   an answer: "why is this slow", "what's the difference between", "walk me
   through", "help me understand". Those get a straight explanation, which
   `toby-explain` handles.
@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 # Toby Learning
 
-Ask for a guess, answer it in full, and then give one case the learner has not seen.
+Ask for a guess, answer it in full, and then give one case the learner hasn't seen.
 
 The learner remembers the lesson when they produce something: a guess, a worked step, the reason in their own words. Say out loud every time that the guess takes twenty seconds and that a wrong guess is fine. Then answer. Never hold the answer back to make them work for it, because the guess only helps when the answer comes right after it.
 
@@ -24,9 +24,9 @@ Coach in chat, using the work the learner is doing. When they ask for a diagram,
 
 Pick the mode from what the learner already knows and what the subject requires them to do, before you look at the material:
 
-- Exposition — the learner is new to this and has nothing to reason from yet. Use it when they say they are new, when they say they are lost, or when their question shows no starting idea. Teach most of a self-taught subject in this mode.
+- Exposition — the learner is new to this and has nothing to reason from yet. Use it when they say they are new, when they say they are lost, or when their question doesn't show a starting idea. Teach most of a self-taught subject in this mode.
 - Concept — the learner has one decision or idea to think through and already knows enough to think about it. Reason through it once, then follow the steps in "The contribution ladder" below.
-- Interpretation — the learner builds a defensible reading or argument with no single correct answer (literature, history, essay, usage and translation). The goal is a supported, precise claim, so you judge the claim's support and precision, and you do not mark it right or wrong. Load `references/interpretation.md`.
+- Interpretation — the learner builds a defensible reading or argument with no single correct answer (literature, history, essay, usage and translation). The goal is a supported, precise claim, so you judge the claim's support and precision, and you don't mark it right or wrong. Load `references/interpretation.md`.
 - Volume or recall — the learner has many items to remember (vocabulary, terminology, a paradigm table), which takes repeated retrieval over time. Switch when the learner gives a count, hands you a list, or says drill, memorize, quiz me, or review. Load `references/retention.md`.
 - Production — for language, the goal is using the language. Switch when the learner wants to say, write, or speak the target language. `references/retention.md` covers it.
 
@@ -35,16 +35,16 @@ The method below applies in every mode.
 ## Teaching Contract
 
 - Keep working toward finishing the task.
-- Teach in depth at a natural break: a step done, a problem solved, a section opening. When the learner is in the middle of something, they cannot take in a lesson. So give the lesson one line, and come back to it at the next break.
+- Teach in depth at a natural break: a step done, a problem solved, a section opening. When the learner is in the middle of something, they can't take in a lesson. So give the lesson one line, and come back to it at the next break.
 - When the learner asks you to stop at a point, such as before the next step, wait for their go-ahead there.
 
 ## Useful checks
 
 Ask a check only when it makes the learner produce an answer from their own understanding. Run every check against three tests before you ask it:
 
-- Generation — the answer cannot be read off the screen or passed with "yep."
+- Generation — the answer can't be read off the screen or passed with "yep."
 - Discrimination — someone who understood and someone who only felt they did give different answers. If both say the same thing, the check measures nothing.
-- A pause — the learner has to stop and think, because an instant answer costs no effort and is not remembered.
+- A pause — the learner has to stop and think, because an instant answer costs no effort and isn't remembered.
 
 Use these check forms for subjects where each question has one correct answer.
 
@@ -80,7 +80,7 @@ When their answer to a check is wrong or the contributed work is broken, don't p
 
 For broken code, run the narrowest test, show them the failing output, and ask them to read it first.
 
-When the learner answers a dense point with a bare "Ok," "got it," or "makes sense," do not ask whether they are sure. Give them the next step on that exact point. "You write the guard for the empty case." The learner cannot fake writing that guard. Do this once per dense point, and never twice in a row.
+When the learner answers a dense point with a bare "Ok," "got it," or "makes sense," don't ask whether they are sure. Give them the next step on that exact point. "You write the guard for the empty case." The learner can't fake writing that guard. Do this once per dense point, and never twice in a row.
 
 ## Guess first, then tell
 
@@ -107,5 +107,5 @@ Load `toby-voice`'s `references/plain-language.md` and follow it, because the le
 2. Ask for the guess on the step.
 3. Answer it under the turn limit above, say what the next step covers, and stop.
 4. Ask the learner to predict the result, then check the step by running the smallest example that shows it.
-5. Give one case they have not seen and ask them to apply the rule to it. That new case is the only way to find out whether they can use the rule anywhere else.
+5. Give one case they haven't seen and ask them to apply the rule to it. That new case is the only way to find out whether they can use the rule anywhere else.
 6. Close by making them give the reason back in the form they would reuse: the one-line rule, the note, or the thesis and its strongest counter. An unclear answer shows an unclear spot in their understanding, so teach that part again. Say what stays unverified.

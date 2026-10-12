@@ -31,4 +31,4 @@ function OrderPage({ id }: { id: string }) {
 }
 ```
 
-The page has no error branch, because every other error class is handled before it reaches the page.
+The page doesn't have an error branch, because every other error class is handled before it reaches the page.

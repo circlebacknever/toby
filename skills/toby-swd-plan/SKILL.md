@@ -2,7 +2,7 @@
 name: toby-swd-plan
 description: >-
   Contains Toby's rules for writing a plan as slices with checks that can fail.
-  Entry skills open this file by path. Do not trigger it from a user request
+  Entry skills open this file by path. Don't trigger it from a user request
   alone.
 disable-model-invocation: true
 ---
@@ -21,7 +21,7 @@ Name each slice for what a person can do once it ships, in their words, such as 
 
 Put a migration or a route in the step whose test fails without it.
 
-Order the slices so each one ships working, with no half-built behavior a person can reach. When a slice is not correct until a later one ships, merge the two. Use a flag only when the earlier slice will ship first, such as when main deploys on every merge. Open `toby-swd-flags` before you write the flag's step.
+Order the slices so each one ships working, with no half-built behavior a person can reach. When a slice isn't correct until a later one ships, merge the two. Use a flag only when the earlier slice will ship first, such as when main deploys on every merge. Open `toby-swd-flags` before you write the flag's step.
 
 ## One file or a folder
 

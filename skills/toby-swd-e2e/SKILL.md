@@ -2,7 +2,7 @@
 name: toby-swd-e2e
 description: >-
   Contains Toby's rules for end-to-end tests through a real entry point. Entry
-  skills open this file by path. Do not trigger it from a user request alone.
+  skills open this file by path. Don't trigger it from a user request alone.
 disable-model-invocation: true
 ---
 
@@ -35,13 +35,13 @@ Assert what the caller sees, such as the response body, the text on the screen, 
 
 ## Real and fake
 
-Keep everything inside the system real, including the database, migrations, config loading, routing, and auth middleware. Point the test at a database made for the run, such as a testcontainers Postgres or the `test_` database Django's test runner creates. When the harness reads the database URL itself, as a compose file or a start script does, make it refuse any other database. A framework runner that creates its own test database, such as Django's, needs no such check.
+Keep everything inside the system real, including the database, migrations, config loading, routing, and auth middleware. Point the test at a database made for the run, such as a testcontainers Postgres or the `test_` database Django's test runner creates. When the harness reads the database URL itself, as a compose file or a start script does, make it refuse any other database. A framework runner that creates its own test database, such as Django's, doesn't need that check.
 
 Fake only third parties outside the system, at the network edge. Patch the HTTP call in the provider's module, or use a stub server or the provider's sandbox. For outbound email, use the framework's test mail backend, such as Rails' `:test` delivery or Django's `locmem` backend. A test that mocks the module under change is a unit test.
 
 ## Test data
 
-Create the data each test needs through the public API or a seed function, with unique ids. Leave no rows another test reads, so tests pass in any order. Wait for a condition, such as a row appearing or a selector rendering, and never sleep a fixed time.
+Create the data each test needs through the public API or a seed function, with unique ids. Don't leave rows that another test reads, so tests pass in any order. Wait for a condition, such as a row appearing or a selector rendering, and never sleep a fixed time.
 
 ## How many
 
@@ -52,4 +52,4 @@ Create the data each test needs through the public API or a seed function, with 
 
 Run the test before and after the change, in the format from `toby-swd-testing`, and watch the first run fail. State the command that runs it in CI.
 
-When the test needs a credential, a device, or a paid service you cannot get here, write it anyway. Mark the criterion unverified, and give the user the command to run.
+When the test needs a credential, a device, or a paid service you can't get here, write it anyway. Mark the criterion unverified, and give the user the command to run.

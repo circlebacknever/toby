@@ -56,4 +56,4 @@ export const STALENESS = {
 } as const;
 ```
 
-A new cache uses one of these categories. Do not cache data that every read needs fresh, because a 1-second TTL still serves stale reads under load.
+A new cache uses one of these categories. Don't cache data that every read needs fresh, because a 1-second TTL still serves stale reads under load.

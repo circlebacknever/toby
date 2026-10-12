@@ -15,7 +15,7 @@ function isTransient(e: unknown): boolean {
 
 Retry only a read, or a write that sends an idempotency key the server dedupes on. A network failure after the server accepted a write looks the same as one before it.
 
-Show sustained offline state once, as a banner in `App.tsx` driven by a `useOnlineState()` hook over `@react-native-community/netinfo`. A screen shows a failure only when it remains after the retries and being offline did not cause it. The screen gets that failure as a typed result from its data hook.
+Show sustained offline state once, as a banner in `App.tsx` driven by a `useOnlineState()` hook over `@react-native-community/netinfo`. A screen shows a failure only when it remains after the retries and being offline didn't cause it. The screen gets that failure as a typed result from its data hook.
 
 ## Native module errors
 

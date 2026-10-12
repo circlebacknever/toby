@@ -35,26 +35,26 @@ Write each issue like this:
 
 - The first line says what goes wrong and for whom, at file:line, in the names the code uses.
 - The last step shows the wrong result.
-- The fix is one change to a function or file you cite, in at most a five-line code block. Give no alternatives.
+- The fix is one change to a function or file you cite, in at most a five-line code block. Don't give alternatives.
 - Report one issue per cause.
 - Put the most harmful issue first, and use no severity labels.
 - Use no label for a code pattern or design principle, such as shotgun surgery or SOLID. Leave out Toby skill names, and quote no code back.
 
-Any report may end with these two lines, which are not issues.
+Any report may end with these two lines, which aren't issues.
 
-- A `Not run:` line listing the commands you could not run and each issue you found only by reading.
-- At most one `Question:` line, when a product decision or a file you cannot read settles whether an issue is real. Ask nothing about a choice the docstring or PR description states, or a guard that unchanged code in the diff relies on.
+- A `Not run:` line listing the commands you couldn't run and each issue you found only by reading.
+- At most one `Question:` line, when a product decision or a file you can't read settles whether an issue is real. Ask nothing about a choice the docstring or PR description states, or a guard that unchanged code in the diff relies on.
 
 ## What to check
 
-Review the current diff unless the user gives a scope, and read a PR's description first. Report only issues the change introduces, and follow each cause to the callers it affects. Drop an issue you cannot write steps for.
+Review the current diff unless the user gives a scope, and read a PR's description first. Report only issues the change introduces, and follow each cause to the callers it affects. Drop an issue you can't write steps for.
 
-1. **Bugs.** Wrong output, a crash, or an error hidden from a caller that needs it. A changed contract or stored format counts when it breaks a caller or data the diff does not update.
+1. **Bugs.** Wrong output, a crash, or an error hidden from a caller that needs it. A changed contract or stored format counts when it breaks a caller or data the diff doesn't update.
 2. **A bug fix with no regression test.** The steps revert the fix and show the suite still passes.
 3. **Security.** Authentication, authorization, injection, secrets, path traversal, deserializing untrusted data, CSRF, SSRF, XSS, and data exposure. Give the attacker's request and what it exposes.
 4. **Acceptance criteria.** An unmet criterion from the request, the ticket, or the plan group the diff implements. Report each criterion as its own issue, and quote it. The steps run the command the criterion lists, or send the input it describes.
 5. **Repo rules.** A break of a rule in `AGENTS.md`, `CLAUDE.md`, or a similar agent instructions file. The Reproduce block has two lines, the rule quoted at path:line and the file:line that breaks it.
-6. **An untested entry point.** A new route, job, or consumer that no test calls through its entry point. The steps delete a line the feature needs and show the suite still passes.
+6. **An untested entry point.** A new route, job, or consumer that the tests don't call through its entry point. The steps delete a line the feature needs and show the suite still passes.
 
 For a change to a `SKILL.md` or to an agent's instructions file, hook, or config, also ask the questions in `references/skills-diff.md`.
 
@@ -77,7 +77,7 @@ Report these even with no sign of another change. The steps change one copy of t
 
 - Does shared code gain a branch for one customer's id, such as `if account.id == 4471:`? The fix branches on an account field that says why this customer differs, such as `account.bills_in_euros`.
 - Is one rule, such as a 30-day refund window or a list of open statuses, written in two places that must change together? Two switches on one field that compute different values, such as a discount and a label, are two rules.
-- Do not report a lookup by id scoped to the signed-in account, such as `get_order(id, account)`, repeated in each entry point.
+- Don't report a lookup by id scoped to the signed-in account, such as `get_order(id, account)`, repeated in each entry point.
 
 ## Production readiness
 
@@ -97,7 +97,7 @@ Ask the questions in `references/production.md` when the diff adds an entry poin
 - Method length, naming taste, style a formatter catches, and code that is correct but awkward.
 - A pattern every similar file in the repo uses, copied correctly.
 - An error the code rightly lets crash the program.
-- A missing rate limit or audit log that the diff did not remove, unless `references/production.md` asks about it.
+- A missing rate limit or audit log that the diff didn't remove, unless `references/production.md` asks about it.
 - Environment variables and CLI flags as untrusted input.
 - Anything you would write with "consider" or "might".
 

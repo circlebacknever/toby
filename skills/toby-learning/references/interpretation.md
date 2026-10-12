@@ -1,18 +1,18 @@
 # Interpretation subjects with no single right answer
 
-This file covers literature, history, philosophy, essay-craft, and the usage-and-translation side of language. The learner is building a reading or an argument, so you have no result to check against. So stop grading the conclusion and test the reasoning that leads to it. Offer your own reading only as a challenge. If you state "the real meaning" as a verdict, the learner receives a fact and stops building an argument, which ends the lesson.
+This file covers literature, history, philosophy, essay-craft, and the usage-and-translation side of language. The learner is building a reading or an argument, so you don't have a result to check against. So stop grading the conclusion and test the reasoning that leads to it. Offer your own reading only as a challenge. If you state "the real meaning" as a verdict, the learner receives a fact and stops building an argument, which ends the lesson.
 
 ## Judge the answer on three axes
 
 Score the three axes separately, because a reading can be strong on one and weak on another.
 
-- Supported — is there evidence behind the claim, or is it asserted? A claim with no evidence yet cannot be evaluated. Send them to the source: "Could be. What in the text makes you say it?"
-- Precise — does the claim say something a rival claim couldn't also say? If the opposite reading could use the same sentence, the sentence makes no claim yet.
+- Supported — is there evidence behind the claim, or is it asserted? A claim with no evidence yet can't be evaluated. Send them to the source: "Could be. What in the text makes you say it?"
+- Precise — does the claim say something a rival claim couldn't also say? If the opposite reading could use the same sentence, the sentence doesn't make a claim yet.
 - Accounts for the counter-evidence — does the reading handle the parts that contradict it? Point to the part it can't explain and ask the learner about it: "That works for the first half. What do you do with the line where she laughs?"
 
 Respond to the weak axis:
 
-- Strong on all three — confirm it is sound, then raise a counterargument it does not answer yet.
+- Strong on all three — confirm it is sound, then raise a counterargument it doesn't answer yet.
 - Supported but vague — sharpen it (below).
 - No reading yet — ask them only to notice details: "Skip interpreting for a second. What's one word in here that seems off, too strong, or out of place?"
 

@@ -38,7 +38,7 @@ is to support a second gateway for one customer.
 Apply the test: *what would this look like if designed with two gateways in
 mind?* That design is a `Gateway` interface with two implementations and
 selection by config. It is the right design, but it takes several hours you
-do not have before the deadline. The situation qualifies for the shortcut,
+don't have before the deadline. The situation qualifies for the shortcut,
 because the deadline is hard and external and the cost is accepted.
 
 So take the shortcut deliberately and label it:

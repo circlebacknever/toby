@@ -13,7 +13,7 @@ If unsure, build the HTML deck.
 
 ## Teaching decks
 
-Put the glossary, mechanism explanations, tables, diagrams, derivations, examples, and summary in the deck. In chat, put one short line that introduces the deck, the question that checks the reader's understanding, and any choices for what to cover next. Use the fewest slides that teach the whole concept. Do not cut the concept short to save slides, even when it needs 18.
+Put the glossary, mechanism explanations, tables, diagrams, derivations, examples, and summary in the deck. In chat, put one short line that introduces the deck, the question that checks the reader's understanding, and any choices for what to cover next. Use the fewest slides that teach the whole concept. Don't cut the concept short to save slides, even when it needs 18.
 
 ---
 
@@ -78,7 +78,7 @@ Vary the opening structure across decks, and pick one of the patterns below for 
 
 **Title slide → cover/index (default for reference decks).** A sparse title slide with the per-artifact logo and the topic in giant type comes first, followed by a dense TOC grid. This pattern works for multi-section reference decks.
 
-**Title → glossary.** A title slide with the per-artifact logo comes first, then a glossary slide that defines the terms before the mechanism. This pattern works for concept-heavy topics where a reader cannot understand the content while its terms are undefined.
+**Title → glossary.** A title slide with the per-artifact logo comes first, then a glossary slide that defines the terms before the mechanism. This pattern works for concept-heavy topics where a reader can't understand the content while its terms are undefined.
 
 **Title → problem statement.** The title slide comes first, then an ink slide that states the problem or question the deck answers. This pattern works for analysis, diagnosis, or decision-support decks.
 
@@ -92,7 +92,7 @@ Vary the opening structure across decks, and pick one of the patterns below for 
 
 ## Title slide pattern — sparse, paper-toned
 
-The title slide opens the deck and identifies it. It shows the per-artifact logo from SKILL.md Logos in the top-left, the topic in big type, and one faint decorative mark on the right. It has no TOC, because the TOC goes on the cover/index slide.
+The title slide opens the deck and identifies it. It shows the per-artifact logo from SKILL.md Logos in the top-left, the topic in big type, and one faint decorative mark on the right. It doesn't have a TOC, because the TOC goes on the cover/index slide.
 
 Build the title slide from these parts:
 - **Logo:** place the per-artifact logo in the top-left.
@@ -159,13 +159,13 @@ Example claim line: `Bound orbits are ellipses, with the Sun at one focus.`
 
 Choose the interaction type to fit the concept. First decide what the learner needs to test or explore. Then pick the interaction type that lets the learner do it. 
 
-**Make a slide interactive** when its concept has a trade-off between two effects or a parameter that governs a visual outcome. Interactivity also fits a process that the learner should be able to step through. If moving a control would let the learner test a guess and see whether the guess holds, build the control. Decorative motion does not meet this condition, so leave it out.
+**Make a slide interactive** when its concept has a trade-off between two effects or a parameter that governs a visual outcome. Interactivity also fits a process that the learner should be able to step through. If moving a control would let the learner test a guess and see whether the guess holds, build the control. Decorative motion doesn't meet this condition, so leave it out.
 
 ### Interaction types
 
-**Slider (continuous parameter).** A scalar value governs a visual or numerical outcome. Use it when the relationship between input and output is the lesson: gain vs noise figure, sample size vs confidence interval, learning rate vs convergence. If the parameter has a few named values, or if the rate of change does not matter, use a toggle or step-through.
+**Slider (continuous parameter).** A scalar value governs a visual or numerical outcome. Use it when the relationship between input and output is the lesson: gain vs noise figure, sample size vs confidence interval, learning rate vs convergence. If the parameter has a few named values, or if the rate of change doesn't matter, use a toggle or step-through.
 
-**Step-through / stepper.** A button advances a process one step at a time. Use for algorithms (sort traversal, packet routing, hash collision resolution), protocols (handshake sequence, state machine transitions), or any process where the sequence is the lesson. Each step updates the diagram and adds an annotation. Do not animate the steps automatically, because the learner controls the pace.
+**Step-through / stepper.** A button advances a process one step at a time. Use for algorithms (sort traversal, packet routing, hash collision resolution), protocols (handshake sequence, state machine transitions), or any process where the sequence is the lesson. Each step updates the diagram and adds an annotation. Don't animate the steps automatically, because the learner controls the pace.
 
 **Toggle / mode switch.** A switch with two or a few options changes the view. Use when the concept has two distinct states or representations that benefit from direct comparison: time domain vs frequency domain, serial vs parallel execution, raw data vs normalized data. The learner sees the difference by switching.
 
@@ -239,7 +239,7 @@ Copy the SKILL.md color tokens into a `T` object with camelCase keys, such as `p
 
 - Put prev/next buttons at the bottom, using Lucide `ChevronLeft` / `ChevronRight` at 16–20px with a 1.5px stroke.
 - Bind `ArrowLeft` and `ArrowRight` keys via `useEffect` + `window.addEventListener`.
-- Disable Prev on the first slide and Next on the last, and do not wrap around.
+- Disable Prev on the first slide and Next on the last, and don't wrap around.
 - Optionally, show position with a small row of indicator dots, and switch to a numeric counter past ~20 dots.
 
 ### Per-slide structure
@@ -281,7 +281,7 @@ Use this pattern when the user asks for a `.pptx` file. The pptx skill builds th
 | Meta / footer | JetBrains Mono | 11 | 400 |
 | Value / ID | JetBrains Mono | 14 | 400 |
 
-If Inter or JetBrains Mono is not installed, fall back to Calibri (sans) and Consolas (mono). Don't use Arial, Times, or Helvetica.
+If Inter or JetBrains Mono isn't installed, fall back to Calibri (sans) and Consolas (mono). Don't use Arial, Times, or Helvetica.
 
 ### pptx card patterns
 

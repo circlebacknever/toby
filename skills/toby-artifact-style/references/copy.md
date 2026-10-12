@@ -13,19 +13,19 @@ Every claim, number, or comparison states its source, its measurement, or its me
 - Fail: "Performance improved significantly."
 
 ### 2. Negation test
-Write the negation of the claim. If nobody would write that negation, the original claim says nothing.
+Write the negation of the claim. If a person wouldn't write that negation, the original claim doesn't say anything.
 
 - Fail: "The method is fast, reliable, and well-designed." Negation: "The method is slow, fragile, and arbitrary." Nobody writes that negation, so the original says nothing.
 - Pass: "The method runs in O(n log n) for n ≤ 10⁶." The negation is a real claim someone could dispute.
 
 ### 3. Substitution test
-Replace the subject with an unrelated noun. If the sentence still makes sense, it does not describe its subject.
+Replace the subject with an unrelated noun. If the sentence still makes sense, it doesn't describe its subject.
 
 - Fail: "This dashboard unlocks new possibilities." Substitute: "This stapler unlocks new possibilities." The sentence still makes sense, so the original is meaningless.
 - Pass: "This dashboard shows alerts where p95 exceeds 200 ms." Substituting "stapler" makes the sentence nonsense, so the original is meaningful.
 
 ### 4. Reader-skim cut
-Apply this cut after the first three tests pass. If a reader who already knows the material can skip the sentence and lose nothing, cut the sentence. Do not restate the obvious.
+Apply this cut after the first three tests pass. If a reader who already knows the material can skip the sentence and lose nothing, cut the sentence. Don't restate the obvious.
 
 ---
 
@@ -50,13 +50,13 @@ Match how certain the wording sounds to how much is known about the claim. Don't
 
 ## Hard rules
 
-**A subtitle never restates the title.** Do not write a title or heading as two halves that mirror each other, and do not write a clever claim.
+**A subtitle never restates the title.** Don't write a title or heading as two halves that mirror each other, and don't write a clever claim.
 
 **A decision is a whole sentence that states the action and its reason.** "Approve the controlled release, because both meters stayed inside the watch band." A button label can be the verb alone, such as Approve or Hold.
 
-**Do not use first or second person in artifact copy**, except in a note that says a judgment depends on taste, such as "This looks wrong to me, because it resembles the cache-coherence bug from M-03."
+**Don't use first or second person in artifact copy**, except in a note that says a judgment depends on taste, such as "This looks wrong to me, because it resembles the cache-coherence bug from M-03."
 
-**Do not use exclamation points.**
+**Don't use exclamation points.**
 
 ---
 
@@ -67,7 +67,7 @@ Layouts with a hero section, feature cards, and a call-to-action (CTA) button ar
 - **Hero headline:** state what the thing does. "This tool models p95 latency under burst load." passes. "Built for performance you'll love" fails.
 - **Feature card:** give a concrete behavior and the measurement that backs it. "In a test at 10⁴ events per second, the monitor detected a threshold breach within 50 ms."
 - **CTA verb:** state the next step. "Read the derivation." "Open the worked example." "Run the benchmark." Never write `Get started.` or `Start your journey.`
-- Testimonials, social-proof counts, and "as seen in" rows are not allowed unless the artifact exists to show those sources.
+- Testimonials, social-proof counts, and "as seen in" rows aren't allowed unless the artifact exists to show those sources.
 
 ---
 
@@ -76,7 +76,7 @@ Layouts with a hero section, feature cards, and a call-to-action (CTA) button ar
 ### Before
 > Our powerful new dashboard delivers blazing-fast insights at scale, empowering you to unlock the full potential of your data. Built on a robust, modern stack, it's the dashboard you've always wanted.
 
-The paragraph fails all four tests. The paragraph stacks adjectives, uses inflated verbs, tells the reader what they want, gives no amounts, and states a mission.
+The paragraph fails all four tests. The paragraph stacks adjectives, uses inflated verbs, tells the reader what they want, doesn't give amounts, and states a mission.
 
 ### After
 > The dashboard shows an alert when p95 latency stays above 200 ms for 60 seconds. It samples latency once per second. The data comes from production traces for the last 30 days, about 2.6 million requests.

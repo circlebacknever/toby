@@ -10,7 +10,7 @@ Load this file when you build a chart, plot, or data visualization for a Toby Ar
 - **Numeric ticks or direct annotations.** Use tabular numerals (`tnum`).
 - **Legend.** Add a legend when the chart has ≥ 2 encodings. Skip the legend for a single series.
 - **Source / model note.** Place it below the chart at meta size (12 px) in `--text-muted`. "Source: prod traces, 2026-04-12 to 2026-05-10."
-- **Caveat.** Put the caveat next to the figure. Do not move it into a footnote. "The data was sampled once per second, so spikes shorter than 1 s may be missing."
+- **Caveat.** Put the caveat next to the figure. Don't move it into a footnote. "The data was sampled once per second, so spikes shorter than 1 s may be missing."
 
 ## Chart palette — positional order
 

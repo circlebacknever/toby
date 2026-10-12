@@ -6,13 +6,13 @@ When step 2 of `toby-swd-errors` calls for a retry, put it in one client wrapper
 
 | Status | Handling |
 |---|---|
-| 4xx except 408 and 429 | Surface. Do not retry. |
+| 4xx except 408 and 429 | Surface. Don't retry. |
 | 408 | Retry on a fresh connection. |
 | 429 | Retry at the `Retry-After` time (seconds or an HTTP date), or after a backoff when the header is missing. When that time falls after the caller's deadline, throw a transient error and skip the retry. |
 | 5xx except 501 | Retry with backoff when the request is safe to repeat. |
-| 501 | Surface. Do not retry. |
+| 501 | Surface. Don't retry. |
 
-A network failure or a timeout rejects the call with no status, so the wrapper retries it the same way as a 5xx. The wrapper sets one `permanent` flag on the error it throws, so callers do not re-derive the class or retry again. One response interceptor turns a sustained outage into "service unavailable" and lets a permanent error reach the caller that can act on it.
+A network failure or a timeout rejects the call with no status, so the wrapper retries it the same way as a 5xx. The wrapper sets one `permanent` flag on the error it throws, so callers don't re-derive the class or retry again. One response interceptor turns a sustained outage into "service unavailable" and lets a permanent error reach the caller that can act on it.
 
 ## gRPC retries
 
@@ -27,7 +27,7 @@ One helper wraps every RPC and reads the status code:
 | `INTERNAL` | No, because it signals a broken invariant. |
 | `INVALID_ARGUMENT`, `NOT_FOUND`, `PERMISSION_DENIED`, and every other code | No. |
 
-The helper passes the deadline in `ctx`, stops sleeping when the deadline expires, and skips an attempt that cannot finish before it.
+The helper passes the deadline in `ctx`, stops sleeping when the deadline expires, and skips an attempt that can't finish before it.
 
 ## Timeouts
 

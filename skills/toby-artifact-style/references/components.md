@@ -79,7 +79,7 @@ Build these components to the specs below when a page needs them.
 
 ## Consolidation rules
 
-Use one component for each problem, even when that component goes by several names. Do not invent a separate component when an existing one already covers the case.
+Use one component for each problem, even when that component goes by several names. Don't invent a separate component when an existing one already covers the case.
 
 ---
 

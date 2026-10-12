@@ -2,7 +2,7 @@
 name: toby-swd-observability
 description: >-
   Contains Toby's rules for logs, metrics, alerts, and traces in code that runs
-  in production. Entry skills open this file by path. Do not trigger it from a
+  in production. Entry skills open this file by path. Don't trigger it from a
   user request alone.
 disable-model-invocation: true
 ---
@@ -40,7 +40,7 @@ When the formatter prints only the message, write `key=value` pairs after the ev
 
 ## The outcome log
 
-When an entry point changes state or calls another service, log one line as it finishes. The line holds the event name, the ids it acted on, the result, and the duration, as in the `order.cancelled` example. A request log from middleware records the path and the status, and the outcome log adds which record changed and how. A queue consumer and a scheduled job are entry points too. A read-only entry point needs no outcome log.
+When an entry point changes state or calls another service, log one line as it finishes. The line records the event name, the ids it acted on, the result, and the duration, as in the `order.cancelled` example. A request log from middleware records the path and the status, and the outcome log adds which record changed and how. A queue consumer and a scheduled job are entry points too. A read-only entry point doesn't need an outcome log.
 
 ## What else to log
 
@@ -55,7 +55,7 @@ Never log passwords, tokens, API keys, cookies, card numbers, a raw request or r
 
 ## Metrics
 
-Give a new entry point the metrics its sibling entry points record, including their business-event counters. Record a duration as a histogram, so a dashboard can show p95 and p99. When the change adds a queue, record its depth and the age of its oldest message. When the repo has no metrics client, add `duration_ms` to an outcome log the entry point already writes, and ask before adding a client.
+Give a new entry point the metrics its sibling entry points record, including their business-event counters. Record a duration as a histogram, so a dashboard can show p95 and p99. When the change adds a queue, record its depth and the age of its oldest message. When the repo doesn't have a metrics client, add `duration_ms` to an outcome log the entry point already writes, and ask before adding a client.
 
 Keep each metric label to a small fixed set of values, such as a route template or a status class.
 
@@ -67,4 +67,4 @@ Before renaming an event or a metric, search the repo for alert and dashboard de
 
 ## Traces
 
-When the repo already uses tracing, such as OpenTelemetry, pass the trace context on. Add a span around a new outbound call or slow step only where auto-instrumentation does not already create one. Auto-instrumentation covers most HTTP clients and database drivers. Ask before adding tracing to a repo that has none.
+When the repo already uses tracing, such as OpenTelemetry, pass the trace context on. Add a span around a new outbound call or slow step only where auto-instrumentation doesn't already create one. Auto-instrumentation covers most HTTP clients and database drivers. Ask before adding tracing to a repo that has none.

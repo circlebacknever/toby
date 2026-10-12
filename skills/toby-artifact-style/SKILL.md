@@ -31,9 +31,9 @@ This skill sets the color tokens, the copy rules, and the visual rules that ever
 
 **Paper.** `--toby-paper` (`#fdfaf1`) is the default background. Use paper for any panel where the reader reads text, compares values, or works through details.
 
-**Ink.** Use `--toby-ink` (`#1a1c1f`) for decision panels, evidence panels, summaries, and section dividers. An ink panel tells the reader that this panel gives a conclusion or a decision. Use ink only for those panels, because when an artifact uses ink everywhere, the reader cannot tell which panel gives a conclusion.
+**Ink.** Use `--toby-ink` (`#1a1c1f`) for decision panels, evidence panels, summaries, and section dividers. An ink panel tells the reader that this panel gives a conclusion or a decision. Use ink only for those panels, because when an artifact uses ink everywhere, the reader can't tell which panel gives a conclusion.
 
-**Red.** Use `--toby-accent` (`#c44e3f`) for a risk, a broken limit, a value past its threshold, or an action that cannot be undone. Never use red as a brand color or for plain emphasis. Keep red rare, because readers stop noticing a red that appears often.
+**Red.** Use `--toby-accent` (`#c44e3f`) for a risk, a broken limit, a value past its threshold, or an action that can't be undone. Never use red as a brand color or for plain emphasis. Keep red rare, because readers stop noticing a red that appears often.
 
 ## Visual patterns
 
@@ -137,16 +137,16 @@ When this session already produced an artifact, give the new one a different com
 
 ## Color rules
 
-- Do not use gradients, rainbow scales, glow, inner shadows, or colored shadows.
+- Don't use gradients, rainbow scales, glow, inner shadows, or colored shadows.
 - For emphasis, use ink weight, a hairline, or position.
-- Do not give a card a colored left accent as decoration, because readers recognize that accent as a sign of AI-generated design. An alert or toast keeps its 4px state strip.
+- Don't give a card a colored left accent as decoration, because readers recognize that accent as a sign of AI-generated design. An alert or toast keeps its 4px state strip.
 
 ## Typography
 
 - **Sans:** Use Inter at weights 400, 500, and 600, with the system sans font as the fallback.
 - **Mono:** Use JetBrains Mono at weights 400 and 500 for values, units, IDs, timestamps, and coordinates.
 - **Sizes:** display 34 · h1 28 · h2 22 · section 18 · body 14 · body-sm 13 · meta 12 · eyebrow 11 · mono 13. The sizes are in px. For pptx, use the point sizes in `references/decks.md`.
-- **Weights:** Use 400 for body, 500 for emphasis, and 600 for headings. Do not use 700 in product UI.
+- **Weights:** Use 400 for body, 500 for emphasis, and 600 for headings. Don't use 700 in product UI.
 - **Letter-spacing:** Use 0 on display text, headings, and body, and use +0.12em on eyebrows only.
 - **Numerals:** Use tabular numerals (`tnum`) everywhere.
 - **Casing:** Write section labels as eyebrows, in UPPERCASE with 0.12em letter-spacing. Write headings and body text in sentence case. Never use Title Case. Write tokens in all-lowercase (`$toby-paper`).
@@ -154,13 +154,13 @@ When this session already produced an artifact, give the new one a different com
 ## Motion
 
 - Use only these motions: an opacity fade, a 4–8px positional slide for menus and toasts, and a hairline ring on focus. An accordion can also rotate its chevron 90° when it opens.
-- Do not use spring bounces, scale-up entrances, parallax, particle effects, or animation that only decorates. An animation that the reader can step through or pause counts as content, so it is allowed.
+- Don't use spring bounces, scale-up entrances, parallax, particle effects, or animation that only decorates. An animation that the reader can step through or pause counts as content, so it is allowed.
 
 ## Imagery + backgrounds
 
 - Paper is the background. Artifacts use no imagery by default.
 - Avoid generic lifestyle photos, decorative stock art, repeating patterns, textures, and gradients. Use real or generated imagery when the task requires the reader to see what the product, place, object, state, gameplay, or person looks like.
-- Do not use emoji or unicode dingbats. The allowed unicode characters are `→` for handoffs, `·` as a metadata separator, and `±` for uncertainty.
+- Don't use emoji or unicode dingbats. The allowed unicode characters are `→` for handoffs, `·` as a metadata separator, and `±` for uncertainty.
 
 ## Logos
 
@@ -172,7 +172,7 @@ Each artifact gets its own logo, built from three parts:
 
 **Choose the drawing for the structure of the subject.** Use a crosshair or grid for a network topology, nested squares for a recursive algorithm, and an orbit arc for an antenna or wave. Use branching lines or a Y-fork for a decision process, and a horizontal rail with a tick for a time series. Use a bell curve outline for a probability distribution, and stacked horizontal bars for a queue or pipeline. Use a partial orbit arc for a rotation or cycle, because readers take a closed circle as decoration. Use a 3×3 grid of squares for matrix or table data.
 
-Do not use an orbit for every subject, a triangle only because it is geometric, or a square only because it is simple. If you cannot explain why the shape fits the subject, pick a different shape.
+Don't use an orbit for every subject, a triangle only because it is geometric, or a square only because it is simple. If you can't explain why the shape fits the subject, pick a different shape.
 
 ## Purpose check
 

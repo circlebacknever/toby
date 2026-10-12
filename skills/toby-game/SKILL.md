@@ -3,7 +3,7 @@ name: toby-game
 description: >-
   Collaborate with the user to build a single-file HTML simulation game or toy
   in Toby's style. Trigger only when the user explicitly invokes this skill by
-  name or with the `/toby-game` slash command. Do not trigger on a general
+  name or with the `/toby-game` slash command. Don't trigger on a general
   request to make a game, a sim, a toy, a visualizer, or a simulation.
 disable-model-invocation: true
 ---
@@ -14,7 +14,7 @@ Build one self-contained HTML game with the creator, who picks the genre, theme,
 
 ## Opening move
 
-Do not ask "what genre?" First ask what system we are modeling, and what one surprising thing it should do when it runs. Then ask whether there is a target, meaning an institution, a ceremony, or a process. If there is a target, ask who the underdog is, meaning the person who has to deal with that target. A premise can have no target and be a pure toy, so do not force a bureaucracy onto that toy. When there is a target, pick the specific procedure to mock, such as a claim form or an appeal step. Copy its real details before you write any joke.
+Don't ask "what genre?" First ask what system we are modeling, and what one surprising thing it should do when it runs. Then ask whether there is a target, meaning an institution, a ceremony, or a process. If there is a target, ask who the underdog is, meaning the person who has to deal with that target. A premise might not have a target and can be a pure toy, so don't force a bureaucracy onto that toy. When there is a target, pick the specific procedure to mock, such as a claim form or an appeal step. Copy its real details before you write any joke.
 
 ## The dials
 
@@ -39,7 +39,7 @@ Each item is a note creators gave on earlier games. Design to avoid every one of
 
 - `references/gameplay.md`: tie outcomes to choices the player saw coming ("feels unfair"), make winning require getting past an obstacle in the game's design ("it solved itself"), check collisions against the positions drawn on screen and move objects with real physics ("the physics looks wrong"), make the world advance on its own and respond to the player at once ("it doesn't feel like a game"), and teach the player's one action in one line ("the instructions are too long").
 - `references/comedy-and-narrative.md`: use the game's wider register ("make it funnier"), advance each storyline one step at a time and pick each line from the lines not yet shown ("the jokes repeat"), build the run as a story that brings early details back at the end ("there's no story"), and show a feed line only when something in the game changed ("the feed flashes").
-- `references/architecture.md`: compute the physics so values cannot grow without limit, and assert that values stay finite ("the sim drifts").
+- `references/architecture.md`: compute the physics so values can't grow without limit, and assert that values stay finite ("the sim drifts").
 - `references/cross-device.md`: keep live controls on screen on a phone ("it breaks on mobile").
 - `references/visual-identity.md`: use a warm paper background, near-black ink, one red, one light source, and constant small motion ("it looks generic").
 - `references/calibration-and-testing.md`: check that the random, human-level, and superhuman test bots each score in their target range, and run the invariant tests, before calling the game done.

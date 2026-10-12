@@ -1,6 +1,6 @@
 # Code Observations
 
-A finding states what the code does, then what follows from it: the cost, the count, the date, or the failure. Some findings add a second fact that shows the problem and give no opinion after it.
+A finding states what the code does, then what follows from it: the cost, the count, the date, or the failure. Some findings add a second fact that shows the problem and don't give an opinion after it.
 
 ---
 
@@ -27,7 +27,7 @@ A finding states what the code does, then what follows from it: the cost, the co
 ## Over-built architecture with counts
 
 - The request handler accesses one database row through four interfaces. Three of them only forward the call.
-- A factory builds one type. The commit that added it mentions a second type, but that type has not been added in any later commit.
+- A factory builds one type. The commit that added it mentions a second type, but that type hasn't been added in any later commit.
 - The service has an interface, a base class, and one implementation. The abstraction supports other implementations, but none have been written.
 
 ## Misleading names
@@ -35,7 +35,7 @@ A finding states what the code does, then what follows from it: the cost, the co
 - The flag is named `ENABLE_NEW_CHECKOUT_V2_FINAL`. It has been renamed twice since `FINAL` was added to the name.
 - The oldest of the 40 call sites of `TEMP_FIX` is from 2022.
 - `utils.js` is 1,800 lines and contains functions from nine unrelated areas.
-- There's a `UserManager`, a `UserHandler`, and a `UserService`. `UserManager` and `UserHandler` both call `UserService`. `UserHandler` has no callers.
+- There's a `UserManager`, a `UserHandler`, and a `UserService`. `UserManager` and `UserHandler` both call `UserService`. `UserHandler` doesn't have callers.
 
 ## Tests
 
@@ -51,6 +51,6 @@ A finding states what the code does, then what follows from it: the cost, the co
 
 ## Failures in CI and migrations
 
-- The test passes on your laptop and fails in CI, because it reads `~/.aws/config`, which the CI machines do not have.
+- The test passes on your laptop and fails in CI, because it reads `~/.aws/config`, which the CI machines don't have.
 - The test fails one run in nine because two workers write the same temp file. It failed in CI 14 times this month.
 - The migration has an up step and no down step, so there is no written way to roll it back.

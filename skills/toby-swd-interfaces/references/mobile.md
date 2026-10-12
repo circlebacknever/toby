@@ -35,7 +35,7 @@ type RootStackParamList = {
 };
 ```
 
-> Shows the detail screen for the product with this id. Loads the product and recommendations on mount via the products repository. Renders a guest view if the user is not signed in.
+> Shows the detail screen for the product with this id. Loads the product and recommendations on mount via the products repository. Renders a guest view if the user isn't signed in.
 
 A route that passes `{ product, recommendations, user }` needs a comment about stale recommendations and a separate deep-link case. With an id, the screen reads `useProduct(productId)` and `useAuth()`, and deep links work unchanged.
 
@@ -52,7 +52,7 @@ interface FeedCache { load(): Promise<FeedItem[] | null>; save(items: FeedItem[]
 interface Session   { tokens(): Promise<Tokens | null>; save(t: Tokens): Promise<void>; clear(): Promise<void>; }
 ```
 
-`Session.save` writes to Keychain or Keystore, because AsyncStorage is not encrypted. `FeedCache` handles its version suffix and the size limit. Logout calls `Session.clear()` and `FeedCache.clear()` and keeps `UserPrefs`, so the list of data that logout clears is written in one file.
+`Session.save` writes to Keychain or Keystore, because AsyncStorage isn't encrypted. `FeedCache` handles its version suffix and the size limit. Logout calls `Session.clear()` and `FeedCache.clear()` and keeps `UserPrefs`, so the list of data that logout clears is written in one file.
 
 ## Screen data hook
 
@@ -65,4 +65,4 @@ type OrderScreenState =
   | { status: 'loaded'; order: Order; actions: OrderActions };
 ```
 
-`actions` holds only the actions the current user may perform. So the screen has no separate permission flag that could differ from what the handler allows. Each action returns `Result`, so callers need no try/catch.
+`actions` holds only the actions the current user may perform. So the screen doesn't have a separate permission flag that could differ from what the handler allows. Each action returns `Result`, so callers don't need a try/catch.

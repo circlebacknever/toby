@@ -6,7 +6,7 @@ This file explains how to choose what a diagram shows, how to place its boxes, t
 
 Decide what the diagram shows before you decide where anything goes.
 
-1. Write the reader's question as one sentence. Write the diagram title as a sentence that answers it. Cut every node and arrow the answer does not need, or move it to a second diagram.
+1. Write the reader's question as one sentence. Write the diagram title as a sentence that answers it. Cut every node and arrow the answer doesn't need, or move it to a second diagram.
 2. Pick the diagram type from the question.
    - A flowchart shows steps and choices in order.
    - A sequence diagram shows which part calls which, in time order.
@@ -19,7 +19,7 @@ Decide what the diagram shows before you decide where anything goes.
 6. Write each node label so that it is true on every run. Mark a part that appears only under a condition, as in `optional style, hooks`.
 7. Keep every node at the same level of detail. When one node stands for a whole sub-process, draw that sub-process as its own diagram.
 8. When many arrows leave one node for several targets, run them along one shared line that branches near the targets. Arrows into one node from several sources join a shared line the same way.
-9. Split a diagram when it answers two questions, when one container holds more than 7 nodes, or when the arrows cannot be drawn without a crossing.
+9. Split a diagram when it answers two questions, when one container holds more than 7 nodes, or when the arrows can't be drawn without a crossing.
 
 When the output is Markdown that renders Mermaid, draw each sequence diagram in Mermaid, because Mermaid places the participants and messages itself.
 
@@ -32,7 +32,7 @@ Write the plan as a list before you write any coordinates. The list has four par
 3. Pick one direction of flow, either left to right or top to bottom. Every forward arrow points that way.
 4. Assign each node to a grid cell by its step in the flow. Nodes at the same step share a column in a left-to-right flow, or a row in a top-to-bottom flow.
 
-Order the nodes in each column so that the arrows between columns do not cross. When two arrows still cross, swap two nodes in one column and check again.
+Order the nodes in each column so that the arrows between columns don't cross. When two arrows still cross, swap two nodes in one column and check again.
 
 ## Grid
 
@@ -41,7 +41,7 @@ Place every box, every arrow bend, and every gap on an 8px grid.
 - Make each x, y, width, and height a multiple of 8. Round a size up to the next multiple of 8, never down.
 - When rounding adds space to a box, split the added space evenly between opposite sides.
 - On a pptx slide, one grid step is 0.0833in, which is 8px at 96 dpi.
-- Do not round stroke widths to the grid. Do not round the 2px padding tolerance from the Review section to the grid either.
+- Don't round stroke widths to the grid. Don't round the 2px padding tolerance from the Review section to the grid either.
 - The center of a box side falls on a 4px step when the box size is an odd multiple of 8. An arrow may attach at that point, but every bend and every shared line stays on the 8px grid.
 
 ## Text boxes
@@ -51,10 +51,10 @@ Size each box from its text. Never pick a box size first and fit the text into i
 - Budget 0.6 × the font size per character for Inter and JetBrains Mono. JetBrains Mono advances 0.6em per character. Inter averages less, so the budget leaves spare width for Inter. Budget 0.75 × the font size per character for uppercase eyebrows, because of their 0.12em tracking.
 - When a browser is available, read the rendered width with `getBBox()` or `getBoundingClientRect()`, and use it in place of the budget. Measure only after every font face and weight on the page has loaded, because a width read from a fallback font sizes every box wrong.
 - Box width is the widest line plus the left and right padding, rounded up to the grid. Box height is the line count × the line height, plus the top and bottom padding, rounded up to the grid.
-- Use 16px padding for 13–14px text and 24px padding for 16–18px text. The top and bottom padding are equal, and the left and right padding are equal. No side has less than the set padding. Measure top padding from the top of the capital letters, and bottom padding from the baseline. Do not measure from the edge of the text line, because the line adds space above and below the letters.
-- Break a label longer than 24 characters into two lines at a word boundary. SVG does not wrap text, so write each line as its own `<tspan>`.
+- Use 16px padding for 13–14px text and 24px padding for 16–18px text. The top and bottom padding are equal, and the left and right padding are equal. No side has less than the set padding. Measure top padding from the top of the capital letters, and bottom padding from the baseline. Don't measure from the edge of the text line, because the line adds space above and below the letters.
+- Break a label longer than 24 characters into two lines at a word boundary. SVG doesn't wrap text, so write each line as its own `<tspan>`.
 - Center the text in its box. In SVG, set `text-anchor="middle"`, and give each line its own baseline `y` at the center of that line plus 0.35 × the font size. Leave out `dominant-baseline`, because some renderers, including QuickLook, ignore it on `<tspan>` lines and draw the text above center.
-- Use a state color on a box only when the box shows that state. A decision box gets the watch colors, and a box that is not a decision never does.
+- Use a state color on a box only when the box shows that state. A decision box gets the watch colors, and a box that isn't a decision never does.
 - Give every box in a row the same height, and center the content of each box vertically so that its top and bottom padding stay equal. In an HTML card, use a flex column with `justify-content: center`.
 - Give every box in a column the same width, so a narrower label in that column gets more left and right padding.
 
@@ -109,9 +109,9 @@ A label that touches no edge but sits 4px from the top and 20px from the bottom 
 
 ## Review
 
-An overlap check on the render misses uneven padding, crowded arrow labels, and arrow ends that do not show which box they point to. Run every step below before you describe the layout as finished.
+An overlap check on the render misses uneven padding, crowded arrow labels, and arrow ends that don't show which box they point to. Run every step below before you describe the layout as finished.
 
-1. Check that every SVG file parses, with `xmllint --noout`. A file that does not parse renders as an error page. XML forbids a double hyphen inside a comment, so keep flags such as `--dry-run` out of comments.
+1. Check that every SVG file parses, with `xmllint --noout`. A file that doesn't parse renders as an error page. XML forbids a double hyphen inside a comment, so keep flags such as `--dry-run` out of comments.
 2. Render the artifact after its fonts have loaded. View it at full size, and then view each quarter of it at twice the size. A whole-page screenshot at reduced size hides a 2px overlap.
 3. List every box that contains text, including nodes, panels, callouts, and slide containers, with its box coordinates, its text, and its four padding values in pixels, or in points on a pptx slide. Read each padding value from the render. A value computed from the source is only the intended value, because a renderer can place text away from its coordinates. Mark each box whose widest line exceeds its inner width. Mark each box whose top and bottom padding differ by more than 2px, or whose left and right padding differ by more than 2px. Mark each box with a side below the set padding. Mark each value that is off the 8px grid.
 4. List every arrow with its start point, its bends, and its end point, and check each one on the render. Mark each arrow that crosses a box, a label, or another arrow. Mark each arrow whose end is more than 12px from the box it points to.
@@ -121,4 +121,4 @@ An overlap check on the render misses uneven padding, crowded arrow labels, and 
 
 When you report on the layout, give the counts from steps 3 and 4, as in `14 text boxes and 11 arrows, none marked`. Report `there are no overflows` only when the lists from steps 3 and 4, read from the render, support that claim.
 
-When the artifact cannot be rendered in this session, say that the layout has not been verified.
+When the artifact can't be rendered in this session, say that the layout hasn't been verified.

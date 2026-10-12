@@ -78,14 +78,14 @@ CONTRAST_PATTERNS = [
 # a reply on them, so both checks use a form added here.
 FOIL_PATTERNS = [
     (re.compile(r",\s+not\s+(?:a|an|the|just|only|because|to|for|from|in|on|by|its|his|her|their|my|your)\b"),
-     "invented foil `X, not Y`"),
-    (re.compile(r"—\s*not\s"), "invented foil after a dash"),
+     "invented foil"),
+    (re.compile(r"—\s*not\s"), "invented foil"),
     # "The fixture is built, not run." The rejected half is one word before the
     # end of the sentence.
-    (re.compile(r",\s+not\s+[\w-]+\s*(?=[.;]|$)", re.M), "invented foil `X, not Y`"),
+    (re.compile(r",\s+not\s+[\w-]+\s*(?=[.;]|$)", re.M), "invented foil"),
     (re.compile(r"\b(?:it|that|this|which|they|these|those)(?:'s|'re| is| was| are| were) not\s+[^.,\n]{1,60},"
                 r"\s*(?:it|that|this|they)(?:'s|'re| is| was| are| were)\b", re.I),
-     "`That's not X, it's Y`"),
+     "invented foil"),
 ]
 
 
@@ -105,41 +105,41 @@ TIC_PATTERNS = [
     # "Right." and "Correct." are left out, because each one can be the answer.
     (re.compile(SENTENCE_START + r"(?:Good|Great|Nice|Perfect|Excellent|Awesome|Wonderful|Lovely)"
                 r"(?: (?:work|job|thinking|question))?[.!]", re.M),
-     "praise for the user, so open with the answer"),
+     "praise for the user"),
     # "right — what happens when the input is empty?" grades the answer, then
     # welds the next clause on with a dash.
     (re.compile(SENTENCE_START + r"(?:[Rr]ight|[Cc]orrect|[Ee]xactly|[Yy]es|[Gg]ood|[Gg]reat|[Nn]ice)\s+—", re.M),
-     "grade and a dash, so delete the grade and start with the next clause"),
+     "grade and a dash"),
     (re.compile(SENTENCE_START + r"(?:Very close|So close|Spot on|Bingo|(?:You )?[Nn]ailed it|"
                 r"You(?:'ve| have)? got it|Good (?:instinct|intuition|eye|thinking)|"
                 r"(?:Good|Nice|Great) catch|Right (?:idea|instinct|track)|"
                 r"(?:Partly|Half|Mostly|Exactly) right|You(?:'re| are) (?:close|almost there|on the right track)|"
                 r"Almost there|Close,? but not quite)[.!]", re.M),
-     "grade on the user's attempt, so open with the answer"),
+     "grade on the user's attempt"),
     (re.compile(SENTENCE_START + r"(?:Here(?:'s| is) (?:why|how|the thing|the catch|the deal|the kicker|"
                 r"the trick|the twist|what happens|what's going on|the idea)|Let me explain|"
                 r"Let me break (?:it|this|that) down|Think (?:about|of) it (?:this|like this) way|Consider this|"
                 r"Put another way|To put it (?:simply|another way)|In other words)\s*[.:]", re.M),
-     "sentence that announces the next one, so delete it"),
+     "sentence that announces the next one"),
     (re.compile(SENTENCE_START + r"(?:(?:The )?(?:[Ss]hort|[Ll]ong|[Qq]uick|[Ss]imple|[Dd]irect) (?:answer|version)|"
                 r"(?:The )?[Bb]ottom line|In short|In a nutshell|Put simply|Simply put|"
                 r"The gist|The upshot|The verdict|Spoiler)\s*:", re.M),
-     "labelled answer, so delete the label and state the answer"),
+     "labelled answer"),
     (re.compile(r"(?:^|(?<=[.!?]\s))(?:Your|The|My)\s+(?:[\w-]+\s+){0,2}[\w-]+,\s+"
                 r"(?:repaired|corrected|rewritten|revised|tightened|cleaned up|reworded|improved|simplified)\s*:", re.M),
-     "labelled answer, so delete the label and give the new version"),
+     "labelled answer"),
     (re.compile(r",\s+and\s+(?:both|all(?: three| four| of them)?|each(?: one)?)\s+"
                 r"(?:matters?|counts?|(?:is|are) important)\b", re.I),
-     "importance flag on a count, so delete it and give the items"),
+     "importance flag"),
     # "You're absolutely right!" and "Of course!" agree before checking.
     # "You're right." with no adverb passes, because it can be the answer.
     (re.compile(SENTENCE_START + r"(?:You(?:'re| are) (?:absolutely |totally |completely |so )right|"
                 r"Of course|Certainly|Absolutely|Sure thing)[.!]", re.M),
-     "agreement before checking, so open with the answer or the evidence"),
+     "agreement before checking"),
     # "Noted." and "Got it." acknowledge a correction and say nothing. The user
     # flagged "Noted" on 2026-10-08, so a reply opens with the change itself.
     (re.compile(SENTENCE_START + r"(?:Noted|Got it|Understood)[.!]", re.M),
-     "stock acknowledgement, so open with the change or the next step"),
+     "stock acknowledgement"),
 ]
 
 
@@ -158,16 +158,179 @@ MECHANICAL_PATTERNS = [
 # TIC_PATTERNS, FIGURATIVE_FRAMES, and COINED_TERMS. Each form here matches a
 # fixed phrase, because a user turns off a hook that blocks correct replies.
 REPLY_PATTERNS = FOIL_PATTERNS + TIC_PATTERNS + [
-    (re.compile(r"\bnot just\b"), "`not just`, so say what it is"),
-    (re.compile(r"\brather than\b"), "`rather than`, so write only the thing you chose"),
-    (re.compile(r",\s*though\.?\s*$", re.M), "trailing `though` on a sentence that was already complete"),
-    (re.compile(r"\bthat said,", re.I), "`that said` on a sentence that was already complete"),
+    (re.compile(r"\bnot just\b"), "invented foil"),
+    (re.compile(r"\brather than\b"), "invented foil"),
+    (re.compile(r",\s*though\.?\s*$", re.M), "trailing though"),
+    (re.compile(r"\bthat said,", re.I), "that said"),
     # `carry` is legal only for moving an object or an arithmetic carry, and a
     # reply about code almost never means either one.
-    (re.compile(r"\bcarr(?:y|ies|ied|ying)\b", re.I), "`carry` used as a metaphor, so write contains, has, includes, or states"),
+    (re.compile(r"\bcarr(?:y|ies|ied|ying)\b", re.I), "carry as a metaphor"),
     (re.compile(r"\b(?:hope this helps|feel free|let me know if|don't hesitate)\b", re.I),
-     "closing offer, so cut it"),
+     "closing offer"),
 ]
+
+
+# PATTERN_NOTES maps each finding label to what the broken pattern is and why it
+# makes a sentence hard to read. voice-check.py and hooks/voice-stop-check.py
+# print these, so both explain a label the same way. The notes give no rewrite,
+# because the user asked that the agent write its own from the reason.
+PATTERN_NOTES: dict[str, tuple[str, str]] = {
+    # Found by slogan_findings and PREDICTED_PATTERNS.
+    "heading written as a claim": ("The heading states a claim as a full sentence.",
+                                   "Readers scan headings to find a section, and a claim is slower to scan than a label."),
+    "noun phrase with no verb": ("The line is a noun phrase with no verb.",
+                                 "The reader can't tell what the thing does."),
+    "chained pair": ("The second sentence starts on the last word of the first sentence.",
+                     "The reader reads the same word twice to follow one idea."),
+    "one-word definition": ("The sentence defines a thing with one word, as in \"X is a wrapper.\"",
+                            "The one word doesn't tell the reader what the thing does."),
+    "label with a period": ("A label ends with a period as if it were a sentence.",
+                            "The line has no verb, so the reader can't tell what the label claims."),
+    "label with no value": ("A field label is followed by \"None\".",
+                            "The reader can't tell what is missing or where the writer looked."),
+    "setup sentence before the fact": ("The sentence prepares the reader for a fact and doesn't state it.",
+                                       "The reader has to read on to find the point."),
+    "sentence about the document": ("The sentence describes the document, as in \"This section covers X.\"",
+                                    "The reader gets no content from it."),
+    "litotes": ("The sentence states a thing by denying its opposite, as in \"not uncommon\".",
+                "The reader has to undo the \"not\" to find the claim."),
+    "abstract noun as actor": ("An abstract noun does a person's action, as in \"the decision wants\".",
+                               "The reader can't tell which person or program acted."),
+    "setup question": ("The sentence asks a question that the next sentence answers, as in \"The result?\"",
+                       "The reader waits for an answer the writer already had."),
+    "noun doing a verb's job": ("A noun phrase stands in for a verb, as in \"provides the ability to\".",
+                                "The extra words hide the action from the reader."),
+    "meeting jargon": ("The sentence uses meeting jargon, such as \"the ask\".",
+                       "The reader has to translate the jargon into a plain word."),
+    "rhythm device": ("The sentence uses a balanced frame for its sound, such as \"less X, more Y\".",
+                      "The frame adds rhythm and no meaning, and the reader parses it twice."),
+    "vague intensifier": ("A word such as \"very\" or \"much\" scales a claim with no number.",
+                          "The reader can't tell how big the effect is."),
+    "code given feelings": ("The sentence gives code a feeling, as in \"the parser is happy\".",
+                            "Code doesn't feel, so the reader has to guess what the code did."),
+    "hedge stack": ("The sentence stacks hedges, as in \"might possibly\".",
+                    "The reader can't tell how sure the writer is or what is unknown."),
+    "would-have stated as fact": ("The sentence states what would have happened as if someone measured it.",
+                                  "The reader can't tell the guess from the result."),
+    "claim about the user": ("The sentence claims something the user didn't say or do.",
+                             "The reader sees a guess about themselves stated as a fact."),
+    "what a thing never does": ("The sentence says what a thing doesn't do.",
+                                "The reader learns nothing about what the thing does, unless they expected it."),
+    "program given a judgment": ("The sentence gives a program a judgment, as in \"the code prefers X\".",
+                                 "Programs don't judge, so the reader has to guess the fact behind the word."),
+    "bullet restates its heading": ("The bullet repeats the words of the heading above it.",
+                                    "The reader reads the same fact twice."),
+    "empty qualifier": ("An adjective fits every noun of its kind, as in \"actual output\".",
+                        "The adjective adds a word and no meaning."),
+    "opening phrase that frames the evidence": ("An opening phrase says how the writer found the fact, as in \"Looking at the logs,\".",
+                                                "The reader reads the method before the finding."),
+    "relation word with its other half missing": ("A relation word such as \"in exchange\" has no second half.",
+                                                  "The reader waits for what was traded, and the sentence never says."),
+    "negated actor": ("\"No\" plus a noun, or \"nothing\" or \"nobody\", does the action, as in \"no purge removes it\" or \"Nothing calls X\".",
+                      "The reader has to picture the action and then cancel it."),
+    "container verb": ("Text, a line, or a document is said to hold something.",
+                       "Text doesn't hold anything, so the reader has to work out what the text says."),
+    "double negation": ("\"Only\" and a negation both limit the same clause, as in \"only where a chart wouldn't show it\".",
+                        "The reader has to undo two negations to find what is allowed. A rewrite that undoes them "
+                        "can change which case the sentence allows, as in \"equally well\" written for \"worse\"."),
+    "negation on a noun": ("A verb is followed by \"no\" and a noun, as in \"has no test\" or \"needs no log\".",
+                           "The reader reads the verb as a positive claim and then has to reverse it at the noun."),
+    "uncontracted negation": ("A negation is written in full, as in \"does not\" or \"cannot\".",
+                              "People say \"doesn't\" and \"can't\", so the full form reads stiff and slows the reader."),
+    "two facts joined by and": ("A comma and \"and\" join two facts with different subjects.",
+                                "The reader can't tell whether the two facts are related."),
+    "bare `that` as an object": ("\"That\" stands alone as the object, as in \"run that\".",
+                                 "The reader has to search back for what \"that\" means."),
+    "rider after a complete claim": ("A clause after a complete sentence repeats what the sentence said.",
+                                     "The reader reads the same claim twice."),
+    "heading joins two clauses": ("The heading joins two clauses with a comma.",
+                                  "Two clauses turn a label into a sentence the reader has to parse."),
+    "grade before the answer": ("A one-word grade such as \"Almost.\" comes before the answer.",
+                                "The reader gets a verdict before the content."),
+    "count before the items": ("The sentence gives a count, such as \"Two fixes.\", before the items.",
+                               "The reader gets a number with nothing to attach it to."),
+    "dramatic word": ("A dramatic word, such as \"worst\" or \"damning\", adds emphasis.",
+                      "The word states a feeling, and the reader can't tell the size of the problem."),
+    "cleft for emphasis": ("The sentence wraps its claim in \"X is what makes Y\".",
+                           "The extra words add emphasis and no meaning."),
+    "reflexive for emphasis": ("\"Itself\" is added for emphasis, as in \"the system itself\".",
+                               "The word adds length and no meaning."),
+    "deferred antecedent": ("The sentence says \"this\" and gives its meaning only after a colon.",
+                            "The reader doesn't know what \"this\" means until the end."),
+    "punchline closer": ("The reply ends on a punchline or a summary line.",
+                         "The line repeats or decorates the facts and adds none."),
+    "code given senses": ("The sentence gives code a sense, as in \"the check sees\".",
+                          "Code reads and matches, so the reader has to guess the action."),
+    "sentence that announces the next one": ("The sentence announces the next sentence, as in \"Here's why.\"",
+                                             "The reader reads past it to find the content."),
+    "coined name": ("The writer made up a name for something the source already names.",
+                    "The reader has to learn a second name for one thing."),
+    "importance flag": ("A phrase says something matters without saying why, as in \"and both matter\".",
+                        "The reader gets no reason and no consequence."),
+    "picture word": ("A word of place describes code or a rule, as in \"the rule lives in\".",
+                     "A rule is in a file, so the reader has to translate the picture."),
+    "fragment": ("The sentence has no subject or no verb.",
+                 "The reader has to guess who did what."),
+    "doubled verb": ("Two verbs do the same job in one sentence.",
+                     "The reader parses two actions where there is one."),
+    "intensifier with no contrast": ("\"Actually\", \"really\", or \"truly\" appears with no contrast.",
+                                     "The word implies a contrast the sentence never gives."),
+    "either with no or": ("\"Either\" appears with no \"or\".",
+                          "The reader waits for a second option that never comes."),
+    "closing offer": ("The reply ends with an offer of more help.",
+                      "The offer adds no fact, and the reader reads past it."),
+    # Found by the word lists, the foil and tic patterns, and the line checks.
+    "banned word": ("The word is on the banned list in the Toby instructions.",
+                    "The word is vague, inflated, or stock, and the reader learns nothing from it."),
+    "sense-scoped word": ("The word is banned when it only says something matters, and allowed as a plain noun.",
+                          "When the word only adds emphasis, the reader gets no reason."),
+    "carry as a metaphor": ("\"Carry\" describes something other than moving an object or an arithmetic carry.",
+                            "Text and code don't carry things, so the reader has to guess the verb."),
+    "invented foil": ("The sentence contrasts the thing with something nobody claimed, as in \"X, not Y\".",
+                      "The reader has to process a claim nobody made."),
+    "coined term": ("The term is a phrase made up in this repo.",
+                    "The reader hasn't seen the term and can't look it up."),
+    "figurative frame": ("The phrase is a metaphor or an idiom.",
+                         "The reader has to translate the picture into what the thing does."),
+    "praise for the user": ("The sentence praises the user, as in \"Good.\"",
+                            "The praise says nothing about the subject, and the reader reads past it."),
+    "grade and a dash": ("A grade such as \"Right\" is joined to the next clause with a dash.",
+                         "The reader gets a verdict before the content."),
+    "grade on the user's attempt": ("The sentence grades the user's attempt, as in \"Very close.\"",
+                                    "The reader gets a verdict before the content."),
+    "labelled answer": ("A label such as \"Short answer:\" comes before the answer.",
+                        "The label delays the answer and adds no fact."),
+    "agreement before checking": ("The reply agrees, as in \"You're absolutely right!\", before any check.",
+                                  "The reader can't tell whether the writer checked the claim."),
+    "stock acknowledgement": ("The reply opens with \"Noted.\" or \"Got it.\"",
+                              "The word says nothing about the change."),
+    "trailing though": ("A trailing \"though\" follows a complete sentence.",
+                        "The word implies a contrast the sentence never states."),
+    "that said": ("\"That said\" opens a sentence after a complete claim.",
+                  "The phrase implies a contrast and gives none."),
+    "stray period at the start of a line": ("A line starts with a lone period.",
+                                            "The period is an editing leftover, and the reader stops on it."),
+    "list number with no text": ("A list number has no text after it.",
+                                 "The reader expects an item that is missing."),
+    "clause weld": ("A dash or a semicolon joins two clauses.",
+                    "The mark doesn't say how the clauses relate, so the reader has to guess."),
+    "bare this or that": ("\"This\" or \"that\" stands alone as the subject.",
+                          "The reader has to search back for what the word means."),
+    "sentence over 35 words": ("The sentence runs past 35 words.",
+                               "The reader loses the subject before the sentence ends."),
+    "sentence over 25 words": ("The sentence runs past the 25-word ceiling.",
+                               "Each extra clause adds one more thing for the reader to track."),
+    "sentence count doesn't match the comment": ("The prose gives a sentence count that differs from the comment above it.",
+                                                  "The reader trusts a number that is wrong."),
+    "term the skill never defines": ("A reference file uses a term that the other files of its skill never use.",
+                                     "The reader has no definition to look up."),
+}
+
+
+def explain(pattern: str) -> str:
+    """Return what a broken pattern is and why it is hard to read, on one line."""
+    what, why = PATTERN_NOTES[pattern]
+    return f"What it is: {what} Why it is hard to read: {why}"
 
 
 def line_for_offset(text: str, offset: int) -> int:
@@ -521,6 +684,49 @@ PREDICTED_PATTERNS = [
                 r"checks|catches|imports|uses|changes|touches|sees|runs|clears|updates|returns|names|"
                 r"fires|sets|stores|owns)\s+(?:it|them|the|a|an|this|that|these|those|any|its|their)\b", re.I),
      "negated actor"),
+    # "Text holds only what no widget shows better." The form above needs an
+    # object, so it missed this one. After a clause word, "no" plus a noun and
+    # a verb is the actor of that clause, as in "hosts that no team owns".
+    (re.compile(r"\b(?:what|that|which|who|where|when|while|unless|until|than|if|because|since)\s+no\s+"
+                r"(?!longer\b|matter\b|more\b|less\b|doubt\b)[a-z][\w-]*\s+"
+                r"(?:can(?:not|'t)?|could|will|would|should|must|may|might|does|did|has|had|is|was|"
+                r"[a-z]{2,}(?:s|ed))\b", re.I),
+     "negated actor"),
+    # "Nothing calls `UserHandler`" makes a negative pronoun the actor, the same
+    # problem as "no purge removes it". The retest on 2026-10-12 found it in 5
+    # of 10 notes.
+    (re.compile(r"(?:^|(?<=[.!?]\s)|(?<=^- )|\b(?:what|that|which|where|when|while|unless|until|if|because|since|so|and|but)\s+)"
+                r"(?:Nothing|Nobody|No one)\s+(?:else\s+)?(?:(?:in|on|from|outside|inside)\s+(?:the\s+|this\s+)?[\w-]+\s+)?(?:can(?:not|'t)?|could|will|would|should|does|did|"
+                r"[a-z]{2,}(?:s|ed))\b", re.I | re.M),
+     "negated actor"),
+    # "Text holds the answer" and "The line holds the event name" give text a
+    # container verb. A database table holds rows, so "table" is left out.
+    (re.compile(r"\b(?:text|sentence|paragraph|reply|message|doc|document|page|section|heading|list|"
+                r"comment|prose|copy|line|bullet|title|caption|answer|summary)s?\s+(?:holds?|held)\b", re.I),
+     "container verb"),
+    # "`tests/orders/` has no test for `cancelOrder`" puts the negation on the
+    # noun. The user wants "doesn't have a test", which puts it on the verb.
+    # "have no idea" is how people talk, so it passes.
+    (re.compile(r"\b(?:has|have|had|find|finds|found|need|needs|needed|get|gets|got|see|sees|saw|"
+                r"return|returns|returned|give|gives|gave|take|takes|took|make|makes|made|show|shows|"
+                r"contain|contains|hold|holds|carry|carries|run|runs|ran|leave|leaves|left)\s+no\s+"
+                r"(?!longer\b|more\b|less\b|matter\b|later\b|sooner\b|other\b|idea\b|one\b|doubt\b)[a-z]", re.I),
+     "negation on a noun"),
+    # "The repo does not have a rate limiter" reads stiff. The user asked on
+    # 2026-10-12 for negations written the way people say them, as "doesn't".
+    (re.compile(r"\b(?:does|do|did|is|are|was|were|has|have|had|could|would|should|will)\s+not\b|\bcannot\b", re.I),
+     "uncontracted negation"),
+    # "only what no widget shows" limits one clause twice.
+    (re.compile(r"\bonly\s+(?:what|whatever|when|where|the\s+[\w-]+\s+(?:that|which))\s+"
+                r"(?:no|nothing|none|nobody)\b", re.I),
+     "double negation"),
+    # "uses text only where a chart wouldn't show the data better" limits the
+    # clause with "only" and negates its verb too. The retest found it in 9 of 10 notes.
+    # "Load it only when the guide is not loaded" reads fine, so the form needs a
+    # comparison after the negation, as in "wouldn't show the data better".
+    (re.compile(r"\bonly\s+(?:what|whatever|when|where|if)\s+(?!no\b|nothing\b|none\b|nobody\b)[^.;:\n]{0,40}?(?:n't|\bnot\b|\bnever\b|\bno\b)"
+                r"[^.;:\n]{0,40}?\b(?:better|worse|more|less|faster|slower|clearer|differently)\b", re.I),
+     "double negation"),
     # "Five outputs is a small sample, and Fable has two." A comma and `and`
     # before a new subject and its verb join two facts in one sentence.
     (re.compile(r",\s+and\s+(?:(?:the|a|an|this|that|these|those|no|each|every)\s+[\w-]+|it|they|[A-Z][\w.-]*)\s+"

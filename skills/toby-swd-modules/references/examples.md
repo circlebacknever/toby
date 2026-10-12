@@ -11,7 +11,7 @@ the socket into a string. `RequestParser` parses the string into a
 structured request. The team describes the design as "first read, then parse",
 which is a sign of temporal decomposition.
 
-The defect is that `RequestReader` cannot know where the request ends without
+The defect is that `RequestReader` can't know where the request ends without
 parsing the headers, because the length header determines body size. So both
 classes know the request format. That knowledge is a single design decision
 written in two modules, which is leakage. The parsing code is also duplicated. Callers also have to
@@ -53,7 +53,7 @@ job, and moving the calculation inside removes a setting from every caller.
 component's props list includes `currentUser` though only the leaf uses it.
 
 `currentUser` is a pass-through variable (check 4). The intermediate
-components are forced to know about a value they have no use for. Adding the
+components are forced to know about a value they don't use. Adding the
 next such value means editing the whole chain again. Fix it with a value that only the
 top and bottom components touch, such as a `CurrentUserContext` provided near `App` and
 read in `AvatarMenu`. The prop is removed from the intermediates. Keep the context small
@@ -85,4 +85,4 @@ that one component is better than five shallow ones.
 A counter-case shows when a split is correct. If `<Row>` also contained
 the logic for formatting currency across locales, that *is* a separate piece of
 knowledge that other code also needs. Extract it as a general-purpose helper, so that each
-piece hides one decision. A high line count alone does not justify a split.
+piece hides one decision. A high line count alone doesn't justify a split.

@@ -1,10 +1,10 @@
 # Hooks
 
-The repo has three voice checks, because each one checks text that the other two do not see.
+The repo has three voice checks, because each one checks text that the other two don't see.
 
 | Mechanism | Reads | Catches |
 |---|---|---|
-| `scripts/voice-check.py` | any file, a directory, or stdin | every pattern, on demand, followed by the rules the patterns do not check |
+| `scripts/voice-check.py` | any file, a directory, or stdin | every pattern, on demand, followed by the rules the patterns don't check |
 | `voice-write-check.py` | a file the agent just wrote | prose in files, as each file is written |
 | `voice-stop-check.py` | the reply the agent just sent | prose in chat, which no file check sees |
 
@@ -19,11 +19,13 @@ some-command | scripts/voice-check.py -
 `--review` prints every prose sentence with its findings under it, for the
 sentence-by-sentence read the READ rules need.
 
-It prints three groups. **FIX** holds rules with no judgement in them, and a
-FIX finding makes the run exit 1. **DECIDE** holds rules a machine cannot
-settle. The checker prints each DECIDE sentence, and a DECIDE finding never
+It prints four groups. Each finding names a broken writing pattern.
+**FIX** lists rules with no judgement in them, and a FIX finding makes the run
+exit 1. **DECIDE** lists rules a machine can't settle. The checker prints each DECIDE sentence, and a DECIDE finding never
 fails the run. Most DECIDE findings are real, so read each one.
-**READ** lists the rules the patterns do not check. Every run prints it. The
+**PATTERNS** says what each broken pattern in the findings is and why it's
+hard to read.
+**READ** lists the rules the patterns don't check. Every run prints it. The
 patterns miss 7 of the 49 bad sentences in `evals/gold/labels.jsonl`, so
 after you handle the findings, read every sentence against the READ list.
 
@@ -71,7 +73,7 @@ appears even when the agent leaves the divider out.
 The write hook needs `scripts/voice-check.py`. It looks in `TOBY_ROOT`, then in
 a checkout that holds the hook, then in the installed skill at
 `~/.claude/skills/toby-voice`. Installing with `--tool claude` puts the checker
-there, so nothing needs setting. With none of those it exits 0 and says nothing,
+there, so you don't need to set anything. With none of those it exits 0 and says nothing,
 because a hook that fails loudly on a machine that never asked for it gets
 deleted.
 

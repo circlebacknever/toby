@@ -12,7 +12,7 @@ description: >-
 
 # Toby SWD Experiment
 
-An experiment answers one question, compares candidates, or finds a value that reading the code cannot settle.
+An experiment answers one question, compares candidates, or finds a value that reading the code can't settle.
 
 ## Loop
 
@@ -32,18 +32,18 @@ Name throwaway work with `experiment`, `poc`, `spike`, `scratch`, `debug`, or `t
 
 ## Checks
 
-During discovery, the user's feedback and manual observation can be the verification. Run automated tests, browser automation, screenshots, or broad checks only when the user asks or the experiment code needs them. Do not change settings the user chose, because the user's observations depend on those settings.
+During discovery, the user's feedback and manual observation can be the verification. Run automated tests, browser automation, screenshots, or broad checks only when the user asks or the experiment code needs them. Don't change settings the user chose, because the user's observations depend on those settings.
 
-When the experiment drives something physical, costly, or visible outside the machine, reverting the code does not undo the effect. Run the candidate first in the cheapest stand-in that behaves like the real system, and ask before acting on the real one.
+When the experiment drives something physical, costly, or visible outside the machine, reverting the code doesn't undo the effect. Run the candidate first in the cheapest stand-in that behaves like the real system, and ask before acting on the real one.
 
 ## Finish
 
 When the user chooses a behavior:
 
 - Move the chosen behavior into the normal project path.
-- Delete the experiment code, temp names, flags, debug routes, scratch files, and notes the final behavior does not need.
+- Delete the experiment code, temp names, flags, debug routes, scratch files, and notes the final behavior doesn't need.
 - Write down the inputs, random seeds, and versions the experiment code used without recording them, so someone can get the same result outside this session.
-- Write durable tests for the chosen behavior when the project has a reliable test setup that can check that behavior. When the user tested by hand, report the checks that did not run.
+- Write durable tests for the chosen behavior when the project has a reliable test setup that can check that behavior. When the user tested by hand, report the checks that didn't run.
 - Search the diff for the throwaway names before saying the experiment is finished.
 
 ## Red flags

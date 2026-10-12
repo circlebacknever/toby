@@ -4,14 +4,14 @@ Load this file when you put a geometric mark on a slide, panel, or page. A mark 
 
 ## Two scales
 
-- **Content scale (120–220 px).** The mark shows part of the content, so pair it with a small UPPERCASE label that names it. The label is mandatory, because unlabeled geometry counts as decoration, which is not allowed at this scale.
+- **Content scale (120–220 px).** The mark shows part of the content, so pair it with a small UPPERCASE label that names it. The label is mandatory, because unlabeled geometry counts as decoration, which isn't allowed at this scale.
 - **Decorative scale (40–80 px).** The mark adds texture, so set its opacity to ≤ 0.25 and give it no label.
 
-Do not size a mark between 80 px and 120 px. Pick a size inside one of the two ranges.
+Don't size a mark between 80 px and 120 px. Pick a size inside one of the two ranges.
 
 ## Geometry beside a claim
 
-Place each mark next to the claim it clarifies. Do not put a mark on a slide that has no claim, because a mark only explains the claim beside it.
+Place each mark next to the claim it clarifies. Don't put a mark on a slide that doesn't make a claim, because a mark only explains the claim beside it.
 
 ## Stroke and color
 
@@ -60,15 +60,15 @@ Pick the mark for the structure of the subject. These defaults cover common subj
 - For an orbital subject, use `orbit-marker` at content scale and `orbital-lattice` as a decorative backdrop.
 - For a signal or transmission subject, use `signal-rings` for the emitter and `coordinate-fan` for sector coverage.
 
-Do not use `orbit-marker` for every artifact whatever the subject, `locator-reticle` as decoration when no target needs locating, or `calibration-grid` everywhere because it looks technical.
+Don't use `orbit-marker` for every artifact whatever the subject, `locator-reticle` as decoration when the artifact has nothing to locate, or `calibration-grid` everywhere because it looks technical.
 
-If you cannot explain why the mark fits the subject's structure, pick a different mark.
+If you can't explain why the mark fits the subject's structure, pick a different mark.
 
 ---
 
 ## Label format
 
-Give each content-scale mark a small UPPERCASE mono label at 11px, with +0.12em letter-spacing, in `--text-muted`. Place the label beneath or beside the mark. Do not put the label inside the mark.
+Give each content-scale mark a small UPPERCASE mono label at 11px, with +0.12em letter-spacing, in `--text-muted`. Place the label beneath or beside the mark. Don't put the label inside the mark.
 
 Examples include `ORBIT MARKER`, `UNCERTAINTY FAN`, and `COORDINATE STAMP · 34.05° N, 118.24° W`.
 

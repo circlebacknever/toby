@@ -2,7 +2,7 @@
 name: toby-swd-extensibility
 description: >-
   Contains Toby's rules for code that branches on a type, kind, status, or
-  provider. Entry skills open this file by path. Do not trigger it from a user
+  provider. Entry skills open this file by path. Don't trigger it from a user
   request alone.
 disable-model-invocation: true
 ---

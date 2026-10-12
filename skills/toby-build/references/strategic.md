@@ -6,9 +6,9 @@ Open this file when step 1 of `toby-build` marks the work strategic. Each sectio
 
 Strategic work also reads the call sites the change would affect, and the sibling feature. The sibling is the shipped feature most like this one, on the same layer and using the same data. Read it end to end: route, handler, model, test, and doc.
 
-Before copying the sibling, check it against the "Design check" in `toby-swd-architecture` and the red flags in `toby-swd-modules`. Follow its structure when it passes, and design the new code without each flaw you found. Do not copy a shallow module, one whose interface is nearly as complex as the work behind it.
+Before copying the sibling, check it against the "Design check" in `toby-swd-architecture` and the red flags in `toby-swd-modules`. Follow its structure when it passes, and design the new code without each flaw you found. Don't copy a shallow module, one whose interface is nearly as complex as the work behind it.
 
-Greenfield means the repo has no similar feature. Before you create a second new file, state the two closest patterns the repo uses elsewhere, even in another layer. Say which one you extend, as the greenfield example in `references/examples.md` does.
+Greenfield means the repo doesn't have a similar feature. Before you create a second new file, state the two closest patterns the repo uses elsewhere, even in another layer. Say which one you extend, as the greenfield example in `references/examples.md` does.
 
 ## Slices and the plan
 
@@ -33,4 +33,4 @@ The plan's design block has each of these lines that has content:
 
 ## Resuming half-built work
 
-Before touching code, recover the mode, the criteria, the plan, the steps already checked off, and the last stop's decision. When you cannot find one of these, rebuild it from the code and the original request. List which ones you rebuilt, and confirm them before continuing, because criteria rebuilt from a diff repeat the diff's mistakes. Half-built experiment code stays experiment code until the user says otherwise.
+Before touching code, recover the mode, the criteria, the plan, the steps already checked off, and the last stop's decision. When you can't find one of these, rebuild it from the code and the original request. List which ones you rebuilt, and confirm them before continuing, because criteria rebuilt from a diff repeat the diff's mistakes. Half-built experiment code stays experiment code until the user says otherwise.

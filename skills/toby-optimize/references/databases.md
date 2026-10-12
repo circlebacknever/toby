@@ -4,10 +4,10 @@ This file covers N+1 queries, bulk writes, indexes, and connection pools. Open i
 
 ## N+1 queries
 
-A loop that reads a lazy relation, which the ORM loads only when code first reads it, runs one query per row. 50 orders with 5 line items each take 351 queries, but the profiler shows no single slow query. Pick the cheapest fix that removes the loop:
+A loop that reads a lazy relation, which the ORM loads only when code first reads it, runs one query per row. 50 orders with 5 line items each take 351 queries, but the profiler doesn't show a single slow query. Pick the cheapest fix that removes the loop:
 
 1. Add eager-load hints to the query that loads the parent rows (`joinedload`, `selectinload`, `include`). 351 queries become 3.
-2. When a view always needs the same fields, add a repository method that returns a flat row type with exactly those fields from one query. A caller cannot trigger N+1 on a field that is not a relation.
+2. When a view always needs the same fields, add a repository method that returns a flat row type with exactly those fields from one query. A caller can't trigger N+1 on a field that isn't a relation.
 3. Add a denormalized read table, updated on write, only after a measurement shows the joined query is still too slow.
 
 ## Bulk writes

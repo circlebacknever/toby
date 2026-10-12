@@ -5,7 +5,7 @@ Ask these questions of a new entry point, job, consumer, outbound call, migratio
 - When a webhook, consumer, or job runs again after a retry, does it insert a second row, send a second message, or charge a card twice?
 - Can two requests sent at once both pass a check and both succeed, such as two agents claiming one ticket?
 - Can a caller send a value, such as `limit=1000000`, that makes one request read every row or use unbounded memory?
-- Does an outbound call have no timeout?
+- Is there an outbound call without a timeout?
 - Can a crash between a database write and a message or call leave the work half done?
 - Can the previous release, still running during a deploy, read what this release writes, or run against the migrated schema?
 - Does a migration lock a large table?

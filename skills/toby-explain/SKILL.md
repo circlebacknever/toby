@@ -28,7 +28,7 @@ Back up every claim.
 - For a claim about what code does when it runs, quote the output you saw.
 - For any other claim, say where it comes from.
 
-When you cannot back up a claim, call it a guess, and use the word "guess".
+When you can't back up a claim, call it a guess, and use the word "guess".
 
 Answer in the chat. Draw a diagram or a chart only when the user asks for one.
 
@@ -61,17 +61,17 @@ When the user has shown no code or text, give the answer first. Then give the sm
 
 ## The reader
 
-Judge what the user knows from what they say about themselves, since a beginner can ask a precise question. When the user knows a related field, compare the new idea to the closest idea in that field. Leave the comparison out when the two ideas do not match well.
+Judge what the user knows from what they say about themselves, since a beginner can ask a precise question. When the user knows a related field, compare the new idea to the closest idea in that field. Leave the comparison out when the two ideas don't match well.
 
 ## How to write it
 
 - Put each explanation next to the line, equation, or passage it explains.
 - Say what causes what, as in "The test fails because CI runs in UTC."
-- When one sentence cannot show how several things connect, draw a short text diagram, such as `request → cache → database`.
+- When one sentence can't show how several things connect, draw a short text diagram, such as `request → cache → database`.
 - Load `toby-voice/references/plain-language.md`, and follow it.
 - Never quiz the user, and never hold back the answer. Only `toby-learning` asks the user questions, and only when the user starts it.
 - Leave out a general tutorial, anything the reader can work out alone, a boxed "Insight" note, and a summary at the end.
 
 When you explain a step during other work, say what has to be true before the step runs. After the step, say what your check showed and what is still unresolved.
 
-Open `references/examples.md` for a worked example when the question is not about code, or when the user shows no code or text. Also open that file when you explain a decision you made partway through a task.
+Open `references/examples.md` for a worked example when the question isn't about code, or when the user doesn't show code or text. Also open that file when you explain a decision you made partway through a task.

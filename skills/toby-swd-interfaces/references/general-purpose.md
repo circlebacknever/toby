@@ -9,7 +9,7 @@ Build the functionality for current needs, and make the interface serve more tha
 - **Is this API easy to use for the common case today?** A `find(query)` is better than thirty `findByXAndYAndZ` only if `find(...)` is also easy to call for the common case.
 - **Does it keep one purpose?** An interface that serves unrelated purposes has become too general.
 
-Do not add parameters or extension points for needs nobody has named. Cover today's needs plus one or two specific changes that the request, a ticket, or the code states.
+Don't add parameters or extension points for needs nobody has named. Cover today's needs plus one or two specific changes that the request, a ticket, or the code states.
 
 ## One method per caller variation
 

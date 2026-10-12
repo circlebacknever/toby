@@ -6,7 +6,7 @@ Copy how these files are organized, and copy how each example decides which fold
 
 ## Example 1: Backend payments service AGENTS.md
 
-Scope decision: `services/payments/` is a module that covers a distinct area of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` gets no AGENTS.md, and anything an agent needs to know about `util/` goes in the payments AGENTS.md.
+Scope decision: `services/payments/` is a module that covers a distinct area of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` doesn't get an AGENTS.md, and anything an agent needs to know about `util/` goes in the payments AGENTS.md.
 
 ```markdown
 # Payments
@@ -39,7 +39,7 @@ part of the system that is allowed to move funds.
   mutates a posted entry is a bug.
 ```
 
-The file has no function signatures and no algorithm descriptions, because those are in interface comments in `gateway.py`. This file would stay accurate through a full rewrite of the internals.
+The file doesn't have function signatures or algorithm descriptions, because those are in interface comments in `gateway.py`. This file would stay accurate through a full rewrite of the internals.
 
 ---
 
@@ -105,4 +105,4 @@ a caller needs.
 
 ## Example 3: Frontend feature module scope decision
 
-Scope decision: `features/checkout/` is a feature module, so it gets one AGENTS.md at its root. `features/checkout/components/PriceRow/` holds one component and no subfolders, so it gets no AGENTS.md. If `PriceRow` expects something from callers that is not obvious, write it in the comment on its props type.
+Scope decision: `features/checkout/` is a feature module, so it gets one AGENTS.md at its root. `features/checkout/components/PriceRow/` has one component and doesn't have subfolders, so it doesn't get an AGENTS.md. If `PriceRow` expects something from callers that isn't obvious, write it in the comment on its props type.

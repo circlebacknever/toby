@@ -2,7 +2,7 @@
 name: toby-swd-flags
 description: >-
   Contains Toby's rules for a feature flag's kind, check site, tests, data,
-  rollout, and removal. Entry skills open this file by path. Do not trigger it
+  rollout, and removal. Entry skills open this file by path. Don't trigger it
   from a user request alone.
 disable-model-invocation: true
 ---
@@ -15,7 +15,7 @@ Add a flag so unfinished or risky code can ship turned off, and write its remova
 
 | Kind | Use it for | Remove it when |
 | --- | --- | --- |
-| Release | a slice that is not correct until a later slice ships | the feature is on for everyone |
+| Release | a slice that isn't correct until a later slice ships | the feature is on for everyone |
 | Kill switch | a risky path or dependency you may need to turn off in an incident | the path is retired |
 | Experiment | comparing two behaviors on real traffic | the decision is made |
 
@@ -33,7 +33,7 @@ A release flag defaults to off, and the off path runs exactly today's code. A ki
 
 Read the flag once per request, at the entry point, and pass the value down or pick an implementation there. Read a flag once at startup only when every user gets the same value and a restart to change it is acceptable. When a frontend and its API both read the flag, they can disagree for one user. Make the API accept requests from both frontend paths, or make the frontend use the value the API returns.
 
-When the paths differ in more than a line or two, put each in its own function, and branch once at the check site. Do not nest one flag inside another.
+When the paths differ in more than a line or two, put each in its own function, and branch once at the check site. Don't nest one flag inside another.
 
 ## Tests
 
@@ -43,7 +43,7 @@ Then run them with the flag at its other value. Each test that fails must assert
 
 ## Data
 
-Ship a schema change in the releases that `toby-swd-hardening`'s `references/deploys.md` lists, because a flag cannot hide it. Put only the code that reads the new column behind the flag. Keep writing the old column until the flag is gone, because the off path reads it. On a single instance, one release can add the column, write both columns, and add the flagged read.
+Ship a schema change in the releases that `toby-swd-hardening`'s `references/deploys.md` lists, because a flag can't hide it. Put only the code that reads the new column behind the flag. Keep writing the old column until the flag is gone, because the off path reads it. On a single instance, one release can add the column, write both columns, and add the flagged read.
 
 Backfill before you turn the flag on. In the release that removes the flag, write only the new column. Drop the old column one release later, as steps 3 and 4 of `toby-swd-hardening`'s `references/deploys.md` say. A single instance that stops before the new release starts can do both in one release. That release needs a tested down migration.
 

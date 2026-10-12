@@ -36,7 +36,7 @@ scripts/install.sh --tool all --force            # replace Toby files already th
 ```
 
 The installer checks every target before it writes anything. If a Toby skill
-folder already exists, or an instruction file has no Toby marker block, it lists
+folder already exists, or an instruction file doesn't have a Toby marker block, it lists
 each one and stops with nothing changed. A dry run lists the same files.
 
 One tool at a time:
@@ -69,13 +69,13 @@ scripts/install.sh --hooks --tool claude
 ```
 
 That copies both hooks to `~/.claude/toby/hooks`, then prints the `settings.json`
-block to paste, with the paths already filled in. It does not edit
+block to paste, with the paths already filled in. It doesn't edit
 `settings.json` itself. Merge the block with any hooks already there.
 
 Without being asked, the agent runs the voice checker on every prose file a turn wrote,
 because the operating guide's Self Review tells it to. The agent fixes everything under FIX and
 answers every line under DECIDE. Then it reads every sentence against the READ
-list, which covers the rules the patterns do not check. The patterns miss 94 of the 170
+list, which covers the rules the patterns don't check. The patterns miss 94 of the 170
 bad sentences in `evals/gold/repo-review.jsonl`, so the agent needs the READ
 pass. The hooks run the patterns on each file the agent writes and each reply
 it sends.
@@ -84,7 +84,7 @@ it sends.
 
 ### Claude Code: pick one of two layouts
 
-The writing rules go in `CLAUDE.md`, or in an output style. Do not use both,
+The writing rules go in `CLAUDE.md`, or in an output style. Don't use both,
 because the same 2,400 tokens would then go in front of every turn twice. The
 `--output-style` flag below prevents that.
 
@@ -115,7 +115,7 @@ Then turn it on, in this order:
 3. Choose **Toby**.
 4. Start a new session, or run `/clear`. The style is read once at session start.
 
-**Until you finish step 3, the voice rules are not loaded at all.** The shorter
+**Until you finish step 3, the voice rules aren't loaded at all.** The shorter
 `CLAUDE.md` says so in its first lines, so Toby will tell you if you ask him to
 write something before the style is on.
 
@@ -127,7 +127,7 @@ write something before the style is on.
 | Setup after install | none | `/config`, Output style, Toby |
 | Reaches a subagent | yes | no, a subagent runs its own system prompt |
 
-The last two rows are the ones to weigh. A subagent does not read the output style, so
+The last two rows are the ones to weigh. A subagent doesn't read the output style, so
 the file checks in `evals/` and the Stop hook still apply the rules there.
 
 ## Toby is careful to avoid breaking things
@@ -151,7 +151,7 @@ When the block is already there, only the block changes. When there is no block,
 - `scripts/install.sh` - the installer.
 - `scripts/validate-skills.py` - the validator.
 - `output-styles/toby.md` - the voice rules as a Claude Code output style, generated from `base/toby.md`.
-- `scripts/voice-check.py` - the voice checker. It runs the pattern checks on a file or stdin, splits findings into what to fix and what to decide, and prints the rules the patterns do not check.
+- `scripts/voice-check.py` - the voice checker. It runs the pattern checks on a file or stdin, splits findings into what to fix and what to decide, and prints the rules the patterns don't check.
 - `scripts/voice_rules.py` - the rules the checker runs. The validator imports them too, so the checker never needs the validator.
 - `hooks/` - a Stop hook that reads the finished reply, and a PostToolUse hook that reads a file as soon as it is written. `hooks/README.md` wires them up.
 - `scripts/token-budget.py` - what a turn costs, by which skills fire.
@@ -163,9 +163,9 @@ The instruction files, the output style, and the Stop hook each deliver the voic
 
 Turn the style on with `/config`, then Output style, then Toby. It sets `keep-coding-instructions: true`, so the engineering behaviour is untouched.
 
-A subagent runs its own system prompt, so the output style does not reach one. The file checks and the hook still matter for that reason. Toby keeps that boundary visible, because two files that both claim the voice rules will disagree by Thursday.
+A subagent runs its own system prompt, so the output style doesn't reach one. The file checks and the hook still matter for that reason. Toby keeps that boundary visible, because two files that both claim the voice rules will disagree by Thursday.
 
-A skill points at the guide by calling it "the operating guide" and never by a filename. `base/toby.md` is a path in this repo and nowhere else after install, and the installed name is `CLAUDE.md` on one tool, `AGENTS.md` on another, `copilot-instructions.md` on a third. The guide loads on every turn, so the name is all a skill needs. The validator fails on `base/toby.md` inside `skills/`. It does not police the `AGENTS.md` spelling, because `toby-swd-docs` uses that filename for the module doc in the user's own repo.
+A skill points at the guide by calling it "the operating guide" and never by a filename. `base/toby.md` is a path in this repo and nowhere else after install, and the installed name is `CLAUDE.md` on one tool, `AGENTS.md` on another, `copilot-instructions.md` on a third. The guide loads on every turn, so the name is all a skill needs. The validator fails on `base/toby.md` inside `skills/`. It doesn't police the `AGENTS.md` spelling, because `toby-swd-docs` uses that filename for the module doc in the user's own repo.
 
 ## Skills
 
@@ -236,7 +236,7 @@ improve one of these numbers, run `evals/run.py record` to write the new number 
 `evals/baselines/gates.json`, so later runs fail if it gets worse.
 
 `tests/test-gates.py` seeds a regression against each gate and checks it goes
-red, so a gate cannot quietly lose the ability to fail. The evals that need a
+red, so a gate can't quietly lose the ability to fail. The evals that need a
 model to write something are stored beside these and never gate, because five samples
 of the voice suite on identical inputs scored 1, 1, 4, 4, and 11.
 
@@ -246,10 +246,10 @@ Full install test that never touches your real home:
 scripts/test-install.sh
 ```
 
-It installs into a throwaway `HOME`, then checks what it installed. Skill counts are read from the repo, so adding a skill cannot leave the test quietly red. Every installed skill is compared byte-for-byte against `skills/`, and every instruction block is compared against `base/toby.md`.
+It installs into a throwaway `HOME`, then checks what it installed. Skill counts are read from the repo, so adding a skill can't leave the test quietly red. Every installed skill is compared byte-for-byte against `skills/`, and every instruction block is compared against `base/toby.md`.
 
 It also tests the installer's marker-block and `--force` rules described above. A re-install without `--force` must refuse, text around a marker block must survive, and a file with no marker block must come back untouched. The temp dirs clear on the way out.
 
 ## Making it yours
 
-This installs Toby's taste, which is a generous name for preferences he cannot stop having. Rewrite `base/toby.md`, and the preferences become yours.
+This installs Toby's taste, which is a generous name for preferences he can't stop having. Rewrite `base/toby.md`, and the preferences become yours.

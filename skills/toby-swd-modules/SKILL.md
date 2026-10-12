@@ -2,7 +2,7 @@
 name: toby-swd-modules
 description: >-
   Contains Toby's checks for where code goes and when to split or merge modules.
-  Entry skills open this file by path. Do not load it from a user request alone.
+  Entry skills open this file by path. Don't load it from a user request alone.
 disable-model-invocation: true
 ---
 
@@ -29,13 +29,13 @@ Put two pieces of code in one module when any of these hold:
 - both depend on one design decision
 - each is almost always used with the other
 - they fall under one simple higher-level category
-- one cannot be understood without the other
+- one can't be understood without the other
 
 ### 2. Information-leakage check
 
 Take each significant design decision or implementation detail: a file format, a wire protocol, a storage layout, a policy. Count how many modules would need to change if it changed. More than one is leakage. Move that knowledge so exactly one module has it.
 
-Two modules may share a signature without leakage when each adds its own functionality. Do not report leakage for a caller and an implementer of one interface, or for a dispatcher and its handlers. Also do not report it for several implementations of one interface, or for a decorator and the object it wraps.
+Two modules may share a signature without leakage when each adds its own functionality. Don't report leakage for a caller and an implementer of one interface, or for a dispatcher and its handlers. Also don't report it for several implementations of one interface, or for a decorator and the object it wraps.
 
 ### 3. Pull complexity downward
 
@@ -73,7 +73,7 @@ Before calling a boundary decision done, check the diff against the checks above
 
 - **Classitis, or too many small modules**: many shallow modules have interfaces that add more complexity than the modules remove. Too many frontend components is the same flag.
 - **Accessors as the public surface**: a module whose surface is mostly per-field get/set is shallow by definition. The `toby-swd-interfaces` red flags give the replacement and the plain-data exception.
-- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy is applied for its own sake, when the problem does not have the structure the pattern solves. A pattern is worth adding only when it removes complexity.
+- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy is applied for its own sake, when the problem doesn't have the structure the pattern solves. A pattern is worth adding only when it removes complexity.
 
 ## References
 

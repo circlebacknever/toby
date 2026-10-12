@@ -6,13 +6,13 @@ This file covers poison messages, overlapping runs, and a request that writes th
 
 A message that fails every time, such as one with a missing field, comes back on every redelivery. Cap the deliveries with the broker's dead-letter setting, such as an SQS redrive policy or Sidekiq's dead set. In RabbitMQ, use a quorum queue with `x-delivery-limit` and a dead-letter exchange. Test that the next message still runs after a poison message.
 
-Kafka has no dead-letter setting. A Kafka consumer that does not depend on order publishes the message to a dead-letter topic after its last attempt, then commits the offset. Spring Kafka's `DeadLetterPublishingRecoverer` and Karafka's dead letter queue do this.
+Kafka doesn't have a dead-letter setting. A Kafka consumer that doesn't depend on order publishes the message to a dead-letter topic after its last attempt, then commits the offset. Spring Kafka's `DeadLetterPublishingRecoverer` and Karafka's dead letter queue do this.
 
 When the repo has alerting, such as alert rules or an alerting service, alert when the dead-letter queue holds a message. Otherwise list that alert as a follow-up, with its queue and threshold. Cite the broker's redrive, such as SQS `start-message-move-task`, and write a replay command only when the broker has none. The broker deletes old dead messages, such as after at most 14 days in SQS, so a message nobody watches is lost. Under an SQS redrive policy the broker moves the message, so log the message id on the consumer's last attempt. The message's receive count shows which attempt is the last.
 
 Some consumers depend on message order for one record, as in a Kafka partition or an SQS FIFO group. There, a skipped `order.paid` lets `order.refunded` apply to an order that was never paid. For these consumers, set no dead-letter redrive, and hold that record's later messages until someone fixes the failed one. In Kafka, holding the failed message also holds every later record in its partition. Set the queue's retention to its maximum. Fix the failed message before retention ends, because the broker then deletes it and the record's later messages.
 
-For these consumers, when the repo has alerting, alert when a message's receive count passes the retry limit. Kafka keeps no receive count, so alert on a Kafka partition whose committed offset stops increasing while its lag is above zero. When the repo has no alerting, list that alert as a follow-up, with its queue and threshold.
+For these consumers, when the repo has alerting, alert when a message's receive count passes the retry limit. Kafka keeps no receive count, so alert on a Kafka partition whose committed offset stops increasing while its lag is above zero. When the repo doesn't have alerting, list that alert as a follow-up, with its queue and threshold.
 
 ## Overlapping runs
 

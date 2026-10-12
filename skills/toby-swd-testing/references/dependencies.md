@@ -4,7 +4,7 @@ This file has the rules for a test that depends on a database engine, a third-pa
 
 ## Database engine
 
-Django drops `select_for_update` on SQLite, so a test there cannot show that a lock works.
+Django drops `select_for_update` on SQLite, so a test there can't show that a lock works.
 
 ## Third-party providers
 

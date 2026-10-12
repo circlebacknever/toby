@@ -29,7 +29,7 @@ A new cached list built from products adds one entry to `evictDerivedFrom`. A ba
 
 When writes are frequent, move eviction to a background worker that reads the database's change log. Callers still never keep a list of cache keys.
 
-The lock that stops many callers from loading the same missing cache key at once also goes inside `getOrLoad`. A call site cannot choose well between waiting, serving stale data, and returning null. When call sites copy the lock, a bug in one copy disables caching for every key that call site reads.
+The lock that stops many callers from loading the same missing cache key at once also goes inside `getOrLoad`. A call site can't choose well between waiting, serving stale data, and returning null. When call sites copy the lock, a bug in one copy disables caching for every key that call site reads.
 
 ## Where to put the cache
 

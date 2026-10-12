@@ -1,6 +1,6 @@
 # Worked Examples
 
-Do not reuse the wording of these examples. Follow how each answer is built, and write new content for the question in front of you.
+Don't reuse the wording of these examples. Follow how each answer is built, and write new content for the question in front of you.
 
 ## By subject
 
@@ -31,4 +31,4 @@ Mid-refactor, you just moved a range check from the controller into the reposito
 
 The user asks why the narrator keeps mentioning the color of the water.
 
-→ One reading is that the water changes with the narrator's mood. The water is flat right after the argument with her sister, and stormy again three pages later when she lies to her mother. This reading is wrong if the water changes color at a point where the narrator's mood does not change. Check the two mid-book mentions before you claim the reading holds all the way through.
+→ One reading is that the water changes with the narrator's mood. The water is flat right after the argument with her sister, and stormy again three pages later when she lies to her mother. This reading is wrong if the water changes color at a point where the narrator's mood doesn't change. Check the two mid-book mentions before you claim the reading holds all the way through.

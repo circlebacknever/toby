@@ -61,7 +61,7 @@ Task: a `UserCard` used in a list, a profile header, and a search result.
 The interface comment for this is a paragraph. A caller rendering the common
 case still has to make eight decisions. Making callers choose eight options is overexposure,
 because rarely used options make the common call harder. `theme` passed through here only for a child component
-is information leakage, because `UserCard` does not use it.
+is information leakage, because `UserCard` doesn't use it.
 
 **Design it twice.** Option A keeps one component and gives the options
 sensible defaults. Option B uses one shared inner component plus a few small wrapper components, one for each use.

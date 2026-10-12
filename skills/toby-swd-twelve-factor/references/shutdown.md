@@ -9,4 +9,4 @@ On `SIGTERM`, take these steps inside the platform's grace period, which is 30 s
 3. Stop taking new work, finish the work in flight, and close connections.
 4. In a consumer, stop pulling and return each unfinished message to the queue.
 
-Liveness reports that the process runs. Readiness reports that this instance has finished starting and is not shutting down. Readiness must not fail on a dependency every instance shares, such as the database. To check, send `SIGTERM` to a local run during a slow request, and confirm the request finishes.
+Liveness reports that the process runs. Readiness reports that this instance has finished starting and isn't shutting down. Readiness must not fail on a dependency every instance shares, such as the database. To check, send `SIGTERM` to a local run during a slow request, and confirm the request finishes.

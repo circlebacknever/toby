@@ -2,7 +2,7 @@
 
 ---
 
-## Example 1 — Backend: redefine the function so the error cannot happen
+## Example 1 — Backend: redefine the function so the error can't happen
 
 ```python
 def remove_session(store, sid):
@@ -12,7 +12,7 @@ def remove_session(store, sid):
 ```
 
 Most callers call this to make sure a session is gone, often after a partial
-failure where they cannot know if it exists. The exception forces a try/except
+failure where they can't know if it exists. The exception forces a try/except
 at every site. Redefine the semantics from "delete it, fail if absent" to
 "ensure it is absent":
 
@@ -62,7 +62,7 @@ catch { return []; }   // caller cannot distinguish "no orders" from "failed"
 ```
 
 This masks information the caller needs, because an empty list and a failed
-request look identical. The UI cannot show a retry state, so it gives false information to
+request look identical. The UI can't show a retry state, so it gives false information to
 the user.
 
 Surface the failure as part of the contract,
