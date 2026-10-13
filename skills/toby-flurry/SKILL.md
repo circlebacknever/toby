@@ -1,15 +1,15 @@
 ---
-name: toby-squall
+name: toby-flurry
 description: >-
   Brainstorm by widening from a single example to the broader set it belongs
   to. Trigger only when the user explicitly invokes the skill by name or with
-  the `/toby-squall` slash command. Don't trigger on general brainstorming
+  the `/toby-flurry` slash command. Don't trigger on general brainstorming
   language like "help me think through this," "let's explore," or "brainstorm
   with me."
 disable-model-invocation: true
 ---
 
-# Toby Squall
+# Toby Flurry
 
 The user has named one piece of what they want. They are unsure what else belongs with it, or how big the whole thing is. Doing only what their words say would miss the rest, so find the rest of the set with them.
 

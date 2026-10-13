@@ -1,9 +1,9 @@
 ---
 name: toby-swd-strategy
 description: >-
-  Contains Toby's design pass, run before a change. Entry skills open this file
-  by path. Don't trigger it from a user request alone.
-disable-model-invocation: true
+  Contains Toby's design pass, run before a change. Use it before any change
+  beyond one line, and before a switch to a new tool or framework. Skip it for
+  a change that copies a pattern already in the file.
 ---
 
 # Toby SWD Strategy

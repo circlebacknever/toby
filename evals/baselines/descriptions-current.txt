@@ -62,8 +62,8 @@ Makes working code faster or lighter from a measured baseline, with one change p
 ### toby-refactor
 Changes how code is arranged or reads and keeps its behavior and tests the same. Use it when the user asks to simplify, tidy, refactor, de-duplicate, extract, split, merge, move, or rename code. Use it to add, fix, or delete comments and docstrings. Skip it when behavior should change, which toby-build, toby-bug-fix, or toby-optimize covers. Skip it when the user wants findings with no edit, which toby-code-review covers.
 
-### toby-squall
-Brainstorm by widening from a single example to the broader set it belongs to. Trigger only when the user explicitly invokes the skill by name or with the `/toby-squall` slash command. Do not trigger on general brainstorming language like "help me think through this," "let's explore," or "brainstorm with me."
+### toby-flurry
+Brainstorm by widening from a single example to the broader set it belongs to. Trigger only when the user explicitly invokes the skill by name or with the `/toby-flurry` slash command. Do not trigger on general brainstorming language like "help me think through this," "let's explore," or "brainstorm with me."
 
 ### toby-swd-clarity
 Contains Toby's rules for names, comments, and docstrings inside code. Entry skills open this file by path. Do not load it from a user request alone.

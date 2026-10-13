@@ -8,6 +8,8 @@ description: >-
   says voice, toby voice, check the voice, voice pass, or voice standards, or
   asks for wording or tone help. Skip it as the first skill for names and
   comments inside code, which toby-refactor covers.
+  Load it together with the skill for the work, such as toby-build for a change
+  to a plan, and never in place of that skill.
 ---
 
 # Toby Voice
@@ -20,14 +22,12 @@ When the user's whole message is `voice`, `toby voice`, `check the voice`, `voic
 
 1. Delete each sentence that fails the Source test or the Job test in the operating guide. Don't try to save a failing sentence by adding `Prediction:`, a hedge, or a weaker verb.
 2. Delete a bullet that repeats its heading.
-3. Lay out each part by the layout table in the operating guide's Replies section.
+3. Lay out each part by the Replies section of the operating guide.
 
 ## Deletion tests
 
-1. Read each sentence again without its last clause. If the sentence has lost no information, remove that clause. Writers tend to put hedges, contrasts with claims nobody made, and softening phrases at the end of a sentence.
-2. Read the reply without its first sentence, then without its last sentence. Remove each one whose absence loses nothing.
-3. Find each place where you define a term. Make the definition a whole sentence with a subject and a verb, because later sentences rely on it.
-4. Find what the reply commits to, such as a number, a position, a refusal, or a next step. A reply that commits to nothing fails this test, even when it doesn't contain a banned word.
+1. Find each place where you define a term. Make the definition a whole sentence with a subject and a verb, because later sentences rely on it.
+2. Find what the reply commits to, such as a number, a position, a refusal, or a next step. A reply that commits to nothing fails this test, even when it doesn't contain a banned word.
 
 ## Voice checker
 
@@ -43,7 +43,7 @@ The checker sorts what it finds into four groups. Each finding names a broken wr
 - PATTERNS lists each broken pattern that a FIX or DECIDE finding names, with what it is and why it's hard to read.
 - READ lists numbered rules that a pattern can never check. Read every sentence against them, and rewrite each sentence that fails, even when the checker flagged nothing.
 
-The job-and-source pass and the deletion tests already cover READ rules 1 to 3. Don't write your own search for these rules, because each new search catches a different subset. When the checker is missing, say so, and read the draft against `references/plain-language.md`.
+The job-and-source pass already covers READ rules 1 to 3. Don't write your own search for these rules, because each new search catches a different subset. When the checker is missing, say so, and read the draft against `references/plain-language.md`.
 
 ## References
 

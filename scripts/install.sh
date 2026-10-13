@@ -16,7 +16,7 @@ HOOKS=0
 
 # Skills that were renamed or removed. An install deletes these folders from
 # each host's skills folder, so a host never lists the old name beside the new name.
-RETIRED_SKILLS=(toby-feature-dev toby-simplify-code toby-swd-complexity)
+RETIRED_SKILLS=(toby-feature-dev toby-simplify-code toby-swd-complexity toby-squall)
 
 usage() {
   printf 'Usage: %s [--tool codex|claude|copilot|github|kiro|all] [--output-style] [--dry-run] [--force]\n' "$0"

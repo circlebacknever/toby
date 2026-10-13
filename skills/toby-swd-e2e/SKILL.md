@@ -1,9 +1,9 @@
 ---
 name: toby-swd-e2e
 description: >-
-  Contains Toby's rules for end-to-end tests through a real entry point. Entry
-  skills open this file by path. Don't trigger it from a user request alone.
-disable-model-invocation: true
+  Contains Toby's rules for end-to-end tests through a real entry point. Use it
+  when writing a test that drives a route, a CLI command, a screen, or a job
+  the way a user does. Skip it for unit tests, which toby-swd-testing covers.
 ---
 
 # Toby SWD End-to-End Tests

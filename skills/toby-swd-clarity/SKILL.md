@@ -1,9 +1,9 @@
 ---
 name: toby-swd-clarity
 description: >-
-  Contains Toby's rules for names, comments, and docstrings inside code. Entry
-  skills open this file by path. Don't trigger it from a user request alone.
-disable-model-invocation: true
+  Contains Toby's rules for names, comments, and docstrings inside code. Use it
+  when naming something in code, or writing or fixing a comment or docstring.
+  Skip it for prose outside code, which toby-voice covers.
 ---
 
 # Toby SWD Clarity

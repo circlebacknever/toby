@@ -1,10 +1,10 @@
 ---
 name: toby-swd-docs
 description: >-
-  Contains Toby's rules for a module's README.md and AGENTS.md. Other Toby
-  skills open this file by its path. Don't trigger it only because a user request
-  mentions docs.
-disable-model-invocation: true
+  Contains Toby's rules for a module's README.md and AGENTS.md. Use it when a
+  module's structure or commands change, or when the user asks to write or
+  update a module's README or AGENTS.md. Skip it for other prose, which
+  toby-voice covers.
 ---
 
 # Toby SWD Docs

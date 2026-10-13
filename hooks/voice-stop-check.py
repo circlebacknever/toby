@@ -59,10 +59,10 @@ SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\**\s+|\n\s*\n|\n(?=\s*(?:[-*]|\d+\.)
 # The matched lines are symptoms. A blocked reply often has problems no
 # pattern finds, so the message asks for a rewrite of the whole reply, and it
 # asks to keep every fact the reader needs.
-REPROMPT = """The voice hook blocked this reply, so rewrite the whole reply and send it again. Start with the content itself, and don't mention the hook or the rewrite.
+REPROMPT = """The voice hook blocked this reply, so rewrite the whole reply and send it again. Start the new reply with the heading `## Revised reply` on its own line, then the content. Don't mention the hook.
 
 1. Put the answer in the first sentence, and each condition that changes it right after.
-2. Lay out each part by the layout table in the Replies section of your instructions.
+2. Lay out each part by the Replies section of your instructions.
 3. Keep every fact, number, command, path, and URL the user needs.
 4. Cut each sentence that only repeats an earlier one, introduces the next one, or sums up.
 5. Check each count and number against the facts in the reply.

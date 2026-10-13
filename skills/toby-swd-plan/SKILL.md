@@ -2,9 +2,8 @@
 name: toby-swd-plan
 description: >-
   Contains Toby's rules for writing a plan as slices with checks that can fail.
-  Entry skills open this file by path. Don't trigger it from a user request
-  alone.
-disable-model-invocation: true
+  Use it when writing or revising a plan file. Skip it for a status update in
+  chat.
 ---
 
 # Toby SWD Plan

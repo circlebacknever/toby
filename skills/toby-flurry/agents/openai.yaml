@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby Flurry"
+  short_description: "Widen examples into option sets"
+  default_prompt: "Use $toby-flurry to widen one example into a mapped option set."
+policy:
+  allow_implicit_invocation: false

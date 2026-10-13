@@ -50,7 +50,7 @@ When the request doesn't name the new tool or state the end state, ask one quest
 4. Apply. Make one step, then run the tests. When the user asked for commits, commit after each passing step.
 5. Finish. Search for each name the refactor removed or replaced. List each match that stays, with the reason it stays.
 
-## Method skills
+## Other skills
 
 Each skill below is at `../<skill>/SKILL.md` relative to this skill's folder. Open the ones the target design needs.
 

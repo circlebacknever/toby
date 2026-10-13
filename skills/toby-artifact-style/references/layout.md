@@ -28,7 +28,7 @@ When the output is Markdown that renders Mermaid, draw each sequence diagram in 
 Write the plan as a list before you write any coordinates. The list has four parts.
 
 1. List every node with its label text, and count the characters in the longest line of each label.
-2. List every arrow as `from → to`, with its label if it has one.
+2. List every arrow as `from → to`, with its label if it has one. Label an arrow only when the reader can't tell the relation without it, and use a literal verb for the label, such as reads, calls, or returns.
 3. Pick one direction of flow, either left to right or top to bottom. Every forward arrow points that way.
 4. Assign each node to a grid cell by its step in the flow. Nodes at the same step share a column in a left-to-right flow, or a row in a top-to-bottom flow.
 

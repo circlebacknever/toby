@@ -4001,7 +4001,7 @@ the ticker reports things it should not know
 the title slide opens the deck and identifies it
 the toby instructions file is the file every session loads
 the toby instructions file that every session loads lists actions that need approval
-the toby squall slash command
+the toby flurry slash command
 the toby swd interfaces red flags give the replacement and the plain data exception
 the toby swd interfaces skill covers how to apply this to the interface of a function class or endpoint
 the tokens are under state families below

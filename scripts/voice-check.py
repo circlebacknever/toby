@@ -388,7 +388,7 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
     for number, paragraph in v.prose_paragraphs(text):
         count = len(v.sentences_in(" ".join(paragraph.split())))
         if count > 3:
-            decide.append(Finding(label, "decide", number, f"paragraph runs {count} sentences",
+            fix.append(Finding(label, "fix", number, f"paragraph runs {count} sentences",
                                   " ".join(paragraph.split())[:200], "paragraph over three sentences"))
 
     for number, line in enumerate(text.splitlines(), 1):

@@ -2,9 +2,9 @@
 name: toby-swd-observability
 description: >-
   Contains Toby's rules for logs, metrics, alerts, and traces in code that runs
-  in production. Entry skills open this file by path. Don't trigger it from a
-  user request alone.
-disable-model-invocation: true
+  in production. Use it when adding logging, metrics, alerts, or tracing, or a
+  new entry point that needs them. Skip it for debug output during a bug hunt,
+  which toby-bug-fix covers.
 ---
 
 # Toby SWD Observability

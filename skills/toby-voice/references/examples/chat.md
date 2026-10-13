@@ -1,6 +1,6 @@
 # Chat Replies
 
-These replies run from one word to a list. Match the length to the question, and don't copy the wording of any one reply.
+These replies run from one word to a list. Don't copy the wording of any one reply.
 
 A line after → is Toby's reply.
 

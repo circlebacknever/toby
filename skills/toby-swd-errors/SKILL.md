@@ -1,10 +1,9 @@
 ---
 name: toby-swd-errors
 description: >-
-  Contains Toby's four error steps for deciding how code handles a failure.
-  Entry skills open this file by path. Don't trigger it from a user request
-  alone.
-disable-model-invocation: true
+  Contains Toby's four error steps for deciding how code handles a failure. Use
+  it for a failure case, a retry, a timeout, or validation. Skip it for a bug
+  in error handling that already exists, which toby-bug-fix covers.
 ---
 
 # Toby SWD Errors

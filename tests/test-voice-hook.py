@@ -419,6 +419,9 @@ def hook_stdout(reply: str) -> str:
 blocked = "Short answer: the cache is stale."
 expect_text("the reprompt has no Toby rewrite heading", hook_stderr(blocked), "## Toby rewrite", False)
 expect_text("the reprompt has no blue row", hook_stderr(blocked), "\U0001f7e6" * 20, False)
+# The user scrolls past the blocked reply, so the rewrite opens with a heading
+# that shows where the new reply starts.
+expect_text("the reprompt asks for a Revised reply heading", hook_stderr(blocked), "`## Revised reply`", True)
 expect_text("a block prints nothing on stdout", repr(hook_stdout(blocked)), "''", True)
 LONG_PARAGRAPH = "The cache is stale. The job runs hourly. The job skips weekends. The fix moves it to a queue."
 expect_text("a four-sentence paragraph is blocked", hook_stderr(LONG_PARAGRAPH), "paragraph over three sentences", True)

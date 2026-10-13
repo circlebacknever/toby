@@ -6,7 +6,7 @@ toby-feature-dev                5370     251    5412      3
 toby-game                        886     174    4963      6
 toby-learning                   2734     130    2396      2
 toby-simplify-code              1798      88    2061      1
-toby-squall                      956      97       0      0
+toby-flurry                      956      97       0      0
 toby-swd-clarity                2384     142     977      1
 toby-swd-complexity             2523     154   16970      6
 toby-swd-docs                   2084     125    1826      1

@@ -553,7 +553,7 @@ COLOAD_TOKEN_CEILING = 20000
 # Each skill needs the description clause and both host fields. toby-game once
 # had the clause and nothing else, which left the rule stated once and enforced
 # nowhere.
-INVOKE_ONLY_SKILLS = ["toby-game", "toby-squall", "toby-learning", "toby-plain"]
+INVOKE_ONLY_SKILLS = ["toby-game", "toby-flurry", "toby-learning", "toby-plain"]
 CODEX_HIDE_RE = re.compile(r"^policy:\s*\n(?:[ \t]+.*\n)*?[ \t]+allow_implicit_invocation:\s*false\b", re.M)
 
 

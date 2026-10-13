@@ -2,9 +2,9 @@
 name: toby-swd-architecture
 description: >-
   Contains Toby's default structure for feature code and the design check for a
-  finished diff. Entry skills open this file by path. Don't trigger it from a
-  user request alone.
-disable-model-invocation: true
+  finished diff. Use it when deciding where a feature's entry point, rules,
+  data access, and wiring go, or when checking the structure of a diff. Skip it
+  for a question about how existing code works, which toby-explain covers.
 ---
 
 # Toby SWD Architecture

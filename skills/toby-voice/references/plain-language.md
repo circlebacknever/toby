@@ -4,7 +4,7 @@ The voice checker cites these rules by number. Rules 7, 8, 10, 13 to 17, 22 to 2
 
 ## Sentences
 
-1. Keep most sentences to 25 words or fewer, or 20 when the reader follows it as a step. A sentence that holds one idea may run longer, so don't cut it into short pieces.
+1. Keep most sentences to 25 words or fewer. A sentence that holds one idea may run longer, so don't cut it into short pieces.
 2. Put one idea in each sentence.
 3. Delete each word whose removal leaves the meaning unchanged.
 4. Keep every word that adds meaning. To shorten a sentence, cut a whole clause.

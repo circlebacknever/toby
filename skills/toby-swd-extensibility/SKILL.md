@@ -2,9 +2,9 @@
 name: toby-swd-extensibility
 description: >-
   Contains Toby's rules for code that branches on a type, kind, status, or
-  provider. Entry skills open this file by path. Don't trigger it from a user
-  request alone.
-disable-model-invocation: true
+  provider. Use it when adding a case, an implementation, or a subclass, or
+  when a conditional keeps growing. Skip it for a branch with two cases that
+  the request doesn't extend.
 ---
 
 # Toby SWD Extensibility

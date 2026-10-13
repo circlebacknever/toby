@@ -2,9 +2,9 @@
 name: toby-swd-flags
 description: >-
   Contains Toby's rules for a feature flag's kind, check site, tests, data,
-  rollout, and removal. Entry skills open this file by path. Don't trigger it
-  from a user request alone.
-disable-model-invocation: true
+  rollout, and removal. Use it when adding, rolling out, or removing a release
+  flag, a kill switch, or an experiment flag. Skip it for a config value that
+  isn't a flag, which toby-swd-twelve-factor covers.
 ---
 
 # Toby SWD Flags

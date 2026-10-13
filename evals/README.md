@@ -109,7 +109,7 @@ the ranges overlap.
 probes before Group 2, zero after, confirmed by a second run whose instructions
 never mentioned skip clauses. The skip-clause pass removed those seven false firings.
 
-N5 and N6 cover `toby-game` and `toby-squall`, which fire only when the user
+N5 and N6 cover `toby-game` and `toby-flurry`, which fire only when the user
 names them. Both stayed silent on a prompt containing every trigger noun in their
 descriptions. `check_invoke_only` in the validator holds the same rule from the
 other side: each of them must state it in its description and have a matching

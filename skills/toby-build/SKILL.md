@@ -6,7 +6,8 @@ description: >-
   design at least as good as before. Use it when the user asks to
   add, build, implement, wire up, or finish a behavior, such as a feature, a
   ticket, an endpoint, a method, a screen, a job, a flag, a new status, or logs
-  and metrics. Skip it for wrong output, which toby-bug-fix covers, and for
+  and metrics. Use it to add or change a feature in a plan or a spec.
+  Skip it for wrong output, which toby-bug-fix covers, and for
   slow code, which toby-optimize covers. Skip it when behavior stays the same,
   which toby-refactor covers, and for a throwaway, which toby-swd-experiment
   covers. Skip it for a one-file edit that copies a pattern already in that

@@ -1,9 +1,10 @@
 ---
 name: toby-swd-campfire
 description: >-
-  Contains Toby's refactor before a change and the design check after it. Entry
-  skills open this file by path. Don't trigger it from a user request alone.
-disable-model-invocation: true
+  Contains Toby's refactor before a change and the design check after it. Use
+  it when a change lands in code that makes the change hard, or after the tests
+  pass to check the design. Skip it when the user asks for a refactor alone,
+  which toby-refactor covers.
 ---
 
 # Toby SWD Campfire

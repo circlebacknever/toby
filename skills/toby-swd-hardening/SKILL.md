@@ -2,9 +2,9 @@
 name: toby-swd-hardening
 description: >-
   Contains Toby's checks that production code survives bad input, retries,
-  outages, and deploys. Entry skills open this file by path. Don't trigger it
-  from a user request alone.
-disable-model-invocation: true
+  outages, and deploys. Use it for a new entry point, job, consumer, or
+  outbound call, or when the user asks to harden code. Skip it for throwaway
+  code, which toby-swd-experiment covers.
 ---
 
 # Toby SWD Hardening

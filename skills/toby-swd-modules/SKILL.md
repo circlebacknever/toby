@@ -1,9 +1,9 @@
 ---
 name: toby-swd-modules
 description: >-
-  Contains Toby's checks for where code goes and when to split or merge modules.
-  Entry skills open this file by path. Don't trigger it from a user request alone.
-disable-model-invocation: true
+  Contains Toby's checks for where code goes and when to split or merge
+  modules. Use it for a new module or boundary, or a question about where code
+  belongs. Skip it for a change inside one function.
 ---
 
 # Toby SWD Modules

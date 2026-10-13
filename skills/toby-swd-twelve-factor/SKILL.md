@@ -2,9 +2,9 @@
 name: toby-swd-twelve-factor
 description: >-
   Contains Toby's twelve-factor checks for new processes, config, secrets, and
-  backing services. Entry skills open this file by path. Don't trigger it from
-  a user request alone.
-disable-model-invocation: true
+  backing services. Use it for a new process, worker, scheduled job, config
+  value, secret, or backing service. Skip it for a change that adds none of
+  these.
 ---
 
 # Toby SWD Twelve-Factor

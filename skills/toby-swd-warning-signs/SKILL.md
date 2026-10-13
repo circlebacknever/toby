@@ -2,9 +2,9 @@
 name: toby-swd-warning-signs
 description: >-
   Contains the warning signs in code from Martin Fowler's Refactoring. Each
-  sign is a question, with the case where the code is fine and the refactorings that
-  remove it. Entry skills open this file by path. Don't trigger it from a user request alone.
-disable-model-invocation: true
+  sign is a question, with the case where the code is fine and the refactorings
+  that remove it. Use it when deciding what to refactor or reviewing code for
+  design problems. Skip it for a bug, which toby-bug-fix covers.
 ---
 
 # Toby SWD Warning Signs
