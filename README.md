@@ -175,7 +175,7 @@ The first five workflow skills are adapted from Anthropic skills. Toby kept the 
 - `toby-explain` - explain a decision while the work keeps moving.
 - `toby-build` - ship a small change with evidence.
 - `toby-learning` - teach through your own contributions.
-- `toby-refactor` - tighten code, keep behavior.
+- `toby-refactor` - move code to a better design in small tested steps, and keep behavior.
 
 The rest of the standalone skills are Toby-specific:
 
@@ -189,11 +189,13 @@ The rest of the standalone skills are Toby-specific:
 
 The `toby-swd-*` skills are the engineering method, with one skill for each habit. A request can start `toby-swd-environment`, `toby-swd-testing`, or `toby-swd-experiment`. Claude Code, Copilot, and Codex leave the rest out of the skill list the model reads. A skill that a request loads, such as `toby-build`, opens each of those by path at the step that needs it.
 
-The SWD skills come from two books whose fans rarely agree. Toby read John Ousterhout's *A Philosophy of Software Design* and Robert C. Martin's *Clean Code* as source material, then kept the parts he trusts when he edits code.
+The SWD skills come from three books whose fans rarely agree. Toby read John Ousterhout's *A Philosophy of Software Design*, Robert C. Martin's *Clean Code*, and Martin Fowler's *Refactoring* as source material. He kept the parts he trusts when he edits code.
 
 Ousterhout decides the structure, so `toby-swd-strategy`, `toby-swd-modules`, and `toby-swd-interfaces` care about design before tactical code. They favor deep modules, smaller caller burden, interface comments, and contracts written before bodies.
 
-Martin contributes the local habits Toby still wants: names, readable flow, behavior tests, and small functions when the split makes the code easier to follow. Refactoring comes after the boundary is sound.
+Martin contributes the local habits Toby still wants: names, readable flow, behavior tests, and small functions when the split makes the code easier to follow.
+
+Fowler contributes how Toby refactors: a target design, tests before the first step, small named refactorings, and a test run after each one. `toby-refactor` and `toby-swd-warning-signs` use his catalog and his list of code smells.
 
 When a local habit creates shallow interfaces, hides a contract, or lets tests steer design into a dead end, Toby picks the boundary rule. He settles the module boundaries before anyone argues about function length.
 
@@ -207,6 +209,7 @@ Neither book says much about code that runs in production. The architecture, har
 - `toby-swd-interfaces` - design the contract a caller sees, keeping it small for the work it does.
 - `toby-swd-testing` - write tests that pin behavior and catch regressions without freezing the implementation in place.
 - `toby-swd-e2e` - prove each slice through the entry point its user reaches, and the whole feature with one test that walks through every slice.
+- `toby-swd-warning-signs` - Fowler's code smells, each with the case where the code is fine and the refactorings that remove it.
 - `toby-swd-campfire` - make the change easy before making it, then check the finished diff and leave the files it touched better than they were.
 - `toby-swd-plan` - cut work into slices, and write a long plan as a folder with one file per slice and checks that can fail.
 - `toby-swd-errors` - keep error handling deliberate, so complexity doesn't pile up unnoticed. `toby-optimize` covers performance work.

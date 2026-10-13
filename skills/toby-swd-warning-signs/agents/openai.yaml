@@ -1,0 +1,6 @@
+interface:
+  display_name: "Toby SWD Warning Signs"
+  short_description: "Find warning signs in code and the refactorings that remove them"
+  default_prompt: "Use $toby-swd-warning-signs to check this code for warning signs and name the refactoring for each."
+policy:
+  allow_implicit_invocation: false

@@ -537,8 +537,9 @@ ROUTING_GROUPS = {
     "refactor": [
         "toby-refactor", "toby-swd-strategy", "toby-swd-architecture", "toby-swd-modules",
         "toby-swd-extensibility", "toby-swd-interfaces", "toby-swd-docs", "toby-swd-testing",
+        "toby-swd-warning-signs", "toby-swd-clarity", "toby-swd-errors",
     ],
-    "review": ["toby-code-review", "toby-swd-architecture", "toby-swd-environment"],
+    "review": ["toby-code-review", "toby-swd-architecture", "toby-swd-environment", "toby-swd-warning-signs"],
     "explain": ["toby-explain", "toby-swd-modules"],
     "experiment": ["toby-swd-experiment", "toby-swd-environment", "toby-swd-testing"],
     "prose": ["toby-voice", "toby-swd-docs"],

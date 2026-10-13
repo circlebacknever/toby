@@ -79,6 +79,10 @@ Report these even with no sign of another change. The steps change one copy of t
 - Is one rule, such as a 30-day refund window or a list of open statuses, written in two places that must change together? Two switches on one field that compute different values, such as a discount and a label, are two rules.
 - Don't report a lookup by id scoped to the signed-in account, such as `get_order(id, account)`, repeated in each entry point.
 
+**Warning signs**
+
+Open `toby-swd-warning-signs`, and ask its questions of the code the diff adds or changes. Report a warning sign only when the diff adds it and the request, a ticket, a TODO, or `git log` shows a change it makes harder. The steps make that change and show each extra file it edits, or the wrong result in a copy it missed. Write the fix as the edit to make, such as moving `price()` into `Order`, without the warning sign's or the refactoring's name.
+
 ## Production readiness
 
 Ask the questions in `references/production.md` when the diff adds an entry point, job, consumer, outbound call, migration, write, or check before a write. Ask them too when it changes a stored or queued format.
@@ -94,7 +98,7 @@ Ask the questions in `references/production.md` when the diff adds an entry poin
 
 ## Don't report
 
-- Method length, naming taste, style a formatter catches, and code that is correct but awkward.
+- Method length, naming taste, style a formatter catches, and code that is correct but awkward, unless it passes the Warning signs block above.
 - A pattern every similar file in the repo uses, copied correctly.
 - An error the code rightly lets crash the program.
 - A missing rate limit or audit log that the diff didn't remove, unless `references/production.md` asks about it.
@@ -107,4 +111,5 @@ When the fix is unclear, open the skill for the issue's area at `../<skill>/SKIL
 
 - `toby-swd-architecture` for boundaries, special cases, and copied rules
 - `toby-swd-extensibility` for a switch or a subclass
+- `toby-swd-warning-signs` for a warning sign and the refactoring that removes it
 - `toby-swd-e2e` for an untested entry point
