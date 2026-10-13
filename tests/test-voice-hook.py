@@ -23,18 +23,9 @@ BREAKS = [
     "The migration ran. It has not been verified, though.",
     "That said, the second run passed.",
     "Fixed the off-by-one in the pager. Hope this helps.",
-    "Teaching prose is a first-read surface, so keep it plain.",
-    "A five-bullet list is five sentences wearing a hat.",
-    "That decorator is a shallow pass-through in disguise.",
-    "Narrow the blast radius before you start guessing at the cause.",
     "Two libraries carry the framework.",
-    "The rule lives in AGENTS.md, so read it first.",
-    "This finding rests on reading the diff.",
-    "When the cache is down, the request falls through to load().",
-    "Every lever feeds a formula.",
     "The fixture for that fix is built, not run.",
     "That's not a slip in word choice, it's the failure the guide describes.",
-    "Checkpoints and caches sit in the stores.",
     "The retry wrapper is at line 88 and the two call sites that reach it are both "
     "in the same file, which means removing it changes nothing outside that "
     "module, though the test suite has not run yet so that is still open.",
@@ -48,6 +39,20 @@ BREAKS = [
     "Noted. I'll use specify from now on.",
     "Got it. The plan now covers the hook tests.",
     "Understood. I'll keep the old rubric wording.",
+]
+
+# A figurative frame or a coined term can be a literal use, so the checker
+# reports it as DECIDE and the stop hook lets the reply through.
+DECIDE_ONLY = [
+    "Teaching prose is a first-read surface, so keep it plain.",
+    "A five-bullet list is five sentences wearing a hat.",
+    "That decorator is a shallow pass-through in disguise.",
+    "Narrow the blast radius before you start guessing at the cause.",
+    "The rule lives in AGENTS.md, so read it first.",
+    "This finding rests on reading the diff.",
+    "When the cache is down, the request falls through to load().",
+    "Every lever feeds a formula.",
+    "Checkpoints and caches sit in the stores.",
 ]
 
 CLEAN = [
@@ -105,6 +110,13 @@ for reply in BREAKS:
         print(f"ok   blocks: {reply[:56]}")
     else:
         print(f"FAIL allowed a break: {reply}")
+        failures += 1
+
+for reply in DECIDE_ONLY:
+    if run(reply) == 0:
+        print(f"ok   lets through: {reply[:56]}")
+    else:
+        print(f"FAIL blocked a DECIDE-only reply: {reply}")
         failures += 1
 
 false_positives = 0
@@ -227,7 +239,7 @@ Follow these steps to add one.
 - Approve the $400 monthly cost.
 - Approve the 6-week migration.
 
-A stampede under peak load is not uncommon, and complexity creeps into the handler.
+A stampede under peak load isn't uncommon, and complexity creeps into the handler.
 
 The result? The build is incredibly slow, and the compiler complains about the types.
 
@@ -299,27 +311,28 @@ for form in FORMS:
         notes.append(f"rewrite {form}")
 expect("the plain rewrites pass", rewrite_out.returncode, 0)
 
-# Figurative verbs sit in FIX, so they fail the run. A plain sentence with the
-# same facts passes.
+# A figurative verb is a DECIDE finding, so it doesn't fail the run. A plain
+# sentence with the same facts gets no finding.
 verb_out = check_text("The rule lives in AGENTS.md.\n")
-expect("a figurative verb fails the run", verb_out.returncode, 1)
+expect("a figurative verb doesn't fail the run", verb_out.returncode, 0)
+expect("a figurative verb is a DECIDE finding", "DECIDE  (" in verb_out.stdout, True)
 plain_out = check_text("The rule is in AGENTS.md.\n")
 expect("the literal version passes", plain_out.returncode, 0)
 
-# A verb for a feeling, given to a system, is a metaphor, so it fails the run.
+# A verb for a feeling, given to a system, is a metaphor, and a person decides.
 feeling_out = check_text("Stream resume is the one most likely to embarrass a demo.\n")
-expect("a verb for a feeling fails the run", feeling_out.returncode, 1)
+expect("a verb for a feeling is a DECIDE finding", "DECIDE  (" in feeling_out.stdout, True)
 
 # --review prints every sentence, so the reader can answer for each one.
 with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
-    handle.write("# A heading\n\nThe parser reads the header. The rule lives in AGENTS.md.\n")
+    handle.write("# A heading\n\nThe parser reads the header. The repo has no tests.\n")
     review_file = handle.name
 review_out = subprocess.run([sys.executable, str(CHECKER), review_file, "--review"],
                             capture_output=True, text=True)
 Path(review_file).unlink()
 expect("--review fails the run on a FIX finding", review_out.returncode, 1)
 for wanted in ("READ  (", "1. A heading", "2. The parser reads the header.",
-               "3. The rule lives in AGENTS.md.", "FIX  figurative frame"):
+               "3. The repo has no tests.", "FIX  negation on a noun"):
     if wanted in review_out.stdout:
         print(f"ok   --review prints {wanted!r}")
     else:
@@ -401,17 +414,15 @@ def hook_stdout(reply: str) -> str:
     return result.stdout
 
 
-# A blocked reply gets rewritten below the first draft in the same message, so
-# the hook asks for a blue row and a fixed heading the user can spot and search
-# for, and it shows the user a notice of its own.
+# A blocked reply asks for a rewrite without a banner or a heading, and the
+# hook prints nothing to the user.
 blocked = "Short answer: the cache is stale."
-expect_text("the reprompt asks for the Toby rewrite heading", hook_stderr(blocked), "## Toby rewrite", True)
-expect_text("the reprompt asks for the blue row", hook_stderr(blocked), "\U0001f7e6" * 20, True)
-try:
-    notice = json.loads(hook_stdout(blocked)).get("systemMessage", "")
-except ValueError:
-    notice = ""
-expect_text("a block shows the user a Toby rewrite notice", notice, "Toby rewrite", True)
+expect_text("the reprompt has no Toby rewrite heading", hook_stderr(blocked), "## Toby rewrite", False)
+expect_text("the reprompt has no blue row", hook_stderr(blocked), "\U0001f7e6" * 20, False)
+expect_text("a block prints nothing on stdout", repr(hook_stdout(blocked)), "''", True)
+LONG_PARAGRAPH = "The cache is stale. The job runs hourly. The job skips weekends. The fix moves it to a queue."
+expect_text("a four-sentence paragraph is blocked", hook_stderr(LONG_PARAGRAPH), "paragraph over three sentences", True)
+expect_text("a three-sentence paragraph passes", hook_stderr("The cache is stale. The job runs hourly. The fix moves it."), "paragraph over three sentences", False)
 expect_text("a clean reply prints nothing on stdout", repr(hook_stdout(CLEAN[0])), "''", True)
 
 

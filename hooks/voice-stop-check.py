@@ -57,27 +57,16 @@ SENTENCE_LIMIT = 40
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\**\s+|\n\s*\n|\n(?=\s*(?:[-*]|\d+\.)\s)")
 
 # The matched lines are symptoms. A blocked reply often has problems no
-# pattern finds, and an eval on 2026-10-02 showed that agents rewrite the whole
-# reply when asked to. The same eval showed a request to cut sentences also cut
-# facts the reader needed, so the message asks to keep them.
-#
-# The rewrite appears below the first draft in the same message, so the user
-# cannot tell where it starts. A row of blue squares is visible while scrolling,
-# and the fixed heading lets the user search for every rewrite in a thread.
-DIVIDER = "\U0001f7e6" * 20 + "\n\n## Toby rewrite"
-NOTICE = "Toby rewrite: the voice hook blocked the reply above, and the rewrite follows."
-
-REPROMPT = """The voice hook blocked this reply. The lines below matched its patterns. A reply with these lines usually has other problems that no pattern finds, so rewrite the whole reply before you send it again.
-Start the rewrite with these lines exactly, each followed by a blank line, so the user can see where the rewrite begins:
-
-""" + DIVIDER + """
+# pattern finds, so the message asks for a rewrite of the whole reply, and it
+# asks to keep every fact the reader needs.
+REPROMPT = """The voice hook blocked this reply, so rewrite the whole reply and send it again. Start with the content itself, and don't mention the hook or the rewrite.
 
 1. Put the answer in the first sentence, and each condition that changes it right after.
-2. Put steps, options, and separate findings in a list.
+2. Lay out each part by the layout table in the Replies section of your instructions.
 3. Keep every fact, number, command, path, and URL the user needs.
 4. Cut each sentence that only repeats an earlier one, introduces the next one, or sums up.
 5. Check each count and number against the facts in the reply.
-6. Define each term the user has not seen, or replace it with a plain word.
+6. Define each term the user hasn't seen, or replace it with a plain word.
 7. Fix every matched line:"""
 
 # Fenced code, inline code, and quoted text are not Toby's prose. A reply quotes
@@ -146,26 +135,26 @@ def main() -> int:
         for match in pattern.finditer(reply):
             hits.append(f"{match.group(0).strip()!r}: broken pattern: {reason}. {v.explain(reason)}")
 
-    for frame, pattern in v.FIGURATIVE_RE:
-        for match in pattern.finditer(reply):
-            hits.append(f"{match.group(0)!r}: broken pattern: figurative frame. {v.explain('figurative frame')}")
-
-    for term, pattern in v.COINED_RE:
-        for match in pattern.finditer(reply):
-            hits.append(f"{match.group(0)!r}: broken pattern: coined term. {v.explain('coined term')}")
-
     for sentence in SENTENCE_SPLIT_RE.split(reply):
         words = sentence.split()
         if len(words) > SENTENCE_LIMIT:
             hits.append(f"the {len(words)}-word sentence starting {' '.join(words[:6])!r}: "
                         f"broken pattern: sentence over 25 words. {v.explain('sentence over 25 words')}")
 
+    # A paragraph past three sentences buries separate points, which a list
+    # shows one at a time.
+    for block in re.split(r"\n\s*\n", reply):
+        lines = [line for line in block.splitlines() if line.strip()]
+        if not lines or any(re.match(r"\s*(?:[-*]|\d+[.)]|#)", line) for line in lines):
+            continue
+        count = len([s for s in re.split(r"(?<=[.!?])\s+", " ".join(lines)) if s.strip()])
+        if count > 3:
+            hits.append(f"the {count}-sentence paragraph starting {' '.join(block.split()[:6])!r}: "
+                        f"broken pattern: paragraph over three sentences. {v.explain('paragraph over three sentences')}")
+
     if not hits:
         return 0
 
-    # Claude Code reads stdout JSON on every exit code, and shows systemMessage
-    # to the user, so the notice appears even when the rewrite skips the divider.
-    print(json.dumps({"systemMessage": NOTICE}))
     print(REPROMPT, file=sys.stderr)
     for hit in dict.fromkeys(hits):
         print(f"  - {hit}", file=sys.stderr)

@@ -44,15 +44,22 @@ Tactical work is one slice, with its criteria and design in chat. For strategic 
 
 Before designing, read the file that implements the behavior today and the test that covers it. When you don't find a test for it, say where you searched, such as "`tests/orders/` doesn't have a test for `cancelOrder`."
 
+Also read every place that reads, renders, stores, or documents the thing the change touches. Check each one with the change in place, and put each one the change breaks in the work.
+
 Cite a path:line for each claim about how the code behaves, or list the claim as an assumption. Before adding a helper, module, component, hook, or error type, search the repo for one. Cite the closest match, or the search that found nothing.
 
 ## 3. Write the criteria
 
-Before any code, open `references/criteria.md` and write one criterion per behavior the request names. In strategic work, add one for a nearby behavior that must keep working. In tactical work, the criterion's Check also lists the existing tests that must keep passing.
+Before any code, write the criteria in this order:
+
+1. Picture the finished result the way the user will use it, and read the code it touches.
+2. Open `references/criteria.md`, and write one criterion per behavior that result needs, including each behavior the request names and each place its words cover.
+
+In strategic work, add one for a nearby behavior that must keep working. In tactical work, the criterion's Check also lists the existing tests that must keep passing.
 
 For strategic work, open `toby-swd-e2e` before you write the Check lines.
 
-Reread the request for a second reasonable reading. Open `references/ambiguity.md` when the two readings would build different behavior, or when the literal request leaves the user's problem unsolved.
+Take the reading that covers the whole request and solves the problem the user described. Open `references/ambiguity.md` only when two readings both fit the words and neither has a usual answer, as the Decisions section of the operating guide defines it.
 
 ## 4. Cut slices and stop
 
@@ -64,11 +71,15 @@ A slice ships only when these hold:
 - It is correct on its own, or hidden by a flag that is off by default. Open `toby-swd-flags` for a release flag, kill switch, or experiment flag.
 - A user or caller reaches it from outside its module. Give the path:line of the wiring, such as the registered route or the render site.
 
-At stop 1 of strategic work, first ask whether to write the plan at its path. Then show the criteria under `What done means for [task]` and the slice names, and wait for a yes. Tactical work shows the same list and continues in the same reply. Never write "assuming yes, proceeding" past a stop.
+At stop 1 of strategic work, show the criteria under `What done means for [task]`, the slice names, and the plan's path, and wait. In the same message, offer to write the plan there. When the user says yes, the user has approved the criteria, and you write the plan at that path.
+
+Tactical work shows the same list and continues in the same reply. Never write "assuming yes, proceeding" past a stop.
 
 ## 5. Design
 
-Open `toby-swd-architecture` and follow its "Default structure" when the change adds or moves a business rule, a write, or an outbound call. For every change, open `toby-swd-strategy` and run its design pass. Open `toby-swd-campfire` and answer its "Before the first edit" list. Then open each skill whose condition holds:
+Open `toby-swd-architecture` and follow its "Default structure" when the change adds or moves a business rule, a write, or an outbound call. For every change, open `toby-swd-strategy` and run its design pass.
+
+Open `toby-swd-campfire` and answer its "Before the first edit" list. Then open each skill whose condition holds:
 
 - Open `toby-swd-modules` for a new module or boundary.
 - Open `toby-swd-interfaces` for a new or changed signature, including a parameter added with a default. Skip it for a field added beside fields of the same kind, and copy their format.
@@ -78,7 +89,9 @@ Open `toby-swd-architecture` and follow its "Default structure" when the change 
 - Open `toby-swd-hardening` and `toby-swd-observability` for a new entry point, job, consumer, or outbound call, or a new write or failure path in a handler. Open both for a request about logging, metrics, alerts, or hardening.
 - Open `toby-swd-twelve-factor` for a new process, worker, scheduler, or scheduled job, a new config value or secret, or a new backing service.
 
-List the structure chosen, the alternative rejected, any new signature, the one function that computes each new rule, and any refactor that runs first. A `Structure: follows <path:line>` line replaces the structure chosen and the alternative rejected. When the design depends on a guess about how a library behaves, read the library's installed code. When you can't, ask the user before the first edit.
+List the structure chosen, the alternative rejected, any new signature, the one function that computes each new rule, and any refactor that runs first. A `Structure: follows <path:line>` line replaces the structure chosen and the alternative rejected.
+
+When the design depends on a guess about how a library behaves, read the library's installed code. When you can't, state the guess as an assumption, and ask about it only as the Decisions section of the operating guide allows.
 
 Before writing the plan or the first edit, read "Don't build" in `references/checks.md`.
 

@@ -3,7 +3,7 @@ name: toby-swd-warning-signs
 description: >-
   Contains the warning signs in code from Martin Fowler's Refactoring. Each
   sign is a question, with the case where the code is fine and the refactorings that
-  remove it. Entry skills open this file by path. Don't load it from a user request alone.
+  remove it. Entry skills open this file by path. Don't trigger it from a user request alone.
 disable-model-invocation: true
 ---
 

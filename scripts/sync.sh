@@ -141,7 +141,7 @@ for target in raw_targets:
 # Every tool installs a skill by copying its folder, so each tool gets the
 # checker at <skills dir>/toby-voice/scripts/voice-check.py. The copy of
 # voice_rules.py there reads the guide from references/toby.md.
-for name in ("voice-check.py", "voice_rules.py"):
+for name in ("voice-check.py", "voice_rules.py", "voice_fixes.py"):
     source = root / "scripts" / name
     target = root / "skills" / "toby-voice" / "scripts" / name
     target.parent.mkdir(parents=True, exist_ok=True)

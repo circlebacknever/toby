@@ -56,6 +56,7 @@ from typing import NamedTuple
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import voice_rules as v  # noqa: E402
+from voice_fixes import fix_for  # noqa: E402
 
 WELD_RE = re.compile(r"\w\s+—\s+\w|\w;\s+\w")
 LABEL_DASH_RE = re.compile(r"^(?:[-*]\s+)?\**[A-Z][\w-]*(?:\s[\w-]+)?\**\s+—$")
@@ -94,8 +95,7 @@ READ_RULES = [
      "An adjective fits every noun of its kind, such as actual output or a named audit.",
      "The adjective adds a word and no meaning."),
     ("wrong join",
-     "A join between clauses misstates the relation, such as `because` with no cause, "
-     "or a colon before fewer than three items.",
+     "A join between clauses misstates the relation, such as `because` with no cause.",
      "The reader follows a relation that is false."),
     ("half relation",
      "A relation word such as `in exchange` has no second half, or a small number has no `only` before it.",
@@ -166,7 +166,11 @@ class Finding(NamedTuple):
     pattern: str
 
     def text(self) -> str:
-        return f"{self.source}:{self.line}  broken pattern: {self.rule}\n      {self.sentence}"
+        how, fine = fix_for(self.pattern)
+        lines = [f"{self.source}:{self.line}  broken pattern: {self.rule}", f"      {self.sentence}", f"      Fix: {how}"]
+        if self.bucket == "decide" and fine:
+            lines.append(f"      Fine when: {fine}")
+        return "\n".join(lines)
 
 
 NUMBER_WORDS = {w: i for i, w in enumerate(
@@ -275,6 +279,11 @@ def undefined_term_findings(text: str, label: str) -> list[Finding]:
     return found
 
 
+# These forms are certain enough to fail the run. Each one is a construction
+# the guide bans outright, and a match is almost never correct prose.
+FIX_FORMS = {"negation on a noun"}
+
+
 def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
     text = v.prose_only(raw)
     tiers = v.load_banned_words()
@@ -288,7 +297,12 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
 
     if not defining:
         for word in tiers["hard"]:
-            for m in re.finditer(rf"(?<![A-Za-z]){re.escape(word)}(?![A-Za-z])", text, re.I):
+            # A banned word inside a path, an identifier, a config value, or
+            # double quotes is exempt, because the rules exempt code and quotes.
+            for m in re.finditer(rf"(?<![A-Za-z/._=-]){re.escape(word)}(?![A-Za-z/._=-])", text, re.I):
+                line_start = text.rfind("\n", 0, m.start()) + 1
+                if text.count('"', line_start, m.start()) % 2 == 1:
+                    continue
                 add(fix, f"banned word {m.group(0)!r}", m.start(), "banned word")
         # One foil finding per line, because the older CONTRAST_PATTERNS and
         # FOIL_PATTERNS both match a sentence such as "a real tension, not a free
@@ -301,12 +315,14 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
                 if line not in foil_lines:
                     foil_lines.add(line)
                     add(fix, f"{rule} {m.group(0).strip()!r}", m.start(), "invented foil")
+        # A coined term or a figurative frame can be a literal use, such as a
+        # camera lens or land area, so a person decides.
         for term, pattern in v.COINED_RE:
             for m in pattern.finditer(text):
-                add(fix, f"coined term {m.group(0)!r}", m.start(), "coined term")
+                add(decide, f"coined term {m.group(0)!r}", m.start(), "coined term")
         for frame, pattern in v.FIGURATIVE_RE:
             for m in pattern.finditer(text):
-                add(fix, f"figurative frame {m.group(0)!r}", m.start(), "figurative frame")
+                add(decide, f"figurative frame {m.group(0)!r}", m.start(), "figurative frame")
         for m in CLOSING_OFFER_RE.finditer(text):
             add(fix, f"closing offer {m.group(0)!r}", m.start(), "closing offer")
         for pattern, reason in v.TIC_PATTERNS:
@@ -356,7 +372,24 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
         # The guide lists the dramatic words to ban them, like the banned words.
         if defining and form == "dramatic word":
             continue
-        decide.append(Finding(label, "decide", number, form, excerpt[:200], form))
+        # A match inside double quotes is quoted text, which the rules exempt,
+        # so it can't fail the run. The form counts as quoted only when every
+        # match of its pattern on the line sits inside a quoted span.
+        lines_of_text = text.splitlines()
+        line_text = lines_of_text[number - 1] if number <= len(lines_of_text) else ""
+        quoted = False
+        if form in FIX_FORMS:
+            spans = [m.span() for m in re.finditer(r'"[^"\n]+"', line_text)]
+            hits = [m.start() for p, f in v.PREDICTED_PATTERNS if f == form for m in p.finditer(line_text)]
+            quoted = bool(hits) and all(any(a <= h < b for a, b in spans) for h in hits)
+        bucket = "fix" if form in FIX_FORMS and not quoted else "decide"
+        (fix if bucket == "fix" else decide).append(Finding(label, bucket, number, form, excerpt[:200], form))
+
+    for number, paragraph in v.prose_paragraphs(text):
+        count = len(v.sentences_in(" ".join(paragraph.split())))
+        if count > 3:
+            decide.append(Finding(label, "decide", number, f"paragraph runs {count} sentences",
+                                  " ".join(paragraph.split())[:200], "paragraph over three sentences"))
 
     for number, line in enumerate(text.splitlines(), 1):
         if not v.is_prose_line(line):
@@ -365,8 +398,8 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
             count = len(sentence.split())
             trimmed = " ".join(sentence.split())[:200]
             if count > 35:
-                fix.append(Finding(label, "fix", number, f"sentence runs {count} words", trimmed,
-                                   "sentence over 35 words"))
+                decide.append(Finding(label, "decide", number, f"sentence runs {count} words", trimmed,
+                                      "sentence over 35 words"))
             elif count > 25:
                 decide.append(Finding(label, "decide", number, f"sentence runs {count} words", trimmed,
                                       "sentence over 25 words"))
@@ -388,7 +421,7 @@ def print_patterns(found: list[Finding]) -> None:
         return
     print(f"PATTERNS  ({len(patterns)}) — each label in the findings above is a broken writing pattern. "
           "This list says what each pattern is and why it makes a sentence hard to read. "
-          "The checker suggests no rewrite, so write one that removes the problem the reason states.\n")
+          "Each finding above gives its fix.\n")
     for pattern in patterns:
         what, why = v.PATTERN_NOTES[pattern]
         print(f"  {pattern}\n      What it is: {what}\n      Why it is hard to read: {why}\n")
@@ -477,8 +510,8 @@ def main() -> int:
         return 1 if all_fix else 0
     if all_decide:
         print(f"DECIDE  ({len(all_decide)}) — each finding names a broken writing pattern that the checker "
-              "may have matched by mistake. Read each sentence. Rewrite it when it has the pattern, "
-              "and say why it's fine when it doesn't.\n")
+              "may have matched by mistake. Read each sentence. Apply its fix, unless its \"Fine when\" line "
+              "describes the sentence, and then say which case applies.\n")
         for finding in all_decide:
             print(f"  {finding.text()}\n")
         print("  Most of these are real. Don't dismiss the group.\n")

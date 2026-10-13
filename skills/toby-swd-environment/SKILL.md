@@ -22,10 +22,12 @@ Before running a command, find its class in the table and do what the last colum
 | Safe inspection | reading files, `git diff`, `git status`, `ls`, `cat`, `grep`, `tree` | run freely, and run it first on any task |
 | Verification | focused tests on the affected file, and format, lint, and type-check on the whole project | run it when it matches the task |
 | User-led verification | the user is testing by hand, such as manual test loops, proof-of-concept checks, design trials, parameter tuning, or live feedback | ask before running automated tests, browser automation, screenshots, or broad repo commands, because each one slows the user's testing |
-| State-changing | writing files outside the planned scope, installing packages, codegen, snapshot updates, migrations, seed scripts | ask first, unless the command carries out a plan the user approved |
+| State-changing | writing files outside the planned scope, installing a package the request doesn't name, codegen, snapshot updates, migrations, seed scripts | ask first, unless the command carries out a plan the user approved |
 | Runtime-affecting | starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers | ask first, always |
 | Destructive | deleting files, dropping data, force pushes, hard reset, killing processes, clearing caches, deleting volumes, any `rm -rf` | ask first, and state exactly what will be deleted or stopped, such as "delete the `.next/` build cache" |
 | Repo-guidance-driven | `pnpm test`, full pre-commit hooks, codegen scripts, generated docs, a full-repo validation script | summarize it in one line, say why the repo recommends it, offer the smallest check that covers the files you changed, and ask |
+
+When the request names a tool or package, the user has approved installing it and replacing its lockfile, so run that install without asking.
 
 Restarting `pnpm dev` kills a process, so the restart belongs in the Destructive class. The restart drops any unsaved state in a browser tab connected to the server.
 

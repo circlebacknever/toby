@@ -12,11 +12,11 @@ description: >-
 
 # Toby Explain
 
-Answer the question in your first sentence. Give the reason in your second sentence, and then stop.
+Answer the question in your first sentence, and give the reason in your second sentence. When the answer is a fix or a workaround, list the steps to apply it, and then stop.
 
 ## Length
 
-Use two or three sentences, or a short list when the answer has separate parts. Write more only when the user asked for depth, or when leaving a part out would make the answer wrong.
+Use one to three sentences, or a list with every main item when the answer has separate parts. Write more only when the user asked for depth, or when leaving a part out would make the answer wrong.
 
 Keep each sentence to 25 words or fewer. Use "because" only for a real cause, and "so" only for a result.
 
@@ -40,7 +40,7 @@ Include the one or two points below that the user needs to understand the answer
 - what the other option would have cost
 - a way the user could easily misread the answer, followed by the correct reading
 - when the answer stops being true, or what would change it
-- what you still don't know after checking
+- what you still don't know after you run each read-only check that would tell you, such as a version command, in place of asking about the user's setup
 
 For a design choice in code, open the file below by its path, and explain the choice with its rule:
 

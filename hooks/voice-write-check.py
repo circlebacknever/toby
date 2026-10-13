@@ -89,8 +89,8 @@ def main() -> int:
     if result.returncode == 0 and "DECIDE  (" not in result.stdout:
         return 0
 
-    print(f"voice-check.py found voice breaks in {target.name}. Rewrite each FIX sentence, "
-          "and answer each DECIDE sentence.",
+    print(f"voice-check.py found voice breaks in {target.name}. Apply the fix under each FIX finding. "
+          "Apply the fix under each DECIDE finding too, unless its \"Fine when\" line describes the sentence.",
           file=sys.stderr)
     print(result.stdout.strip(), file=sys.stderr)
     print("These patterns miss 94 of the 170 bad sentences in the repo-review gold set. Before you finish the task, run "

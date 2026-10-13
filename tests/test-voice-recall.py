@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Count how many gold-labelled sentences scripts/voice-check.py catches.
 
-Each row in evals/gold/labels.jsonl is one sentence with a label. A row with a
+Each row in each evals/gold/*.jsonl file is one sentence with a label. A row with a
 `context` field puts the sentence inside that markdown, such as `# {text}` for a
 heading, because some rules apply only to headings or list items.
 
@@ -10,7 +10,7 @@ sentences get a FIX finding, which get only DECIDE, and which get no finding. It
 when a good row gets a FIX finding. A miss on a bad row does not fail the run,
 because the misses are the gap this test measures.
 
-Run: python3 tests/test-voice-recall.py [labels.jsonl]
+Run: python3 tests/test-voice-recall.py [file.jsonl ...]
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CHECKER = REPO_ROOT / "scripts" / "voice-check.py"
-LABELS = Path(sys.argv[1]) if len(sys.argv) > 1 else REPO_ROOT / "evals" / "gold" / "labels.jsonl"
+LABEL_FILES = [Path(a) for a in sys.argv[1:]] or sorted((REPO_ROOT / "evals" / "gold").glob("*.jsonl"))
 
 
 def result_for(row: dict) -> str:
@@ -36,28 +36,30 @@ def result_for(row: dict) -> str:
     return "DECIDE" if "DECIDE  (" in run.stdout else "none"
 
 
-rows = [json.loads(line) for line in LABELS.read_text().splitlines() if line.strip()]
-counts: dict[str, Counter] = {"bad": Counter(), "good": Counter(), "unknown": Counter()}
 false_positives: list[str] = []
-
-for label in ("bad", "good"):
-    print(f"--- {label} rows")
-    for row in (r for r in rows if r["label"] == label):
+for labels in LABEL_FILES:
+    rows = [json.loads(line) for line in labels.read_text().splitlines() if line.strip()]
+    counts: dict[str, Counter] = {"bad": Counter(), "good": Counter(), "unknown": Counter()}
+    print(f"=== {labels.name}")
+    for row in rows:
+        label = row["label"] if row["label"] in counts else "unknown"
         result = result_for(row)
         counts[label][result] += 1
-        print(f"{result:<6} {row['id']}  {row['text'][:70]}  ({row['why']})")
-        if label == "good" and result == "FIX":
-            false_positives.append(row["id"])
+        if label != "unknown":
+            print(f"{result:<6} {label:<4} {row['id']}  {row['text'][:70]}  ({row.get('why', '')})")
+        # The held-out file measures precision and never gates, so no pattern
+        # gets tuned to pass it.
+        if label == "good" and result == "FIX" and row.get("split") != "heldout":
+            false_positives.append(f"{labels.name}:{row['id']}")
+    for label, tally in counts.items():
+        total = sum(tally.values())
+        print(f"{label}: {total} rows, {tally['FIX']} FIX, {tally['DECIDE']} DECIDE only, {tally['none']} with no finding")
+    fix_total = counts["good"]["FIX"] + counts["bad"]["FIX"]
+    if fix_total:
+        print(f"FIX precision: {counts['bad']['FIX']} of {fix_total} FIX findings are on bad rows")
     print()
 
-for row in (r for r in rows if r["label"] == "unknown"):
-    counts["unknown"][result_for(row)] += 1
-
-for label, tally in counts.items():
-    total = sum(tally.values())
-    print(f"{label}: {total} rows, {tally['FIX']} FIX, {tally['DECIDE']} DECIDE only, {tally['none']} with no finding")
-
 if false_positives:
-    print(f"\nFAIL good rows with a FIX finding: {', '.join(false_positives)}")
+    print(f"FAIL good rows with a FIX finding: {', '.join(false_positives)}")
     raise SystemExit(1)
-print("\nok   no good row has a FIX finding")
+print("ok   no good row has a FIX finding")

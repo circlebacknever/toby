@@ -1,11 +1,11 @@
 # Ambiguity
 
-Use this file when two readings of the request would build different behavior. Pick the next step by what a wrong guess would cost.
+Use this file when two readings of the request both fit its words and neither has a usual answer. The Decisions section of the operating guide says what a usual answer is. Read the repo and run the read-only commands that could answer the question before you decide it's open.
 
 When doing what the request says wouldn't solve the problem the user described, say so before any code.
 
-- **Ask before any code** when the code built from a wrong guess would write data, change a public contract or a stored format, or move money. Ask first also when that code would touch permissions, ship a user-visible string, call an external system, or cost more to undo than to make. Send one message with at most three questions, both readings side by side, and your recommendation.
-- **Ship it marked `assumed`** when a wrong guess costs one edit to undo. Take the reading that matches how this repo already behaves, and record the reading taken, the reading dropped, and what changes if the user wanted the other one. Don't write `assumed: standard behavior`, because it states neither reading and leaves the question open.
+- **Ship it marked `assumed`** when one edit undoes a wrong guess. Take the reading closest to how this repo already behaves, and record the reading taken, the reading dropped, and what changes if the user wanted the other one. Don't write `assumed: standard behavior`, because it states neither reading.
+- **Ask before any code** only when one edit can't undo a wrong guess, because the code would write data, change a public contract or a stored format, move money, change permissions, or call an external system. Ask every question in one message, with both readings side by side and the answer you recommend.
 - **Ship the part that can be undone, marked `blocked`,** when nobody is available to answer. Record the question verbatim and stop where the irreversible part starts. Never mark a question blocked before asking it.
 
 Don't ask a question the repo or the user already answered. For example, a new field in an existing response uses the format of the fields beside it.

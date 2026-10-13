@@ -14,8 +14,15 @@ docs/plans/members/team-invites/
 ```markdown
 # Toby's plan for team invites
 
-Mode: durable implementation. Members can invite a teammate by email and see the
-invite as pending until the teammate accepts it.
+## Intent
+The user's words: "Let org admins invite a teammate by email." The result: an
+admin invites an address, sees it as pending, and the teammate accepts the
+email link and signs in as a member.
+
+Done when: `e2e/invites.spec.ts` "invite, accept, sign in" passes, and the
+members screen shows the new member in place of the pending invite.
+
+Mode: durable implementation.
 
 ## Criteria
 1. Submitting an email on the members screen shows that address in a Pending list
@@ -25,8 +32,14 @@ invite as pending until the teammate accepts it.
 3. Opening a used or expired link shows an expired state and creates no account.
 4. The members list still renders for an org with no pending invites.
 
-Out of scope: bulk invites, revoking an invite, picking a role, and resending.
-Each one is a follow-up.
+## Out of scope
+- Bulk invites, because the members screen takes one address at a time.
+- Picking a role, because every new member joins with the default member role
+  that `members/roles.ts` assigns.
+
+## Optional
+- Revoking an invite and resending one. Group 2 builds both unless the user
+  rejects them, because an admin who typed the wrong address needs a way out.
 
 ## Design
 - Structure chosen: an `invites` module with `createInvite(orgId, email, actor)`
@@ -122,7 +135,4 @@ Verification check 2 covers criterion 4.
 
 Stop here. Before group 2, the user decides whether a Pending row also shows
 who sent the invite and when it expires.
-
-In session 1, the user chose to show both. Group 2's steps now add the
-inviter's name and the expiry date to each Pending row.
 ```

@@ -43,7 +43,9 @@ Slices: first `invite shows up as pending`, then `the invite email opens the acc
 
 Wiring: slice one connects at `screens/Members.tsx:210` through `<InviteForm onSubmit={createInvite} />`, and slice two connects at `jobs/index.ts:17` through the `invite.created` subscription.
 
-Stops: this flow crosses two screens, so the work is strategic. At stop 1, ask whether to write the plan at `docs/plans/members/team-invites/`, show the criteria, and wait for a yes. What the second slice builds depends on whether the pending row should also show the inviter and the expiry. So at stop 3, after the first slice, ask that question.
+Stops: this flow crosses two screens, so the work is strategic. At stop 1, show the criteria, the slice names, and the plan's path, `docs/plans/members/team-invites/`, and offer to write the plan there.
+
+The pending row shows only the address, the way the members list shows a member. The plan lists that choice as an assumption the user can change at stop 3.
 
 Slice one doesn't give a user any value without slice two. Main deploys on every merge, so slice one reaches users before slice two exists. An invite that creates a row and mails nobody is half-built behavior that a user can trigger. Slice one therefore ships behind the release flag `team-invites`, which is off by default, and its checks run with the flag on. The flag turns on for users after slice two sends the email, and the last step of slice two removes the flag. `toby-swd-plan`'s `references/example.md` has the plan for this feature.
 
@@ -69,7 +71,7 @@ Because this work is greenfield, do these steps before you create a second new f
 
 - The nearest conventions the repo already has are `billing/` for money-adjacent modules and the `jobs/` daily aggregate pattern that `jobs/revenue_rollup.ts` uses. Extend those two, and don't invent a third layout.
 - Design the module's boundary once, following `toby-swd-modules` and `toby-swd-interfaces`. The module exposes `seatCountForDay(workspace, date)` and defines the storage layout that the function reads, so callers never read or write rows directly.
-- The user chooses which word to use for a billed person. Today `seat`, `member`, and `active user` mean the same thing, but one of them is about to appear on an invoice.
+- The plan uses `seat` for a billed person, because the user said "bill by seat", and lists that word as an assumption. Today `seat`, `member`, and `active user` mean the same thing in the repo.
 
 Slices: first `the CLI reports a day's seat count` (`bin/usage show --workspace X --date Y`), then `the usage page shows it`. Counting ships first because the page has nothing to render without it. The CLI gives slice one an entry point a user can run, so slice one isn't a layer cut.
 
@@ -83,11 +85,11 @@ Request: "the search should match on SKU as well as product name."
    - **Source**: the user said "the search should match on SKU as well".
    - **Check**: the criterion is unmet if `test_full_sku_ranks_first` finds any name match ranked above it, or if the existing `search_ranking` suite finds any ordering change.
 2. **Observable**: a query matching a name and a different product's SKU returns the name match first.
-   - **Source**: the second reading of "match on SKU as well", handled as `references/ambiguity.md` describes, so it ships marked `assumed`.
+   - **Source**: the request doesn't say how a SKU match ranks against a name match, so this criterion keeps the name-first order the `search_ranking` suite already checks, marked `assumed`.
    - **Check**: the criterion is unmet if `test_name_match_outranks_foreign_sku` finds the SKU match first.
 
 Slices: there is one slice, `search matches a full SKU`. The baseline run matters more than usual here, because criterion 1's Check compares the `search_ranking` output with its output before the first edit. Run it and quote it.
 
 Wiring: no new wiring is needed. The change is inside a code path that callers already call, so the existing call site at `search/query.ts:60` makes the slice reachable from outside its module.
 
-Stops: show the criteria only. Criterion 2 came from rereading the request, because "match on SKU as well" has a second reading where SKU matches outrank names. One edit undoes that choice, so criterion 2 ships marked `assumed`. The chosen reading ranks name matches first, so the SKU-first reading is dropped. If the user wanted the other reading, the ordering clause in `rankResults` changes.
+Stops: show the criteria only. Criterion 2 keeps the order the repo already uses. If the user wants SKU matches first, one edit to the ordering clause in `rankResults` makes that change.

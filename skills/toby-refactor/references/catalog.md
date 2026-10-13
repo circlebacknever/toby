@@ -58,9 +58,9 @@ Move Field works the same way, after Encapsulate Variable puts every read and wr
 **Substitute Algorithm, or switch a library, runtime, or tool.**
 
 1. Put the calls to the old implementation behind one function or module, when they aren't already.
-2. Write the new implementation behind the same interface, and run the same tests against it.
+2. Write the new implementation with the new tool's own API behind the same interface, and run the same tests against it.
 3. Move callers to the new implementation.
-4. Delete the old implementation, with its config files and dependencies.
+4. Delete the old implementation, with its config files, its dependencies, and any folder layout only the old tool needed.
 
 A small project can switch its runtime, test runner, or build tool in one step. Afterward, search the repo for each name of the old tool.
 
@@ -79,9 +79,14 @@ The names below are the standard terms for the rest of the catalog. Use them in 
 ## Repo conventions
 
 - Follow the repo's convention for a construct when two or more sibling files use it, even over the textbook idiom.
-- Use a language idiom the repo doesn't use yet only when the target design calls for it. Otherwise, note it as a follow-up.
+- Use a language idiom the repo doesn't use yet when the target design calls for it, and list it in the plan.
 - Reuse a helper, error type, or config accessor the repo already has when two or more call sites use it. Search the repo for the operation before you write a new one.
 - Use a library only to replace code that reimplements an error-prone area, such as timezones, unicode, retries, deep equality, or schema validation. Outside those areas, keep a few lines of standard-library code, because saving a line or two isn't worth an import. Confirm the library is already a direct dependency in the manifest. Adding a dependency needs the user's approval.
+
+## Checks that stay
+
+- Remove a try/catch, a guard, or a validation only when you can quote the type, contract, or earlier check that rules out its condition.
+- Keep every check on input from outside the program, such as a request body, a file, or an environment variable, because that input can hold any value.
 
 ## Not a refactoring
 

@@ -1,9 +1,10 @@
 ---
 name: toby-code-review
 description: >-
-  Reports the real issues in a change and edits nothing. Use it when the user
-  asks to review, check, or audit a diff, a PR, a commit, a branch, or the
-  working tree. Use it when the user asks what is wrong with a change. Skip it
+  Reports the real issues in a change or a plan and edits nothing. Use it when
+  the user asks to review, check, or audit a diff, a PR, a commit, a branch,
+  the working tree, a plan, or a spec.
+  Use it when the user asks what is wrong with a change. Skip it
   when the user wants the code changed, which toby-refactor or toby-bug-fix
   covers. Skip it for a question about how code works, which toby-explain
   covers.
@@ -55,6 +56,8 @@ Review the current diff unless the user gives a scope, and read a PR's descripti
 4. **Acceptance criteria.** An unmet criterion from the request, the ticket, or the plan group the diff implements. Report each criterion as its own issue, and quote it. The steps run the command the criterion lists, or send the input it describes.
 5. **Repo rules.** A break of a rule in `AGENTS.md`, `CLAUDE.md`, or a similar agent instructions file. The Reproduce block has two lines, the rule quoted at path:line and the file:line that breaks it.
 6. **An untested entry point.** A new route, job, or consumer that the tests don't call through its entry point. The steps delete a line the feature needs and show the suite still passes.
+
+Before you write about a plan or a spec, read every file in it. Report each feature the plan promises and doesn't build in any step, and quote the promise at path:line in the Reproduce block. Check each entry point the plan adds against `../toby-swd-hardening/SKILL.md`.
 
 For a change to a `SKILL.md` or to an agent's instructions file, hook, or config, also ask the questions in `references/skills-diff.md`.
 

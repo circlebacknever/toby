@@ -2,7 +2,7 @@
 name: toby-swd-clarity
 description: >-
   Contains Toby's rules for names, comments, and docstrings inside code. Entry
-  skills open this file by path. Don't load it from a user request alone.
+  skills open this file by path. Don't trigger it from a user request alone.
 disable-model-invocation: true
 ---
 

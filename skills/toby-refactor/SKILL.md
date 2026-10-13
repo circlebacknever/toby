@@ -30,18 +30,21 @@ Say in one line whether the refactor is tactical or strategic. It's strategic wh
 - It switches the code to a new runtime, framework, build tool, or test runner.
 - It moves code between modules or changes the folder layout.
 - It changes a signature or an exported type that more than one caller uses.
-- The user names an end state, such as "as Bun-native as possible", and doesn't list single edits.
+- The user states an end state for the whole codebase, and doesn't list single edits.
 
 When a condition from this list appears partway through the work, say so, and treat the rest of the refactor as strategic.
 
-Strategic work adds these to the steps below:
+A tool switch adds these to step 1:
 
-- At step 1, open `toby-swd-strategy`. For a tool switch, list each old tool, config file, and dependency that leaves the repo.
-- When the request doesn't state the end state, ask one question about it before the first edit. Recommend the option that removes the old tool from the repo.
+- Design the target so the new tool does each job the old tool did, with its own API and standard layout.
+- Remove the old tool, its config files, and its dependencies as part of the target.
+- When the switch replaces the test runner, rewrite the tests for the new runner with the same assertions.
+
+When the request doesn't name the new tool or state the end state, ask one question about it before the first edit. Recommend the option that removes the old tool from the repo.
 
 ## Steps
 
-1. Target. Write the target design in one or two sentences, with the change it makes cheaper. Open `toby-swd-warning-signs`, and ask its questions of the code the target touches.
+1. Target. Write the target design in one or two sentences, with the change it makes cheaper. For strategic work, open `toby-swd-strategy` and design the target with it. Open `toby-swd-warning-signs`, and ask its questions of the code the target touches.
 2. Tests. Run the tests that cover the code you'll change, and confirm they pass. When the tests miss a behavior the refactor touches, write a characterization test first, as `toby-swd-testing` describes. When the user declines tests, list each unchecked behavior before the first edit.
 3. Plan. Open `references/catalog.md`, and write the refactor as a sequence of named refactorings. Change a public, exported, or stored interface with the parallel change steps in that file.
 4. Apply. Make one step, then run the tests. When the user asked for commits, commit after each passing step.
@@ -66,7 +69,8 @@ Mechanical means a pure rename, a dead-code deletion, or a swap. For a swap, pro
 Check this edge for each class of change:
 
 - For an idiom swap, null, undefined, and empty handling match. Iteration order, short-circuiting, and laziness stay the same. The code throws the same exception type.
-- For a library substitution, error type and message, ordering and stability, locale and timezone, and precision all match. A change in performance class (linear to quadratic, sync to async) is a behavior change, so don't make that substitution.
+- For a library substitution, error type and message, ordering and stability, locale and timezone, and precision all match. Outside a tool switch, a change in performance class (linear to quadratic, sync to async) is a behavior change, so don't make that substitution.
+- For a tool switch, swap each old runtime API, such as a `node:` import, for the new tool's own API, and let the tests prove each swap.
 - For reuse of a repo pattern, the helper's defaults match the inline code: timeouts, retries, logging, caching, and what it throws.
 - For an early return or predicate extraction, the same side effects run before the return, and the extracted predicate has none of its own.
 

@@ -2,7 +2,7 @@
 name: toby-swd-strategy
 description: >-
   Contains Toby's design pass, run before a change. Entry skills open this file
-  by path. Don't load it from a user request alone.
+  by path. Don't trigger it from a user request alone.
 disable-model-invocation: true
 ---
 
@@ -12,7 +12,7 @@ Leave the code you change easier to change than it was. Don't count working code
 
 ## Design pass
 
-For anything beyond a one-line change, don't implement the first idea. When the change copies the structure of similar code and doesn't make a design choice, write `Structure: follows <path:line>` and skip the rest of this pass. Do the same for a new optional parameter passed unchanged to an existing call, and cite that call.
+For anything beyond a one-line change, don't implement the first idea. When the change copies the structure of similar code and doesn't make a design choice, write `Structure: follows <path:line>` and skip the rest of this pass. Do the same for a new optional parameter passed unchanged to an existing call, and cite that call. When the request replaces a tool or a structure, design each approach to remove the old one, because the current code shows the replaced design.
 
 - State the change in one sentence. List each likely next change that the request, a ticket, or the code states, and leave out any you inferred.
 - Sketch at least two approaches that differ in where the complexity is: which module handles the hard part, what the interface exposes, and what callers must manage. Make the second approach the strongest option a competent engineer would pick. Pick the one with the simplest caller-side interface, even when its implementation is harder.

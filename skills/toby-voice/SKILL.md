@@ -20,7 +20,7 @@ When the user's whole message is `voice`, `toby voice`, `check the voice`, `voic
 
 1. Delete each sentence that fails the Source test or the Job test in the operating guide. Don't try to save a failing sentence by adding `Prediction:`, a hedge, or a weaker verb.
 2. Delete a bullet that repeats its heading.
-3. Turn a paragraph that holds steps, options, or separate findings into a list.
+3. Lay out each part by the layout table in the operating guide's Replies section.
 
 ## Deletion tests
 

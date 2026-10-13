@@ -57,13 +57,16 @@ was gone.
 or stdin. It splits findings into FIX and DECIDE. A FIX finding needs no
 judgement and makes the run exit 1. The checker prints each DECIDE sentence,
 and a DECIDE finding never fails the run. The checker then prints READ, the
-rules the patterns don't check. `tests/test-voice-recall.py` counts how many
-gold sentences the patterns catch. Pass it `evals/gold/chat-tics.jsonl` to run
-the chat-tic rows. Those rows are in their own file so that the counts other
-files cite for `labels.jsonl` stay correct. Pass it `evals/gold/repo-review.jsonl`
-to run the 240 sentences from the hand review of this repo's markdown on
-2026-10-02. Each row quotes the text as it was before the fixes. A reviewer
-labelled a row bad only when the sentence was a tic and a rewrite read clearer.
+rules the patterns don't check.
+
+`tests/test-voice-recall.py` reads every file in `evals/gold/`. For each file, it reports these counts:
+
+- the gold sentences that get a FIX or DECIDE finding
+- the FIX findings that are on bad rows
+
+Each row's `labeled_by` field says who set its label. The user set some labels, two agents set the labels they agreed on under the current guide, and a guide rule set one. Rows the two agents disagreed on are `unknown`.
+
+`heldout.jsonl` holds sentences that use each FIX trigger word. They were written for this test and never used to tune a pattern, so the file reports precision and never fails the run.
 
 The split exists because the two get handled differently, and because readers learn
 to ignore a single undifferentiated list. Most DECIDE

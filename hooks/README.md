@@ -64,11 +64,9 @@ write hook fires after the write, so the agent gets the findings while it is
 still working on the file. The Stop hook fires after the reply, so the agent
 gets one pass to repair it.
 
-The repaired reply appears below the first draft in the same message. The
-Stop hook asks the agent to start the repair with a row of blue squares and a
-`## Toby rewrite` heading, so you can spot it while scrolling and search for it.
-The hook also prints a `systemMessage` that Claude Code shows you, which
-appears even when the agent leaves the divider out.
+The Stop hook also blocks a paragraph longer than three sentences, so separate
+points reach you as a list. The repaired reply starts with its content, and the
+hook doesn't add a banner or a heading.
 
 The write hook needs `scripts/voice-check.py`. It looks in `TOBY_ROOT`, then in
 a checkout that holds the hook, then in the installed skill at

@@ -16,7 +16,14 @@ Greenfield means the repo doesn't have a similar feature. Before you create a se
 
 ## Stops
 
-Stop 3 comes at the end of each plan group, as the Plan Format section of the operating guide requires. Open with what the user can now do, using the slice's name. Then list what proved it and what the next slice does, and wait for the user's yes. When the next slice depends on a decision, open with that question. Ask the same way about a criterion that turned out wrong, or an item from step 1's strategic list that reading the code missed.
+Stop 3 comes at the end of each plan group, as the Plan Format section of the operating guide requires. At each stop 3:
+
+1. Open with what the user can now do, using the slice's name.
+2. List what proved it and what the next slice does.
+3. For each decision the next slice depends on, take its usual answer and list it as an assumption the user can change at this stop.
+4. Wait for the user's yes.
+
+Put a question before step 1 only when the Decisions section of the operating guide allows one. Do the same when a criterion turned out wrong, or when reading the code missed an item from step 1's strategic list.
 
 ## The design lines
 
@@ -33,4 +40,6 @@ The plan's design block has each of these lines that has content:
 
 ## Resuming half-built work
 
-Before touching code, recover the mode, the criteria, the plan, the steps already checked off, and the last stop's decision. When you can't find one of these, rebuild it from the code and the original request. List which ones you rebuilt, and confirm them before continuing, because criteria rebuilt from a diff repeat the diff's mistakes. Half-built experiment code stays experiment code until the user says otherwise.
+Before touching code, recover the mode, the criteria, the plan, the steps already checked off, and the last stop's decision. When you can't find one of these, rebuild it from the code and the original request. List which ones you rebuilt, and confirm them before continuing, because criteria rebuilt from a diff repeat the diff's mistakes.
+
+Half-built experiment code stays experiment code until the user says otherwise.

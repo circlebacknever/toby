@@ -4,13 +4,13 @@ The voice checker cites these rules by number. Rules 7, 8, 10, 13 to 17, 22 to 2
 
 ## Sentences
 
-1. Keep a sentence to 25 words or fewer, or 20 when the reader follows it as a step. Vary the length under that cap.
+1. Keep most sentences to 25 words or fewer, or 20 when the reader follows it as a step. A sentence that holds one idea may run longer, so don't cut it into short pieces.
 2. Put one idea in each sentence.
 3. Delete each word whose removal leaves the meaning unchanged.
 4. Keep every word that adds meaning. To shorten a sentence, cut a whole clause.
 5. Put the condition first, as in "If the build fails, clear the cache."
 6. Make the actor the subject, as in "The migration drops the column." Use the passive only when the actor is unknown or doesn't matter.
-7. Join two clauses with a word that states their true relation, such as "because", "so", or "after". Use "because" only for a cause and "so" only for a result. Never join clauses with a dash or semicolon. Use a colon only to introduce a list of three or more items, and put it after a whole sentence that leaves out the number of items.
+7. Join two clauses with a word that states their true relation, such as "because", "so", or "after". Use "because" only for a cause and "so" only for a result. Never join clauses with a dash or semicolon.
 8. When a sentence describes two actions with verbs ending in "-ing", rewrite it as numbered steps.
 
 ## Words
@@ -36,7 +36,7 @@ The voice checker cites these rules by number. Rules 7, 8, 10, 13 to 17, 22 to 2
 
 22. Open a doc, a slide, or a paragraph with a whole sentence that says what the thing is and does.
 23. Write a section heading as a one- or two-word label or a plain phrase. Write a slide or chart title as a plain sentence.
-24. Use "and" to join two facts about one process. Use "which" to start at most one clause in a sentence. Avoid a term defined by one word, because it reads as a slogan.
+24. Use "and" to join related facts. Use "which" to start at most one clause in a sentence. Avoid a term defined by one word, because it reads as a slogan.
 25. Leave out what a thing doesn't do unless a reader would assume it does. Put each fact only in the document whose reader needs it.
 26. Use each verb in its literal sense. `land`, `live in`, `sit in`, `feed`, `fall through`, and `rest on` describe physical things.
 27. Give each verb an actor that can perform it.
@@ -68,7 +68,6 @@ Use playful wording only in names, such as variable or test names. Never use it 
 These habits aren't in the operating guide's banned lists.
 
 - Answer the question without restating it first.
-- Write the real points, and don't pad a list to a rounder number.
 - Replace `just` or `simply` before an instruction with the steps and what can go wrong.
 - State a claim and stand behind it, with no `I'm no expert` before it.
 - State a criticism directly, and put real praise on its own line.

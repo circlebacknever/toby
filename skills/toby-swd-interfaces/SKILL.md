@@ -2,7 +2,7 @@
 name: toby-swd-interfaces
 description: >-
   Contains Toby's procedure for designing a callable surface before its body.
-  Entry skills open this file by path. Don't load it from a user request alone.
+  Entry skills open this file by path. Don't trigger it from a user request alone.
 disable-model-invocation: true
 ---
 
