@@ -22,9 +22,9 @@ Pick the mode from what the learner already knows and what the subject requires:
 
 - **Exposition:** the learner is new to the topic and has no starting mental model yet. Teach most self-taught topics in this mode.
 - **Concept:** the learner has one decision or mechanism to work through and knows the basics. Walk through one example, then use the contribution ladder below.
-- **Interpretation:** the learner builds a defensible reading or argument where no single answer is fixed (literature, history, essays, translation). Load `references/interpretation.md`.
-- **Volume or recall:** the learner has many items to retain (vocabulary, terminology, paradigms). Load `references/retention.md`.
-- **Production:** the learner is practicing speaking or writing a target language, covered in `references/retention.md`.
+- **Interpretation:** the learner builds a defensible reading or argument in literature, history, essays, or translation. Load `references/interpretation.md`.
+- **Volume or recall:** the learner has many items to remember (vocabulary, terminology, paradigms). Load `references/retention.md`.
+- **Production:** the learner practices speaking or writing a target language, which `references/retention.md` covers.
 
 ## Teaching contract
 
@@ -36,8 +36,8 @@ Pick the mode from what the learner already knows and what the subject requires:
 
 Distinguish an opening guess (before you explain a new idea) from a check (after you taught the idea):
 
-- **Opening guess (before explaining):** Ask one why-question ("Before I explain: what do you think decides whether Postgres uses the index?"), say that a 20-second guess or "I don't know" is fine, and stop. Skip the guess on purely mechanical or syntax questions. In your next reply, always give the full explanation right away: confirm what the guess got right, correct the rest in one sentence, and never answer an opening guess with another question.
-- **Post-lesson check (after explaining):** Ask a check that requires generation, discrimination (separating real understanding from surface familiarity), and a brief pause to think. Good checks ask the learner to predict output before running, spot a planted defect, defend a rejected option, state what breaks downstream if a condition changes, or name the unhandled edge case. Never use yes/no checks or "does that make sense?".
+- **Opening guess (before explaining):** Ask one why-question ("Before I explain: what do you think decides whether Postgres uses the index?"), say that a quick guess or "I don't know" is fine, and stop. Skip the guess on mechanical or syntax questions. In your next reply, give the full explanation right away: confirm what the guess got right, correct the rest in one sentence, and never answer an opening guess with another question.
+- **Post-lesson check (after explaining):** Ask a question that makes the learner generate an answer and pause to think. Ask them to predict output before running, spot a planted bug, defend a rejected option, state what breaks if a condition changes, or name an unhandled edge case. Never use yes/no checks or "does that make sense?".
 
 ## The contribution ladder
 
@@ -56,7 +56,7 @@ Start every reply to a learner's check answer with the fact ("Yes" or the direct
 - **Right with sound reasoning:** confirm it and move to the next step or edge case ("What happens when the input list is empty?").
 - **Right with thin or missing reasoning:** ask the one why-question that tests the mechanism.
 - **Half right:** confirm the right half and ask about the half that failed.
-- **Wrong or broken contribution:** don't paste the fix immediately. Point to the smallest failing piece (or run the narrowest test and show the failure output) and ask them to trace it on a concrete input (such as an empty list up to line 3). If they stay stuck, give the error category, then show the fix and ask them to state the rule in one line.
+- **Wrong or broken contribution:** don't paste the fix right away. Point to the smallest failing piece (or run the narrowest test and show the failure output) and ask them to trace it on a concrete input. If they stay stuck, name the error category, show the fix, and ask them to state the rule in one line.
 - **Bare "ok" or "got it" on a dense point:** once per dense point, hand them a small immediate application ("Write the guard for the empty case").
 
 ## Reading the learner
@@ -69,8 +69,8 @@ Load `../toby-voice/references/plain-language.md` and follow it. Write every def
 
 ## Working loop
 
-1. Assess what the learner knows, pick the mode, and cut the material into one-idea steps (quizzing any step that repeats an earlier session's lesson before re-explaining it).
+1. Assess what the learner knows, pick the mode, and cut the material into one-idea steps. Quiz any step that repeats an earlier session's lesson before re-explaining it.
 2. Ask for the opening guess on a non-mechanical step, then answer it in full within the five-sentence turn limit.
 3. Have the learner predict the result of a small runnable example or contribute the decision step on the ladder.
 4. Give one unseen case so the learner applies the rule in a new context.
-5. Close by having the learner state the reusable one-line rule (or thesis and strongest counter-argument) in their own words, and state what remains unverified.
+5. Close by having the learner state the reusable one-line rule in their own words, and state what you didn't verify.

@@ -42,21 +42,21 @@ Write each issue in this format:
 
 End the report with these optional lines when they apply:
 
-- `Not run:` listing the commands you couldn't run and each issue found only by reading.
-- At most one `Question:` line when a product decision or unreadable file settles whether an issue is real. Don't ask about a choice stated in the docstring or PR description, or a guard that unchanged code relies on.
+- `Not run:` listing the commands you couldn't run and each issue you found only by reading.
+- At most one `Question:` line when a product decision or unreadable file settles whether an issue is real. Don't ask about a choice that the docstring or PR description states, or a guard that unchanged code relies on.
 
 ## What to check
 
 Review the current diff unless the user gives a scope, and read a PR's description first. Report only issues the change introduces, trace each cause to its callers, and drop any issue you can't write reproduction steps for.
 
-1. **Bugs.** Wrong output, a crash, or an error hidden from a caller that needs it, including a changed contract or stored format that breaks a caller or existing data.
+1. **Bugs.** Wrong output, a crash, an error hidden from a caller that needs it, or a changed contract or format that breaks callers or stored data.
 2. **A bug fix without a regression test.** The steps revert the fix and show the test suite still passes.
 3. **Security.** Authentication, authorization, injection, secrets, path traversal, unsafe deserialization, CSRF, SSRF, XSS, and cross-tenant data exposure. State the attacker's request and what it exposes.
 4. **Acceptance criteria.** An unmet criterion from the request, ticket, or plan group. Quote the criterion and give the command or input that fails it.
 5. **Repo rules.** A break of a rule in the project's `AGENTS.md` or contributing guide. Quote the rule at `path:line` and the `file:line` that breaks it.
 6. **An untested entry point.** A new route, job, or consumer that no test calls through its entry point. The steps delete a required line in the handler and show the suite still passes.
 
-When reviewing a plan or spec, read every file in it, report each promised feature that no step builds (quoting `path:line`), and check each new entry point against `../toby-swd-hardening/SKILL.md`. For a change to a `SKILL.md` or agent instructions, hook, or config file, also check `references/skills-diff.md`.
+When reviewing a plan or spec, read every file in it and report each promised feature that no step builds at `path:line`. Check each new entry point against `../toby-swd-hardening/SKILL.md`, and check `references/skills-diff.md` when the diff touches a `SKILL.md` or agent config.
 
 ## Design
 
@@ -64,11 +64,11 @@ Skip design questions on choices the user already approved in a plan.
 
 **Module boundaries and extensibility**
 
-Report one of these when the diff leaks one decision across modules, or when the request, a ticket, a TODO, or `git log` shows a follow-on change coming:
+Report one of these when two modules share knowledge of one format or rule, or when the request, a ticket, a TODO, or `git log` shows a follow-on change coming:
 
 - Does an entry point compute a price, limit, or status transition rule that another entry point also needs?
 - Does the diff write another module's table or parse its wire/file format directly, bypassing that module's rules?
-- Does the diff thread a pass-through parameter through three or more functions that don't read it?
+- Does the diff pass a parameter through three or more functions that don't read it?
 - Does the diff add a case to a switch on a type, status, or provider while another switch on that field falls through to a default? The fix adds the case and guards the default with `assert_never` or `never`.
 - Does a subclass break its parent's contract, such as throwing `NotImplementedError` on a method callers invoke without a `supports_*()` check?
 
@@ -77,8 +77,8 @@ Report one of these when the diff leaks one decision across modules, or when the
 Report these even without a second change in `git log`:
 
 - Does shared code branch on one customer's id (`if account.id == 4471`)? The fix branches on a capability field (`account.bills_in_euros`).
-- Is one business rule (such as a 30-day refund window or the list of open statuses) duplicated in two places that must change together? Two switches on the same field that compute different things (a discount and a display label) are separate rules.
-- Don't report a caller-scoped lookup (`get_order(id, account)`) repeated across entry points.
+- Do two places that must change together duplicate one business rule (such as a 30-day refund window or the list of open statuses)? Two switches on the same field that compute different things (a discount and a display label) are separate rules.
+- Don't report a lookup that filters by the caller's account (`get_order(id, account)`) across entry points.
 
 **Warning signs**
 
@@ -110,7 +110,7 @@ Check `references/production.md` whenever the diff adds or changes an entry poin
 When the fix is unclear, open `../<skill>/SKILL.md`:
 
 - `toby-swd-architecture` for boundaries, special cases, and duplicated rules
-- `toby-swd-modules` for information leakage and pass-through threading
+- `toby-swd-modules` when two modules share one format or pass parameters through intermediate functions
 - `toby-swd-extensibility` for switches and subclasses
 - `toby-swd-warning-signs` for code smells and their refactorings
 - `toby-swd-e2e` for untested entry points

@@ -15,7 +15,7 @@ Write the decision as a note:
 Endpoint: GET /api/products/:id
 Current P95: 450ms
 Source of slowness: Postgres query (joins + product variants), ~400ms
-Expected hit ratio: 80% (catalog changes hourly; reads are constant)
+Expected hit ratio: 80% (catalog changes hourly, and reads are constant)
 Staleness budget: 5 minutes
 Decision: cache, 5-minute TTL, repository-level
 Projected median: 5ms, on a hit
@@ -28,7 +28,7 @@ Remove a cache whose measured hit rate stays low or whose underlying query is no
 
 - Every write path must evict or update the affected keys, and any path that skips eviction serves stale reads.
 - Every cache key for non-public data must include the tenant, account, or role scope (`org:{orgId}:invoice:{id}`) so one user never reads another user's cached record.
-- Never cache a transient error or empty fallback for the full TTL. Let the error fail fast or cache a negative result for at most a few seconds when guarding against repeated misses.
+- Never cache a transient error or empty fallback for the full TTL. Let the error fail fast or cache an empty/"not found" result for at most a few seconds when guarding against repeated misses.
 - After a cache flush or restart every request misses, so the database or upstream service must survive peak load with a cold cache.
 - Tests must cover both the cached and uncached paths and reset the cache between tests, and metrics must track hits, misses, and miss latency.
 

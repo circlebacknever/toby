@@ -23,9 +23,9 @@ Before writing any slide, pick an opening pattern and plan which slides are inte
 
 ---
 
-## Deck structure — title and end slides
+## Deck structure
 
-A deck opens with a title slide, unless it uses the no-title-slide opening below, and closes with an end slide. Both are sparse on purpose, because they come before and after the dense reference content. Between them come the cover/index, then the content, then the references.
+Order a standard deck as Title, Cover/index, Content slides, References, and Fin:
 
 ```
 01  Title           (paper, sparse, mark + giant topic)
@@ -56,9 +56,9 @@ The slide id is right-aligned in muted mono text, in this format:
 XX / NN · R-XX.X · LABEL
 ```
 
-- `XX / NN` — current slide of total (1-indexed, zero-padded to 2 digits).
-- `R-XX.X` — reference deck identifier, for example `R-04.2`.
-- `LABEL` — short uppercase section name (`TITLE`, `INDEX`, `GLOSSARY`, `KEPLER`, `WORKED`, `APPLY`, `FIN`).
+- `XX / NN`: current slide of total (1-indexed, zero-padded to 2 digits).
+- `R-XX.X`: reference deck identifier, for example `R-04.2`.
+- `LABEL`: short uppercase section name (`TITLE`, `INDEX`, `GLOSSARY`, `KEPLER`, `WORKED`, `APPLY`, `FIN`).
 
 On ink slides, color the footer text with `--text-on-dark-muted` (`#a8a39a`).
 
@@ -74,27 +74,20 @@ On ink slides, color the footer text with `--text-on-dark-muted` (`#a8a39a`).
 
 ## Opening patterns
 
-Vary the opening structure across decks, and pick one of the patterns below for each deck.
+Vary the opening structure across decks, and pick one of these patterns after the title slide:
 
-**Title slide → cover/index (default for reference decks).** A sparse title slide with the per-artifact logo and the topic in giant type comes first, followed by a dense TOC grid. This pattern works for multi-section reference decks.
-
-**Title → glossary.** A title slide with the per-artifact logo comes first, then a glossary slide that defines the terms before the mechanism. This pattern works for concept-heavy topics where a reader can't understand the content while its terms are undefined.
-
-**Title → problem statement.** The title slide comes first, then an ink slide that states the problem or question the deck answers. This pattern works for analysis, diagnosis, or decision-support decks.
-
-**Title → worked example first.** The title slide comes first, followed immediately by a concrete worked example or case, and the mechanism explanation comes after. This pattern works when the reader should see a concrete case before the general rule.
-
-**Title → big fact.** The title slide comes first, then a single high-contrast slide that states the central numerical fact, measurement, or result. This pattern works for decks that lead with evidence and are built around their conclusion.
-
-**No title slide.** Start directly with the first claim. Use a section eyebrow and the per-artifact logo in the footer, and skip the dedicated opening slide. This pattern works for short reference cards (≤ 6 slides) or when the deck is one section of a longer lesson.
+- **Title → cover/index (default for reference decks):** follow the title slide with a dense TOC grid for multi-section reference decks.
+- **Title → glossary:** follow the title slide with a glossary slide when readers need term definitions before the mechanism.
+- **Title → problem statement:** follow the title slide with an ink slide stating the question or problem for diagnosis or decision decks.
+- **Title → worked example first:** follow the title slide with a concrete worked example before explaining the general rule.
+- **Title → big fact:** follow the title slide with one high-contrast numerical finding for evidence-led decks.
+- **No title slide:** start directly on the first claim with a section eyebrow and footer logo for short reference cards (`<= 6` slides).
 
 ---
 
-## Title slide pattern — sparse, paper-toned
+## Title slide pattern
 
-The title slide opens the deck and identifies it. It shows the per-artifact logo from SKILL.md Logos in the top-left, the topic in big type, and one faint decorative mark on the right. It doesn't have a TOC, because the TOC goes on the cover/index slide.
-
-Build the title slide from these parts:
+Build the paper-toned title slide from these parts (keeping the TOC on the cover/index slide):
 - **Logo:** place the per-artifact logo in the top-left.
 - **Eyebrow and scope line:** put an eyebrow with the deck id above the topic and one 22px sentence on the deck's scope below it.
 - **Big topic:** set it in 96–128px Inter 600 with tight negative letter-spacing, end it with a period, and align it left.
@@ -137,11 +130,9 @@ See `references/components.md` for the components referenced above.
 
 ---
 
-## End slide pattern — sparse, ink-toned
+## End slide pattern
 
-The end slide closes the deck. It shows a single centred claim that states the most fundamental fact the deck taught. It has an ink background, a faint geometric backdrop, and the per-artifact logo in the corner, with no content cards.
-
-Build the end slide from these parts:
+Build the ink-toned closing slide from these parts:
 - **Ink-toned:** the background is `#1a1c1f`.
 - **Logo:** place the per-artifact logo in the top-left, with `--text-on-dark` for the strokes and the red dot kept accent red.
 - **One centred claim:** set it in 64–80px Inter 500 and end it with a period. A reader who remembers only the claim still has something useful.
@@ -157,9 +148,7 @@ Example claim line: `Bound orbits are ellipses, with the Sun at one focus.`
 
 ## Interactivity catalog
 
-Choose the interaction type to fit the concept. First decide what the learner needs to test or explore. Then pick the interaction type that lets the learner do it. 
-
-**Make a slide interactive** when its concept has a trade-off between two effects or a parameter that governs a visual outcome. Interactivity also fits a process that the learner should be able to step through. If moving a control would let the learner test a guess and see whether the guess holds, build the control. Decorative motion doesn't meet this condition, so leave it out.
+Add an interactive control only when it lets the learner test a guess, step through a process, or adjust a parameter to see a tradeoff. Leave out decorative motion.
 
 ### Interaction types
 
@@ -302,7 +291,7 @@ If Inter or JetBrains Mono isn't installed, fall back to Calibri (sans) and Cons
 - Use the status colors on status pills, status callout panels, and worked-example rows.
 - Use `--toby-accent` red for consequence callouts and the single logo dot only.
 
-### Section divider (ink) — recipe
+### Section divider
 - Fill the background with ink (`#1a1c1f`).
 - Put the eyebrow (UPPERCASE +0.12em, 11 pt mono, `--text-on-dark-muted`) at the top-left, for example `SECTION 03`.
 - Center the section title (Inter 38 pt, 600, `--text-on-dark`) horizontally, about 38% down from the top.

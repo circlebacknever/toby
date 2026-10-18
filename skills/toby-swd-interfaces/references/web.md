@@ -1,8 +1,8 @@
-# Web SPAs (React, Solid, Svelte)
+# Web SPAs
 
 ## Hook return type
 
-A hook that returns `[Product | null, Error | null, boolean, refetch, mutate]` needs a seven-sentence comment about positions and null combinations. Each caller also names the positions its own way. Return a discriminated union:
+A hook that returns `[Product | null, Error | null, boolean, refetch, mutate]` needs a long comment about positions and null combinations. Return a tagged union with one variant per valid state:
 
 ```tsx
 type ProductQuery =
@@ -14,13 +14,13 @@ type ProductQuery =
 function useProduct(id: string): ProductQuery & { refetch(): Promise<void>; mutate(p: Product): Promise<void> };
 ```
 
-> Returns the current query state for the product with this id. The status discriminator has one value for each of the four legal combinations (loading, success, error, stale). refetch triggers a fresh load. mutate updates locally and reconciles with the server.
+> Returns the current query state for the product with this id. The status field has one value for each valid state (loading, success, error, stale). refetch triggers a fresh load. mutate updates locally and reconciles with the server.
 
 In Solid, return the same union inside a signal, and in Svelte, return it inside a store.
 
 ## Component props
 
-A `Dialog` with twelve props, including `variant`, `initialFocus`, `closeOnEsc`, and `closeOnOverlayClick`, needs a comment that tells callers which combination is safe for a destructive action. When the call sites use the dialog for three different purposes, make one component for each purpose. Build all three on one shared inner component:
+A `Dialog` with twelve props (`variant`, `initialFocus`, `closeOnEsc`, `closeOnOverlayClick`) needs a comment explaining which combination is safe for a destructive action. When callers use the dialog for three distinct purposes, export one component per purpose built on one shared inner component:
 
 ```tsx
 <ConfirmDialog open={open} onClose={close} title="Save changes?" onConfirm={doSave} />
@@ -31,11 +31,11 @@ A `Dialog` with twelve props, including `variant`, `initialFocus`, `closeOnEsc`,
 
 > DestructiveConfirmDialog — Renders a destructive-action confirmation when open is true. Calls onConfirm if the user proceeds. Every other path counts as cancel and calls onClose, including esc and overlay click. Focus defaults to the cancel button.
 
-`DestructiveConfirmDialog` locks in the safe settings, so no caller can build an unsafe version. If callers repeat three prop combinations but use them for the same purpose, keep one component.
+`DestructiveConfirmDialog` locks in the safe settings so callers can't build an unsafe version.
 
 ## Headless hook
 
-A `useCombobox` that takes `isOpen`, `setIsOpen`, `highlightedIndex`, and their setters makes every caller write and track the open, closed, and highlighted state itself. Keep that state inside the hook, and return prop bundles. A prop bundle is an object of props that the caller spreads onto one element:
+A `useCombobox` that takes `isOpen`, `setIsOpen`, and `highlightedIndex` forces every caller to manage open and keyboard state. Keep that state inside the hook and return grouped element props that the caller spreads onto each element:
 
 ```tsx
 function useCombobox<T>(opts: {
@@ -54,6 +54,6 @@ function useCombobox<T>(opts: {
 };
 ```
 
-> Implements a headless combobox state machine for the items and id function the caller passes. Returns prop bundles that wire ARIA attributes and keyboard handlers to the input, list, and items. Rendering state includes filteredItems, computed from the current input value through filter, and highlightedIndex, which tracks keyboard navigation. onSelect fires when the user confirms a choice via Enter or click.
+> Manages open state, filtering, and keyboard navigation for a combobox. Returns element prop objects that wire ARIA attributes and keyboard handlers to the root, input, list, and items. Calls onSelect when the user confirms a choice via Enter or click.
 
-The caller spreads the bundles and renders `filteredItems`. Keyboard handling, IME composition, ARIA, and focus stay inside the hook.
+The caller spreads the returned props and renders `filteredItems`, while keyboard, IME, ARIA, and focus logic stay inside the hook.

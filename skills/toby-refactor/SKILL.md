@@ -20,7 +20,7 @@ Change the structure of code so the next change costs less, while keeping observ
 - Decide the target design before the first edit, then move the code all the way to it.
 - Keep each step small enough that a failing test points to that step. When a step fails, revert it and take a smaller step.
 - Keep refactoring and behavior changes separate. When the work needs a behavior change, state it and run that change under `toby-build` or `toby-bug-fix`.
-- Measure the gain by a count that dropped: lines, branches, tools, or files edited per rule change. "Clearer" and "more idiomatic" don't count on their own, and "Nothing worth refactoring" is a complete answer.
+- Measure the gain by a count that dropped: lines, branches, tools, or files you must edit when a rule changes. "Clearer" and "more idiomatic" don't count on their own, and "Nothing worth refactoring" is a complete answer.
 
 ## Tactical or strategic
 
@@ -33,13 +33,13 @@ State `Mode: cleanup (tactical)` or `Mode: cleanup (strategic)` in one line. The
 
 When a strategic condition appears mid-refactor, say so and treat the rest of the work as strategic.
 
-For a tool switch, design the target so the new tool handles every job the old tool did using its own standard API and layout, remove the old tool with its configs and dependencies, and port test assertions when switching test runners. When the request doesn't name the new tool or end state, ask one question in the first sentence and recommend the option that removes the old tool.
+For a tool switch, make the new tool handle every job the old tool did using its own standard API and layout. Remove the old tool with its configs and dependencies, and port test assertions when switching test runners. When the request doesn't name the new tool or end state, ask one question in the first sentence and recommend the option that removes the old tool.
 
 ## Steps
 
 1. **Target.** State the target design in one or two sentences with the change it makes cheaper. Open `toby-swd-warning-signs` to check the touched code, and for strategic work open `toby-swd-strategy`.
-2. **Tests.** Run the covering tests and confirm they pass. When a behavior the refactor touches lacks a test, write a characterization test first (`toby-swd-testing`), or list each unchecked behavior if the user declines tests.
-3. **Sequence.** Open `references/catalog.md` and list the sequence of named refactorings. Tactical work lists the sequence in chat, and strategic work offers to write a plan file using `toby-swd-plan` before the first edit. Use parallel change from `references/catalog.md` for public, exported, or multi-caller interfaces.
+2. **Tests.** Run the covering tests and confirm they pass. When a behavior the refactor touches lacks a test, write a test that locks in what the code returns today (`toby-swd-testing`), or list each unchecked behavior if the user declines tests.
+3. **Sequence.** Open `references/catalog.md` and list the sequence of steps in plain words. Tactical work lists the sequence in chat, and strategic work offers to write a plan file using `toby-swd-plan` before the first edit. For public, exported, or multi-caller interfaces, add the new interface alongside the old one while you move callers over (`parallel change` in `references/catalog.md`).
 4. **Apply.** Apply one refactoring step (or one caller batch in a parallel change) and run the tests before starting the next step. Commit after each passing step when the user asked for commits.
 5. **Finish.** Search the repo for every removed or replaced identifier, and list any remaining match with the reason it stays.
 
@@ -55,13 +55,13 @@ Open each skill at `../<skill>/SKILL.md` that the target design needs:
 
 ## Behavior drift
 
-Ship a step only when a passing test asserts the behavior it touches, or when the step is mechanical (a pure rename, dead-code deletion, or proven-equivalent swap) and you quote why its edge case can't occur (such as `"non-null string typed by schema"`). Check these edge cases before shipping a swap or extraction:
+Ship a step only when a passing test asserts the behavior it touches, or when the step is a pure rename, dead-code deletion, or equivalent swap whose edge case you quote as impossible (such as `"non-null string typed by schema"`). Check these edge cases before shipping a swap or extraction:
 
 - **Idiom swap:** null, undefined, and empty handling, iteration order, short-circuiting, laziness, and thrown exception types all match.
-- **Library substitution:** error type and message, ordering, stability, locale, timezone, precision, and complexity class (linear vs. quadratic, sync vs. async) all match.
-- **Extracted or moved statements:** statements stay inside the same database transaction and lock acquisition order, and sequential `await` calls aren't turned into concurrent calls (or the reverse).
-- **Implicit contracts:** serialized field names in queues or databases, exception types caught higher up the stack, and log or metric keys stay unchanged unless every reader updates with them.
-- **Helper reuse or early return:** the helper's defaults (timeouts, retries, logging, caching, errors) match the inline code, and extracted predicates have no side effects.
+- **Library substitution:** error type and message, ordering, stability, locale, timezone, precision, linear vs. quadratic growth, and sync vs. async execution all match.
+- **Extracted or moved statements:** statements stay inside the same database transaction and lock acquisition order, and you don't turn sequential `await` calls into concurrent calls (or the reverse).
+- **Implicit contracts:** serialized field names in queues or databases, exception types that callers higher up the stack catch, and log or metric keys stay unchanged unless every reader updates with them.
+- **Helper reuse or early return:** the helper's defaults (timeouts, retries, logging, caching, errors) match the inline code, and extracted condition functions don't change state.
 
 ## Keep
 
@@ -75,4 +75,4 @@ Don't fix a bug or security issue inside a refactoring step, because that change
 
 ## Final response
 
-Lead with the target design, whether the code matches it, and the change it makes cheaper. List the applied refactorings in order, any characterization tests added, any edge cases or steps left out for lack of tests, and any bugs or follow-ups at `file:line`.
+Lead with the target design, whether the code matches it, and the change it makes cheaper. List the refactoring steps you applied, any tests you added, any edge cases or steps you left out for lack of tests, and any bugs or follow-ups at `file:line`.

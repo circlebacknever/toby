@@ -1,56 +1,35 @@
 # Worked Examples: The Shortcut and the Sound Design
 
-Each example shows the shortcut, the smallest change that works, and why it
-causes problems later. The sound design follows, with the structure the code
-would have had if designed with the change in mind.
+Each example shows the quick shortcut, why it causes problems later, and the design you would build with the change in mind.
 
 ---
 
-## Example 1 — A new module's design pass
+## 1. New module design pass
 
-Task: add retry logic to the HTTP client's GET calls in `billing/sync.py` and
-`orders/sync.py`. Both calls fail on transient 503s today.
+Task: add retry logic to the HTTP client's GET calls in `billing/sync.py` and `orders/sync.py`. Both calls fail on transient 503s today.
 
-**Shortcut:** wrap each call site in a `for` loop with a `sleep`, which works.
-The loop is copied into both files with a slightly different backoff. Now there
-are two retry policies, and their settings become more different over time.
+**Shortcut:** wrap each call site in a `for` loop with a `sleep`. You copy the loop into both files with a slightly different backoff, so the repo now has two retry policies that drift apart over time.
 
 **Sound design, with two approaches sketched first:**
 
-- *A: retry decorator on each call site.* Interface: callers add `@retry(...)`.
-  The decorator hides the loop, but every call site still chooses its policy
-  and can choose the wrong one.
-- *B: a retrying transport the client is constructed with.* Interface: callers
-  call the client normally. Retry is a property of the client, configured
-  once.
+- *A: retry decorator on each call site.* Callers add `@retry(...)`. The decorator hides the loop, but every call site still chooses its own retry policy and can pick the wrong one.
+- *B: a retrying transport you pass to the client constructor.* Callers call the client normally, and you configure retries once on the client.
 
-B has the simpler caller-side interface. Pick B even though its implementation
-(wrapping the transport, classifying retryable errors) is more work than a loop. The
-transport is written once, and every call site gets retries from it.
+B has the simpler caller-side interface. Pick B even though wrapping the transport takes more work than a loop. You write the transport once, and every call site gets retries automatically.
 
 ---
 
-## Example 2 — Modifying existing code under a real deadline
+## 2. Deadline shortcut
 
-The existing `PaymentProcessor` hardcodes one gateway. The task, due tomorrow,
-is to support a second gateway for one customer.
+`PaymentProcessor` hardcodes one gateway, and a deadline tomorrow requires supporting a second gateway for one customer.
 
-Apply the test: *what would this look like if designed with two gateways in
-mind?* That design is a `Gateway` interface with two implementations and
-selection by config. It is the right design, but it takes several hours you
-don't have before the deadline. The situation qualifies for the shortcut,
-because the deadline is hard and external and the cost is accepted.
-
-So take the shortcut deliberately and label it:
+With two gateways in mind, the sound design is a `Gateway` interface with two implementations selected by config. When the deadline is hard and external and the user accepts the cleanup cost, take the shortcut and label it in the code:
 
 ```python
 def process(self, payment):
-    # SHORTCUT: this gateway switch is hardcoded for ACME only and shipped under the
-    # 4/12 deadline. The sound design is a Gateway interface with config selection.
-    # Do this before adding a third gateway, or the problem grows. Tracked: JIRA-1234.
+    # SHORTCUT: hardcodes ACME to Stripe for the 4/12 deadline.
+    # Replace with a Gateway interface selected by config before adding a third gateway (JIRA-1234).
     if payment.customer_id == ACME:
         return self._charge_via_stripe(payment)
     return self._charge_via_legacy(payment)
 ```
-
-Under a deadline, label the shortcut and state when and how to replace it.

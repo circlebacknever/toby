@@ -17,7 +17,7 @@ type User struct {
 }
 ```
 
-When one struct serves as the database row, the domain entity, and the JSON response, every caller depends on the schema and secrets can leak if a tag is missed. Split the struct when an audience must never receive a field (such as `HashedPassword`) or when the database columns and wire format diverge:
+When one struct serves as the database row, the domain object, and the JSON response, every caller depends on the table schema and secrets can leak if you miss a struct tag. Split the struct when callers must never receive a field (such as `HashedPassword`) or when the database columns and wire format differ:
 
 ```go
 // auth/internal/store/user_row.go
@@ -34,4 +34,4 @@ When all three views share the same safe fields, keep one struct with `db` and `
 
 ## Read models
 
-Define a separate read model only when a query returns a projection that differs from the entity, such as an aggregated dashboard or report.
+Define a separate read struct or query type only when a screen needs aggregated or pre-joined columns that don't match a single table.

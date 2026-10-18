@@ -17,7 +17,7 @@ In this skill, `AGENTS.md` refers to a module documentation file inside the user
 
 ### Scope
 
-Create an `AGENTS.md` only when the user asks or the repo already keeps one at each module root (such as a service, domain package, or frontend feature). Never create one in a leaf folder, a single-file utility folder, or a grouping directory. Put those notes in the nearest module-root `AGENTS.md` above it.
+Create an `AGENTS.md` only when the user asks or the repo already keeps one at each module root (such as a service or domain package). Never create one in a leaf folder, a single-file utility folder, or a grouping directory. Put those notes in the nearest module-root `AGENTS.md` above it.
 
 ### Sections
 
@@ -58,10 +58,10 @@ Update `README.md` whenever the public API or caller constraints change.
 
 Check each doc you wrote or touched against these items:
 
-- An `AGENTS.md` was created in a leaf folder.
-- The doc copies implementation mechanics or signatures that belong in interface comments.
-- A cross-module reason is duplicated across call sites when the sites should point to `AGENTS.md`.
-- A structural or API change left an existing `AGENTS.md` or `README.md` describing the old state (update it when docs are in scope, or report the stale line at `file:line`).
-- A line in `AGENTS.md` could be deleted without causing an agent mistake.
+- You created an `AGENTS.md` in a leaf folder.
+- The doc copies implementation mechanics or signatures that belong in docstrings.
+- Call sites repeat a cross-module reason when they should point to `AGENTS.md`.
+- A structural or API change left an existing `AGENTS.md` or `README.md` describing the old state. Update the doc or report the stale line at `file:line`.
+- You could delete a line in `AGENTS.md` without causing an agent mistake.
 
 Open `references/examples.md` before writing a new `AGENTS.md` or `README.md`, or when deciding which folder gets one.

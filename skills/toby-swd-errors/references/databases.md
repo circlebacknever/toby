@@ -4,11 +4,11 @@ This file covers transaction retry wrappers and optimistic versus pessimistic co
 
 ## Transaction retry
 
-Add a `WithRetry(ctx, db, fn)` wrapper when a transaction runs at `SERIALIZABLE` or `REPEATABLE READ`, or when deadlocks or transient connection resets can occur and the caller can't resend the request. Omit the wrapper when a job queue or caller above already retries the operation. Keep the retry safe with three rules:
+Add a `WithRetry(ctx, db, fn)` wrapper when a transaction runs at `SERIALIZABLE` or `REPEATABLE READ`, or when deadlocks or connection resets can occur. Omit the wrapper when a job queue or caller above already retries the operation. Keep the retry safe with three rules:
 
-- Retry a connection reset only when it occurred before `COMMIT` was sent, or when `fn` records an `idempotency key` under a unique constraint and returns the existing result on a constraint conflict.
+- Retry a connection reset only when it happened before the client sent `COMMIT`, or when `fn` saves an `idempotency key` under a unique constraint.
 - Keep external side effects (emails, HTTP calls, queue publishes) outside `fn` and run them after commit (`toby-swd-hardening`'s `references/messages.md`).
-- Read every row that `fn` computes from inside `fn`, so each retry recomputes on fresh rows and doesn't overwrite concurrent updates with stale values.
+- Read every row that `fn` uses inside `fn`, so each retry recomputes on fresh rows and doesn't overwrite concurrent updates with stale values.
 
 ## Concurrent writes
 

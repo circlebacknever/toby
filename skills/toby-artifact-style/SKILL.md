@@ -56,9 +56,9 @@ Complete these six decisions before writing markup or code:
 
 ## Composition modes
 
-Pick one mode per artifact (and switch the mode, ink placement, and logo mark when building a second artifact in the same session):
+Pick one mode per artifact, and switch the mode, ink placement, and logo mark when building a second artifact in the same session:
 
-- **Dense reference:** multi-column card grids with KV pairs and tables (30–45 seconds of reading per panel) on paper, using ink only to highlight a key measurement or decision.
+- **Dense reference:** multi-column card grids with KV pairs and tables on paper, using ink only to highlight a key measurement or decision.
 - **Spacious argument:** one concept per section with generous whitespace for derivations or worked examples, using ink only at summary or decision points.
 - **Ink-anchored:** mostly paper panels with ink panels serving as section dividers, quoted measurements, and decisions.
 - **Ink-forward:** mostly ink panels stating conclusions for executive snapshots or final-state cards, using a paper panel only for a dense table or diagram.
@@ -118,7 +118,7 @@ Pick one mode per artifact (and switch the mode, ink placement, and logo mark wh
 
 ## Typography, motion, and imagery
 
-- **Typography:** use Inter (`400` body, `500` emphasis, `600` headings, never `700`) and JetBrains Mono (`400`, `500`) with `tabular-nums` everywhere. Standard px sizes are `display 34`, `h1 28`, `h2 22`, `section 18`, `body 14`, `body-sm 13`, `meta 12`, `eyebrow 11`, and `mono 13` (deck slide titles and hero topics scale with `references/decks.md`). Use sentence case for headings and body text, and UPPERCASE with `+0.12em` tracking only on eyebrows.
+- **Typography:** use Inter (`400` body, `500` emphasis, `600` headings, never `700`) and JetBrains Mono (`400`, `500`) with `tabular-nums` everywhere. Standard px sizes are `display 34`, `h1 28`, `h2 22`, `section 18`, `body 14`, `body-sm 13`, `meta 12`, `eyebrow 11`, and `mono 13` (deck slide titles scale with `references/decks.md`). Use sentence case for headings and body text, and UPPERCASE with `+0.12em` tracking only on eyebrows.
 - **Color and motion:** never use gradients, rainbow scales, glow, colored shadows, spring bounces, scale entrances, or decorative animation. Use only opacity fades, 4–8px menu/toast slides, focus rings, chevron rotation, and user-controlled simulation steps.
 - **Imagery and symbols:** default to paper without stock photos or textures. Never use emoji or dingbats. The allowed symbols are `→` (handoff), `·` (separator), and `±` (uncertainty).
 
@@ -126,13 +126,13 @@ Pick one mode per artifact (and switch the mode, ink placement, and logo mark wh
 
 Build each artifact's logo from three parts: a 1px hairline geometric mark, one lowercase word for the topic in Inter 600, and a single `--toby-accent` red dot.
 
-Match the mark to the subject's structure: a grid or crosshair for a network, nested squares for recursion, a partial orbit arc for a wave or cycle, a Y-fork for a decision tree, a ticked rail for a time series, a bell curve for a distribution, stacked bars for a queue, or a 3×3 grid for a matrix (`references/geometry.md`). If you can't state why the mark fits the subject, pick another mark.
+Match the mark to the subject's structure (`references/geometry.md`): a grid or crosshair for a network, nested squares for recursion, a partial orbit arc for a cycle, a Y-fork for a decision tree, a ticked rail for a time series, a bell curve for a distribution, or stacked bars for a queue. If you can't state why the mark fits the subject, pick another mark.
 
 ## Purpose and output types
 
 Remove any panel or slide that doesn't teach a concept, state a measurement, define a term, list a constraint, show a worked step, or ask a check question.
 
-- **HTML or React:** load Inter and JetBrains Mono from Google Fonts with system fallbacks, set the page to `--toby-paper`, and set cards to `--toby-paper-3` with a 1px `--border-hairline` border.
+- **HTML or React:** load Inter and JetBrains Mono from Google Fonts with system fallbacks. Set the page to `--toby-paper`, and set cards to `--toby-paper-3` with a 1px `--border-hairline` border.
 - **SVG or HTML widget (`visualize` tool):** call `visualize:read_me` first, replace its CSS variables with these tokens, and fill a top-level `<rect>` or wrapper with `--toby-paper` when a background is needed.
 - **Decks (`.pptx` or HTML):** follow `references/decks.md`.
 

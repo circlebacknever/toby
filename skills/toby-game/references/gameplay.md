@@ -11,6 +11,6 @@ A pure sandbox toy doesn't have a win or loss outcome, so it needs responsive mo
 
 ## Difficulty and progression
 
-- **Shape difficulty with structure first.** In a multi-round run, per-round win probabilities multiply (`0.62^6 ≈ 6%`), so add checkpoints, best-of-N rounds, or story retries before tuning raw numbers.
-- **Require skill to win.** Add obstacles, plateaus that require a deliberate tactical shift, and diminishing returns on repeated moves so a single obvious strategy or random clicking doesn't win automatically (`references/calibration-and-testing.md`).
+- **Set difficulty with structure first.** In a multi-round run, per-round win probabilities multiply (`0.62^6 ≈ 6%`), so add checkpoints, best-of-N rounds, or story retries before tuning raw numbers.
+- **Require skill to win.** Add obstacles, plateaus that require a tactical shift, and diminishing returns on repeated moves so a single strategy or random clicking doesn't win automatically (`references/calibration-and-testing.md`).
 - **Share the rules with the opponent.** Let an opponent read the same game state and buy from the same upgrade list on a predictable schedule.

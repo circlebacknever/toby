@@ -1,27 +1,23 @@
 # Comments and obviousness
 
-This file has the rules for interface, precision, and intuition comments, and the four cases a first-time reader gets wrong. Open it when the change adds or edits a comment, a docstring, or control flow a reader could misread.
+Open this file when adding or editing a comment, a docstring, or control flow that a reader could misread.
 
 ## Comments
 
-Write an interface comment at the entry point that states behavior, arguments, return value, side effects, exceptions, and caller preconditions, with no internals. If the interface comment can't be complete without describing how the code works inside, change the design, as `toby-swd-interfaces` describes.
+Write an interface comment at the entry point that states behavior, arguments, return value, side effects, exceptions, and caller preconditions, without internals (`toby-swd-interfaces`).
 
-Every other comment must add something the code doesn't show, either more precise detail or the reason behind the code. There are two kinds:
+Every other comment must add information the code and types can't express:
 
-- **Precision**, on fields, arguments, and return values, adds what the name and type can't say, such as units, inclusive or exclusive bounds, what null or empty means, ownership, and invariants. A field whose name and type state the whole contract doesn't get a comment.
-- **Intuition**, inside code, says why the code exists, what a block does as a whole, or why a non-obvious approach was chosen. For a bug fix whose purpose isn't obvious, say why and cite the tracker.
+- **Field, argument, and return comments** state units, inclusive or exclusive bounds, what `null` or empty means, and invariants (`// Null while the request is loading or after it fails.`). Omit the comment when the name and type state the whole contract.
+- **Why comments** inside a function explain why a block exists or why you chose a non-obvious approach, citing the issue tracker when a bug fix looks unusual.
 
-A field comment is a whole sentence too, such as `// This is null while the request is loading or after it fails.`
-
-Delete a comment that restates the adjacent code or the name. Delete commented-out code, and leave change history to git. Document each decision once, in the place a reader looks first. At a call site, point to the called method's comment and don't explain it again. Write a decision that affects several modules in the AGENTS.md of the module that contains them, as `toby-swd-docs` describes. At each affected place in the code, add a comment that points to that AGENTS.md section.
-
-Keep secrets, credentials, tokens, and personal data out of logs, diagnostics, and source.
+Delete commented-out code and comments that only restate the code. Document each decision once where a reader looks first: point call sites to the called function's docstring, and record cross-module constraints in the module's `AGENTS.md` (`toby-swd-docs`). Never put secrets, tokens, or personal data in comments or logs.
 
 ## Obviousness
 
-After writing, reread the code as a developer new to it, and check that their first guess about each behavior is right. When a reviewer says the code confused them, trust that over your own impression. Fix these four cases:
+Reread touched code as a developer new to the file, and fix these four traps:
 
-- **Generic container.** A tuple, pair, or untyped object that the caller reads by position gets a type with named fields.
-- **Declared type differs from the real one.** When a value is declared as a broad type but behaves like a narrower subtype, the mismatch breaks every user of the declared type. Change the declared type to match the real behavior. A component that takes another component's props and drops or reinterprets one is this case.
-- **Behavior that breaks convention.** A constructor that starts threads, a method that changes unrelated state, or an effect with a non-obvious trigger gets a comment where someone reading the file from top to bottom first sees it. The same code gets a second comment where a reader would act on the wrong assumption.
-- **Hidden control flow.** An event handler, callback, or effect states in its own comment when and why it runs.
+- **Unlabeled tuple or array:** replace a positional tuple or array return (`[data, err, loading]`) with an object or tagged union that has named fields.
+- **Declared type broader than allowed values:** narrow the declared type to match the values the code actually accepts.
+- **Surprising side effects:** when a constructor starts threads or a method mutates unrelated state, document that side effect at the declaration and at the call site.
+- **Event handlers and effects:** state above an event handler, callback, or `useEffect` when and why it runs.

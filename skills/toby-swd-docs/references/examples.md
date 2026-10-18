@@ -19,11 +19,11 @@ part of the system that moves funds.
 - `pytest services/payments` runs the module's tests.
 
 ## Constraints
-- Charges are idempotent per `idempotency_key` (one key per payment intent). Retrying a timed-out
-  request must reuse the same key, because the processor may have succeeded before the connection
-  dropped, and rotating the key on a timeout double-charges the card.
-- PCI rules forbid storing raw card numbers, so card data is tokenized at the edge and only the
-  token reaches this module.
+- Charges are idempotent per `idempotency_key` (one key per payment intent). A retry after a
+  timeout must reuse the same key, because the processor may have succeeded before the connection
+  dropped. Rotating the key on a timeout charges the card twice.
+- PCI rules forbid storing raw card numbers, so the edge service exchanges card numbers for tokens
+  and passes only tokens to this module.
 
 ## Cross-module decisions
 - "Settlement ordering": the ledger is the source of truth, because processor webhooks arrive
@@ -76,7 +76,7 @@ result = gateway.charge(PaymentRequest(
 - `Gateway.refund(charge_id, amount_cents)` issues a partial or full refund.
 - `Ledger.entries_for_order(order_id)` returns all ledger entries for an order.
 
-Full signatures and error types are in the interface comments in `gateway.py`.
+Full signatures and error types are in the docstrings in `gateway.py`.
 
 ## Known gotchas
 

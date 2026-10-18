@@ -16,7 +16,7 @@ Keep most sentences to 25 words or fewer, or 20 words in a step the reader runs.
 Keep every word that adds meaning, and don't drop facts to make a sentence shorter.
 
 - Before: "Fixed. Tests green. Shipped."
-- After: "The retry loop was swallowing the timeout. I fixed the handler, and the four failing tests now pass. The fix isn't deployed yet."
+- After: "The retry loop was swallowing the timeout. I fixed the handler, and the four failing tests now pass. I haven't deployed the fix yet."
 
 ### Nouns after pronouns
 
@@ -49,7 +49,7 @@ When four or more nouns sit together, the reader has to guess which noun describ
 Use a word such as `because`, `so`, or `but` that says how two clauses connect, and never join clauses with a semicolon or an em dash.
 
 - Before: "The cache never invalidates — the TTL is set at construction."
-- After: "The cache never invalidates, because the TTL is set at construction."
+- After: "The cache never invalidates, because the constructor sets the TTL."
 - Before: "Don't run the seed script; it truncates first."
 - After: "Don't run the seed script, because it truncates the table first."
 
@@ -72,7 +72,7 @@ Use a word such as `because`, `so`, or `but` that says how two clauses connect, 
 
 When a banned word doesn't have a plain replacement, rewrite the sentence so the meaning is direct.
 
-- Banned-word swap: "Cloze the word that carries the learning."
+- Banned-word swap: "Blank out the word that carries the lesson."
 - Recast: "Blank out the word the learner must supply."
 - Banned-word swap: "This is the load-bearing assumption of the design."
 - Recast: "The design fails if this assumption is wrong."
@@ -100,15 +100,13 @@ Ask whether a reader could look the word up in a dictionary and find your meanin
 
 ### Whole sentences
 
-These "Before" lines came from an overview where the words were plain and the sentences were short, yet the prose failed the Whole and Literal tests:
+Each "Before" line below fails the Whole or Literal test:
 
 - Before: "A multi agent framework platform" → After: "Backplane is an extensible multi-agent platform."
 - Before: "Users talk to agents. Agents read, call tools, and pause for people." → After: "Users instruct agents, and agents call tools and wait for human feedback."
 - Before: "Two libraries carry the framework." → After: "The platform consists of a UI toolkit that all agents share and a runtime for building agents."
 - Before: "A plugin is data. The framework compiles it." → After: "Developers define new agents as plugins."
 - Before: "No plugin imports an engine. No framework file names a plugin." → After: delete both sentences, because a reader of an overview wouldn't assume a plugin imports an engine.
-
-The first example is a fragment with no verb, the second and fourth chop one idea into slogan fragments, and the third uses `carry` as a metaphor.
 
 ### Literal verbs
 

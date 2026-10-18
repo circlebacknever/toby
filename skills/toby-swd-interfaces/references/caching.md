@@ -2,7 +2,7 @@
 
 ## Get-or-load
 
-A cache with separate `get`, `set`, and `delete` methods needs a seven-sentence comment. Each caller must handle two requests that miss the same cache key at the same moment. Each caller must also convert values to JSON and allow for expiry times that aren't exact. Make the only read method one that loads and caches the value when the value is missing:
+A cache with separate `get`, `set`, and `delete` methods forces every caller to handle concurrent misses, JSON serialization, and TTLs. Expose a single read method that loads and caches the value on a miss:
 
 ```ts
 interface Cache {
@@ -19,11 +19,11 @@ interface Cache {
 }
 ```
 
-`get` and `set` stay private, because public ones lead each caller to write its own miss handling. Cache warming fills the cache ahead of time. Warming is the one case that writes a value without loading it, so warming gets its own `warm(key, value, ttl)` method.
+Keep raw `get` and `set` private, and add a `warm(key, value, ttl)` method only when pre-populating the cache ahead of traffic.
 
 ## Typed keys
 
-`invalidate(key: string)` accepts any string, so `products:${id}` in one file and `product:${id}` in another both compile. Put the functions that build cache keys inside one cache class for each kind of data, such as products:
+`invalidate(key: string)` accepts any string, so `products:${id}` in one file and `product:${id}` in another both compile. Put the functions that build cache keys inside one cache class for each domain:
 
 ```ts
 class ProductsCache {
@@ -41,19 +41,19 @@ class ProductsCache {
 }
 ```
 
-Callers never write a cache key, and a misspelled method name fails to compile. A change to the cache key format, such as a new version prefix, edits one file.
+Callers never build a `cache key` string, and changing the key format edits one file.
 
 ## Outage behavior
 
-What `getOrLoad` does when the cache server is down is part of its contract, so state it:
+State in `getOrLoad`'s comment what happens when the cache server is unreachable:
 
 ```ts
 /**
  * Returns the cached value or loads it via the supplied function.
  * If the cache is unavailable, calls load() directly and does not cache
- * the result. Cache outages are reported through metrics and never thrown
- * to callers. The cache never returns stale data.
+ * the result. getOrLoad reports cache outages through metrics and never
+ * throws them to callers. The cache never returns stale data.
  */
 ```
 
-Callers then don't need error handling for cache outages. The metrics show the outage, and during the outage every read goes to the database or other backing store. Sometimes the caller must decide whether to read without the cache, as with financial data. In that case, return `Result<T, CacheUnavailable>`. A third choice is stale-while-revalidate, which returns the old cached value while it loads a new one. A stale-while-revalidate comment states the oldest data a caller can get.
+When callers must know that the cache is down before hitting the database, return `Result<T, CacheUnavailable>`. When using stale-while-revalidate, state the maximum age of stale data in the comment.

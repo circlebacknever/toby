@@ -1,13 +1,13 @@
 ---
 name: toby-swd-experiment
 description: >-
-  Runs a short, reversible discovery loop while the behavior is still undecided.
-  Use it when the user says spike, prototype, proof of concept, throwaway, try a
-  few values, compare options, tweak settings, or let me test. Use it whenever
-  the request says throwaway, even when it also names retries, timeouts, or
-  tests. Skip it for work the user intends to keep, which toby-build covers.
-  Skip it for starting or stopping a server alone, which toby-swd-environment
-  covers.
+  Runs a short, reversible discovery loop while the user is still choosing the
+  behavior. Use it when the user says spike, prototype, proof of concept,
+  throwaway, try a few values, compare options, tweak settings, or let me test.
+  Use it whenever the request says throwaway, even when it also names retries,
+  timeouts, or tests. Skip it for work the user intends to keep, which
+  toby-build covers. Skip it for starting or stopping a server alone, which
+  toby-swd-environment covers.
 ---
 
 # Toby SWD Experiment
@@ -26,7 +26,7 @@ Change one thing per pass so you can tell which change caused the result:
 
 ## Where experiment code goes
 
-Put experiment code in a local script, a dev-only debug panel, or a labeled block in the nearest file that prints the inputs, candidate values, and result. Prefix throwaway identifiers and files with `experiment`, `poc`, `spike`, `scratch`, `debug`, or `temp` so cleanup can search for them, and keep experiment state out of durable code.
+Put experiment code in a local script, a dev-only debug panel, or a labeled block in the nearest file. Prefix throwaway identifiers and files with `experiment`, `poc`, `spike`, `scratch`, `debug`, or `temp` so you can find and delete them later, and keep experiment state out of durable code.
 
 ## Checks
 
@@ -38,14 +38,14 @@ When the user picks a behavior:
 
 - Move the chosen behavior into the normal project structure.
 - Delete all experiment code, temp identifiers, debug routes, scratch files, and notes, and search the diff for the throwaway prefixes above.
-- Record the inputs, random seeds, and library versions used so the result is reproducible.
+- Record the inputs, random seeds, and library versions you used so the result is reproducible.
 - Write durable tests for the kept behavior when the repo has a test harness, and report any check that didn't run.
 
 ## Red flags
 
 Check for and report any of these before finishing:
 
-- Scratch code left in a production path after the user chose.
-- Multiple candidates changed in a single pass.
-- Durable tests written for behavior that is still undecided.
-- Asking the user for feedback before stating what value changed and what to look for.
+- You left scratch code in a production path after the user chose.
+- You changed multiple candidates in a single pass.
+- You wrote durable tests for behavior the user hasn't chosen yet.
+- You asked the user for feedback before stating what value changed and what to look for.

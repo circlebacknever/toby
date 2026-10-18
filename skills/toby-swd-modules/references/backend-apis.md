@@ -33,7 +33,7 @@ app.use(injectTenantContext()); // reads req.user, writes req.tenant
 app.use(audit());               // reads every field above
 ```
 
-This chain is temporal decomposition: each step mutates `req`, and no type records which fields exist at which step. Replace the chain with a typed session helper at the entry point and pass the tenant scope into the operation:
+Here each middleware step mutates `req` in sequence, and the type system can't check which fields exist at each step. Replace the chain with a typed session helper at the entry point and pass the tenant scope into the operation:
 
 ```ts
 async getOrder(@Req() req: Request) {

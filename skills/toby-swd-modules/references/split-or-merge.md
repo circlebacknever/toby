@@ -1,23 +1,24 @@
 # Split or merge
 
-This file has the details of check 7 in `SKILL.md`. Open it before you split, merge, extract, or inline code.
+This file gives the rules for splitting, merging, extracting, or inlining functions and modules.
 
 ## Merge
 
-Merge two pieces when check 1 puts them in one module, or when merging removes a duplicated rule. Also merge when the merged interface is simpler because it does automatically what callers used to coordinate. Keep blocks separate when they look alike and change for different reasons.
-
-A cache uses a hash table, but hash tables serve unrelated callers, so check 1 doesn't put them in one module.
+Merge two pieces when they share a design decision, when merging removes a duplicated rule, or when the merged interface lets callers skip manual coordination steps. Keep blocks separate when they look alike by coincidence and change for different reasons.
 
 ## Split
 
-Split only when the resulting pieces are independently understandable and each interface is simpler than the original. Length alone isn't a reason to split, so a long method that is one deep abstraction with a simple signature stays whole.
+Split a function or module only when a reader can understand each piece on its own and each piece has a simpler interface than the original. Length alone isn't a reason to split, so keep a long function whole when its steps share local state behind one simple signature.
 
-One valid split extracts a general-purpose subtask, so the parent keeps its interface and the child method works on its own. The other valid split divides a method doing unrelated things into separate caller-visible methods. Take the second split only if most callers need just one of the results. If callers must invoke both halves and pass state between them, the split created shallow methods, so don't make that split.
+Two splits work well:
+
+- Extract a self-contained helper function so the parent keeps its interface and the helper works on its own.
+- Divide a function that does two unrelated jobs into two caller-visible functions, provided callers rarely need to call both halves in sequence.
 
 ## Inline
 
-Inline a shared helper back into its callers when it has gained a flag parameter or a branch for each caller. Then extract only the code that every caller still shares.
+Inline a shared helper back into its callers when it has gained a boolean flag or a branch for each caller. Then extract only the code that every caller still shares.
 
 ## Conjoined methods
 
-Apply the conjoined-methods test. If you can't understand one method's implementation without reading another's, the two methods are conjoined. That pair is a red flag even when the methods share a file.
+When you can't understand one function's body without reading another function's body side by side, the two functions are conjoined. Merge them back together or redraw the split so each function stands on its own.

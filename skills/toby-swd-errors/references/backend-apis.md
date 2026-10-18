@@ -30,7 +30,7 @@ Wrap RPC calls in one helper that checks the status code and respects the deadli
 
 ## Timeouts
 
-Set each outbound timeout to the dependency's healthy p99.9 latency plus margin (or match the repo's existing outbound clients, defaulting to a few seconds when unknown). Without a timeout, a slow dependency ties up worker threads and cascades upstream. When a dependency is non-critical (such as a recommendations panel), degrade gracefully when its timeout expires.
+Set each outbound timeout to the dependency's healthy p99.9 latency plus margin, or match the repo's existing outbound clients (defaulting to a few seconds). Without a timeout, a slow dependency ties up worker threads and cascades upstream. When a dependency is non-critical (such as a recommendations panel), degrade gracefully when its timeout expires.
 
 ## Circuit breakers
 

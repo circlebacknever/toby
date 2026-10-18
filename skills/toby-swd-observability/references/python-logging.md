@@ -16,4 +16,4 @@ When `logging` uses a JSON formatter, pass fields in `extra={"order_id": order.i
 
 ## structlog
 
-In `structlog`, pass fields as keyword arguments, as shown in `SKILL.md`.
+In `structlog`, pass fields as keyword arguments, as `SKILL.md` shows.

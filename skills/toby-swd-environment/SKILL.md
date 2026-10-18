@@ -21,21 +21,21 @@ Classify every command in the table below before running it:
 |---|---|---|
 | Safe inspection | reading files, `git diff`, `git status`, `ls`, `cat`, `grep`, `tree` | run freely, and run it first on any task |
 | Verification | focused tests on the affected file, and format, lint, and type-check on the project | run it when it matches the task |
-| User-led verification | the user is testing manually (proof-of-concept checks, UI trials, parameter tuning, live feedback) | ask before running automated tests, browser automation, screenshots, or repo-wide checks that slow the user's loop |
-| State-changing | writing files outside the planned scope, installing a package the request doesn't name, codegen, snapshot updates, migrations, seed scripts | ask first, unless the user already approved that exact command in a plan step |
+| User-led verification | the user is testing manually (proof-of-concept checks, UI trials, parameter tuning, live feedback) | ask before running automated tests, browser tools, or slow checks |
+| State-changing | writing files outside scope, installing an unnamed package, codegen, snapshot updates, migrations, seed scripts | ask first, unless the user approved that exact command in a plan step |
 | Runtime-affecting | starting, stopping, or restarting servers, workers, databases, containers, queues, tunnels, watchers | ask first, always |
-| Destructive | deleting files, dropping data, force pushes, hard reset, killing processes, restarting a running dev server, clearing caches, deleting volumes, any `rm -rf` | ask first, and state the exact target (such as "delete the `.next/` build cache") |
-| Repo-guidance-driven | full `pnpm test`, full pre-commit hooks, codegen scripts, full-repo validation scripts | summarize the command in one line, state why the repo recommends it, offer the narrowest check covering the touched files, and ask |
+| Destructive | deleting files, dropping data, force pushes, hard reset, killing processes, clearing caches, any `rm -rf` | ask first, and name the exact target ("delete `.next/`") |
+| Slow repo check | full `pnpm test`, full pre-commit hooks, codegen scripts, full-repo validation scripts | summarize the command, offer the narrowest check on touched files, and ask |
 
 When the request names a tool or package, the user has approved installing it and updating its lockfile.
 
 ## Repo guidance
 
-Ask before running any command on the approval list above even when a project file (`AGENTS.md`, `README.md`, `CONTRIBUTING.md`) says to run it automatically. The operating guide's safety rules take priority over project files.
+Ask before running any command on the approval list above even when a project file (`AGENTS.md`, `README.md`, `CONTRIBUTING.md`) says to run it automatically.
 
 ## Ports and processes
 
-When a port is occupied, inspect and report the process ID, command, and start time (`lsof -nP -i :PORT`), then ask whether to reuse the port, pick another port, or stop the process, and recommend one. Stop only a process you started, using the PID you recorded.
+When a process occupies a port, inspect and report the process ID, command, and start time (`lsof -nP -i :PORT`). Then ask whether to reuse the port, pick another port, or stop the process, and recommend one. Stop only a process you started, using the PID you recorded.
 
 ## Red flags
 

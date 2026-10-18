@@ -15,23 +15,23 @@ Build an extension point only when the request, a ticket, a TODO, a second imple
 
 ## Replace the growing conditional
 
-When a `switch` or `if` chain gains a branch on each new product case, or repeats across files, work through these five options in order and stop at the first one that fits (leave a switch alone when its cases have stayed fixed for a year):
+When a `switch` or `if` chain gains a branch on each new product case, or repeats across files, work through these five options in order and stop at the first one that fits. Leave a switch alone when its cases have stayed fixed for a year:
 
 1. **Move the branch onto the type** when the data object or a null-object stand-in can compute the answer itself.
 2. **Data-driven dispatch** (a lookup map from `kind` to a function or value) when each branch runs a small stateless behavior.
-3. **Discriminated union with an exhaustive switch** guarded by `assertNever` / `assert_never` when branches read different fields per variant.
-4. **Polymorphism** (an interface with one class per case) when cases keep growing and each case holds its own private state or dependencies.
+3. **Tagged union with an exhaustive switch** guarded by `assertNever` / `assert_never` when branches read different fields per variant.
+4. **Polymorphism** (an interface with one class per case) when cases keep growing and each case keeps its own private state or dependencies.
 5. **Registry** (`registerHandler`) only when external or plugin code must add cases without editing a central file.
 
 Open `references/replace-the-conditional.md` when choosing between adjacent options or for frontend and backend examples.
 
-When two switches on the same field compute different values (such as a fee and a label), keep them separate and make both exhaustive with `assert_never`, a typed `Record<Kind, ...>`, or a test over all enum values. When adding a case to a conditional duplicated across files you already touch, consolidate the copies within the limits of `toby-swd-campfire`, and list copies in other files as follow-ups at `file:line`.
+When two switches on the same field compute different values (such as a fee and a label), keep them separate. Make both exhaustive with `assert_never`, a typed `Record<Kind, ...>`, or a test over all enum values. When you add a case to a conditional that repeats across files you already touch, merge the copies within `toby-swd-campfire` limits, and list copies in other files as follow-ups at `file:line`.
 
 ## Inheritance
 
 - Implement interfaces freely (`Storage` implemented by disk, S3, and memory classes), so adding a provider adds one class without changing callers.
-- Share code through a passed-in helper object, and avoid an implementation base class or default interface methods, because base and derived classes can break each other through shared state and self-calls.
-- When a framework requires a base class, mark every method `final` except the one or two methods subclasses are meant to override, and never write the same field from both parent and subclass.
+- Share code through a passed-in helper object. Avoid implementation base classes and default interface methods, because base and derived classes can break each other through shared state.
+- When a framework requires a base class, mark every method `final` except the one or two methods subclasses override. Never write the same field from both parent and subclass.
 
 ## Red flags
 

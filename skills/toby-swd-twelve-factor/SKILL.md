@@ -17,7 +17,7 @@ Declare every imported package in the manifest and lockfile, and invoke a system
 
 ## Config
 
-Read every value that varies between deploys from environment variables, validate all required variables at startup, and redact secret values from validation errors and serialized config objects. When the repo has a config module (`references/config.md`), read all env vars through it and check the diff for raw `os.environ`, `process.env`, or `import.meta.env` reads outside it. Never branch on environment names (`NODE_ENV === "production"`) in domain code, and never put secrets in client-bundled `VITE_*`, `NEXT_PUBLIC_*`, or `EXPO_PUBLIC_*` variables.
+Read every deploy-varying value from environment variables, validate required variables at startup, and redact secrets from validation errors and serialized config objects. When the repo has a config module (`references/config.md`), read all env vars through it and check the diff for raw `os.environ`, `process.env`, or `import.meta.env` reads outside it. Never branch on environment names (`NODE_ENV === "production"`) in domain code, and never put secrets in client-bundled `VITE_*`, `NEXT_PUBLIC_*`, or `EXPO_PUBLIC_*` variables.
 
 ## Backing services
 
@@ -25,11 +25,11 @@ Connect to every database, cache, queue, and third-party API through a URL and c
 
 ## Build, release, run
 
-Run database migrations in the deploy release step, and don't run them during web worker startup (except on single-instance deployments such as a single-host Kamal setup). Check startup code for `migrate`, `db.create_all()`, or `sequelize.sync()`.
+Run database migrations in the deploy release step, and don't run them during web worker startup (single-host Kamal setups are the one exception). Check startup code for `migrate`, `db.create_all()`, or `sequelize.sync()`.
 
 ## Processes
 
-Store any state that a subsequent request reads in a backing service (database, Redis, object storage), never in module-level mutable state, in-memory sessions, or container-local disk without a persistent volume. Pure computation caches (`lru_cache`) with bounded size may stay in memory.
+Store any state that a later request reads in a backing service (database, Redis, object storage). Never keep cross-request state in module-level variables, in-memory sessions, or container-local disk without a persistent volume. Pure computation caches (`lru_cache`) with bounded size may stay in memory.
 
 ## Port binding
 
@@ -37,7 +37,7 @@ Read the listening port from config (`PORT`), and check `listen()` or `run()` ca
 
 ## Concurrency
 
-Run new consumers and scheduled tasks in the repo's worker process or platform scheduler, never inside startup hooks that every process, console, and migration runs (`config/initializers/` in Rails, `AppConfig.ready()` in Django, or multi-worker FastAPI lifespan hooks). Check startup code for `setInterval`, `node-cron`, `APScheduler`, `rufus-scheduler`, or background threads.
+Run new consumers and scheduled tasks in the repo's worker process or platform scheduler. Never start them inside web startup hooks that every process, console, and migration runs (`config/initializers/` in Rails, `AppConfig.ready()` in Django, or multi-worker FastAPI lifespan hooks). Check startup code for `setInterval`, `node-cron`, `APScheduler`, `rufus-scheduler`, or background threads.
 
 ## Disposability
 
@@ -53,4 +53,4 @@ Write service logs to `stdout` and CLI logs to `stderr` (keeping `stdout` for pr
 
 ## Admin processes
 
-Write backfills that new code requires at deploy time as migrations, and put slow or one-off maintenance tasks in repo management commands that reuse the app's config and models.
+Write backfills that new code requires at deploy time as migrations. Put slow or one-off maintenance tasks in repo management commands that reuse the app's config and models.

@@ -9,7 +9,7 @@ description: >-
 
 # Toby SWD Observability
 
-Write logs and metrics for the engineer paged at 3 a.m. so they can tell from the logs alone what ran, for which request and record, and why it failed.
+Write logs and metrics so the on-call engineer can tell from the logs alone what ran, for which request and record, and why it failed.
 
 ## Use what the repo has
 
@@ -17,7 +17,7 @@ Use the repo's existing logger, metrics client, and tracer in their established 
 
 ## Log lines
 
-Write each log line as a stable `noun.verb_past` event name plus named fields. Check the logger's formatter first: when it outputs structured fields (such as `structlog` or a JSON formatter), pass each value as a field (with `extra={...}` in standard Python `logging`, `references/python-logging.md`); when it prints only the message string, append `key=value` pairs and list a structured formatter as a follow-up.
+Write each log line as a stable `noun.verb_past` event name plus named fields. Check the logger's formatter first: when it outputs structured fields (`structlog` or JSON), pass each value as a field (`references/python-logging.md`). When the formatter prints only the message string, append `key=value` pairs and list a structured formatter as a follow-up.
 
 ```python
 log.info("order.cancelled", order_id=order.id, user_id=user.id, refund_cents=refund, duration_ms=elapsed)
@@ -35,18 +35,18 @@ log.info("order.cancelled", order_id=order.id, user_id=user.id, refund_cents=ref
 
 ## The outcome log
 
-When an entry point (HTTP route, RPC, queue consumer, or scheduled job) mutates state or calls an external service, log one summary line when it finishes with the event name, record ids, outcome, and `duration_ms`. Read-only entry points covered by access middleware don't need a second log line.
+When an entry point (HTTP route, RPC, consumer, or job) mutates state or calls an external service, log one summary line when it finishes. Include the event name, record ids, outcome, and `duration_ms`. Read-only entry points that access middleware already logs don't need a second log line.
 
 ## Other events
 
 - Log each outbound service call with the target, `duration_ms`, and status or error.
 - Log decisions that branch behavior, such as a feature flag or fallback path.
 - Log an unhandled error once with its stack trace at the handler that catches and responds to it (`log.exception`).
-- Inside a batch loop, log only failed items (rate-limited or sampled under high volume) and log one summary line after the loop with `succeeded_count`, `failed_count`, and `duration_ms`.
+- Inside a batch loop, rate-limit or sample item-failure logs under high volume, and log one summary line after the loop with `succeeded_count`, `failed_count`, and `duration_ms`.
 
 ## Redacted data
 
-Never log passwords, tokens, API keys, session cookies, card numbers, raw request or response bodies, or whole ORM/model objects. Log users by `user_id` without email addresses or full names. If a secret reaches a log, rotate it.
+Never log passwords, tokens, API keys, session cookies, card numbers, raw request or response bodies, or whole ORM/model objects. Log users by `user_id` without email addresses or full names. If code logs a secret, rotate that secret.
 
 ## Metrics
 
@@ -54,8 +54,8 @@ Match the metrics that sibling entry points record, ending metric names with the
 
 ## Alerts
 
-State which alert pages on-call when a new public entry point's error rate spikes, or list the missing alert with its metric and threshold as a follow-up. Before renaming a log event or metric, search the repo for alert and dashboard definitions (`*.rules.yml`, `monitors/`, Terraform monitors), and test any event or metric that drives a paging alert.
+State which alert pages on-call when a new public entry point's error rate spikes, or list the missing alert with its metric and threshold as a follow-up. Before renaming a log event or metric, search the repo for alert and dashboard definitions (`*.rules.yml`, `monitors/`, Terraform), and test any event or metric that drives a paging alert.
 
 ## Traces
 
-When the repo uses OpenTelemetry or another tracer, propagate the trace context across calls and queues, and add manual spans only around slow internal steps that auto-instrumentation doesn't already wrap.
+When the repo uses OpenTelemetry or another tracer, propagate the trace context across calls and queues. Add manual spans only around slow internal steps that auto-instrumentation doesn't already wrap.

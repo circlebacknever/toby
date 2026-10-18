@@ -20,8 +20,8 @@ admin invites an address, sees it as pending, and the teammate opens the email
 link, accepts, and signs in as a member.
 
 Done when: `e2e/invites.spec.ts` "invite, accept, sign in" invites an address,
-opens the link from the stub mail server, accepts, signs in as the new member,
-and sees the member replace the pending invite on the members screen.
+opens the link from the stub mail server, accepts, and signs in as the new
+member on the members screen.
 
 Mode: durable implementation.
 
@@ -41,29 +41,28 @@ Mode: durable implementation.
 - Revoking or resending an invite, unless the user adds it before group 2 starts.
 
 ## Design
-- Structure chosen: an `invites` module with `createInvite(orgId, email, actor)`
+- Structure we chose: an `invites` module with `createInvite(orgId, email, actor)`
   and `acceptInvite(token)` that writes the `invites` table and enqueues the
   invite email.
-- Alternative rejected: storing pending invites in `members` with a `pending`
+- Alternative we rejected: storing pending invites in `members` with a `pending`
   status, which would force every member query to filter out pending rows.
-- Rule: `Invite.isExpired()` computes whether an invite has expired, called by
-  both `acceptInvite` and the Pending list.
-- Hardening: only an org admin can invite, the email input is capped at 254
-  characters, and the email runs through the existing `mailer` job with a
-  timeout and idempotency key.
+- Rule: `Invite.isExpired()` computes whether an invite has expired, and both
+  `acceptInvite` and the Pending list call it.
+- Hardening: only an org admin can invite, the handler caps the email input at
+  254 characters, and `mailer` sends the email with a timeout and idempotency key.
 - Logs: handlers log `invite.created` and `invite.accepted` with `invite_id` and
   `duration_ms`, and omit the email address.
 - Twelve-factor: the change uses existing processes, config, and backing services.
 - Refactor first: `members/list.ts` already renders any row list without a
-  preparatory refactor.
+  refactor beforehand.
 
 ## Flag
 `team-invites` is a release flag, off by default, because `main` deploys on
 every merge. The invites API reads the flag once per request, and the members
 screen renders the Invite section only when `GET /orgs/:id/invites` returns 200.
-Rollout after group 2 ships: enable for the internal org, then 10% of orgs
-hashed by `org_id`, then 100%, turning it off if `invite.created` errors exceed
-1% for 10 minutes. Owner: Sam, removal after 100% rollout by 2026-12-01.
+After group 2 ships, enable the flag for the internal org, then 10% of orgs
+hashed by `org_id`, then 100%. Turn the flag off if `invite.created` errors
+exceed 1% for 10 minutes. Owner: Sam, removal after 100% rollout by 2026-12-01.
 
 ## Groups
 | File | Slice | Criteria | Depends on | Status |
@@ -87,13 +86,12 @@ Rollback: drop the `invites` table with `0043_invites_down.sql` and turn off
       and the second passes.
 - [x] Edit `api/invites.ts` to add `createInvite(orgId, email, actor)`, and create
       `db/migrations/0043_invites.sql` for the `invites` table. The function
-      returns the pending invite and rejects a duplicate unexpired invite
-      (`test_create_invite_rejects_duplicate` fails before and passes after).
+      returns the pending invite and rejects a duplicate unexpired invite. Run
+      `test_create_invite_rejects_duplicate` before and after the edit.
 - [x] Ask before running `pnpm db:migrate` against the local database.
 - [x] Edit `api/invites/router.ts` to register `POST /orgs/:id/invites` and
-      `GET /orgs/:id/invites`, guarded by the `team-invites` flag in
-      `flags/index.ts` (off by default, with its kind and removal condition in a
-      comment at the check site).
+      `GET /orgs/:id/invites` behind the `team-invites` flag in `flags/index.ts`.
+      Add a comment at the check site stating the flag's kind and removal condition.
 - [x] Edit `screens/Members.tsx` to render `<InviteForm>` and the Pending list
       when `GET /orgs/:id/invites` returns 200.
 

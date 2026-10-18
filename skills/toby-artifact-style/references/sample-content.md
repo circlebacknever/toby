@@ -15,10 +15,10 @@ When placeholder content lacks a real subject, use the spacecraft operations voc
 ## Mission / artifact identifiers
 
 - `M-01` through `M-05` are ids for the five sample topics under Domain clusters.
-- `v4.2`, `v3.9` — versions.
-- `R-04.2` — reference deck identifier.
-- `T+04:12 UTC`, `T+18`, `T+42` — mission elapsed time.
-- `n=240` — sample count.
+- `v4.2`, `v3.9`: versions.
+- `R-04.2`: reference deck identifier.
+- `T+04:12 UTC`, `T+18`, `T+42`: mission elapsed time.
+- `n=240`: sample count.
 - Full session line: `SESSION T+04:12 · M-01 · v4.2`.
 
 ---
@@ -27,9 +27,9 @@ When placeholder content lacks a real subject, use the spacecraft operations voc
 
 Decisions use only these three verbs:
 
-- **Approve** — proceed with the action.
-- **Hold** — defer the action and gather more evidence.
-- **Reject** — block the action.
+- **Approve:** proceed with the action.
+- **Hold:** defer the action and gather more evidence.
+- **Reject:** block the action.
 
 `Defer`, `File`, `Review`, `Snapshot`, and `Block` are archive actions, so don't use them as decision verbs.
 

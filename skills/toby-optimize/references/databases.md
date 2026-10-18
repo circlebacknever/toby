@@ -8,7 +8,7 @@ A loop that reads a lazy relation, which the ORM loads only when code first read
 
 1. Add eager-load hints to the query that loads the parent rows (`joinedload`, `selectinload`, `include`). 351 queries become 3.
 2. When a view always needs the same fields, add a repository method that returns a flat row type with exactly those fields from one query. A caller can't trigger N+1 on a field that isn't a relation.
-3. Add a denormalized read table, updated on write, only after a measurement shows the joined query is still too slow.
+3. Add a separate read table that the write path keeps updated with pre-joined rows only after a measurement shows the joined query is still too slow.
 
 ## Bulk writes
 
@@ -16,7 +16,7 @@ Send a loop of single-row statements as one statement, such as `UPDATE ... WHERE
 
 ## Indexes
 
-Choose indexes when the table or the query is designed, and check each hot query with `EXPLAIN ANALYZE` before it ships. Build a new index on a table that takes writes with `CREATE INDEX CONCURRENTLY`, in a migration outside a transaction. Run `EXPLAIN ANALYZE` on a write, such as an `UPDATE` or `DELETE`, only between `BEGIN` and `ROLLBACK`, because it executes the statement.
+Choose indexes when you design the table or the query, and check each hot query with `EXPLAIN ANALYZE` before it ships. Build a new index on a table that takes writes with `CREATE INDEX CONCURRENTLY`, in a migration outside a transaction. Run `EXPLAIN ANALYZE` on a write, such as an `UPDATE` or `DELETE`, only between `BEGIN` and `ROLLBACK`, because it executes the statement.
 
 - Index each foreign key the code looks rows up by.
 - For `WHERE customer_id = ? AND status = ? ORDER BY created_at DESC`, use `(customer_id, status, created_at DESC)`. It also serves queries on its leading columns, but not a query on `status` alone.

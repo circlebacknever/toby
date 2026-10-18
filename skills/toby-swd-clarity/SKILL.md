@@ -12,13 +12,13 @@ Names and types state part of a contract, and comments state the rest: behavior,
 
 ## Naming
 
-Pick each name so a reader who sees only the identifier guesses what the variable holds or what the function does. Make names more specific as their scope widens: `i` fits a three-line loop, while fields, parameters, and exports need exact names. Avoid over-specific names (such as `selection` on a function that accepts any range), and use `data`, `value`, `result`, `status`, `flag`, or `count` only in tiny scopes where the meaning is immediate.
+Pick each name so a reader who sees only the identifier guesses what the variable holds or what the function does. Make names more specific as their scope widens: `i` fits a three-line loop, while fields, parameters, and exports need exact names. Avoid overly narrow names (such as `selection` on a function that accepts any text range). Use `data`, `value`, `result`, `status`, `flag`, or `count` only in tiny scopes where the meaning is obvious.
 
-Give each name one meaning, and pair related variables with a shared root and prefix (`srcBlock` and `dstBlock`). When no short, accurate name fits, the function or variable is doing two jobs and should be split; keep a dense expression whole when its result has one clear name.
+Give each name one meaning, and pair related variables with a shared root and prefix (`srcBlock` and `dstBlock`). When a function or variable needs a long, awkward name, split its two jobs apart. Keep a dense expression whole when its result has one clear name.
 
 ## Consistency
 
-Do similar things the same way, and dissimilar things differently. Match the file and repo's existing conventions for naming, structure, error handling, and test layout, and reuse the exact term already established for a domain concept.
+Do similar things the same way, and dissimilar things differently. Match the file and repo's conventions for naming, structure, error handling, and test layout, and reuse the existing term for each domain concept.
 
 Change an existing convention only when new evidence justifies converting every call site in the same diff. When one concept has multiple names across the repo, list the repo-wide rename as a follow-up and don't add another local name.
 

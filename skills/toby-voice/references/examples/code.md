@@ -7,7 +7,7 @@ This file shows how to state a code finding outside `toby-code-review`: state wh
 ## Fact and consequence
 
 - `parseConfig` reads the file on every call. Each request calls `parseConfig`, so at 4,000 requests a minute the process reads the file 4,000 times a minute.
-- The index on `orders(created_at)` is unused. Every query filters on `tenant_id` first, so the planner uses the tenant index.
+- The query planner never uses the index on `orders(created_at)`. Every query filters on `tenant_id` first, so the planner uses the tenant index.
 - Deleting a user leaves their sessions in the table. Add a foreign-key cascade, or delete the sessions in the same transaction.
 - The handler catches `Exception` and logs at `debug`. Production runs at `info`, so the production logs omit these failures.
 - The retry wraps the whole request, including the body stream read. The first attempt consumes the stream, so the retry sends an empty body.
@@ -19,7 +19,7 @@ This file shows how to state a code finding outside `toby-code-review`: state wh
 - The app imports a package to check whether a number is even, and that package has had two CVEs.
 - The function returns a variable named `temp`, writes it to the database, and renders it on the homepage. Rename `temp` for what it holds.
 - The `// temporary` comment dates from 2019, and both the author and the reviewer have left the company.
-- The retry count and timeout come from config, while the URL they call is hardcoded to staging.
+- The client reads the retry count and timeout from config, and hardcodes the staging URL.
 - The client retries a 400 response three times and sends the same invalid payload each time.
 - The catch block returns `null` on error, and the caller crashes two lines later when it dereferences that return value.
 - `process` is 200 lines and performs nine separate jobs, and its name describes none of them.
@@ -32,7 +32,7 @@ This file shows how to state a code finding outside `toby-code-review`: state wh
 
 ## Misleading names
 
-- The flag is named `ENABLE_NEW_CHECKOUT_V2_FINAL`, and the team has renamed it twice since adding `FINAL`.
+- The team named the flag `ENABLE_NEW_CHECKOUT_V2_FINAL` and has renamed it twice since adding `FINAL`.
 - The oldest of the 40 call sites of `TEMP_FIX` dates from 2022.
 - `utils.js` is 1,800 lines and mixes functions from nine unrelated modules.
 - `UserManager` and `UserHandler` both call `UserService`, and no code in the repo calls `UserHandler`.
@@ -42,7 +42,7 @@ This file shows how to state a code finding outside `toby-code-review`: state wh
 - The test suite takes 40 minutes, so the team runs it once a week and catches regressions up to six days after merge.
 - `test1` asserts that `true` is `true` and has never failed.
 - The team re-records the 4,000-line snapshot whenever it fails, so the snapshot never blocks a regression.
-- The only assertion in the test is commented out, so the test passes without checking the result.
+- The test comments out its only assertion, so it passes without checking the result.
 
 ## Performance
 

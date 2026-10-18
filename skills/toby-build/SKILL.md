@@ -23,45 +23,42 @@ To open a skill, read `../<name>/SKILL.md` relative to this skill's folder. Open
 
 ## 1. Size the work
 
-State `Mode: durable implementation (tactical)` or `Mode: durable implementation (strategic)` in one line. The work is strategic, and needs a written plan, when any of these apply:
+State `Mode: durable implementation (tactical)` or `Mode: durable implementation (strategic)` in one line. The work is strategic, and needs a written plan, when it touches any of these:
 
-- a new module or boundary
-- an API that code outside this deploy calls, such as a mobile app, a partner's server, or a package's users
-- an event, or a persisted format
-- a migration, unless it only adds a table or adds a column that is nullable or has a default
+- a new module, boundary, or subsystem without a similar one in the repo
+- an API called outside this deploy, an event, or a stored format
+- a migration, unless it only adds a table or a nullable/defaulted column
 - a new or changed rule for auth, permissions, billing, money, or privacy
 - a behavior that three or more call sites depend on
-- a UI workflow that crosses more than one screen
-- a new subsystem without a similar one in the repo, such as a data store or service
-- work the user expects to take more than one session
+- a UI workflow across multiple screens, or work spanning multiple sessions
 
-Adding an optional parameter with a default or a response field, or reusing an existing check such as an owner filter, stays tactical. Removing, renaming, or retyping a field, or changing what an exported function returns or what its callers must handle, is strategic. When a strategic trigger turns up mid-build, switch to strategic, say so, and stay strategic.
+Adding an optional parameter with a default, adding a response field, or reusing an existing check stays tactical. Removing, renaming, or retyping a field, or changing what callers must handle, is strategic. When a strategic trigger turns up mid-build, switch to strategic, say so, and open `references/strategic.md`.
 
 Tactical work is one slice, with its criteria and design in chat. For strategic work, open `references/strategic.md`.
 
 ## 2. Read the code
 
-Read the file that implements the behavior today, its tests, and every place that reads, renders, stores, or documents the touched behavior. When you don't find a test, state where you searched, such as "`tests/orders/` doesn't have a test for `cancelOrder`." Include every caller or doc the change breaks in the work.
+Read the file that implements the behavior today, its tests, and every place that reads, renders, stores, or documents it. When you don't find a test, state where you searched, such as "`tests/orders/` doesn't have a test for `cancelOrder`." Include every caller or doc the change breaks in the work.
 
 Cite `path:line` for each claim about how the code behaves, or mark it as an assumption. Before adding a helper, module, component, hook, or error type, search the repo and cite the closest match or the search that found none.
 
 ## 3. Write the criteria
 
 1. Picture how the user will use the finished result, and open `references/criteria.md`.
-2. Write one criterion per behavior the result needs, plus one for a nearby behavior that must keep working in strategic work (in tactical work, list the existing tests in the Check).
+2. Write one criterion per required behavior. In strategic work, add a criterion for nearby behavior that must keep working, and in tactical work, list the existing tests in the Check.
 3. For strategic work, open `toby-swd-e2e` before writing the Check lines.
 
 Take the reading that covers the whole request and solves the user's problem. Open `references/ambiguity.md` only when two readings fit the words and neither has a usual answer under the operating guide's Decisions section.
 
 ## 4. Cut slices and stop
 
-For strategic work, open `toby-swd-plan` before naming the slices. Each slice ships only when:
+For strategic work, open `toby-swd-plan` before naming the slices. Ship a slice only when:
 
 - It leaves the system working.
-- It is correct on its own, or hidden behind an off-by-default flag (`toby-swd-flags`).
+- It is complete on its own, or you hide it behind an off-by-default flag (`toby-swd-flags`).
 - A user or caller reaches it from outside its module, at a cited `path:line` such as a registered route or render site.
 
-At stop 1 of strategic work, show the three-line criteria under `What done means for [task]`, the slice names, and the plan's path, offer to write the plan there, and wait. Tactical work states each criterion on one line in chat and continues in the same reply. Never write "assuming yes, proceeding" past a stop.
+At stop 1 of strategic work, show the criteria under `What done means for [task]`, the slice names, and the plan's path. Offer to write the plan there and wait for approval. Tactical work states each criterion on one line in chat and continues in the same reply.
 
 ## 5. Design
 
@@ -73,11 +70,11 @@ Open `toby-swd-campfire` and run its "Before the first edit" check. Then open ea
 - Open `toby-swd-interfaces` for a new or changed signature that callers must handle.
 - Open `toby-swd-extensibility` when the design branches on a type, kind, status, or provider, or adds an implementation or subclass.
 - Open `toby-swd-errors` for a failure case, retry, timeout, or validation.
-- Open `toby-optimize` for a stated time or memory budget, or a cache, batch, or queue added for speed.
+- Open `toby-optimize` for a stated time or memory budget, or when you add a cache, batch, or queue for speed.
 - Open `toby-swd-hardening` and `toby-swd-observability` for a new entry point, job, consumer, outbound call, write, or failure path, or any request about logs, metrics, alerts, or hardening.
 - Open `toby-swd-twelve-factor` for a new process, worker, scheduled job, config value, secret, or backing service.
 
-State the structure chosen, the alternative rejected, any new signature, the one function that computes each new rule, and any preparatory refactor (or `Structure: follows <path:line>`). Read the installed source of any library behavior the design relies on, or state it as an assumption. Read "Don't build" in `references/checks.md` before writing the plan or the first edit.
+State the structure you chose, the alternative you rejected, any new signature, the one function that computes each new rule, and any refactor you run before the feature edits. Read the installed source of any library behavior the design relies on, or state it as an assumption. Read "Don't build" in `references/checks.md` before writing the plan or the first edit.
 
 ## 6. Write the plan and stop
 
@@ -88,7 +85,7 @@ For strategic work, write the plan and stop for approval at stop 2 before the fi
 Open `toby-swd-testing` before the first edit.
 
 - Build one criterion at a time.
-- Read the installed source for each library function, config field, env var, CLI flag, prop, or error type the change uses and didn't define, unless the repo already calls it at a `path:line` you cite.
+- Read the installed source for each external function, config field, env var, CLI flag, prop, or error type you use, unless the repo already calls it at a cited `path:line`.
 - When the code needs a different module, boundary, or signature than the design states, stop, update the design, and state what changed.
 - Open `toby-swd-docs` when module structure changes or the change alters an API described in a `README.md` or `AGENTS.md`.
 

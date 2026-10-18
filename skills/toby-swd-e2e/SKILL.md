@@ -14,7 +14,7 @@ Prove each slice with a test that drives the feature through its real entry poin
 
 Find the repo's end-to-end setup and add the test in its style. Open `references/harnesses.md` for the files and markers used in each stack.
 
-When the repo doesn't have an end-to-end harness, use the framework's in-process test client when one exists. Otherwise propose a minimal harness only when the user asked for an e2e test or the work is strategic under `toby-build`. In other work, run the entry point manually, quote the output, and list the missing harness as a follow-up. Ask before installing a tool or starting a server or container (`toby-swd-environment`).
+When the repo doesn't have an end-to-end harness, use the framework's in-process test client when one exists. Propose a new harness only when the user asked for an e2e test or the change is multi-slice work in `toby-build`. In other work, run the entry point manually, quote the output, and list the missing harness as a follow-up. Ask before installing a tool or starting a server or container (`toby-swd-environment`).
 
 ## Drive the entry point
 
@@ -35,17 +35,17 @@ For a queue consumer, ask before starting a container (`toby-swd-environment`) a
 
 Keep everything inside the service boundary real: database, migrations, config loading, routing, and auth middleware. Point the test at an isolated test database, and make custom harnesses refuse any connection URL that isn't a test database.
 
-Fake only third-party services at the network edge by stubbing the HTTP call in the provider module, using a local stub server, or using the framework's test mail backend (`:test` in Rails, `locmem` in Django). A test that mocks an internal module is a unit test.
+Fake only third-party services at the HTTP boundary: stub the HTTP call in the provider module, run a local stub server, or use the framework's test mail backend (`:test` in Rails, `locmem` in Django). A test that mocks an internal module is a unit test.
 
 ## Test data
 
-Create test data through the public API or seed helpers with unique ids, and clean up in a transaction rollback or teardown hook so a failed assertion mid-test doesn't leave rows behind. Wait for an observable condition (a row saved or a selector visible) and never sleep for a fixed duration.
+Create test data through the public API or seed helpers with unique ids. Clean up in a transaction rollback or teardown hook so a failed assertion mid-test doesn't leave rows behind. Wait for an observable condition (a row saved or a selector visible) and never sleep for a fixed duration.
 
 ## How many
 
-- Write one e2e test per slice for its primary behavior plus one per failure criterion, and keep combinatoric edge cases in unit tests.
-- When a feature spans two or more slices, add one whole-feature test in the final slice that walks through every slice in order (such as invite, accept, then sign in).
+- Write one e2e test per slice for its main path plus one per failure criterion, and leave input-combination edge cases to unit tests.
+- When a feature spans two or more slices, add one whole-feature test in the final slice that runs every slice in order.
 
 ## Run it
 
-Run the test before and after the change in the format `toby-swd-testing` gives (failing before and passing after for new behavior), and state the CI command that runs it. When a test requires credentials or hardware you don't have, write the test, mark the criterion `unverified`, and give the user the command to run.
+Run the test before and after the change in the format `toby-swd-testing` gives, and state the CI command that runs it. When a test requires credentials or hardware you don't have, write the test, mark the criterion `unverified`, and give the user the command to run.

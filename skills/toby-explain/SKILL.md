@@ -12,7 +12,17 @@ description: >-
 
 # Toby Explain
 
-Answer the question in your first sentence, and give the reason in your second sentence. When the answer is a fix or workaround, list the steps to apply it and stop.
+Answer the question in your first sentence, and give the reason in your second sentence. Keep every sentence short and active so the user understands it on the first read. When the answer is a fix or workaround, list the numbered steps to apply it and stop.
+
+## How to explain
+
+Write the way a clear human engineer explains something to a teammate:
+
+- **Name who does what.** Put the actor (`the browser`, `the handler`, `Postgres`, `you`) before an active verb (`sends`, `checks`, `locks`, `returns`). Never hide the actor in passive voice (`"is validated"`, `"is returned"`).
+- **Walk one example through in time order.** When explaining how code or a system works, trace one concrete input from start to finish in the order the steps happen (`"When a user clicks Cancel, the browser sends POST /orders/42/cancel..."`).
+- **Use everyday words first.** Explain what happens in plain words before naming internal abstractions. After you introduce a long identifier (`WorkspaceSeatRollupJob`), you can call it `that job` in the next sentence so the prose reads naturally.
+- **Put `file:line` at the end of the sentence or bullet.** Don't interrupt the middle of a clause with file paths.
+- **Break multi-point paragraphs into bullets.** Keep paragraphs to at most three short sentences. When listing reasons, steps, or differences, give each one its own bullet or number.
 
 ## Evidence
 
@@ -23,15 +33,15 @@ Back up every claim in chat:
 - State the source for any other claim, or call an unverified claim a `guess`.
 - Draw a diagram or chart only when the user asks for one.
 
-## What to say
+## What to include
 
-Include the one or two points below that the user needs:
+Include only the one or two points below that answer the user's question:
 
-- For a design or tradeoff question, state what was chosen, why it fits better than the alternative, and what the other option would have cost.
+- For a design or tradeoff question, state what the code chose, the concrete bug or maintenance cost it avoids in this codebase, and what the other option would have cost.
 - State a common misreading and the right reading, or state what condition would change the answer.
 - Run every read-only check (such as a version or config command) before stating what remains unknown.
 
-For a design choice in code, open the matching skill by path (`../<skill>/SKILL.md`) and explain the choice with its rule:
+When the user asks where code should go or why a design rule applies, open the matching skill by path (`../<skill>/SKILL.md`) and explain the choice in plain words using the concrete code in front of you:
 
 - Where code goes: `toby-swd-modules` and `references/placement-note.md`
 - Feature structure: `toby-swd-architecture`
@@ -46,16 +56,15 @@ For a design choice in code, open the matching skill by path (`../<skill>/SKILL.
 
 ## Without code
 
-When the user hasn't shown code or text, state the answer first, then give the smallest example where the common wrong assumption predicts a different result from the actual one.
+When the user hasn't shown code or text, state the answer first, then give a short concrete example where the common assumption fails.
 
 ## The reader
 
-Match the explanation to what the user says about their background, because a beginner can ask a precise question. Compare a new concept to a familiar field only when the two mechanisms match closely.
+Match the explanation to what the user says about their background, because a beginner can ask a precise question. Compare a new concept to a familiar field only when both work the same way.
 
-## How to write it
+## Finishing checks
 
 - Put each explanation next to the line, equation, or passage it explains, and state what causes what (`"The test fails because CI runs in UTC."`).
-- Use a short arrow chain (`request → cache → database`) when one sentence can't show how parts connect.
 - Load `../toby-voice/references/plain-language.md` and follow it.
 - Never quiz the user or hold back the answer, because only `/toby-learning` asks check questions.
 - Leave out general tutorials, boxed "Insight" notes, and closing summaries.

@@ -22,8 +22,8 @@ To open a skill by path, read `../<skill>/SKILL.md` relative to this skill's fol
 1. **Reproduce.** Open `toby-swd-testing` and write the failing test its bug-fix rule describes. When the repo doesn't have a test harness, reproduce the failure with one command and quote its output. When you can't reproduce it, list what you tried and stop before any edit.
 2. **Classify a failing test.** When the report is a test that started failing, classify it into one of the four cases in `toby-swd-testing` before editing the test or the code.
 3. **Find the cause.** Trace the path from the failing input to the wrong output, citing `file:line` at each step, and state the cause in one sentence with its `file:line` before the first edit. Call an uncited cause a guess and keep reading.
-4. **Choose the fix.** Fix the cause where it happens. When duplicated logic or a tangled condition obscures the cause, run "Before the first edit" from `toby-swd-campfire` with existing passing tests first. Open `toby-swd-architecture` when the fix moves a rule, `toby-swd-strategy` when the fix would work around a design flaw, and `toby-swd-errors` when the cause is in an error, retry, or validation path. When the repair requires new behavior across multiple files, say so and switch to `toby-build` with the reproduction as criterion 1.
-5. **Prove it.** Run the reproduction before and after the fix in the form `toby-swd-testing` gives, then run the narrowest tests covering the touched code. When the test was written after the fix, revert the fix first to watch the test fail on the expected assertion (`before`), then restore the fix (`after`).
+4. **Choose the fix.** Fix the cause where it happens. When duplicated logic or a tangled condition hides the cause, run "Before the first edit" from `toby-swd-campfire` with existing passing tests first. Open `toby-swd-architecture` when the fix moves a rule, `toby-swd-strategy` when the fix would work around a design flaw, and `toby-swd-errors` when the cause is in an error, retry, or validation path. When the repair requires new behavior across multiple files, say so and switch to `toby-build` with the reproduction as criterion 1.
+5. **Prove it.** Run the reproduction before and after the fix in the form `toby-swd-testing` gives, then run the narrowest tests covering the touched code. When you wrote the test after the fix, revert the fix first to watch the test fail on the expected assertion (`before`), then restore the fix (`after`).
 6. **Check the design.** Run "After the tests pass" from `toby-swd-campfire` on the fix, and list flaws outside the fixed function as follow-ups at `file:line`. When finding the cause required state that the logs omitted, add a log field for that state as `toby-swd-observability` describes.
 
 ## Scope
@@ -36,10 +36,10 @@ Check the fix against each entry before reporting:
 
 - The fix doesn't have a failing test or quoted command output before it.
 - The fix branches on the one literal input from the bug report.
-- A test or assertion was weakened so the suite passes.
+- You weakened a test or assertion so the suite passes.
 - A catch block or default value now hides the error.
-- A dependency was installed or a cache cleared before finding the cause.
+- You installed a dependency or cleared a cache before finding the cause.
 
 ## Final response
 
-Lead with the cause in one sentence at `file:line`. Then list the fix, the `before` and `after` runs, and what stays unverified.
+Lead with the cause in one sentence at `file:line`. Then list the fix, the `before` and `after` runs, and what you didn't verify.

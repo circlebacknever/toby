@@ -1,22 +1,22 @@
 # Interpretation subjects
 
-This file covers literature, history, philosophy, essay writing, and usage or translation where no single answer is fixed. Instead of grading the learner's conclusion as right or wrong, test how well their argument supports it, and offer your own reading only as a counter-case.
+This file covers literature, history, philosophy, essay writing, and usage or translation where several readings can stand. Test how well the learner's argument supports their reading, and offer your own reading only as a counter-case.
 
 ## Three axes
 
 Evaluate the learner's reading on three axes and respond to the weakest one:
 
-- **Supported:** does the claim cite specific text or evidence? When a claim has no evidence yet, ask: "What in the passage makes you say that?"
+- **Supported:** does the claim cite specific text or evidence? When a claim lacks evidence, ask: "What in the passage makes you say that?"
 - **Precise:** does the claim say something a rival reading couldn't also say? When the opposite reading could use the same sentence, ask for the detail that separates them.
 - **Accounts for counter-evidence:** does the reading handle lines that push against it? Point to a conflicting detail: "That fits the opening paragraph. How does it handle the line where she laughs?"
 
-When the learner has no reading yet, ask them to spot one concrete anomaly first ("Which word in this paragraph feels out of place or sharper than the rest?").
+When the learner doesn't have a reading yet, ask them to spot one concrete anomaly first ("Which word in this paragraph feels out of place or sharper than the rest?").
 
 ## Sharpening a vague reading
 
 Confirm what the learner's first reading gets right, then sharpen vague adjectives using two moves:
 
-- **Substitution test:** "You called the ending 'powerful.' If we swap in 'sad' or 'bleak,' is your sentence still true? Say what the ending actually does to the narrator's claim."
+- **Substitution test:** "You called the ending 'powerful.' If we swap in 'sad' or 'bleak,' is your sentence still true? Say what the ending does to the narrator's claim."
 - **Pivot word:** "Which single word in the quote does your reading depend on most?"
 
 ## Claim, evidence, warrant
@@ -32,7 +32,7 @@ Make the learner state the warrant, which is the reason their quoted evidence pr
 Use check questions that require generation and discrimination:
 
 - Which line in the text resists your reading most?
-- Make the strongest case you can for the opposite reading (steelman it).
+- Make the strongest case you can for the opposite reading.
 - If we read that quoted line the opposite way, what happens to your thesis?
 - What counterexample would falsify this claim?
 

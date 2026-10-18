@@ -4,7 +4,7 @@
 
 ## Option 1. Move the branch onto the type
 
-A new requirement says that deleted users render as "[deleted]".
+A new requirement says that deleted users render as `"[deleted]"`.
 
 ```python
 def display_name(user):
@@ -13,9 +13,7 @@ def display_name(user):
     return f"{user.first} {user.last}"
 ```
 
-Every caller that formats a name now depends on this branch. Each new user state, such as banned, system, or unverified, needs another branch here or a second copy of this check somewhere else. The concept "deleted" has leaked into name formatting.
-
-Move the branch onto the `User` type:
+Every caller that formats a name now depends on this branch, and each new user state (banned, system, unverified) adds another branch. Move the branch onto `User`:
 
 ```python
 def display_name(user):
@@ -28,26 +26,13 @@ class User:
         return f"{self.first} {self.last}"
 ```
 
-The branch still exists, but only once, next to the data it reads, so callers don't see it. Adding a state changes one method.
-
-The same move removes null checks. Replace `None` with a stand-in object that has the same methods as the real object. Then the normal code doesn't need an `if x is None` check.
+The branch now sits in one method next to the data it reads. You can remove repeated `None` checks the same way by returning a stand-in guest object with the same methods as `User`.
 
 ---
 
 ## Option 2. Data-driven dispatch
 
-When each branch picks a small behavior based on the value of one field, such as `file.kind`, replace the branches with a lookup map.
-
-```tsx
-function renderPreview(file: FileMeta): ReactNode {
-  if (file.kind === "pdf") return <PdfPreview file={file} />;
-  if (file.kind === "csv") return <CsvPreview file={file} />;
-  if (file.kind === "image") return <ImagePreview file={file} />;
-  return <UnknownPreview file={file} />;
-}
-```
-
-Every new file kind requires an edit to this function. Replace it with a map:
+When each branch picks a small behavior based on one field, such as `file.kind`, replace the `if` chain with a lookup map:
 
 ```tsx
 const PREVIEWS: Record<FileKind, FC<{ file: FileMeta }>> = {
@@ -62,15 +47,13 @@ function renderPreview(file: FileMeta): ReactNode {
 }
 ```
 
-Adding a kind means adding one entry. `Record<FileKind, …>` makes a missing entry a compile error, so the set stays complete. The map doesn't need a design pattern or a class.
-
-When a second map on `kind` computes something else, such as an icon, type it as `Record<FileKind, …>` too. The compiler then reports a missing kind in both maps.
+Adding a file kind adds one map entry, and `Record<FileKind, ...>` makes a missing entry a compile error. When a second map on `kind` computes an icon, type it as `Record<FileKind, ...>` so the compiler checks both maps.
 
 ---
 
-## Option 3. Discriminated union with an exhaustive switch
+## Option 3. Tagged union with an exhaustive switch
 
-When the branches read different fields, the map doesn't fit. Keep the switch and let the type make it exhaustive.
+When each branch reads different fields, use a tagged union and an exhaustive `switch`:
 
 ```ts
 type DomainEvent =
@@ -92,15 +75,13 @@ function reduce(state: State, e: DomainEvent): State {
 }
 ```
 
-Add a variant to `DomainEvent` and the `default` arm stops compiling until the new `case` is written. The switch is a single dispatch point that the compiler keeps complete. The compiler reports any `case` a developer forgets to add.
-
-Use this over option 2 when each branch reads different fields. Use option 2 when the branches differ only in which function runs.
+When you add a variant to `DomainEvent`, the `default` arm fails to compile until you handle the new `case`.
 
 ---
 
 ## Option 4. Polymorphism
 
-When each case has its own behavior, private state, or dependencies, a map of functions is the wrong container. Give each case an object behind a shared interface.
+When each case keeps its own private state or dependencies, give each case a class behind a shared interface:
 
 ```ts
 interface Gateway {
@@ -109,25 +90,23 @@ interface Gateway {
 }
 
 class StripeGateway implements Gateway {
-  // stores the Stripe SDK client, the API key, a retry policy, and an idempotency cache
+  // stores the Stripe SDK client, API key, and retry policy
 }
 
 class LegacyBankGateway implements Gateway {
-  // stores a SOAP client, a client cert, a different retry policy, and a nightly batch file
+  // stores a SOAP client, client cert, and nightly batch file
 }
 
 const gateway: Gateway = GATEWAYS[config.gatewayName];
 ```
 
-Each implementation is its own module, with its state and dependencies inside it.
-
-The cost is one interface to keep stable, one class per case, and one place in the code that picks which class to use. Polymorphism is worth that cost when new cases keep being added and each case has state the others don't share. Three one-line branches over a fixed set of cases don't qualify. Use option 2 for them.
+Use polymorphism when you keep adding cases that hold distinct state or clients, and use a lookup map (Option 2) for small stateless branches.
 
 ---
 
 ## Option 5. Registry
 
-Sometimes someone must be able to add a case without editing any shared file. Then the code that picks the handler must accept new handlers while the program runs. Each implementation registers itself.
+Use a runtime registry only when external plugins or independently loaded modules must add cases without editing a central file:
 
 ```ts
 const HANDLERS = new Map<string, MessageHandler>();
@@ -143,22 +122,19 @@ export function dispatch(message: InboundMessage): Promise<void> {
 }
 ```
 
-Each handler module calls `registerHandler` at load, so the dispatcher never imports them. This fits a plugin API, or a set of adapters loaded by config at boot.
-
-It is the most complex option. The registration adds indirection that a reader has to trace. Load order also becomes something you can get wrong. Use a registry only when code you don't control, such as third-party plugins, must add cases.
+Each handler module calls `registerHandler` at startup, so the dispatcher never imports them. Because registration hides call targets and depends on module load order, reserve it for third-party plugins.
 
 ---
 
-## React and React Native examples
+## Frontend examples
 
-- **Status to component.** Replace a `switch (status)` in render with a `Record<Status, FC>`. Put the map above the component or in a sibling module.
-- **Variant prop that grew.** A `<Button variant="…">` whose `variant` gains values every quarter is an option 2 case, where the prop value selects the behavior. Move to compound components with `children`, or a map from variant to a style object.
-- **Field type to input.** A form that renders from a schema maps `field.type` to a component. A `switch (field.type)` inside JSX is the smell.
-- **Behavior split from presentation.** Put the state logic in a headless hook, and have each screen call that hook and render its own markup.
-- **Platform branch.** `Platform.OS === "ios"` checks spread through components are one decision copied into many files. Use `Platform.select({ ios, android })` in one module, or `Foo.ios.tsx` and `Foo.android.tsx` files where the bundler picks the file, so the code doesn't branch.
+- **Status to component:** replace a `switch (status)` in render with a `Record<Status, FC>` lookup map.
+- **Growing variant prop:** when `<Button variant="...">` gains variants every quarter, map `variant` to a style object or split into purpose-named components.
+- **Schema form fields:** map `field.type` to an input component in a lookup object and keep the switch out of JSX.
+- **Platform branches:** replace scattered `Platform.OS === "ios"` checks with `Platform.select({ ios, android })` in one module or `.ios.tsx` / `.android.tsx` files.
 
 ## Backend examples
 
-- **Adapter interface.** `Gateway`, `StorageDriver`, and `Notifier` each have one interface and one implementation per provider. The composition root selects the implementation from config.
-- **Handler map by message type.** Use option 2 for a closed set of message types, and option 5 when handlers ship independently.
-- **Wire discriminated union.** A payload with a `type` tag is validated once where it enters the service, then dispatched with option 3 so the compiler checks that every case is handled.
+- **Provider adapters:** give `Gateway`, `StorageDriver`, and `Notifier` one interface and one class per provider, selected from config at startup.
+- **Message handlers:** use a lookup map for a fixed set of message types, and a registry only when handlers ship in separate packages.
+- **Wire payloads:** validate a tagged payload once at the entry point, then dispatch it with an exhaustive switch.

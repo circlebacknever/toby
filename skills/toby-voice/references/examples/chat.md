@@ -61,7 +61,7 @@ When the user restates an idea and part of it is wrong, say what is wrong in the
 
 - → I don't know why this query is slow. I haven't profiled the join yet, and `EXPLAIN ANALYZE` on `orders` will show whether it scans the table.
 - → I don't know, because I haven't seen that error string before.
-- → I can't tell from here whether that function is safe to delete. This repo doesn't call it, but it is exported, so another repo might call it.
+- → I can't tell from here whether that function is safe to delete. This repo doesn't call it, but this module exports it, so another repo might call it.
 
 ## Self-correction
 

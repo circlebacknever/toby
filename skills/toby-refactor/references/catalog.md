@@ -12,7 +12,7 @@ This file lists the refactorings from Martin Fowler's *Refactoring*, second edit
 
 Inline Function runs these steps in reverse.
 
-**Rename.** Rename Variable, Rename Field, and the simple form of Change Function Declaration work the same way. When every use is in this repo, and the name isn't public, exported, or stored, rename every use in one step with the language's rename tool or a search. Otherwise, use parallel change.
+**Rename.** Rename Variable, Rename Field, and the simple form of Change Function Declaration work the same way. When every use is in this repo and isn't public, exported, or stored, rename every use in one step with a rename tool or search. Otherwise, use parallel change.
 
 **Parallel change.** Use it to change a public, exported, or stored interface, or one with callers in many files.
 
@@ -66,7 +66,7 @@ A small project can switch its runtime, test runner, or build tool in one step. 
 
 ## The rest of the catalog
 
-The names below are the standard terms for the rest of the catalog. Use them in plans and reports.
+Describe each refactoring step in plain words in plans and replies (`inline the one-line wrapper`, `move the tax calculation into Order`), and use the catalog names below only when the user asks for them.
 
 - First set: Extract Variable, Inline Variable, Introduce Parameter Object, Combine Functions into Class, Combine Functions into Transform.
 - Encapsulation: Encapsulate Record, Encapsulate Collection, Replace Temp with Query, Extract Class, Inline Class, Hide Delegate, Remove Middle Man.

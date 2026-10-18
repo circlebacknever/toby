@@ -4,7 +4,7 @@ This file shows worked cases for defining an error out of existence, aggregating
 
 ---
 
-## 1. Redefining semantics
+## 1. Redefining the contract
 
 ```python
 def remove_session(store, sid):
@@ -21,7 +21,7 @@ def remove_session(store, sid):
     store.pop(sid, None)
 ```
 
-Every caller drops its `try/except` block. In the same way, "throw if slice indices are out of range" becomes "return the overlapping slice, or empty when disjoint."
+Every caller drops its `try/except` block. In the same way, "throw if slice indices are out of range" becomes "return the overlapping slice, or an empty slice when out of range."
 
 ---
 
@@ -42,4 +42,4 @@ try { return await api.getOrders(); }
 catch { return []; } // The caller can't tell an empty order list from a failed request.
 ```
 
-Because an empty list and a network outage return the same value, the screen renders "You have 0 orders" during an outage. Return a discriminated union that distinguishes `loaded` (with `[]`) from `failed` so the caller can show a retry state.
+Because an empty list and a network outage return the same value, the screen renders "You have 0 orders" during an outage. Return a tagged union that distinguishes `loaded` (with `[]`) from `failed` so the caller can show a retry state.

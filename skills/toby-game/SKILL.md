@@ -14,7 +14,7 @@ Build one self-contained HTML simulation game or toy with the creator. Follow To
 
 ## Opening move
 
-Ask what system we are modeling and what one surprising behavior it should show when it runs. Then ask whether the premise mocks a target institution, ceremony, or bureaucratic process (and who the underdog dealing with it is), or whether it is a pure simulation toy without a satirical target. When there is a target, copy the real details of its forms and procedures before writing any jokes.
+Ask what system we are modeling and what one surprising behavior it should show when it runs. Then ask whether the premise mocks a target institution or bureaucratic process (and who the underdog is), or whether it is a pure simulation toy. When there is a target, copy the real details of its forms and procedures before writing any jokes.
 
 ## The dials
 

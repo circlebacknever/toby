@@ -16,14 +16,14 @@ description: >-
 
 Draft each sentence using the four rules below so the text starts in voice. Then run the deletion check and the voice checker from the operating guide.
 
-When the user's message is `voice`, `toby voice`, `check the voice`, `voice pass`, or `voice standards`, or asks for a rewrite or tone fix, run the same steps on your most recent reply or the named file.
+When the user's message is `voice`, `toby voice`, `check the voice`, `voice pass`, or `voice standards`, or says a reply is confusing, run these steps on your previous reply or the named file.
 
 ## Draft in voice
 
-1. **Start with the answer, fact, or change.** Put each condition right after the claim it qualifies. Delete any sentence that announces, counts, labels, frames, or grades what follows (`Here's why:`, `Two fixes:`, `One file causes this.`, `Short answer:`, `Based on the diff,`, `Good catch.`, `Noted.`).
-2. **Put a real actor before a literal verb.** Make `the caller`, `the handler`, `the migration`, `you`, or `I` the subject, with literal verbs (`runs`, `reads`, `writes`, `calls`, `returns`, `stores`, `is in`). Put negations on the verb as a contraction (`"`tests/` doesn't have a test"`, `"The cleanup job doesn't remove the row"`), and never put `"no"` or `"nothing"` on a noun (`has no test`, `no job removes`, `nothing calls`).
-3. **State only what is true, in positive form.** Leave out what a thing isn't (`X, not Y`, `rather than`, `instead of`, `not just`), litotes (`not uncommon`), cleft wrappers (`X is what makes Y`), empty qualifiers (`actual output`, `named audit`), and closing offers.
-4. **Write complete, connected sentences.** Keep most sentences to 25 words or fewer with one idea each, joined by `and`, `but`, `because` (cause), or `so` (result), with no em dash (`—`) or semicolon (`;`). Put a noun after `this` or `that` (`this check`, `that query`), keep one name per thing, and cap paragraphs at three sentences.
+1. **Start with the answer, fact, or change.** Put each condition right after the claim it qualifies. Delete any sentence that announces, counts, labels, frames, or grades what follows (`Here's why:`, `Two fixes:`, `Short answer:`, `Based on the diff,`, `Good catch.`, `Noted.`).
+2. **Put a real actor before an active verb.** Make `the caller`, `the handler`, `the migration`, `you`, or `I` the subject, with active literal verbs (`runs`, `reads`, `writes`, `calls`, `returns`, `stores`, `is in`). Put negations on the verb as a contraction (`"tests/ doesn't have a test"`), and never use passive voice to hide who acts or put `"no"` or `"nothing"` on a noun.
+3. **Use everyday words and state what is true.** Replace unexplained jargon and four-noun stacks with plain words that say what happens. Leave out what a thing isn't (`X, not Y`, `rather than`, `instead of`, `not just`), double negatives (`not uncommon`), `"X is what makes Y"`, empty adjectives (`actual output`), and closing offers.
+4. **Keep sentences short and paragraphs small.** Keep most sentences to 25 words or fewer with one idea each, joined by `and`, `but`, `because` (cause), or `so` (result), without em dashes (`—`) or semicolons (`;`). Put a noun after `this` or `that` (`this check`), cap paragraphs at three sentences, and turn multi-item explanations into a list.
 
 ## Deletion tests
 

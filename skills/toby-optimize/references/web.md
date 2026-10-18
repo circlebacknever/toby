@@ -5,8 +5,8 @@ This file covers memoization, virtualization, and render work in React, Solid, a
 ## Memoization
 
 - Leave components unmemoized by default. Where the React Compiler runs, hand-written `useMemo` and `useCallback` are redundant. Solid and Svelte 5 track dependencies, so they don't need hand-written memoization.
-- Use `useMemo` for a computation a profile shows to be expensive, such as a fuzzy filter over thousands of items, and whose inputs change less often than the component renders.
-- Use `useCallback` only for a callback passed to a memoized child or used in another hook's dependency array.
+- Use `useMemo` when a profile shows a computation is slow (such as filtering thousands of items) and its inputs change less often than the component renders.
+- Use `useCallback` only for a callback that you pass to a memoized child or include in another hook's dependency array.
 - Memoize an object prop only when the child that receives it is memoized.
 
 When a component re-renders too often, fix the cause higher in the tree. Common causes are an unstable parent value, a context that changes every render, and unstable list keys.
