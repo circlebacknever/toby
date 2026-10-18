@@ -9,23 +9,23 @@ description: >-
 
 # Toby SWD Architecture
 
-This file says where each part of a feature goes, and what to check in the finished diff.
+This file defines where each part of a feature goes and what to check in the finished diff.
 
 ## Default structure
 
-Use this section for a change that adds or moves a rule, a write, or an outbound call. UI code follows `toby-swd-modules`' `references/web.md`. A library takes each client as an argument from the app that uses it, because the library doesn't have startup code of its own.
+Use this structure when a change adds or moves a rule, a write, or an outbound call. UI code follows `toby-swd-modules`' `references/web.md`, and libraries accept clients as arguments from the calling app.
 
-Copy how the nearest similar feature divides its entry point, rules, and data access. Use the default below when the repo doesn't have a similar feature, or when that feature computes its rules in its entry point.
+Copy how the nearest sibling feature divides its entry point, rules, and data access, unless that sibling computes business rules inside its entry point.
 
 - **Entry point.** A route, view, CLI command, queue consumer, or job runs these steps in order:
-  1. Authenticate the caller and parse input into a typed value.
-  2. When the input identifies one record, load that record by id, scoped to the caller, as `get_object_or_404(Invoice, id=invoice_id, account=request.account)` does.
-  3. Call one operation and turn its result into a response.
-  4. Write the outcome log that `toby-swd-observability` defines, unless middleware already writes that line.
-- **Operation.** An operation is a function or model method named for the business action, such as `renew_loan()`. The operation contains each rule that sets an outcome, such as a price, a limit, a status change, or whether this caller may act on this record.
-- **Writes and API calls.** One module writes each table, and one module calls each third-party API. Other code calls a function in that module, such as `invoice.mark_paid()`. The module that calls a provider converts the provider's types into the repo's own.
-- **Composition root.** The composition root builds clients from config when the process starts. Only the composition root and the repo's config module read environment variables.
-- **Tests.** Pass a network client into an operation only when a test can't patch it. Freeze time with the repo's tool, such as freezegun, `travel_to`, or fake timers, so operations don't need a clock parameter.
+  1. Authenticate the caller, check route-level role guards, and parse input into a typed value.
+  2. When the input identifies one record, load it by id scoped to the caller, as `get_object_or_404(Invoice, id=invoice_id, account=request.account)` does.
+  3. Call one operation and format its return value as a response.
+  4. Write the outcome log defined in `toby-swd-observability`, unless middleware already logs it.
+- **Operation.** A function or model method named for the business action, such as `renew_loan()`. It enforces every business rule, price, limit, state transition, and record-level permission check.
+- **Writes and API calls.** One module writes each table, and one module calls each third-party API and converts the provider's SDK types into the repo's domain types.
+- **Composition root.** Startup code builds clients from typed config. Only the composition root and the config module read environment variables.
+- **Tests.** Pass a network client into an operation only when tests can't patch it. Freeze time with the repo's timer tool (`freezegun`, `travel_to`, fake timers) so operations don't take a clock parameter.
 
 | Framework | Operation | Composition root |
 | --- | --- | --- |
@@ -36,20 +36,20 @@ Copy how the nearest similar feature divides its entry point, rules, and data ac
 
 In Django and Rails the model writes its own table, so add a repository only when the repo already uses repositories.
 
-Compute each price, limit, status change, or format in one function that every caller calls. Put a new rule beside the code that already computes that kind of value, and cite that code at path:line. When that code is in an entry point, or a serializer or form only it calls, put the new rule in an operation. Move the old code there too when `toby-swd-campfire` allows the refactor. A three-line rule doesn't need a service class, repository, or interface.
-
-When you can't tell where a part goes, open `references/examples.md` for a Rails model and an Express webhook.
+Compute each price, limit, status transition, or format in one function that every caller calls, placed beside existing rules of that kind (cited at `path:line`). When existing rules sit in an entry point, put the new rule in an operation and move the old ones there when `toby-swd-campfire` allows. A three-line rule doesn't need a service class, repository, or interface. Open `references/examples.md` for Rails and Express examples.
 
 ## Design check
 
-Answer each question from lines in the finished diff, and fix each yes. A question with no line you can cite is a no.
+Check each question against the finished diff, and fix every `yes`.
 
-1. Does an entry point, or a serializer or form that only it calls, compute a price, limit, status change, or permission on one record? Move the rule into an operation. A lookup by id scoped to the caller stays.
-2. Does code write a table or call an API that a different module writes or calls? Call a function in that module.
-3. Does shared code check which caller or customer it serves, such as `if account.id == ACME_ID`? Move that case into the caller, or make the general path handle it.
-4. Does a `True` or `False` argument switch a function between two jobs, such as `save(user, delete=True)`? Write one function per job.
-5. Does the diff compute a value that another function already computes? Call that function, and cite both lines.
-6. Does a new switch on a type, kind, or status repeat another switch on the same field? Make each switch exhaustive, as `toby-swd-extensibility` describes.
-7. Does an operation build a network client or read an environment variable? Build the client once at startup, and read the variable in the composition root or the config module.
-8. Does code outside a provider's module use the provider's type, such as an SDK response object? Convert that type to the repo's own type inside the provider's module.
-9. Does a write, such as a claim, counter, or status change allowed only from certain statuses, depend on a value read from its row? When two requests or job runs reach the row at once, lock it or make the write conditional, as "Concurrent writes" in `toby-swd-hardening` describes.
+1. Does an entry point, or a serializer or form only it calls, compute a price, limit, status transition, or record-level permission? Move the rule into an operation (a caller-scoped lookup by id stays).
+2. Does code write a table or call an external API owned by another module? Call a function in that module instead.
+3. Does shared code branch on a specific caller or customer id (`if account.id == ACME_ID`)? Move that case to the caller or branch on a capability field.
+4. Does a boolean or enum flag switch a function between two distinct jobs (`save(user, delete=True)`)? Split it into one function per job.
+5. Does the diff compute a value that another function already computes? Call the existing function and cite both lines.
+6. Does a new switch on a type, kind, or status repeat another switch on the same field? Make each switch exhaustive (`toby-swd-extensibility`).
+7. Does an operation build a network client or read an environment variable? Move client construction to startup and env reads to the config module.
+8. Does code outside a provider's module use the provider's SDK types? Convert them to domain types inside the provider module.
+9. Does a write (such as a claim, counter, or status transition) depend on a value read from its row when concurrent requests or jobs can race? Use a conditional write or row lock (`toby-swd-hardening`).
+10. Does code hold a database transaction or row lock open across an outbound HTTP, RPC, or queue call? Commit or release the lock before the external call.
+11. Does a loop run a database query or outbound API call once per item? Replace it with one batch read or bulk call before the loop.

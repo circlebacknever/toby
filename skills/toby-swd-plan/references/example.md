@@ -1,6 +1,6 @@
 # Example plan folder
 
-This plan covers team invites, which take two sessions, so it is a folder with an overview and one file per slice. The folder looks like this:
+This example shows a two-session plan folder for team invites, with `overview.md` and one file per slice:
 
 ```text
 docs/plans/members/team-invites/
@@ -16,11 +16,12 @@ docs/plans/members/team-invites/
 
 ## Intent
 The user's words: "Let org admins invite a teammate by email." The result: an
-admin invites an address, sees it as pending, and the teammate accepts the
-email link and signs in as a member.
+admin invites an address, sees it as pending, and the teammate opens the email
+link, accepts, and signs in as a member.
 
-Done when: `e2e/invites.spec.ts` "invite, accept, sign in" passes, and the
-members screen shows the new member in place of the pending invite.
+Done when: `e2e/invites.spec.ts` "invite, accept, sign in" invites an address,
+opens the link from the stub mail server, accepts, signs in as the new member,
+and sees the member replace the pending invite on the members screen.
 
 Mode: durable implementation.
 
@@ -29,110 +30,92 @@ Mode: durable implementation.
    without a reload.
 2. The invited address receives one invite email with a link that opens the
    accept screen.
-3. Opening a used or expired link shows an expired state and creates no account.
-4. The members list still renders for an org with no pending invites.
+3. Opening a used or expired link shows an expired state and doesn't create an
+   account.
+4. The members list still renders for an org without pending invites.
 
 ## Out of scope
 - Bulk invites, because the members screen takes one address at a time.
 - Picking a role, because every new member joins with the default member role
-  that `members/roles.ts` assigns.
-
-## Optional
-- Revoking an invite and resending one. Group 2 builds both unless the user
-  rejects them, because an admin who typed the wrong address needs a way out.
+   that `members/roles.ts` assigns.
+- Revoking or resending an invite, unless the user adds it before group 2 starts.
 
 ## Design
 - Structure chosen: an `invites` module with `createInvite(orgId, email, actor)`
-  and `acceptInvite(token)`. It is the only code that reads or writes the
-  `invites` table, and it sends the email.
-- Alternative rejected: invite rows in `members` with a `pending` status. Every
-  query on `members` would need a status filter.
-- Rule: `Invite.isExpired()` returns whether an invite has expired.
-  `acceptInvite` and the Pending list both call it.
-- Hardening: only an org admin can invite, and the email field is capped at 254
-  characters. The email goes through the existing `mailer` job, which already
-  has a timeout and retries.
-- Logs: the handlers log `invite.created` and `invite.accepted` with the invite
-  id, and never the email address.
-- Twelve-factor: none apply. The change adds no process, config value, or
-  backing service.
-- Refactor first: none. `members/list.ts` already renders any list of rows.
+  and `acceptInvite(token)` that writes the `invites` table and enqueues the
+  invite email.
+- Alternative rejected: storing pending invites in `members` with a `pending`
+  status, which would force every member query to filter out pending rows.
+- Rule: `Invite.isExpired()` computes whether an invite has expired, called by
+  both `acceptInvite` and the Pending list.
+- Hardening: only an org admin can invite, the email input is capped at 254
+  characters, and the email runs through the existing `mailer` job with a
+  timeout and idempotency key.
+- Logs: handlers log `invite.created` and `invite.accepted` with `invite_id` and
+  `duration_ms`, and omit the email address.
+- Twelve-factor: the change uses existing processes, config, and backing services.
+- Refactor first: `members/list.ts` already renders any row list without a
+  preparatory refactor.
 
 ## Flag
-`team-invites` is a release flag, off by default. Main deploys on every merge,
-so group 1 reaches users before group 2 sends the email. The invites API reads
-the flag once per request. The members screen shows the Invite section only
-when `GET /orgs/:id/invites` returns 200, so only the API reads the flag.
-Rollout: turn it on for the team, then for every org. Turn it off if
-`invite.created` errors stay above 1% for ten minutes. The last step of group 2
-removes it: delete the code that reads it, deploy, then delete it from the flag
-service. Owner: Sam, by 2026-12-01.
-
-## Whole-feature test
-`e2e/invites.spec.ts`, "invite, accept, sign in". The test invites an address
-as an admin, opens the link from the stub mail server, accepts, and signs in as
-the new member. Group 2 adds it.
+`team-invites` is a release flag, off by default, because `main` deploys on
+every merge. The invites API reads the flag once per request, and the members
+screen renders the Invite section only when `GET /orgs/:id/invites` returns 200.
+Rollout after group 2 ships: enable for the internal org, then 10% of orgs
+hashed by `org_id`, then 100%, turning it off if `invite.created` errors exceed
+1% for 10 minutes. Owner: Sam, removal after 100% rollout by 2026-12-01.
 
 ## Groups
-| File | Slice | Criteria | Status |
-| --- | --- | --- | --- |
-| 01-invite-shows-up-as-pending.md | invite shows up as pending | 1, 4 | done |
-| 02-invite-email-opens-accept-screen.md | the invite email opens the accept screen | 2, 3 | not started |
+| File | Slice | Criteria | Depends on | Status |
+| --- | --- | --- | --- | --- |
+| 01-invite-shows-up-as-pending.md | invite shows up as pending | 1, 4 | — | done |
+| 02-invite-email-opens-accept-screen.md | the invite email opens the accept screen | 2, 3 | 01 | not started |
 ```
 
 ## 01-invite-shows-up-as-pending.md
 
 ```markdown
-# Group 1: invite shows up as pending
+# Group 1
 
-This group meets criteria 1 and 4. Every step serves criterion 1.
-Verification check 2 covers criterion 4.
+Slice: `invite shows up as pending`. This group meets criteria 1 and 4.
+Rollback: drop the `invites` table with `0043_invites_down.sql` and turn off
+`team-invites`.
 
 ## Steps
 - [x] Create `e2e/invites.spec.ts` with the tests "invite shows up as pending"
-      and "hidden when off". Run the first one and watch it fail.
+      and "hidden when off". Run both before the feature edits: the first fails
+      and the second passes.
 - [x] Edit `api/invites.ts` to add `createInvite(orgId, email, actor)`, and create
-      `db/migrations/0043_invites.sql` for the table it writes. The function
-      returns the pending invite and rejects an address that already has an
-      unexpired invite. `test_create_invite_rejects_duplicate` fails before it
-      and passes after.
+      `db/migrations/0043_invites.sql` for the `invites` table. The function
+      returns the pending invite and rejects a duplicate unexpired invite
+      (`test_create_invite_rejects_duplicate` fails before and passes after).
 - [x] Ask before running `pnpm db:migrate` against the local database.
 - [x] Edit `api/invites/router.ts` to register `POST /orgs/:id/invites` and
-      `GET /orgs/:id/invites`. Edit `screens/Members.tsx` to add `<InviteForm>`
-      and a Pending section that reads the GET route and shows a new invite
-      before the server responds.
-- [x] Add the `team-invites` flag to `flags/index.ts`, off by default. The
-      invites router returns 404 when the flag is off. The members screen
-      shows the Invite section only when `GET /orgs/:id/invites` returns 200.
-      Put the flag's kind and removal condition in a comment where the router
-      reads it.
+      `GET /orgs/:id/invites`, guarded by the `team-invites` flag in
+      `flags/index.ts` (off by default, with its kind and removal condition in a
+      comment at the check site).
+- [x] Edit `screens/Members.tsx` to render `<InviteForm>` and the Pending list
+      when `GET /orgs/:id/invites` returns 200.
 
 ## Verification
-1. Run `pnpm e2e invites.spec.ts -g "invite shows up as pending"` with the flag
-   on. The test signs in as an org admin, submits `new@example.com`, and reads
-   the Pending list. It fails before the work. After the work, the group fails
-   when the address is missing, needs a reload, or is gone after a reload.
+1. Run `pnpm e2e invites.spec.ts -g "invite shows up as pending"` with
+   `team-invites` on. The test signs in as an org admin, submits
+   `new@example.com`, and checks the Pending list.
 
        before  invite shows up as pending  FAIL  no Invite form on the members screen
        after   invite shows up as pending  PASS
 
-2. Run `pnpm test members` with the flag off, before the first edit and after
-   the last. The group fails when any existing test fails or had to change. Run
-   it again with the flag on. Each test that fails there must assert behavior
-   the flag changes. Keep that test as the flag-off case, with the flag set off
-   inside the test, and add a flag-on copy. This check covers criterion 4.
+2. Run `pnpm test members` with `team-invites` off and on (criterion 4).
 
        before  pnpm test members, flag off  PASS
        after   pnpm test members, flag off  PASS
        after   pnpm test members, flag on   PASS
 
-3. Run `pnpm e2e invites.spec.ts -g "hidden when off"` with the flag off. The
-   group fails when the Invite section renders, or when the POST route returns
-   anything but 404.
+3. Run `pnpm e2e invites.spec.ts -g "hidden when off"` with `team-invites` off.
 
        before  hidden when off  PASS
        after   hidden when off  PASS
 
-Stop here. Before group 2, the user decides whether a Pending row also shows
-who sent the invite and when it expires.
+Stop here. Before group 2 starts, confirm whether a Pending row also displays
+the inviter and expiration timestamp.
 ```

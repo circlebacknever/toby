@@ -1,15 +1,15 @@
-# Cross-device — one live game, two screens
+# Cross-device
 
-A game that never pauses can't put its controls in a menu. The layout and the controls differ between a wide screen and a phone while the game stays live on both.
+Keep a real-time game playable on both desktop and mobile without hiding live action controls inside a pause menu.
 
-**Information the player only reads can fold away, and live controls stay on screen.** Scores, rates, and the catalog you browse between actions can fold into a sheet. Any verb the player uses during play stays on screen and moves to where the hand is. A control that the player has to stop and open with a gesture only works in a paused game, but this game isn't paused. Panels can overlap on screen, but only one on-screen element receives input for an action used during play at a time, so a tap never registers in two places.
+## Live controls and thumb zones
 
-**Keep what the player needs out from under a busy thumb.** On a phone, the live controls go in the two bottom corners, clear of the home indicator. The must-see action renders in the band above them. A thumb holding a stick covers the pixels under it, so nothing critical goes there.
+- **Keep action verbs on screen.** Fold read-only tables, catalogs, and stats into a collapsible sheet, while keeping every control the player uses during live play visible and single-target so a tap never triggers two overlapping elements.
+- **Clear the thumb zone.** On a portrait phone, place live controls in the bottom corners clear of `env(safe-area-inset-*)` and lift the camera so the action renders in the unobstructed band above the player's thumbs.
+- **Adapt to orientation and viewport.** In landscape mobile, move controls to the side gutters and drop the bottom sheet. On desktop, pair mouse/keyboard controls with side panels and clamp ultrawide aspect ratios.
 
-**Lay out per screen.** On a portrait phone, put controls in the bottom corners and lift the camera so the action shows in the clear band. On a phone held sideways, drop the bottom sheet and put controls in the side gutters. Pull the camera back so the play still fits in the short dimension. On a wide desktop, show the scene with mouse and keyboard, and put the information the player only reads beside it. Clamp an ultrawide so the playfield doesn't stretch. As the view narrows, widen the field of view or pull the camera back so a five-inch screen stays legible. Size gameplay-critical things to be seen and hit at arm's length. Measure the panels and bars around the playfield. Store the height of each panel that isn't animating in a CSS variable, and re-measure it on resize. A hardcoded dock height can put a button on top of the controls. Clear the home indicator with `env(safe-area-inset-*)`, and cap a portrait bottom sheet near 40–46vh so it never covers the play. Set minimum sizes for the type and the hit targets for a thumb (roughly a 12px body, 15px panel titles, 44px targets). Before shipping, check three real sizes, which are 390×844 portrait, 768×1024 tablet, and 1280×800 desktop. Look for overlapped controls, cropped panels, and buttons the thumb can't reach.
+## Sizing and frame budget
 
-**Each archetype needs its own layout.** A twitch game puts live controls under both thumbs with the scene clear between them. A manager sim pins the speed knob and the buy verbs and moves the browsing into tabs. A sandbox keeps its sliders thumb-reachable while it runs. Choose which controls to show from the player relationship dial in SKILL.md, and choose where to put them from the screen size.
-
-**Performance is part of the layout.** Cap the pixel ratio, scale particle and shadow budgets down on a phone, and cut detail before frame rate when performance is tight. A phone at 20fps is unplayable however good the layout looks. When pinch-zoom is off, give a live game its own way to see a board bigger than the screen.
-
-Test the game live on a phone in both orientations, with a player using touch. A game tuned on a mouse can be unwinnable on a thumb.
+- Measure docked panel heights into CSS variables on load and `resize`, cap portrait bottom sheets at `40–46vh`, and keep body text at `>= 12px`, panel titles at `>= 15px`, and touch targets at `>= 44px`.
+- Check layout and reachability at `390×844` (portrait phone), `768×1024` (tablet), and `1280×800` (desktop), and test touch input in both orientations.
+- Cap `devicePixelRatio` and scale down particle and shadow counts on mobile so frame rate stays near 60 fps.

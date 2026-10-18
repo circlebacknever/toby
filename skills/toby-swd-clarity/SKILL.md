@@ -8,37 +8,32 @@ description: >-
 
 # Toby SWD Clarity
 
-Names and types state part of a contract. When the language allows it, put the unit, what null means, and which states can occur into the type. Use comments for the rest, which is behavior, side effects, invariants the type can't enforce, and reasons. Non-trivial code with no interface comment is unfinished, however good its names are.
+Names and types state part of a contract, and comments state the rest: behavior, side effects, reasons, and invariants the type system can't enforce. Where the language allows, encode units, nullability, and valid states in the type. Non-trivial code without an interface comment is unfinished.
 
 ## Naming
 
-Picture a developer who sees only the name, with no declaration or surrounding code. Check that they would guess what the variable holds or what the function does. Make a name more specific as its scope grows. A loop index can be `i`, while a field, an argument, or anything exported needs a precise name. An over-specific name misleads too, such as an argument named `selection` on a method that works on any range. Use `data`, `value`, `result`, `status`, `flag`, or `count` only when the meaning is visible at a glance.
+Pick each name so a reader who sees only the identifier guesses what the variable holds or what the function does. Make names more specific as their scope widens: `i` fits a three-line loop, while fields, parameters, and exports need exact names. Avoid over-specific names (such as `selection` on a function that accepts any range), and use `data`, `value`, `result`, `status`, `flag`, or `count` only in tiny scopes where the meaning is immediate.
 
-Give each name one purpose, so every variable with that name behaves the same. When you need several of one kind, keep the common root and add a prefix, such as `srcBlock` and `dstBlock`.
-
-When no precise, short name fits after real effort, the thing probably has a mixed purpose, so split or rethink it. Keep a dense expression as one piece when it computes one result you can name, even if its steps don't have good names.
+Give each name one meaning, and pair related variables with a shared root and prefix (`srcBlock` and `dstBlock`). When no short, accurate name fits, the function or variable is doing two jobs and should be split; keep a dense expression whole when its result has one clear name.
 
 ## Consistency
 
-Do similar things the same way, and dissimilar things differently. Before adding a convention for naming, structure, error handling, style, or test layout, read the local file and project and match what is there. Reuse the exact name already established for a concept.
+Do similar things the same way, and dissimilar things differently. Match the file and repo's existing conventions for naming, structure, error handling, and test layout, and reuse the exact term already established for a domain concept.
 
-Change an existing convention only with information that wasn't available when it was set. The new approach must also be enough of an improvement to justify changing every existing use. Convert every use in the same change, because a half-adopted convention stops a reader from trusting a familiar pattern. When one concept has several names across the codebase, offer the rename as a follow-up, because renaming it in one place adds another name.
+Change an existing convention only when new evidence justifies converting every call site in the same diff. When one concept has multiple names across the repo, list the repo-wide rename as a follow-up and don't add another local name.
 
 ## Proportionality
 
-On every edit, check the names, the comments, and whether a developer new to the code would understand it on the first read. Some code is exported, called from several places, or costly to change later. Only for that code, change a convention everywhere it is used or add an AGENTS.md note. Leave already-clear code outside the change alone.
+On every edit, check that a developer new to the file understands the touched names, types, and comments on the first read. When a change alters a cross-module constraint on exported or shared code, update the module's existing `AGENTS.md` as `toby-swd-docs` describes. Leave clear code outside the diff alone.
 
 ## Red flags
 
-Before calling a clarity pass done, check the touched code for each of these:
+Check the touched code against each item before finishing:
 
-- A name is vague, was hard to pick, or is used for two purposes.
-- A comment repeats the code, or an interface comment describes internals.
-- A field doesn't state its units, its bounds, or what null means, where those aren't obvious.
-- Non-trivial code doesn't have interface or field comments.
-- The touched code handles one concept in more than one way.
-- A quick read gets the behavior wrong.
+- A name is vague, hard to coin, or reused for two purposes.
+- A comment restates the code, or an interface comment describes internal mechanics.
+- A field or parameter omits its units, bounds, or what null means when the type doesn't show them.
+- Non-trivial exported code lacks an interface or field comment.
+- The touched code handles the same concept in two ways, or a quick read misreads the control flow.
 
-Open `references/comments.md` when the change adds or edits a comment, a docstring, or control flow a reader could misread.
-
-Open `references/examples.md` when you write a return type for a hook or a comment on an effect or callback. Also open it for a comment that gives units, bounds, or what null means.
+Open `references/comments.md` when adding or editing a comment, docstring, or non-obvious control flow. Open `references/examples.md` when typing a hook return or documenting units, bounds, null meaning, or callbacks.

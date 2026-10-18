@@ -11,77 +11,58 @@ description: >-
 
 # Toby Artifact Style
 
-This skill sets the color tokens, the copy rules, and the visual rules that every artifact follows. Pick the structure for each artifact from the composition modes below.
+Apply these color tokens, typography rules, composition modes, and copy tests to every visual artifact.
 
-## Words used in this skill
+## Terms
 
-- **Paper** is the cream background color `--toby-paper`. A paper panel is a panel with that background.
-- **Ink** is the near-black color `--toby-ink`. An ink panel is a panel with an ink background.
-- **Red** is the color `--toby-accent`.
-- **Hairline** is a 1px line used as a border or a divider.
-- **Eyebrow** is a small UPPERCASE label above a heading or a value, set at 11px with 0.12em letter-spacing.
-- **Mono** is the monospace font, JetBrains Mono.
-- **KV pair** is a label and its value shown side by side, such as `RETRY RATE` and `18%`.
-- **Pill** is a small label with fully rounded ends.
-- **Sparkline** is a small line chart with no axes that fits inside a table cell or next to a value.
-- **Status colors** are the five color sets for info, stable, watch, consequence, and unknown. Each set has a `-soft` background color, a `-tint` border color, and a `-text` text color. The tokens are under State families below.
-- **Section accent** is the chart palette color given to one section of a page.
-
-## Color roles
-
-**Paper.** `--toby-paper` (`#fdfaf1`) is the default background. Use paper for any panel where the reader reads text, compares values, or works through details.
-
-**Ink.** Use `--toby-ink` (`#1a1c1f`) for decision panels, evidence panels, summaries, and section dividers. An ink panel tells the reader that this panel gives a conclusion or a decision. Use ink only for those panels, because when an artifact uses ink everywhere, the reader can't tell which panel gives a conclusion.
-
-**Red.** Use `--toby-accent` (`#c44e3f`) for a risk, a broken limit, a value past its threshold, or an action that can't be undone. Never use red as a brand color or for plain emphasis. Keep red rare, because readers stop noticing a red that appears often.
+- **Paper** (`--toby-paper`, `#fdfaf1`) is the warm cream default background for reading text, comparing values, and inspecting details.
+- **Ink** (`--toby-ink`, `#1a1c1f`) is the near-black background reserved for decision panels, evidence summaries, and section dividers.
+- **Red** (`--toby-accent`, `#c44e3f`) marks only a risk, a broken limit, a value past its threshold, an irreversible action, and the single dot in the artifact logo.
+- **Hairline** is a 1px border or divider (`--border-hairline`), paired with a 12px card radius (18px only on an outer frame).
+- **Eyebrow** is an 11px UPPERCASE label with `+0.12em` letter-spacing above a heading or value.
+- **KV pair** is a mono eyebrow label paired with a tabular-numeral value, and a **Sparkline** is an axis-free inline trace (`80–120px`) inside a table cell or stat card.
+- **Status colors** are the five semantic families (`info`, `stable`, `watch`, `cons`, `unknown`), each with `-soft` (background), `-tint` (border), and `-text` (foreground) tokens.
 
 ## Visual patterns
 
-1. **Status panels.** A panel that shows a status (info, stable, watch, consequence, or unknown) uses the status colors for that status. Its background is the `-soft` color, its border is the `-tint` color, and its text is the `-text` color. The panel also has a 4px strip on its left edge in the main color of that status, such as `--toby-watch`.
-2. **Section accents.** When a page has more than one section, give each section its own color from the chart palette. Use that color for the section number, for a strip under the section heading, and for the small pills that show cell ids.
-3. **Hairlines and small corner radii.** Use hairlines for almost every divider. Cards keep a 12px corner radius, and only the outer frame that contains them gets 18px.
-4. **Density.** Unless the artifact uses the spacious argument mode, fill slides and dashboards densely. Use KV pairs, stat grids, tables with sparklines in their cells, and rows that each state one measurement.
-5. **Three colors for a chain of reasoning.** When a panel shows a chain of reasoning, give its rows the `-soft` status colors in a fixed order. The rows with the starting facts use info teal, the working rows use watch amber, and the conclusion uses stable green. The Worked Example component uses this order. Other reasoning panels can use it too.
+1. **Status panels.** Give a status panel its family's `-soft` background, `-tint` border, `-text` foreground, and a 4px left strip in the family's main color (`--toby-watch`). Never put a decorative left stripe on a non-status card.
+2. **Section accents.** When a page has multiple sections, assign each section one color from the chart palette in order for its section number, heading rule, and cell pills.
+3. **Density.** Fill reference slides and dashboards densely with KV pairs, stat grids, and sparkline tables unless using the spacious argument mode.
+4. **Three-step reasoning tint.** In a Worked Example or reasoning chain, tint starting premises with `info-soft`, derivation steps with `watch-soft`, and the conclusion with `stable-soft`.
 
-## Load reference files based on task
+## Reference files
 
-- Writing paragraphs, a hero, feature cards, or a CTA, or rewriting a sentence that fails a copy test → `references/copy.md`
-- Building a chart, plot, or data visualization → `references/charts.md`
-- Producing a slide deck (HTML or pptx) → `references/decks.md`
-- Building any component (callout, badge, stat grid, worked example, decision row, sparkline table, code block, dialog) → `references/components.md`
-- Writing CSS for an HTML or React page, including controls, overlays, motion timing, interaction states, icons, or a code block → `references/ui-tokens.md`
-- Needing placeholder data or demo copy for a slide or artifact → `references/sample-content.md`
-- Adding a geometric drawing to a slide or panel, either as a large labeled figure or as faint decoration → `references/geometry.md`
-- Drawing an SVG diagram or a pptx slide, or placing HTML elements by coordinates → `references/layout.md`
+Open the reference file that matches the artifact:
+
+- Paragraphs, heroes, feature cards, CTAs, or copy rewrites: `references/copy.md`
+- Charts, plots, or data visualizations: `references/charts.md`
+- Slide decks (HTML React or `.pptx`): `references/decks.md`
+- UI components (callouts, pills, stat grids, worked examples, decision rows, sparkline tables, code blocks, dialogs): `references/components.md`
+- CSS controls, overlays, motion timing, focus states, or syntax tokens: `references/ui-tokens.md`
+- Placeholder domain data or demo copy: `references/sample-content.md`
+- Geometric marks at content or decorative scale: `references/geometry.md`
+- SVG diagrams, `.pptx` coordinates, or box/arrow layout checks: `references/layout.md`
 
 ## Before you build
 
-Run this checklist before writing any code or markup.
+Complete these six decisions before writing markup or code:
 
-1. **Job.** Decide what the artifact is for. An artifact can teach a mechanism, summarize evidence, serve as a reference, walk through a process, or support a decision. The answer decides the background color and how much content each panel holds.
-2. **Composition mode.** Pick one mode from the list below.
-3. **Ink panels.** Decide which panels or slides use ink, or decide that none do, before you start.
-4. **Logo shape.** Pick a simple line drawing whose form matches the structure of the subject.
-5. **Layout.** For a diagram or slide, write the node and arrow lists from `references/layout.md` before any coordinates.
-6. **For decks:** before writing any slide, identify which slides need interactivity. Choose the interaction type to fit the concept. See `references/decks.md`.
+1. **Job:** decide whether the artifact teaches a mechanism, summarizes evidence, serves as a reference, walks through a process, or supports a decision.
+2. **Composition mode:** pick one of the five modes below.
+3. **Ink panels:** choose which panels or slides use ink before starting.
+4. **Logo mark:** pick a geometric hairline mark that matches the subject's structure.
+5. **Layout:** for diagrams or coordinate slides, write the node and arrow lists from `references/layout.md` before choosing coordinates.
+6. **Deck interactivity:** for decks, pick the opening pattern and which slides use interactive controls (`references/decks.md`).
 
 ## Composition modes
 
-Pick one mode per artifact. The mode sets the layout, the density, and where ink goes.
+Pick one mode per artifact (and switch the mode, ink placement, and logo mark when building a second artifact in the same session):
 
-**Dense reference.** A dense reference is a grid of cards with high information density, several columns, and multiple KV pairs per section. Each panel has enough content for 30–45 seconds of reading. Use it for protocol references, parameter tables, specification sheets, and side-by-side comparisons. Use ink panels only to highlight a measurement or a finding on a page that is mostly paper.
-
-**Spacious argument.** A spacious argument puts one concept in each section, with generous white space around every panel or slide. The reader moves through it slowly. Use it when the artifact covers one deep concept, such as a derivation, a worked example, or an analysis. Ink appears only at summary or decision points.
-
-**Ink-anchored.** Most of the artifact is paper, and its ink panels serve as section dividers, quoted measurements, and decisions. Use this mode for reference decks with several sections.
-
-**Ink-forward.** Most panels are ink. The artifact mostly states conclusions and explains less. Use this mode for summary dashboards, executive snapshots, decision panels, and final-state reference cards. Use a paper panel only as a break for relief or sharp contrast, such as a table to read closely or a diagram that needs white space.
-
-**Diagram-led.** A chart, diagram, or animation takes up most of each panel, and text serves as annotation and labels. Use it when the concept is spatial or relational, as in network topologies, signal flows, state machines, and data distributions. Use cards and KV pairs only to support the diagram.
-
-## Variation
-
-When this session already produced an artifact, give the new one a different composition mode, different ink panels, and a different logo shape. A new deck also uses a different opening pattern and a different interaction type from `references/decks.md`.
+- **Dense reference:** multi-column card grids with KV pairs and tables (30–45 seconds of reading per panel) on paper, using ink only to highlight a key measurement or decision.
+- **Spacious argument:** one concept per section with generous whitespace for derivations or worked examples, using ink only at summary or decision points.
+- **Ink-anchored:** mostly paper panels with ink panels serving as section dividers, quoted measurements, and decisions.
+- **Ink-forward:** mostly ink panels stating conclusions for executive snapshots or final-state cards, using a paper panel only for a dense table or diagram.
+- **Diagram-led:** a chart, diagram, or simulation fills most of the canvas, with text limited to annotations and compact KV cards.
 
 ## Color tokens
 
@@ -102,7 +83,7 @@ When this session already produced an artifact, give the new one a different com
 --toby-watch:        #b07020;  /* amber */
 --toby-unknown:      #88827a;  /* warm grey */
 
-/* The chart palette is in positional order for series and categorical accents. */
+/* Chart palette in positional order */
 --toby-blue-steel:   #2f6e8a;
 --toby-muted-violet: #7a4e85;
 --toby-field-olive:  #7d7e3a;
@@ -135,69 +116,33 @@ When this session already produced an artifact, give the new one a different com
 --toby-unknown-soft: #ebe8e3;  --toby-unknown-tint: #c4bfb6;  --toby-unknown-text: #3f3d39;
 ```
 
-## Color rules
+## Typography, motion, and imagery
 
-- Don't use gradients, rainbow scales, glow, inner shadows, or colored shadows.
-- For emphasis, use ink weight, a hairline, or position.
-- Don't give a card a colored left accent as decoration, because readers recognize that accent as a sign of AI-generated design. An alert or toast keeps its 4px state strip.
-
-## Typography
-
-- **Sans:** Use Inter at weights 400, 500, and 600, with the system sans font as the fallback.
-- **Mono:** Use JetBrains Mono at weights 400 and 500 for values, units, IDs, timestamps, and coordinates.
-- **Sizes:** display 34 · h1 28 · h2 22 · section 18 · body 14 · body-sm 13 · meta 12 · eyebrow 11 · mono 13. The sizes are in px. For pptx, use the point sizes in `references/decks.md`.
-- **Weights:** Use 400 for body, 500 for emphasis, and 600 for headings. Don't use 700 in product UI.
-- **Letter-spacing:** Use 0 on display text, headings, and body, and use +0.12em on eyebrows only.
-- **Numerals:** Use tabular numerals (`tnum`) everywhere.
-- **Casing:** Write section labels as eyebrows, in UPPERCASE with 0.12em letter-spacing. Write headings and body text in sentence case. Never use Title Case. Write tokens in all-lowercase (`$toby-paper`).
-
-## Motion
-
-- Use only these motions: an opacity fade, a 4–8px positional slide for menus and toasts, and a hairline ring on focus. An accordion can also rotate its chevron 90° when it opens.
-- Don't use spring bounces, scale-up entrances, parallax, particle effects, or animation that only decorates. An animation that the reader can step through or pause counts as content, so it is allowed.
-
-## Imagery + backgrounds
-
-- Paper is the background. Artifacts use no imagery by default.
-- Avoid generic lifestyle photos, decorative stock art, repeating patterns, textures, and gradients. Use real or generated imagery when the task requires the reader to see what the product, place, object, state, gameplay, or person looks like.
-- Don't use emoji or unicode dingbats. The allowed unicode characters are `→` for handoffs, `·` as a metadata separator, and `±` for uncertainty.
+- **Typography:** use Inter (`400` body, `500` emphasis, `600` headings, never `700`) and JetBrains Mono (`400`, `500`) with `tabular-nums` everywhere. Standard px sizes are `display 34`, `h1 28`, `h2 22`, `section 18`, `body 14`, `body-sm 13`, `meta 12`, `eyebrow 11`, and `mono 13` (deck slide titles and hero topics scale with `references/decks.md`). Use sentence case for headings and body text, and UPPERCASE with `+0.12em` tracking only on eyebrows.
+- **Color and motion:** never use gradients, rainbow scales, glow, colored shadows, spring bounces, scale entrances, or decorative animation. Use only opacity fades, 4–8px menu/toast slides, focus rings, chevron rotation, and user-controlled simulation steps.
+- **Imagery and symbols:** default to paper without stock photos or textures. Never use emoji or dingbats. The allowed symbols are `→` (handoff), `·` (separator), and `±` (uncertainty).
 
 ## Logos
 
-Each artifact gets its own logo, built from three parts:
+Build each artifact's logo from three parts: a 1px hairline geometric mark, one lowercase word for the topic in Inter 600, and a single `--toby-accent` red dot.
 
-- A simple geometric drawing made of hairlines.
-- One short lowercase word for the topic, in Inter at weight 600.
-- A single red dot as the only color.
+Match the mark to the subject's structure: a grid or crosshair for a network, nested squares for recursion, a partial orbit arc for a wave or cycle, a Y-fork for a decision tree, a ticked rail for a time series, a bell curve for a distribution, stacked bars for a queue, or a 3×3 grid for a matrix (`references/geometry.md`). If you can't state why the mark fits the subject, pick another mark.
 
-**Choose the drawing for the structure of the subject.** Use a crosshair or grid for a network topology, nested squares for a recursive algorithm, and an orbit arc for an antenna or wave. Use branching lines or a Y-fork for a decision process, and a horizontal rail with a tick for a time series. Use a bell curve outline for a probability distribution, and stacked horizontal bars for a queue or pipeline. Use a partial orbit arc for a rotation or cycle, because readers take a closed circle as decoration. Use a 3×3 grid of squares for matrix or table data.
+## Purpose and output types
 
-Don't use an orbit for every subject, a triangle only because it is geometric, or a square only because it is simple. If you can't explain why the shape fits the subject, pick a different shape.
+Remove any panel or slide that doesn't teach a concept, state a measurement, define a term, list a constraint, show a worked step, or ask a check question.
 
-## Purpose check
-
-Remove a panel or slide that does none of these jobs:
-
-- teach a concept
-- state a measurement
-- define a term
-- list a constraint
-- show one step of a worked example
-- ask a question for the reader to answer before reading on
-
-## Output types
-
-- **HTML or React:** apply the tokens above, and load Inter and JetBrains Mono from Google Fonts with system fallbacks. Set the page to `--toby-paper` and cards to `--toby-paper-3` with a 1px `--border-hairline` ring.
-- **SVG or HTML widget from the visualize tool:** call `visualize:read_me` first. Then replace the CSS variables that `read_me` returns with these tokens. Keep the background transparent. When the widget needs a paper background, fill a top-level `<rect>` or a wrapper element with `--toby-paper`.
-- **pptx or HTML deck:** follow `references/decks.md`. The pptx skill handles the file.
+- **HTML or React:** load Inter and JetBrains Mono from Google Fonts with system fallbacks, set the page to `--toby-paper`, and set cards to `--toby-paper-3` with a 1px `--border-hairline` border.
+- **SVG or HTML widget (`visualize` tool):** call `visualize:read_me` first, replace its CSS variables with these tokens, and fill a top-level `<rect>` or wrapper with `--toby-paper` when a background is needed.
+- **Decks (`.pptx` or HTML):** follow `references/decks.md`.
 
 ## Copy rules
 
-Run four tests on every sentence of artifact copy, and rewrite or cut each sentence that fails one. `references/copy.md` has a passing and a failing example for each.
+Check every sentence of artifact copy against the four tests in `references/copy.md`:
 
-1. **Cite.** The claim states its source, measurement, or mechanism.
-2. **Negation.** Write the opposite of the claim. The sentence passes only when someone could write that opposite and mean it.
-3. **Substitution.** Replace the subject with an unrelated noun. The sentence passes only when the result is nonsense.
-4. **Reader-skim.** The sentence passes only when a reader who knows the material would lose something if the sentence were cut.
+1. **Cite:** state the source, measurement, or mechanism.
+2. **Negation:** the opposite of the claim must be a meaningful statement someone could argue for.
+3. **Substitution:** replacing the subject with an unrelated noun must make the sentence nonsense.
+4. **Reader-skim:** cut any sentence a knowledgeable reader could skip without losing information.
 
-Give every number a unit. Put each caveat and each assumption next to the claim it qualifies, never in a footnote.
+Give every number a unit, and place every caveat and assumption right next to the claim it qualifies.

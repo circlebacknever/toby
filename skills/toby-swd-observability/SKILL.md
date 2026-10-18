@@ -9,62 +9,53 @@ description: >-
 
 # Toby SWD Observability
 
-Write logs and metrics for the engineer paged at 3 a.m. who has never read this code. From the logs alone, that person can tell what the system did, for which request, and why it failed.
+Write logs and metrics for the engineer paged at 3 a.m. so they can tell from the logs alone what ran, for which request and record, and why it failed.
 
 ## Use what the repo has
 
-Find the repo's logger, metrics client, and tracer in a nearby handler, and use them in their existing format. Ask before adding a library or switching the repo to a structured logger.
+Use the repo's existing logger, metrics client, and tracer in their established format, and ask before adding a library or changing the repo's log formatter.
 
 ## Log lines
 
-Write each log line as an event name plus named fields. Read the logger's formatter first, because some formatters drop extra fields. When the formatter prints extra fields, as structlog and JSON formatters do, pass each value as a field.
+Write each log line as a stable `noun.verb_past` event name plus named fields. Check the logger's formatter first: when it outputs structured fields (such as `structlog` or a JSON formatter), pass each value as a field (with `extra={...}` in standard Python `logging`, `references/python-logging.md`); when it prints only the message string, append `key=value` pairs and list a structured formatter as a follow-up.
 
 ```python
 log.info("order.cancelled", order_id=order.id, user_id=user.id, refund_cents=refund, duration_ms=elapsed)
 ```
 
-With Python's `logging`, pass these fields as `extra={...}`, as `references/python-logging.md` shows.
-
-When the formatter prints only the message, write `key=value` pairs after the event name, and list a structured formatter as a follow-up.
-
-- Keep the event name stable, in the form `noun.verb_past`.
-- When the repo sets a request id or trace id, keep it on each new line, and pass it on in new outbound calls and queued messages. When the repo sets neither, log the ids the entry point acted on, and list request-id middleware as a follow-up.
-- Use one field name for one thing everywhere, such as `order_id`.
+- Use one field name for each concept everywhere (`order_id`), and end numeric field names with their unit (`_ms`, `_seconds`, `_bytes`, `_cents`).
+- Propagate `request_id` and `trace_id` across spawned async tasks, threads, outbound calls, and queued messages (`contextvars` or `AsyncLocalStorage`). When the repo sets neither, log the domain record ids and list request-id middleware as a follow-up.
 
 ## Levels
 
-- `error` means a person needs to act. Bad user input is `info` or `warn`.
-- `warn` means the code handled something rare, such as a fallback that ran.
-- `info` records a state change, such as created, paid, or cancelled.
-- `debug` is off in production, so put nothing there the on-call engineer needs.
+- `error`: a person must act or a request failed unexpectedly. Client 4xx validation errors are `info` or `warn`.
+- `warn`: the code recovered from an unusual condition, such as a fallback or retry.
+- `info`: a business state change completed (`order.created`, `order.cancelled`).
+- `debug`: off in production, so never put diagnostics needed during an incident at `debug`.
 
 ## The outcome log
 
-When an entry point changes state or calls another service, log one line as it finishes. The line records the event name, the ids it acted on, the result, and the duration, as in the `order.cancelled` example. A request log from middleware records the path and the status, and the outcome log adds which record changed and how. A queue consumer and a scheduled job are entry points too. A read-only entry point doesn't need an outcome log.
+When an entry point (HTTP route, RPC, queue consumer, or scheduled job) mutates state or calls an external service, log one summary line when it finishes with the event name, record ids, outcome, and `duration_ms`. Read-only entry points covered by access middleware don't need a second log line.
 
-## What else to log
+## Other events
 
-- Each call to another service, with the target, the duration, and the result.
-- Each decision that changes the result, such as a flag value.
-- Each error, once, with its stack trace, at the handler that deals with it, such as with `log.exception` in Python.
-- Inside a loop, only a failed item, with its id. After the loop, one line with the success count, the failure count, and the duration.
+- Log each outbound service call with the target, `duration_ms`, and status or error.
+- Log decisions that branch behavior, such as a feature flag or fallback path.
+- Log an unhandled error once with its stack trace at the handler that catches and responds to it (`log.exception`).
+- Inside a batch loop, log only failed items (rate-limited or sampled under high volume) and log one summary line after the loop with `succeeded_count`, `failed_count`, and `duration_ms`.
 
-## What never to log
+## Redacted data
 
-Never log passwords, tokens, API keys, cookies, card numbers, a raw request or response body, or a whole model object. Log a person by user id, and leave out the email and the name. Treat a secret written to a log as leaked, and rotate it.
+Never log passwords, tokens, API keys, session cookies, card numbers, raw request or response bodies, or whole ORM/model objects. Log users by `user_id` without email addresses or full names. If a secret reaches a log, rotate it.
 
 ## Metrics
 
-Give a new entry point the metrics its sibling entry points record, including their business-event counters. Record a duration as a histogram, so a dashboard can show p95 and p99. When the change adds a queue, record its depth and the age of its oldest message. When the repo doesn't have a metrics client, add `duration_ms` to an outcome log the entry point already writes, and ask before adding a client.
-
-Keep each metric label to a small fixed set of values, such as a route template or a status class.
+Match the metrics that sibling entry points record, ending metric names with their unit (`_seconds`, `_bytes`, `_total`). Record latencies as histograms so dashboards show p95 and p99, and record queue depth and oldest-message age for queues. Keep metric labels to small bounded sets (route templates and status classes, never `user_id` or `order_id`).
 
 ## Alerts
 
-State which alert pages someone when a new entry point's error rate rises, unless only staff call it. When none does, list the missing alert as a follow-up, with its metric and threshold.
-
-Before renaming an event or a metric, search the repo for alert and dashboard definitions, such as `*.rules.yml`, a `monitors/` folder, or a Terraform `datadog_monitor`. When the definitions live in another repo, list the rename as a risk. When an alert reads a log event or a metric, test that the code emits it with the fields the alert reads.
+State which alert pages on-call when a new public entry point's error rate spikes, or list the missing alert with its metric and threshold as a follow-up. Before renaming a log event or metric, search the repo for alert and dashboard definitions (`*.rules.yml`, `monitors/`, Terraform monitors), and test any event or metric that drives a paging alert.
 
 ## Traces
 
-When the repo already uses tracing, such as OpenTelemetry, pass the trace context on. Add a span around a new outbound call or slow step only where auto-instrumentation doesn't already create one. Auto-instrumentation covers most HTTP clients and database drivers. Ask before adding tracing to a repo that has none.
+When the repo uses OpenTelemetry or another tracer, propagate the trace context across calls and queues, and add manual spans only around slow internal steps that auto-instrumentation doesn't already wrap.

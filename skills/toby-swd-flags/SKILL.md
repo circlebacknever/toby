@@ -9,50 +9,44 @@ description: >-
 
 # Toby SWD Flags
 
-Add a flag so unfinished or risky code can ship turned off, and write its removal when you add it.
+Add a flag so unfinished or risky code can ship turned off, and plan its removal when you add it.
 
 ## Pick the kind
 
 | Kind | Use it for | Remove it when |
 | --- | --- | --- |
-| Release | a slice that isn't correct until a later slice ships | the feature is on for everyone |
-| Kill switch | a risky path or dependency you may need to turn off in an incident | the path is retired |
-| Experiment | comparing two behaviors on real traffic | the decision is made |
+| Release | a slice that isn't complete until a later slice ships | the feature is on for everyone |
+| Kill switch | a risky path or external dependency you may need to disable during an incident | the path is retired |
+| Experiment | comparing two behaviors on production traffic | the decision is made |
 
-State the kind in the plan. When only some customers get a feature, use the repo's entitlement or plan system, and add no flag.
+State the kind in the plan. When a feature is permanent for specific customer tiers, use the repo's entitlement or plan check and don't add a feature flag.
 
-## Use the repo's flag system
+## Flag system
 
-Find how the repo reads flags, and read the new flag the same way, through the one config or flags module. `toby-swd-twelve-factor`'s `references/config.md` describes that module. Ask before adding a flag provider, a flags module, or a new dependency.
+Read the new flag through the repo's existing flags or config module (`toby-swd-twelve-factor`'s `references/config.md`), and ask before adding a flag provider, module, or dependency.
 
 ## Defaults
 
-A release flag defaults to off, and the off path runs exactly today's code. A kill switch defaults to on. Its off path runs the safe behavior, so give that path a test. When the flag service is down, the code uses the last value it fetched, and uses the default only when it has never fetched one.
+A release flag defaults to `off` and runs today's code unchanged when off. A kill switch defaults to `on` and runs the safe fallback when off. When the flag service is unreachable, keep the last fetched value and fall back to the default only before the first fetch.
 
 ## One check site
 
-Read the flag once per request, at the entry point, and pass the value down or pick an implementation there. Read a flag once at startup only when every user gets the same value and a restart to change it is acceptable. When a frontend and its API both read the flag, they can disagree for one user. Make the API accept requests from both frontend paths, or make the frontend use the value the API returns.
+Read the flag once per request at the entry point, and pass the chosen behavior or implementation down. For percentage rollouts and experiments, evaluate the flag on a stable subject id (such as `user_id` or `org_id`) so one user gets a consistent experience across requests, and pass that value into any background job the request enqueues.
 
-When the paths differ in more than a line or two, put each in its own function, and branch once at the check site. Don't nest one flag inside another.
+When a frontend and an API both depend on the flag, either read the flag from the API response on the frontend or make the API accept requests from both frontend paths. When the two paths differ by more than a couple of lines, extract each into its own function and branch once at the check site. Never nest flags.
 
 ## Tests
 
-Run the existing tests with the flag at the value that runs today's code. That value is off for a release flag, and on for a kill switch around existing code. The tests must pass unchanged.
-
-Then run them with the flag at its other value. Each test that fails must assert a behavior the flag is meant to change. Keep that test unchanged for today's value, and add a copy for the other value with the new expected result. Fix any other failure now, because it is a regression. Run the new slice's tests, including its end-to-end test, with the flag on.
+Run the existing test suite with the flag set to today's path (`off` for a release flag, `on` for a kill switch), and confirm every test passes unchanged. Then run the suite with the flag flipped: keep each test that fails on intentionally changed behavior as the old-path test, add a copy asserting the new path, and fix any unintended failure as a regression. Run all tests for the new slice (including its `toby-swd-e2e` test) with the flag on.
 
 ## Data
 
-Ship a schema change in the releases that `toby-swd-hardening`'s `references/deploys.md` lists, because a flag can't hide it. Put only the code that reads the new column behind the flag. Keep writing the old column until the flag is gone, because the off path reads it. On a single instance, one release can add the column, write both columns, and add the flagged read.
-
-Backfill before you turn the flag on. In the release that removes the flag, write only the new column. Drop the old column one release later, as steps 3 and 4 of `toby-swd-hardening`'s `references/deploys.md` say. A single instance that stops before the new release starts can do both in one release. That release needs a tested down migration.
+A flag guards code paths and can't hide a breaking schema change. Ship schema changes across releases as `toby-swd-hardening`'s `references/deploys.md` describes: write both the old and new columns while the flag exists, put only the read of the new column behind the flag, backfill before enabling the flag, and drop the old column only after the flag is removed.
 
 ## Rollout
 
-Write the rollout as a list of steps, such as the team, then 5% of users, then everyone. For each step, state the metric to watch and the value at which someone turns the flag off. One example is checkout errors above 1% for ten minutes. A small app can use two steps, the team and then everyone. `toby-swd-observability` covers the metrics.
+State the rollout steps (such as internal team, 5% of users, then 100%) and the metric threshold that triggers a rollback (`checkout.failed` above 1% for 10 minutes, `toby-swd-observability`).
 
 ## Removal
 
-When you add the flag, write its removal as a plan step or a ticket. Give the removal an owner, a date, and a condition. State the flag, how to turn it on, and the later slice that removes it. Put the kind and that condition in a comment at the check site.
-
-Remove the flag by deleting the check and the path that lost. That path is the off path for a release flag, the losing path for an experiment, and the retired path for a kill switch. Delete the code that reads the flag first, deploy, and then delete the flag from the flag service. Deleting it from the service first makes the running code read the default, which turns a released feature off.
+When adding a flag, record its owner, target removal date, and removal condition in the plan or a ticket, and in a comment at the check site. After rollout completes, remove the flag check and dead code path in a code deploy first, and delete the flag from the flag service only after that deploy is live everywhere.

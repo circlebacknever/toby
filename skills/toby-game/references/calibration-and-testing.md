@@ -1,21 +1,19 @@
 # Calibration and testing
 
-Measure balance, and check correctness with a script.
+Verify game syntax, invariants, and difficulty balance with automated scripts before calling a build finished.
 
-Pull the logic out and run it headless. Resolve and replay are separate, so the outcome function doesn't need a renderer and can run ten thousand times in a loop. Put a clear marker around the pure logic (state, sim, resolver, rng), so a one-line command can copy it into a node test.
+## Mechanical and invariant checks
 
-`scripts/check-single-html.mjs <file>` runs the mechanical checks. It extracts the largest inline script and syntax-checks it. A missing parenthesis is then caught before release, when the player would see only a blank canvas. It also cross-references every `getElementById`/`$()` against the real element ids, so a stale handler shows up before a player finds the dead button.
+1. Wrap the pure simulation logic (`G`, `reset`, `step`, seeded RNG) between clear markers so a Node test script can import and run it headlessly ten thousand times without a browser.
+2. Run `node <this skill's folder>/scripts/check-single-html.mjs <file>` after each edit to syntax-check the inline script and verify that every `getElementById`/`$()` call matches an element id in the HTML.
+3. Assert invariants across long runs: every position, velocity, and score satisfies `Number.isFinite`, conserved quantities stay bounded, and exact single-step balance deltas match the formula. Remove overlay buttons as soon as their game phase ends.
 
-Assert that the replay never contradicts the result and that the odds stay inside their floor and ceiling. Also assert that a conserved quantity stays conserved and every position and score stays finite over a long run.
+## Bot calibration bands
 
-A `Number.isFinite` guard catches a physics blow-up the eye misses. Assert exact deltas. A test can check "the balance dropped, so the fine works". That test fails even when the fine works, if income in the same step was larger. In headless runs, guard browser-only globals with `typeof`. Give every overlay that waits for a click its own named game phase, and remove that overlay's buttons when the phase ends. When a scripted run fails, isolate a minimal repro. Check the test stubs before the game code, because stubs caused about half of the past failures.
+Run three automated test bots across multiple batches of at least 150 runs each, printing per-round and total win rates:
 
-Use three bots to set the band, which is the target range of scores. A random-input bot finishes near zero, a human-grade bot scores in the target range (often 10–20%), and a superhuman bot scores above it. If random and human-grade score the same, the band is flat, so the game doesn't have any skill in it. The tuning pass can't fix a flat band, because the problem is structural.
+- **Random bot:** finishes near 0% win rate.
+- **Human-grade bot** (with realistic reaction delay and release jitter): finishes inside the target band (typically 10–20%).
+- **Superhuman bot:** finishes well above the human band.
 
-The human-grade bot has to imitate human limits, such as imprecise release timing and reaction delays, or it reports a number no human will get. Combine several batches of runs before you draw a conclusion. In a game of several rounds in a row, the win rate moved between 6% and 12% across batches of 150 runs on identical code. Print the win rate for each round next to the rate you intended, because the total can hide one round that ends half the runs. A toy doesn't have a win to measure, so its band is the parameter range where the sim keeps moving and the surprise reliably shows.
-
-Test the comedy too. Check that every counter the ending reads is one the run tracked, every storyline advances, and the news feed never goes silent.
-
-Patch a working copy with exact-text replacements that each match once, and re-read the file when a replacement matches zero places or several. Run the syntax check after each patch, and never rewrite the whole file.
-
-Done means each bot scores inside its band, the invariants hold, the game plays live in both orientations, and reduced motion is honored.
+When the random and human-grade bots score nearly the same, the game lacks a skill curve, so fix the gameplay structure (`references/gameplay.md`) before tuning numbers. For a pure sandbox toy, verify the parameter range where the simulation stays active and exhibits its surprising behavior. Also verify that every ending stat counter is incremented during play and every storyline can reach its final step.

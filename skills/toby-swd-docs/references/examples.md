@@ -1,58 +1,52 @@
 # Worked Examples
 
-Copy how these files are organized, and copy how each example decides which folders get their own AGENTS.md or README.md. The examples cover a backend module with an AGENTS.md and a README.md, and a frontend scope decision.
+This file shows how to structure a module's `AGENTS.md` and `README.md` and how to decide which folder gets one.
 
 ---
 
-## Example 1: Backend payments service AGENTS.md
+## 1. Service AGENTS.md
 
-Scope decision: `services/payments/` is a module that covers a distinct area of knowledge, so it gets one AGENTS.md at its root. `services/payments/util/` doesn't get an AGENTS.md, and anything an agent needs to know about `util/` goes in the payments AGENTS.md.
+Scope decision: `services/payments/` covers a distinct domain, so it gets one `AGENTS.md` at its root, while `services/payments/util/` does not.
 
 ```markdown
 # Payments
 
 ## What this is
 This module turns an authorized cart into a settled charge and a ledger entry. It is the only
-part of the system that is allowed to move funds.
+part of the system that moves funds.
 
 ## Commands
 - `pytest services/payments` runs the module's tests.
 
 ## Constraints
-- Charges must be idempotent per (order_id, attempt). The retry key passed
-  through gateway.py looks redundant, but it is required because the processor may
-  succeed and then time out our connection. Removing it reintroduces double
-  charges.
-- We may not store PAN data (PCI). That is why card data is exchanged for a
-  token at the edge and only the token reaches this module.
+- Charges are idempotent per `idempotency_key` (one key per payment intent). Retrying a timed-out
+  request must reuse the same key, because the processor may have succeeded before the connection
+  dropped, and rotating the key on a timeout double-charges the card.
+- PCI rules forbid storing raw card numbers, so card data is tokenized at the edge and only the
+  token reaches this module.
 
 ## Cross-module decisions
-- "Settlement ordering": the ledger is the source of truth. The processor
-  webhook is advisory and may arrive out of order. Billing and
-  analytics consume the ledger. Affected sites contain
+- "Settlement ordering": the ledger is the source of truth, because processor webhooks arrive
+  out of order. Billing and analytics read the ledger. Affected sites contain
   `// see "Settlement ordering" in AGENTS.md`.
 
 ## Extension rules
-- A new processor is a new Gateway implementation plus a config entry.
-  Existing gateway code stays untouched.
-- The ledger is append-only, so corrections are compensating entries. Code that
-  mutates a posted entry is a bug.
+- A new payment processor is a new `Gateway` implementation plus a config entry, leaving existing
+  gateway code unchanged.
+- The ledger is append-only, so refunds and adjustments write compensating entries and never
+  mutate posted rows.
 ```
-
-The file doesn't have function signatures or algorithm descriptions, because those are in interface comments in `gateway.py`. This file would stay accurate through a full rewrite of the internals.
 
 ---
 
-## Example 2: Backend payments service README.md
+## 2. Service README.md
 
-This README.md covers the same payments module for a developer who calls the service from outside.
+This `README.md` covers the same payments module for developers who call it from other services.
 
 ```markdown
 # Payments Service
 
-This service processes charges and maintains the ledger of what has been collected. You
-interact with this service to authorize a cart, capture a payment, and issue
-refunds. It is the only service that moves funds directly.
+This service authorizes carts, captures charges, issues refunds, and maintains the payment ledger.
 
 ## How to use it
 
@@ -63,46 +57,37 @@ gateway = Gateway.from_config()
 result = gateway.charge(PaymentRequest(
     order_id="ord_123",
     amount_cents=4999,
-    token="tok_abc",         # The card token comes from the payments edge.
-    idempotency_key="ord_123_attempt_1"
+    token="tok_abc",         # Card token from the payments edge.
+    idempotency_key="ord_123_charge_1"
 ))
 ```
 
 ## Concepts
 
-- **Token**: card data is exchanged for a token at the edge before it
-  reaches this service. Raw card numbers are never handled here.
-- **Idempotency key**: a call with the same (order_id, attempt) combination will return the
-  same result even if the call is retried. Always supply one, because the service will
-  reject requests without it.
-- **Ledger as source of truth**: the ledger records settled charges. Webhooks
-  from the processor are advisory and arrive out of order. Query the ledger
-  for settlement status.
+- **Token**: the edge exchanges raw card data for a token before calling this service.
+- **Idempotency key**: retrying a timed-out call with the same `idempotency_key` returns the
+  original result without charging twice. Generate a new key only after the processor returns a
+  terminal decline and the customer submits a new payment attempt.
+- **Ledger**: the ledger records settled charges and refunds, and callers query the ledger for settlement state.
 
 ## Public API
 
-`Gateway.charge(req)` — authorize and capture a single payment.
-`Gateway.refund(charge_id, amount_cents)` — issue a partial or full refund.
-`Ledger.entries_for_order(order_id)` — returns all ledger entries for an order.
+- `Gateway.charge(req)` authorizes and captures a payment.
+- `Gateway.refund(charge_id, amount_cents)` issues a partial or full refund.
+- `Ledger.entries_for_order(order_id)` returns all ledger entries for an order.
 
-Full signatures and behavior are in the interface comments in `gateway.py`.
+Full signatures and error types are in the interface comments in `gateway.py`.
 
 ## Known gotchas
 
-- Refunds require a `charge_id` from a settled charge. Authorization alone
-  does not produce one. Attempting to refund an authorization that was never captured raises
-  `ChargeNotSettledError`.
-- The idempotency key must be unique per attempt. Reusing a key from a failed
-  attempt will return the original failure.
+- `Gateway.refund` requires a `charge_id` from a settled charge, and refunding an uncaptured
+  authorization raises `ChargeNotSettledError`.
+- Reusing an `idempotency_key` with a different `amount_cents` or `order_id` raises
+  `IdempotencyConflictError`.
 ```
-
-The README points to the interface comments in `gateway.py`, so the
-signatures are written down in one place for a maintainer to update. AGENTS.md states why idempotency is
-required and why the ledger is the source of truth. The README covers only what
-a caller needs.
 
 ---
 
-## Example 3: Frontend feature module scope decision
+## 3. Frontend module scope
 
-Scope decision: `features/checkout/` is a feature module, so it gets one AGENTS.md at its root. `features/checkout/components/PriceRow/` has one component and doesn't have subfolders, so it doesn't get an AGENTS.md. If `PriceRow` expects something from callers that isn't obvious, write it in the comment on its props type.
+Scope decision: `features/checkout/` is a feature module and gets one `AGENTS.md` at its root. `features/checkout/components/PriceRow/` holds one component and has no subfolders, so its caller constraints belong in the doc comment on `PriceRowProps`.

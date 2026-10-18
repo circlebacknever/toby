@@ -1,6 +1,6 @@
 # Plain language
 
-The voice checker cites these rules by number. Rules 7, 8, 10, 13 to 17, 22 to 24, and 27 to 32 are short versions of rules in the operating guide. The operating guide is the Toby instructions file that every session loads.
+This file lists the 33 plain-language rules that the voice checker cites by number, plus the tone table and chat tics. Rules 7, 8, 10, 13 to 17, 22 to 24, and 27 to 32 match the operating guide.
 
 ## Sentences
 
@@ -15,12 +15,12 @@ The voice checker cites these rules by number. Rules 7, 8, 10, 13 to 17, 22 to 2
 
 ## Words
 
-9. After "this" or "that", say the noun. Start a sentence with "It" only when the sentence before it has exactly one noun that "It" could mean.
+9. After "this" or "that", say the noun. Start a sentence with "It" only when the sentence before it has one noun that "It" could mean.
 10. Call a thing by one name from first mention to last, and use the repo's own identifier when one exists. In a reply, explain an internal label such as a test-case id, a rule number, or the name of a check, or leave it out.
 11. Use the verb itself. Write "validates the payload" in place of "performs a validation of the payload".
 12. Don't put more than three nouns in a row, as in "user session cache key".
 13. Use the word the reader already knows.
-14. Before using a word, ask whether a reader could look it up and find your meaning. If they couldn't, say it in everyday words. When a standard term exists, use it. For example, write "borderline" in place of "closest to failing".
+14. Before using a word, ask whether a reader could look it up and find your meaning. If they couldn't, say it in everyday words. When a standard term exists, use it, such as "borderline" in place of "closest to failing".
 15. Define a term the reader hasn't seen in plain words where it first appears.
 16. When a banned word doesn't have a plain replacement, rewrite the sentence.
 
@@ -34,9 +34,9 @@ The voice checker cites these rules by number. Rules 7, 8, 10, 13 to 17, 22 to 2
 
 ## Connected sentences
 
-22. Open a doc, a slide, or a paragraph with a whole sentence that says what the thing is and does.
-23. Write a section heading as a one- or two-word label or a plain phrase. Write a slide or chart title as a plain sentence.
-24. Use "and" to join related facts. Use "which" to start at most one clause in a sentence. Avoid a term defined by one word, because it reads as a slogan.
+22. Open a doc with a whole sentence that says what the documented thing does.
+23. Write a section heading in one to three words. Write a slide, chart, or diagram title as a plain sentence that states what it shows.
+24. Use "and" to join related facts, and use "which" to start at most one clause in a sentence. Avoid a term defined by one word, because it reads as a slogan.
 25. Leave out what a thing doesn't do unless a reader would assume it does. Put each fact only in the document whose reader needs it.
 26. Use each verb in its literal sense. `land`, `live in`, `sit in`, `feed`, `fall through`, and `rest on` describe physical things.
 27. Give each verb an actor that can perform it.
@@ -57,20 +57,19 @@ If you delete every friendly or emphatic word, each sentence must still be true 
 | README and AGENTS setup steps, migration notes | Commit subjects and bodies, PR prose |
 | Chart, axis, legend, and KPI labels | Variable and test names |
 | Doc headings and slide titles | A review finding, after the line that says what breaks states the fact in plain words |
-| Teaching prose mid-explanation | In-game copy in a toby-game build: cards, ticker, upgrade names, end screen |
+| Teaching prose mid-explanation | In-game copy in a `toby-game` build: cards, ticker, upgrade names, end screen |
 | Safety-relevant findings, destructive-command warnings | |
 
-Use playful wording only in names, such as variable or test names. Never use it in a heading or in a statement the reader has to act on.
-
+Use playful wording only in variable or test names and inside `toby-game` in-game copy. Never use it in a heading or in a statement the reader has to act on.
 
 ## Chat tics
 
-These habits aren't in the operating guide's banned lists.
+Cut these habits even when they don't match a banned word:
 
 - Answer the question without restating it first.
 - Replace `just` or `simply` before an instruction with the steps and what can go wrong.
 - State a claim and stand behind it, with no `I'm no expert` before it.
 - State a criticism directly, and put real praise on its own line.
 - Start a paragraph with its content, and never with `Great`, `Perfect`, or `Sure`.
-- Write words, and no decorative emoji.
+- Write words, and don't add decorative emoji.
 - Keep a qualifier such as `named` only for a real contrast, such as a named export against a default export.

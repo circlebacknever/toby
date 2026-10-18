@@ -12,11 +12,11 @@ description: >-
 
 # Toby Code Review
 
-Report a change's real issues in plain English, and fix nothing. When the change has none of the issues below, the report is "No issues found." with no suggestion.
+Report a change's real issues in plain English, and fix nothing. When the change doesn't have any of the issues below, reply `"No issues found."` without suggestions.
 
 ## Report
 
-Write each issue like this:
+Write each issue in this format:
 
 ```text
 1. Cancelling a shipped order refunds the customer twice (orders/cancel.py:42).
@@ -34,85 +34,83 @@ Write each issue like this:
    Fix: Delete the list at reports/sla.py:21 and import OPEN_STATES from tickets/states.py.
 ```
 
-- The first line says what goes wrong and for whom, at file:line, in the names the code uses.
-- The last step shows the wrong result.
-- The fix is one change to a function or file you cite, in at most a five-line code block. Don't give alternatives.
-- Report one issue per cause.
-- Put the most harmful issue first, and use no severity labels.
-- Use no label for a code pattern or design principle, such as shotgun surgery or SOLID. Leave out Toby skill names, and quote no code back.
+- State what goes wrong and for whom on the first line, at `file:line`, using the code's own identifiers.
+- Show the wrong result in the last Reproduce step.
+- Give one fix at a cited function or file, in at most a five-line code block, without alternatives.
+- Report one issue per root cause, ordered from most harmful to least, without severity tags.
+- Don't use pattern labels (such as shotgun surgery or SOLID), keep Toby skill names out of the findings, and don't quote the current code back.
 
-Any report may end with these two lines, which aren't issues.
+End the report with these optional lines when they apply:
 
-- A `Not run:` line listing the commands you couldn't run and each issue you found only by reading.
-- At most one `Question:` line, when a product decision or a file you can't read settles whether an issue is real. Ask nothing about a choice the docstring or PR description states, or a guard that unchanged code in the diff relies on.
+- `Not run:` listing the commands you couldn't run and each issue found only by reading.
+- At most one `Question:` line when a product decision or unreadable file settles whether an issue is real. Don't ask about a choice stated in the docstring or PR description, or a guard that unchanged code relies on.
 
 ## What to check
 
-Review the current diff unless the user gives a scope, and read a PR's description first. Report only issues the change introduces, and follow each cause to the callers it affects. Drop an issue you can't write steps for.
+Review the current diff unless the user gives a scope, and read a PR's description first. Report only issues the change introduces, trace each cause to its callers, and drop any issue you can't write reproduction steps for.
 
-1. **Bugs.** Wrong output, a crash, or an error hidden from a caller that needs it. A changed contract or stored format counts when it breaks a caller or data the diff doesn't update.
-2. **A bug fix with no regression test.** The steps revert the fix and show the suite still passes.
-3. **Security.** Authentication, authorization, injection, secrets, path traversal, deserializing untrusted data, CSRF, SSRF, XSS, and data exposure. Give the attacker's request and what it exposes.
-4. **Acceptance criteria.** An unmet criterion from the request, the ticket, or the plan group the diff implements. Report each criterion as its own issue, and quote it. The steps run the command the criterion lists, or send the input it describes.
-5. **Repo rules.** A break of a rule in `AGENTS.md`, `CLAUDE.md`, or a similar agent instructions file. The Reproduce block has two lines, the rule quoted at path:line and the file:line that breaks it.
-6. **An untested entry point.** A new route, job, or consumer that the tests don't call through its entry point. The steps delete a line the feature needs and show the suite still passes.
+1. **Bugs.** Wrong output, a crash, or an error hidden from a caller that needs it, including a changed contract or stored format that breaks a caller or existing data.
+2. **A bug fix without a regression test.** The steps revert the fix and show the test suite still passes.
+3. **Security.** Authentication, authorization, injection, secrets, path traversal, unsafe deserialization, CSRF, SSRF, XSS, and cross-tenant data exposure. State the attacker's request and what it exposes.
+4. **Acceptance criteria.** An unmet criterion from the request, ticket, or plan group. Quote the criterion and give the command or input that fails it.
+5. **Repo rules.** A break of a rule in the project's `AGENTS.md` or contributing guide. Quote the rule at `path:line` and the `file:line` that breaks it.
+6. **An untested entry point.** A new route, job, or consumer that no test calls through its entry point. The steps delete a required line in the handler and show the suite still passes.
 
-Before you write about a plan or a spec, read every file in it. Report each feature the plan promises and doesn't build in any step, and quote the promise at path:line in the Reproduce block. Check each entry point the plan adds against `../toby-swd-hardening/SKILL.md`.
-
-For a change to a `SKILL.md` or to an agent's instructions file, hook, or config, also ask the questions in `references/skills-diff.md`.
+When reviewing a plan or spec, read every file in it, report each promised feature that no step builds (quoting `path:line`), and check each new entry point against `../toby-swd-hardening/SKILL.md`. For a change to a `SKILL.md` or agent instructions, hook, or config file, also check `references/skills-diff.md`.
 
 ## Design
 
-Skip questions about a design choice the user approved in a plan.
+Skip design questions on choices the user already approved in a plan.
 
 **Module boundaries and extensibility**
 
-Report one of these only when the request, a ticket, a TODO, or `git log` shows another change like this one is coming. One earlier commit counts when it made the same kind of change, such as adding a status. The steps make that change in the file a developer would edit first, and show the wrong result in a file they missed.
+Report one of these when the diff leaks one decision across modules, or when the request, a ticket, a TODO, or `git log` shows a follow-on change coming:
 
-- Does an entry point compute a price, a limit, or whether a status may change, when a second entry point needs the same rule?
-- Does the diff write another module's data, outside a migration or a test fixture, and skip a rule that module enforces?
-- Does the diff add a case to a switch on a type, status, or provider, while another switch on that field returns a default value? The fix adds the missing case to the other switch and replaces its default branch with `assert_never` in Python or a `never` check in TypeScript.
-- Does a subclass break its parent's contract, such as a `refund()` that throws `NotImplementedError` where the parent returns? The code is fine when callers check `supports_refunds()` first.
+- Does an entry point compute a price, limit, or status transition rule that another entry point also needs?
+- Does the diff write another module's table or parse its wire/file format directly, bypassing that module's rules?
+- Does the diff thread a pass-through parameter through three or more functions that don't read it?
+- Does the diff add a case to a switch on a type, status, or provider while another switch on that field falls through to a default? The fix adds the case and guards the default with `assert_never` or `never`.
+- Does a subclass break its parent's contract, such as throwing `NotImplementedError` on a method callers invoke without a `supports_*()` check?
 
 **Special cases and duplication**
 
-Report these even with no sign of another change. The steps change one copy of the rule, or add a second customer with the same need.
+Report these even without a second change in `git log`:
 
-- Does shared code gain a branch for one customer's id, such as `if account.id == 4471:`? The fix branches on an account field that says why this customer differs, such as `account.bills_in_euros`.
-- Is one rule, such as a 30-day refund window or a list of open statuses, written in two places that must change together? Two switches on one field that compute different values, such as a discount and a label, are two rules.
-- Don't report a lookup by id scoped to the signed-in account, such as `get_order(id, account)`, repeated in each entry point.
+- Does shared code branch on one customer's id (`if account.id == 4471`)? The fix branches on a capability field (`account.bills_in_euros`).
+- Is one business rule (such as a 30-day refund window or the list of open statuses) duplicated in two places that must change together? Two switches on the same field that compute different things (a discount and a display label) are separate rules.
+- Don't report a caller-scoped lookup (`get_order(id, account)`) repeated across entry points.
 
 **Warning signs**
 
-Open `toby-swd-warning-signs`, and ask its questions of the code the diff adds or changes. Report a warning sign only when the diff adds it and the request, a ticket, a TODO, or `git log` shows a change it makes harder. The steps make that change and show each extra file it edits, or the wrong result in a copy it missed. Write the fix as the edit to make, such as moving `price()` into `Order`, without the warning sign's or the refactoring's name.
+Open `toby-swd-warning-signs` and check the changed code. Report a warning sign only when the diff introduces it and the request, a ticket, a TODO, or `git log` shows a change it makes harder. State the concrete edit in `Fix:` without naming the smell or refactoring catalog entry.
 
 ## Production readiness
 
-Ask the questions in `references/production.md` when the diff adds an entry point, job, consumer, outbound call, migration, write, or check before a write. Ask them too when it changes a stored or queued format.
+Check `references/production.md` whenever the diff adds or changes an entry point, job, consumer, outbound call, migration, write, check-before-write, or stored/queued format.
 
 ## Prove each issue
 
-- Run the tests for the changed files, or the changed code, and ask before anything broader.
-- Try changed arithmetic and conditions with negative, zero, and empty values, and on each side of each boundary.
-- Assume the code is right, and search for a guard that stops the failure, such as a validation, a type, the framework, or middleware. Drop the issue unless you can say why that guard misses. When you can, give each issue's search to its own subagent, with the changed files and every file the issue cites.
-- Claim only what the input in your steps causes. Claim data loss only when your steps delete, overwrite, or corrupt stored data.
-- Check that the fix deletes nothing an interface or a caller needs.
-- Count line numbers from the diff's hunk headers.
+- Run the focused tests for the changed files, and ask before running broader checks.
+- Test changed arithmetic and conditions with negative, zero, empty, and boundary values.
+- Assume the code is right and search for a validation, type, framework check, or middleware guard that blocks the failure. Drop the issue unless you can explain why that guard misses. When possible, spawn a subagent per candidate issue to search for the guard.
+- Claim only what your reproduction steps cause, and claim data loss only when the steps delete, overwrite, or corrupt stored data.
+- Confirm your proposed fix doesn't delete anything a caller or interface requires, and count line numbers from the diff's hunk headers.
 
 ## Don't report
 
-- Method length, naming taste, style a formatter catches, and code that is correct but awkward, unless it passes the Warning signs block above.
-- A pattern every similar file in the repo uses, copied correctly.
-- An error the code rightly lets crash the program.
-- A missing rate limit or audit log that the diff didn't remove, unless `references/production.md` asks about it.
-- Environment variables and CLI flags as untrusted input.
-- Anything you would write with "consider" or "might".
+- Method length, naming taste, formatting, or awkward code that passes the Design section above.
+- A pattern every sibling file in the repo uses, copied accurately.
+- An unrecoverable error that the code rightly lets crash.
+- A missing rate limit or audit log the diff didn't remove, unless `references/production.md` requires it.
+- Environment variables and CLI flags as attacker-controlled input for injection, unless a request or untrusted file sets them. Still report missing startup validation on required config or secrets exposed in a client bundle.
+- Anything hedged with "consider" or "might".
 
 ## Choosing the fix
 
-When the fix is unclear, open the skill for the issue's area at `../<skill>/SKILL.md`.
+When the fix is unclear, open `../<skill>/SKILL.md`:
 
-- `toby-swd-architecture` for boundaries, special cases, and copied rules
-- `toby-swd-extensibility` for a switch or a subclass
-- `toby-swd-warning-signs` for a warning sign and the refactoring that removes it
-- `toby-swd-e2e` for an untested entry point
+- `toby-swd-architecture` for boundaries, special cases, and duplicated rules
+- `toby-swd-modules` for information leakage and pass-through threading
+- `toby-swd-extensibility` for switches and subclasses
+- `toby-swd-warning-signs` for code smells and their refactorings
+- `toby-swd-e2e` for untested entry points

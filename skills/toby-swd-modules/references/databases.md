@@ -1,12 +1,12 @@
 # Databases and Data Access
 
-In Django and Rails the model writes its own table, so an entry point or an operation calls model methods such as `order.confirm()`. Add a repository only when the repo already has repositories, as "Default structure" in `toby-swd-architecture` says.
+This file covers when to wrap ORM calls in a repository and when to split database row, domain, and API types.
 
 ## ORM in services
 
-A service that calls SQLAlchemy or Hibernate directly handles session scope, lazy loading, filter syntax, and objects that fail after their session closes. Switching ORMs or adding a read replica then means editing every such service. When the repo already has repositories, keep that ORM handling in them. A service then calls `orders.confirm(order_id)` and gets plain domain objects back.
+When a service calls SQLAlchemy or Hibernate directly, it manages session scope, lazy loading, and query syntax, so changing the query layer edits every caller. In repos that use repositories, keep ORM queries inside the repository and return domain objects. In Django and Rails, keep queries and table writes on the model (`toby-swd-architecture`).
 
-## One type for three audiences
+## One type per audience
 
 ```go
 // auth/user.go
@@ -14,27 +14,24 @@ type User struct {
     ID              string `db:"id" json:"id"`
     HashedPassword  string `db:"hashed_password" json:"-"`
     LegacyMfaSecret string `db:"legacy_mfa_secret" json:"-"`
-    // ...the struct has 25 more fields
 }
 ```
 
-This `User` struct is the database row, the JSON DTO, and the domain entity at once. Every consumer then depends on the schema, the wire format, and the hashing scheme. Split the type only when one audience must not see a field, such as `HashedPassword`, or when the columns and the JSON already differ. Then put each audience's type in the package that makes that type's decisions. Here the row type goes in the store package, the domain type in `auth`, and the JSON type in the API package:
+When one struct serves as the database row, the domain entity, and the JSON response, every caller depends on the schema and secrets can leak if a tag is missed. Split the struct when an audience must never receive a field (such as `HashedPassword`) or when the database columns and wire format diverge:
 
 ```go
 // auth/internal/store/user_row.go
-type userRow struct { ... }   // matches the columns, package-private
+type userRow struct { ... } // matches the columns, package-private
 
 // auth/user.go
 type User struct { ID, Email string; Status UserStatus }
 
 // auth/api/user_dto.go
-type UserDTO struct { ... }   // the JSON format
+type UserDTO struct { ... } // the JSON wire format
 ```
 
-A column change stays inside `internal/store`, and a JSON change doesn't need a migration. When all three types would hold the same fields, keep one struct with `db` and `json` tags.
-
-In Django and Rails the model is the row type and the domain type. Add only the JSON type, such as a DRF serializer.
+When all three views share the same safe fields, keep one struct with `db` and `json` tags. In Django and Rails, the model serves as the row and domain type, and a serializer defines the JSON format.
 
 ## Read models
 
-Use a separate type for reads only when a query returns data very different from the stored entity, such as a report or a dashboard. Otherwise use one type for reads and writes.
+Define a separate read model only when a query returns a projection that differs from the entity, such as an aggregated dashboard or report.

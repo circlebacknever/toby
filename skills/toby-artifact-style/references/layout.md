@@ -100,10 +100,10 @@ A label that touches no edge but sits 4px from the top and 20px from the bottom 
 
 ## Slides
 
-- On a 16:9 pptx slide, keep all content inside a 0.5in margin on every side.
-- Set the text frame insets in pptx to equal values on all four sides. The default insets are 0.1in on the left and right and 0.05in on the top and bottom.
+- On a 16:9 pptx slide, keep all content inside at least a 0.5in margin on every side (such as 64px top/bottom and 80px left/right at 1920×1080).
+- Set the text frame insets in pptx to equal values on all four sides (such as 0.1in on all four sides, replacing PowerPoint's asymmetric default).
 - Turn off shrink-text-on-overflow, and size the text box for its text. Shrinking text hides the overflow and leaves a slide with mixed font sizes.
-- Use no body text smaller than 12pt on a slide.
+- Keep body text at 12pt or larger on a slide.
 - On a slide or any canvas with a fixed size, center the diagram in the space it has. When the diagram leaves more than a quarter of the width empty, widen the gaps between its boxes.
 - Size a panel or callout from its content, with the same padding rule as a text box. In a panel with left-aligned text, the left padding equals the top padding, and the right padding is at least the set padding. A panel stretched to fill the space left below a diagram fails the padding rule.
 
@@ -113,7 +113,7 @@ An overlap check on the render misses uneven padding, crowded arrow labels, and 
 
 1. Check that every SVG file parses, with `xmllint --noout`. A file that doesn't parse renders as an error page. XML forbids a double hyphen inside a comment, so keep flags such as `--dry-run` out of comments.
 2. Render the artifact after its fonts have loaded. View it at full size, and then view each quarter of it at twice the size. A whole-page screenshot at reduced size hides a 2px overlap.
-3. List every box that contains text, including nodes, panels, callouts, and slide containers, with its box coordinates, its text, and its four padding values in pixels, or in points on a pptx slide. Read each padding value from the render. A value computed from the source is only the intended value, because a renderer can place text away from its coordinates. Mark each box whose widest line exceeds its inner width. Mark each box whose top and bottom padding differ by more than 2px, or whose left and right padding differ by more than 2px. Mark each box with a side below the set padding. Mark each value that is off the 8px grid.
+3. List every box that contains text (nodes, panels, callouts, and slide containers) with its coordinates, text, and four rendered padding values. Read each padding value from the render, because a renderer can place text away from its source coordinates. Mark any box whose widest line exceeds its inner width, whose opposite padding values differ by more than 2px, whose padding falls below the minimum, or whose coordinates sit off the 8px grid.
 4. List every arrow with its start point, its bends, and its end point, and check each one on the render. Mark each arrow that crosses a box, a label, or another arrow. Mark each arrow whose end is more than 12px from the box it points to.
 5. Find the element nearest each edge of the canvas, page, or slide. Mark each one that is cut off, or that is less than 24px from the edge.
 6. Check the whole artifact against each rule in the Structure, Grid, Spacing, Arrows, Containers, Sequence diagrams, and Slides sections. Write down each rule that fails.

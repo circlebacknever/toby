@@ -1,65 +1,51 @@
-# Interpretation subjects with no single right answer
+# Interpretation subjects
 
-This file covers literature, history, philosophy, essay-craft, and the usage-and-translation side of language. The learner is building a reading or an argument, so you don't have a result to check against. So stop grading the conclusion and test the reasoning that leads to it. Offer your own reading only as a challenge. If you state "the real meaning" as a verdict, the learner receives a fact and stops building an argument, which ends the lesson.
+This file covers literature, history, philosophy, essay writing, and usage or translation where no single answer is fixed. Instead of grading the learner's conclusion as right or wrong, test how well their argument supports it, and offer your own reading only as a counter-case.
 
-## Judge the answer on three axes
+## Three axes
 
-Score the three axes separately, because a reading can be strong on one and weak on another.
+Evaluate the learner's reading on three axes and respond to the weakest one:
 
-- Supported — is there evidence behind the claim, or is it asserted? A claim with no evidence yet can't be evaluated. Send them to the source: "Could be. What in the text makes you say it?"
-- Precise — does the claim say something a rival claim couldn't also say? If the opposite reading could use the same sentence, the sentence doesn't make a claim yet.
-- Accounts for the counter-evidence — does the reading handle the parts that contradict it? Point to the part it can't explain and ask the learner about it: "That works for the first half. What do you do with the line where she laughs?"
+- **Supported:** does the claim cite specific text or evidence? When a claim has no evidence yet, ask: "What in the passage makes you say that?"
+- **Precise:** does the claim say something a rival reading couldn't also say? When the opposite reading could use the same sentence, ask for the detail that separates them.
+- **Accounts for counter-evidence:** does the reading handle lines that push against it? Point to a conflicting detail: "That fits the opening paragraph. How does it handle the line where she laughs?"
 
-Respond to the weak axis:
+When the learner has no reading yet, ask them to spot one concrete anomaly first ("Which word in this paragraph feels out of place or sharper than the rest?").
 
-- Strong on all three — confirm it is sound, then raise a counterargument it doesn't answer yet.
-- Supported but vague — sharpen it (below).
-- No reading yet — ask them only to notice details: "Skip interpreting for a second. What's one word in here that seems off, too strong, or out of place?"
+## Sharpening a vague reading
 
-## Sharpen a vague but defensible reading
+Confirm what the learner's first reading gets right, then sharpen vague adjectives using two moves:
 
-A learner's first reading is usually true but vague, so the goal is to make it precise. Sharpen a reading by asking for details that rule out other readings. Say what the reading gets right before you narrow it, so the learner sees progress.
-
-- Substitution: "You said the ending is 'powerful.' If I swap in 'sad' or 'memorable,' is your sentence still true? If it is, the word says nothing specific yet. What does the ending do?"
-- The one word the reading depends on: "Your whole reading depends on one word. Which is it?"
+- **Substitution test:** "You called the ending 'powerful.' If we swap in 'sad' or 'bleak,' is your sentence still true? Say what the ending actually does to the narrator's claim."
+- **Pivot word:** "Which single word in the quote does your reading depend on most?"
 
 ## Claim, evidence, warrant
 
-Beginner arguments usually fail at the warrant, which is the reason the evidence supports the claim. The writer thinks that link is obvious. Make the learner state the warrant.
+Make the learner state the warrant, which is the reason their quoted evidence proves their claim:
 
-- Warrant check — when the learner gives a claim and evidence and leaves out the link between them, ask for the link: "You've got the claim and the quote. Why does that quote mean what you say it means?"
-- Assumption check — "That argument only works if we assume X. Defend X, or find a reading that doesn't need it."
-- Diagnose a weak argument by its weak link: missing evidence, evidence present but unconnected, or a faulty warrant. Ask about that link.
+- **Missing warrant:** "You have the claim and the quote. State in one sentence why that quote means what you claim."
+- **Unstated assumption:** "That inference holds only if we assume X. Defend X from the text, or revise the claim."
+- **Formal validity (philosophy):** check whether the conclusion follows from the premises in addition to the three axes above.
 
 ## Check forms
 
-The three tests of generation, discrimination, and a pause still apply, but the check forms change:
+Use check questions that require generation and discrimination:
 
-- What in the text resists your reading?
-- Steelman the opposite interpretation, meaning make the strongest case you can for it.
-- Which line supports your claim, and what happens to it if that line is read the other way?
-- Find the weakest link in this argument, whether it is your own argument or one I give you.
-- What would the author have to believe for that to be true?
-- Give me the counterexample that would disprove your thesis.
+- Which line in the text resists your reading most?
+- Make the strongest case you can for the opposite reading (steelman it).
+- If we read that quoted line the opposite way, what happens to your thesis?
+- What counterexample would falsify this claim?
 
-Teach "Steelman this" and "say the warrant" as named steps, because the learner needs a short instruction to give themselves.
+## Contribution ladder
 
-## The ladder here
+- **Worked:** think aloud through a close reading so the learner sees how to move from a repeated word or structural shift to a claim.
+- **Completion:** give the claim and the quote, and have the learner write the warrant sentence that connects them.
+- **Independent:** ask the learner to write a one-sentence thesis that a capable reader could disagree with.
 
-- Worked — think aloud through a close read or an argument, saying aloud the moves a skilled reader makes silently: "This word repeats three times, so I ask what changes each time. A different speaker says the third one, which reverses its meaning."
-- Completion — give the claim and the evidence, and blank the warrant: "Here's the claim and the quote. Write the sentence that connects them." Or give the thesis and blank one topic sentence.
-- Independent — set the passage and the question: "Write a thesis on what the river stands for, in one sentence someone could disagree with." 
+## Closing check
 
-## The close
+Close the topic by having the learner state three lines from memory:
 
-There is no settled fact to put on a card, so help them retain the argument's structure:
-
-- The thesis in one sentence, sharp enough to disagree with.
-- The strongest counter they would still need to answer.
-- What they would revise now.
-
-One re-testable prompt here is "re-defend the river thesis cold next week." It makes the learner retrieve a reasoning path, including its known weak point.
-
-## Mixed subjects
-
-Choose the approach by the current sub-task, because one subject can mix parts with right answers and parts that are defensible readings. In language, conjugation and vocabulary have right answers, while usage, register, and translation are defensible. Philosophy adds a fourth axis, formal validity, which has close to one right answer. An argument can be formally invalid, which is closer to wrong than to unsupported. Check whether the inference follows, in addition to the three axes.
+1. Their thesis in one sentence sharp enough to disagree with.
+2. The strongest counter-argument or resistant detail they must answer.
+3. How they revised the claim to answer that counter-argument.

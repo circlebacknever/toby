@@ -8,53 +8,41 @@ description: >-
 
 # Toby SWD Plan
 
-Write the plan as one group of steps per slice.
+Write the plan as one group of steps per vertical slice.
 
 ## Intent
 
-Open the plan with the user's intent in the user's words and the result that fulfills it. Then list the follow-ups you would suggest once the plan is done. Put each one in a slice, or under Out of scope with its reason, so nothing new turns up after the last group.
+Open the plan with the user's intent in their words, the result that fulfills it, the work mode, and the command or action that proves the whole task is done. List every follow-up you would suggest once the plan finishes, placing each in a slice or under `Out of scope` with its reason.
 
 ## Slices
 
-A slice is the work behind one new thing a person can do. Put every route, job, or email that thing needs in the same slice. Criteria at unrelated entry points, such as a claim route and an hourly job, go in different slices.
+A slice is the work behind one new action a person can run or see. Put every route, migration, job, or email that action needs in the same slice, and put criteria at unrelated entry points in separate slices.
 
-One entry point can hold several slices. Each slice is correct on its own and small enough for one session, such as `report downloads as CSV` and then `CSV export keeps the current filters`.
+Name each slice for what a person can do once it ships (`invite shows up as pending`), and use that exact name for the group heading, the group filename, the stop at its end, and its row in the final report. Order slices so every slice leaves the system working. When an earlier slice deploys before a later slice completes the flow, guard it with an off-by-default release flag (`toby-swd-flags`).
 
-Name each slice for what a person can do once it ships, in their words, such as `invite shows up as pending`. Use that name for the group heading, the group file, the stop at its end, and its row in the final report.
+## File layout
 
-Put a migration or a route in the step whose test fails without it.
+Save a plan with up to three groups for one session at `docs/plans/<feature-group>/<plan-name>.md`, and save a larger or multi-session plan as a folder `docs/plans/<feature-group>/<plan-name>/`:
 
-Order the slices so each one ships working, with no half-built behavior a person can reach. When a slice isn't correct until a later one ships, merge the two. Use a flag only when the earlier slice will ship first, such as when main deploys on every merge. Open `toby-swd-flags` before you write the flag's step.
+- `<plan-name>/overview.md` contains the intent, the whole-task check (including the multi-slice end-to-end scenario), the work mode, the criteria, each assumption, `Out of scope` items with reasons, the design block, and a table of group files with their criteria, dependencies, and status (`not started`, `in progress`, or `done`).
+- One `NN-<slice-name>.md` per slice contains the criteria it meets, its steps, any rollback step for schema or external state changes, and its verification block.
 
-## One file or a folder
-
-A plan folder holds these files:
-
-- `<plan-name>/overview.md` has the intent, the check that shows the whole task is done, the mode, the criteria in their pre-code wording, each assumption with the answer taken, what is out of scope with the reason for each item, the design block, and the whole-feature test. The overview ends with a table of the group files in order, each marked not started, in progress, or done. Mark a row done when that group's verification passes.
-- One `NN-<slice-name>.md` per group, such as `team-invites/01-invite-shows-up-as-pending.md`, has the criteria the slice meets, its steps, and its verification.
-
-A one-file plan has the same parts in the same order.
+A single-file plan contains the same sections in the same order.
 
 ## Steps
 
-Give each step the path of the file, whether it creates, edits, or deletes that file, and what changes there. Give the number of the criterion each step serves. When every step in a group serves the same criterion, say so once under the group heading.
+Give each step the file path, whether it creates, edits, or deletes the file, what changes there, and the criterion number it serves. Give any command on the operating guide's or `toby-swd-environment`'s approval list its own step with the exact command.
 
-Give each command that needs the user's approval its own step, with the exact command. The operating guide and `toby-swd-environment` list those commands. Check off each step as it finishes. When the work departs from an approved step, edit the plan and say what changed before you continue. At each stop, edit the next group's steps to match the user's answer before you start them. When the work turns up a step the result needs, add it to the plan and finish it before the report.
-
-A step gets its own check only when that check can fail while the group's check passes. A unit test for a rejected duplicate is one example.
+Check off each step as it finishes. When work departs from an approved step or turns up a missing step, update the plan and state what changed before continuing. Include a step-level check only when it can fail while the group's end-to-end check passes (such as a unit test for duplicate rejection).
 
 ## Verification
 
-Start each group's verification with one check that runs the slice where a person reaches it, such as an end-to-end test. Run the check before the group's work and watch it fail, then run it again after. `toby-swd-e2e` describes that test. Only after a run, write each check's before and after results under that check, so you can quote them in a later session.
+Start each group's verification with the end-to-end check (`toby-swd-e2e`) that drives the slice's entry point. Run each check before and after the slice's edits and record the output under the check after running it: checks for new behavior must fail (`FAIL`) before and pass (`PASS`) after, while checks for existing behavior that stays working must pass (`PASS`) both before and after.
 
-Leave out a check that passes whether or not the work is right. For example, "`\d invites` lists the columns" passes once the migration runs, before any code writes an invite. "`grep` finds the new route" passes when the handler returns the wrong body.
-
-Add the existing tests for the touched area when a criterion says that behavior stays the same.
+Leave out checks that pass even when the behavior is broken, such as "`\d invites` lists the columns" or "`grep` finds the new route".
 
 ## The whole feature
 
-When the feature has two or more slices, state its end-to-end scenario in the overview, such as invite, accept, then sign in. The last group adds one test that walks through that scenario, and its verification runs that test. When the feature has one slice, its group's end-to-end test is the whole-feature test.
+When a feature has two or more slices, the last group adds and runs one end-to-end test that walks through every slice in order (such as invite, accept, then sign in), and compares the finished behavior against the intent in `overview.md`.
 
-The last group's verification also compares the result with the intent in the overview. When part of the intent doesn't hold, add the missing work to that group and finish it.
-
-`references/example.md` has a plan folder for a two-slice feature, with its overview and its first group file.
+Open `references/example.md` for a two-slice plan folder example.

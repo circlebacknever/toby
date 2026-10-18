@@ -9,40 +9,30 @@ description: >-
 
 # Toby SWD Campfire
 
-Leave each file the change touches easier to change than you found it. Make the change easy before the first edit, and check the design once the tests pass.
+Leave each file the change touches easier to change than you found it: make the change easy before the first edit, and check the design after the tests pass.
 
-When the user asked for the smallest diff, or you take the shortcut that `toby-swd-strategy` allows, skip the edits both sections ask for. Run the design check anyway, and list each refactor or fix you skipped as a follow-up at file:line.
+When the user asked for the smallest diff, or you take a shortcut allowed by `toby-swd-strategy`, skip the refactor edits, run the design check anyway, and list each skipped fix as a follow-up at `file:line`.
 
 ## Before the first edit
 
-Ask what the code would look like if it had been designed with this change in mind. When the answer is the current code plus the new part, add the part. When the current code has a problem from the list below, refactor first with behavior unchanged, then add the change on top with no workaround.
+Ask what the code would look like if it had been designed for this change. When the current code has one of the obstacles below, refactor first with behavior unchanged, then add the feature on top without a workaround:
 
-Look for what would make this change harder than it needs to be:
+- a business value (such as a 30-day refund window) or a multi-condition rule that you would otherwise copy or edit in two places
+- a business rule computed inside an entry point that this change must edit or reuse
+- a branch you would have to hunt for across multiple files, or a misleading name in the touched path
 
-- a business value, such as a 30-day refund window, that you would copy or edit in two places
-- a rule with more than one condition, or a block over three lines, that you would copy or edit in two places
-- a rule that an entry point computes and the change must edit or copy
-- a case you would have to search for across several files
-- a misleading name
+Run the preparatory refactor as its own step when all three hold:
 
-Refactor first, as its own step, when all of these hold:
+- It stays inside the files the change edits anyway, plus at most one new module for a rule moved out of an entry point.
+- You state it before the first edit in the design block or plan.
+- Existing tests or a new characterization test (`toby-swd-testing`) cover the moved behavior, and you confirm implicit contracts (serialized field names, caught exception types, transaction scope, and metric keys) stay intact.
 
-- It stays in the files the feature would edit anyway, plus at most one new module for a rule you move out of an entry point.
-- You state it before the first edit, in the design lines of `toby-build` or in the plan.
-- A test already covers the code it moves, or the plan lists a characterization test for it, as `toby-swd-testing` describes.
-
-Run the tests after the refactor and before the feature code, and change no test to make them pass. When the user asked for commits, the refactor gets its own commit.
-
-When the refactor fails a condition above, list it as a follow-up. Give its file:line, its cost, and what it would make easier, so the user can choose to do it first.
-
-Skip this section in generated or vendored code. Start no cleanup outside the code the change touches, and plan no separate cleanup phase.
+Run the tests after the refactor and before the feature edit without altering any test assertion. When the refactor exceeds the scope above, list it as a follow-up at `file:line` with its cost and what it simplifies. Skip this step in generated or vendored files.
 
 ## After the tests pass
 
-Run the design check in `toby-swd-architecture` on every finished diff. Fix what it finds, and run the tests again. When the lines the change touched have an unclear name, dead branch, or wrong comment, fix one, or list it as a follow-up at file:line.
-
-In a planned build, add each fix to the plan as a step before you make it. List a fix that needs an untouched file as a follow-up at file:line.
+Run the 11-point design check in `toby-swd-architecture` on the finished diff, fix what it finds, and rerun the tests. Fix every wrong comment, dead branch, or misleading name in the lines the diff changed. For untouched lines in the same function, fix one or list it as a follow-up at `file:line`. In a planned build, add any design-check fix to the plan before making it, and list fixes in untouched files as follow-ups.
 
 ## Report
 
-List each refactor and each fix at file:line, with one line on what the next change no longer has to touch.
+List each preparatory refactor and design-check fix at `file:line`, with one line stating what the next change no longer has to touch.

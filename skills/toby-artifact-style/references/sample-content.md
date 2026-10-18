@@ -106,6 +106,6 @@ Place each of these standard caveats next to the claim it qualifies, as SKILL.md
 
 - "assumes a circular orbit and excludes J2 perturbations"
 - "debris flux is excluded above 900 km"
-- "drag coefficient for this body shape isn't measured here, so the estimate is ±25%"
+- "drag coefficient for this body profile isn't measured here, so the estimate is ±25%"
 - "the watch threshold was breached at sample 8, then the two-sample rule was satisfied at sample 9"
 - "rollback was rehearsed 21 May 09:18, with the owner on record"

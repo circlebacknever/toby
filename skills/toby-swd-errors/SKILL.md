@@ -8,48 +8,41 @@ description: >-
 
 # Toby SWD Errors
 
-When you design error handling, reduce the number of places in the code that must contain error-handling logic.
-
-Treat each new special case that a caller must check with a branch as a sign of a design problem first. Merge it into the general case so callers don't have to know it exists.
+Reduce the number of places that must contain error-handling logic. Treat a special case that callers must check with a branch as a design problem first, and fold it into the general path whenever callers don't need to act on it.
 
 ## Error design
 
-For a new error signal, count the handling code it requires at every level between the failure and the code that can act on it. An error signal is a thrown exception, an error return, a status code, a `Result`, or an `Option`. Work through these four steps in order and stop at the first one that applies.
+For a new error signal (an exception, error return, status code, `Result`, or `Option`), count the handling code it adds between the failure and the caller that acts on it. Work through these four steps in order and stop at the first one that fits:
 
-1. **Define the error out of existence.** Before writing any handling, ask whether the operation's semantics can be redefined so the condition is no longer an error. Redefine the semantics only when the condition doesn't need a response, and keep the error when a reported success would hide a bug.
+1. **Define the error out of existence.** Redefine the operation so the condition is normal behavior (such as `remove_session` ensuring the session is absent), provided a reported success wouldn't hide a bug.
+2. **Mask it at the lowest level.** Handle transient failures (a network blip, database deadlock, or rate-limit response) inside the low-level module when the caller doesn't need to know. Use a bounded retry with jittered backoff only when the operation is safe to repeat (a read, an idempotent write, or a write with an `idempotency key` the server deduplicates), and stop retrying when the caller's deadline expires. Never mask or retry a cancellation signal (`CancelledError`, `context.Canceled`, `AbortError`).
+3. **Aggregate.** Let errors that must surface propagate to one top-level handler (such as request middleware), wrapping the underlying error (`raise ... from err`, `%w`, `{ cause: err }`) so the root cause reaches the log (`toby-swd-observability`). Translate internal storage or transport errors at module boundaries into only the cases callers handle differently, and return only caller-safe categories to untrusted clients (omitting stack traces, internal ids, and SQL text).
+4. **Stop in the safest reachable state.** On resource exhaustion, unrecoverable I/O failure, or a broken internal invariant, record diagnostics and stop the failing request, task, or process inside one checked wrapper (`references/safe-stop.md`).
 
-2. **Mask it at the lowest level.** If a low-level module can fully handle the condition without the caller ever knowing, handle it there. Transient errors include a network blip, a database deadlock, and a rate-limit response. Put a bounded retry for them inside the module when logs show the error recurring or the caller can't resend the request. When a limit the caller set is reached, such as its timeout, stop retrying and return the error. Retry only an operation that is safe to repeat, which means an idempotent one or one with an idempotency key the server dedupes on.
+When a failure can't be defined away, masked, or aggregated, and stopping does more harm, run a deliberate degraded mode. For bulk or batch operations, specify in the contract whether a failure rolls back the whole batch or returns per-item results.
 
-3. **Aggregate.** When the error must surface, let it propagate to one handler, such as the top of a request loop, and remove the per-call-site handlers. When that handler replies to an untrusted caller, return the error category the caller needs, and log the detail as `toby-swd-observability` describes. The reply doesn't contain a stack trace, an internal identifier, or query text.
-
-4. **Stop in the safest reachable state.** Callers can't act on resource exhaustion, unrecoverable I/O, or a violated internal invariant. For those errors, record what diagnostics you can, and bring the failing program, process, or task to its safest available stopping point. Put that stop inside one wrapper function that checks for the condition, so call sites don't each repeat the check. Open `references/safe-stop.md` to pick that stopping point. Don't stop on an error only because it is hard to handle.
-
-When a failure can't be defined away, masked, or aggregated, and stopping does more harm, continue in a degraded mode designed for it.
-
-Never redefine or mask a security or authorization outcome so the caller sees success. Such outcomes include an auth denial, a validation rejection, and a permission failure. Return each one as a result the caller acts on.
-
-Don't throw a condition to the caller only because you can't choose how to handle it. Prefer a design whose error handler a test can run.
+Never mask an authentication, authorization, or validation failure as success, and prefer designs whose error handlers a test can trigger deterministically.
 
 ## Brownfield Work
 
-Before adding an error, validation, or retry path, find the existing ones nearby. When the same handling repeats across call sites, report the copies at file:line and the consolidation that would remove them. Preserve caller-visible errors, timing, logs, metrics, and status codes unless the user approves a behavior change.
+Before adding an error, validation, or retry path to existing code, check nearby handlers and report duplicated handling at `file:line`. Preserve caller-visible errors, timing, logs, metrics, and status codes unless the user approves a change.
 
 ## Red flags
 
-- An error signaled for a condition the API could define away.
-- The same error handled at many call sites when one handler would do.
-- An error eliminated or masked that callers needed.
-- Elaborate recovery for a rare unrecoverable error that should stop in its safest state.
-- A retry added above a client or SDK that already retries.
-- Retry backoff with no jitter.
-- Callers of shared state that each take locks or assume an order of tasks. Put the rules for shared mutable state and the ordering of concurrent tasks in one module.
+- An error signaled for a condition the contract could define away.
+- The same error caught across many call sites when one top-level handler would cover it.
+- A caller-needed error or cancellation signal swallowed or masked.
+- Elaborate recovery code written for an unrecoverable invariant failure.
+- A retry added on top of an SDK or caller that already retries, or backoff without jitter.
+- Callers acquiring locks or ordering concurrent tasks across sites when one module should manage that state.
 
 ## References
 
-Read the stack file that matches the code.
+Read the reference that matches the stack:
 
-- `references/examples.md` has one worked case each for error steps 1, 3, and 4, and the masking limit. Open it when you can't tell which error step applies.
+- `references/examples.md` shows worked cases for error steps 1, 3, and 4, and over-masking.
+- `references/safe-stop.md` lists the safe stopping point for each kind of program.
 - `references/web.md` covers React, Solid, and Svelte error boundaries and async errors.
-- `references/mobile.md` covers React Native network errors and native module errors.
-- `references/backend-apis.md` covers HTTP and gRPC retries, timeouts, and circuit breakers.
-- `references/databases.md` covers transaction retry and concurrent writes.
+- `references/mobile.md` covers React Native network and native-module errors.
+- `references/backend-apis.md` covers HTTP and gRPC retries, deadlines, timeouts, and circuit breakers.
+- `references/databases.md` covers transaction retries and concurrent writes.

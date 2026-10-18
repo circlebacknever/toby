@@ -9,39 +9,35 @@ description: >-
 
 # Toby SWD Extensibility
 
-Use this file for code that branches on a type, kind, status, or provider, whether the branch is new or gains a case.
+Use this file when code branches on a type, kind, status, or provider, or adds an implementation or subclass.
 
-Build an extension point only for a next case that someone has shown you. A request, a ticket, a TODO, or a second implementation can show that case. So can a `git log` where the switch gained cases. An extension point with one implementation adds code that every reader has to trace, for a case that may never come.
+Build an extension point only when the request, a ticket, a TODO, a second implementation, or `git log` shows another case coming. An extension point with one implementation adds indirection for a case that may never arrive.
 
 ## Replace the growing conditional
 
-Treat an `if` or `switch` as a design smell when it gains a branch each time the product adds a new kind of thing. Copying the same branch decision across call sites is the same smell. In both cases, adding the next kind means editing shared code or several files at once. A `switch` over a set that has been stable for a year is fine, so leave it alone.
+When a `switch` or `if` chain gains a branch on each new product case, or repeats across files, work through these five options in order and stop at the first one that fits (leave a switch alone when its cases have stayed fixed for a year):
 
-Work through these options in order and stop at the first one that fits.
+1. **Move the branch onto the type** when the data object or a null-object stand-in can compute the answer itself.
+2. **Data-driven dispatch** (a lookup map from `kind` to a function or value) when each branch runs a small stateless behavior.
+3. **Discriminated union with an exhaustive switch** guarded by `assertNever` / `assert_never` when branches read different fields per variant.
+4. **Polymorphism** (an interface with one class per case) when cases keep growing and each case holds its own private state or dependencies.
+5. **Registry** (`registerHandler`) only when external or plugin code must add cases without editing a central file.
 
-1. **Move the branch onto the type** when the data type can compute the answer itself. Delete the branch when the normal code path already handles the unusual input. This option is often the whole fix.
-2. **Data-driven dispatch** fits when each branch picks a small behavior based on the value of one field, such as `kind`. A lookup map from each value to its behavior replaces the branches.
-3. **Discriminated union with an exhaustive switch** fits when branches read different fields. Guard it with `assertNever`.
-4. **Polymorphism** fits when the list of cases keeps growing and each case has its own behavior, private state, or dependencies.
-5. **Registry** fits when new cases must be addable without editing a central file. It is the most complex option.
+Open `references/replace-the-conditional.md` when choosing between adjacent options or for frontend and backend examples.
 
-Open `references/replace-the-conditional.md` when two adjacent options both seem to fit, or for examples in React, React Native, and backend code.
-
-When two switches on the same field compute different values, such as a label and a fee, make each one exhaustive. Use `assert_never`, a sealed type, or a map whose test checks that every value has an entry. The next value then fails the type check or that test in both places. Merge the two switches only when both compute the same value.
-
-In new code, use the chosen option from the start. When you add a case to a conditional copied across files you already edit, replace those copies first, within the limits in `toby-swd-campfire`. List a copy in any other file as a follow-up at file:line.
+When two switches on the same field compute different values (such as a fee and a label), keep them separate and make both exhaustive with `assert_never`, a typed `Record<Kind, ...>`, or a test over all enum values. When adding a case to a conditional duplicated across files you already touch, consolidate the copies within the limits of `toby-swd-campfire`, and list copies in other files as follow-ups at `file:line`.
 
 ## Inheritance
 
-- Implement an interface freely, as disk, S3, and memory classes implement one `Storage` interface. A new case is then a new class, and the code that picks a class stays the same.
-- Share behavior through a helper object passed in, and avoid a base class. A parent and a subclass can break each other with no change at any call site. Default methods on an interface or trait can break implementations the same way.
-- When you write a parent class that other code subclasses, make every method final except the one or two that subclasses override. Never let the parent and a subclass write the same field.
+- Implement interfaces freely (`Storage` implemented by disk, S3, and memory classes), so adding a provider adds one class without changing callers.
+- Share code through a passed-in helper object, and avoid an implementation base class or default interface methods, because base and derived classes can break each other through shared state and self-calls.
+- When a framework requires a base class, mark every method `final` except the one or two methods subclasses are meant to override, and never write the same field from both parent and subclass.
 
 ## Red flags
 
-- An extension point, hook, or option with one implementation and no shown second case.
-- A subclass that overrides a method to throw or to accept less input.
+- An interface, hook, or option with one implementation and no stated second case.
+- A subclass that overrides a parent method to throw `NotImplementedError` or accept narrower inputs.
 
 ## References
 
-Open `references/solid.md` when the design adds an interface or a parent class, or when a plan, a review, or the user cites a SOLID principle. That file lists one question per principle, with its answer.
+Open `references/solid.md` when adding an interface or parent class, or when a plan, review, or user cites SOLID.

@@ -10,36 +10,34 @@ disable-model-invocation: true
 
 # Toby Game
 
-Build one self-contained HTML game with the creator, who picks the genre, theme, and tone each run. Toby's voice rules apply to chat with the creator. The text inside the game, such as its cards, news ticker, upgrade names, and end screen, uses a looser joking style. That style is called the wider register, and `references/comedy-and-narrative.md` describes it.
+Build one self-contained HTML simulation game or toy with the creator. Follow Toby's voice rules in chat, and use the wider joking register from `references/comedy-and-narrative.md` for in-game text (cards, news ticker, upgrade names, and end screens).
 
 ## Opening move
 
-Don't ask "what genre?" First ask what system we are modeling, and what one surprising thing it should do when it runs. Then ask whether there is a target, meaning an institution, a ceremony, or a process. If there is a target, ask who the underdog is, meaning the person who has to deal with that target. A premise might not have a target and can be a pure toy, so don't force a bureaucracy onto that toy. When there is a target, pick the specific procedure to mock, such as a claim form or an appeal step. Copy its real details before you write any joke.
+Ask what system we are modeling and what one surprising behavior it should show when it runs. Then ask whether the premise mocks a target institution, ceremony, or bureaucratic process (and who the underdog dealing with it is), or whether it is a pure simulation toy without a satirical target. When there is a target, copy the real details of its forms and procedures before writing any jokes.
 
 ## The dials
 
-The dials are six settings that describe the game. Choose a setting for each dial, propose that combination with a reason, and let the creator change any setting.
+Propose a starting setting and reason for each of the six dials below, and let the creator adjust any of them:
 
-- **fidelity**: how accurate the model is, from a real physical or statistical model to one that is openly made up.
-- **narrative density**: how much text the game shows, from no text in a silent toy to a constant stream of news lines.
-- **tone**: from warm, to bleak, to the darkest style, which `references/comedy-and-narrative.md` describes under "The dread register".
-- **player relationship**: the player's role, which is watching the system, spending resources to steer it, or controlling it with fast reflexes.
-- **session length**: from an endless toy to a run with a fixed end and a graded ending.
-- **render**: 2D canvas, 3D, or DOM.
-
-Earlier games covered a particle field, an orbit sandbox, and a traffic sim. Others were a satire where the player swipes DOM cards, a penalty-kick duel, and a heist-themed idle game. An idle game keeps playing while the player upgrades it.
+- **Fidelity:** how closely the simulation models real physics or statistics versus playful rules.
+- **Narrative density:** how much text appears, from a silent toy to a live wire-service ticker.
+- **Tone:** from warm comedy to bleak satire to the dread register (`references/comedy-and-narrative.md`).
+- **Player relationship:** watching the system, steering it by spending resources, or controlling it with direct reflexes.
+- **Session length:** an endless sandbox toy or a timed run with a graded ending.
+- **Render:** 2D canvas, 3D (Three.js), or DOM cards.
 
 ## The build
 
-Build the loop first, on placeholder art, before anything else. In that loop the simulation advances on its own, something changes, and the player can affect the result in a way that matters. Confirm the one surprising thing shows. Then apply one reference file at a time, and tune the difficulty with the test bots in `references/calibration-and-testing.md`. End each pass with a short status and the next dial you propose to change.
+Build the playable core loop on placeholder art first: the simulation advances on its own, state changes visibly, the player's action alters the outcome, and the one surprising behavior appears. Then apply the reference files below one pass at a time, calibrate with the test bots, and end each pass with a short status and the next dial to tune.
 
-## Known failures
+## References
 
-Each item is a note creators gave on earlier games. Design to avoid every one of them from the first pass, and read the reference each item gives before that part of the build.
+Read each reference before building or tuning that part of the game:
 
-- `references/gameplay.md`: tie outcomes to choices the player saw coming ("feels unfair"), make winning require getting past an obstacle in the game's design ("it solved itself"), check collisions against the positions drawn on screen and move objects with real physics ("the physics looks wrong"), make the world advance on its own and respond to the player at once ("it doesn't feel like a game"), and teach the player's one action in one line ("the instructions are too long").
-- `references/comedy-and-narrative.md`: use the game's wider register ("make it funnier"), advance each storyline one step at a time and pick each line from the lines not yet shown ("the jokes repeat"), build the run as a story that brings early details back at the end ("there's no story"), and show a feed line only when something in the game changed ("the feed flashes").
-- `references/architecture.md`: compute the physics so values can't grow without limit, and assert that values stay finite ("the sim drifts").
-- `references/cross-device.md`: keep live controls on screen on a phone ("it breaks on mobile").
-- `references/visual-identity.md`: use a warm paper background, near-black ink, one red, one light source, and constant small motion ("it looks generic").
-- `references/calibration-and-testing.md`: check that the random, human-level, and superhuman test bots each score in their target range, and run the invariant tests, before calling the game done.
+- `references/gameplay.md` covers player agency, screen-space hit testing, real kinematics, one-line instructions, and structural difficulty.
+- `references/comedy-and-narrative.md` covers the wider comedy register, escalating story threads, non-repeating flavor queues, and the dread register.
+- `references/architecture.md` covers the single-file HTML structure, pure tick resolution, seeded RNG, clamped frame deltas, and finite-value invariants.
+- `references/cross-device.md` covers thumb-friendly mobile layouts, fold-away reference sheets, and frame-rate budgets.
+- `references/visual-identity.md` covers the paper/ink/red palette, low-poly 3D and 2D/DOM styling, and constant subtle motion.
+- `references/calibration-and-testing.md` covers `scripts/check-single-html.mjs`, invariant checks, and the random, human-grade, and superhuman bot bands.

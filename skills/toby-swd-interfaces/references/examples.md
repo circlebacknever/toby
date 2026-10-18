@@ -1,12 +1,12 @@
 # Worked Examples
 
-A deep module hides a lot of work behind a small interface. A shallow module has an interface about as complex as the work behind it.
+This file shows how the comment test exposes shallow interfaces in a rate limiter, a UI component, and a file uploader.
 
 ---
 
-## Example 1 — Backend: the comment test finds a shallow interface
+## 1. Shallow rate limiter
 
-Task: a module to rate-limit API requests per client.
+Task: rate-limit API requests per client.
 
 **First quick interface (reject this one):**
 
@@ -18,15 +18,9 @@ class RateLimiter:
     def consume(self, bucket, n) -> bool: ...
 ```
 
-The full interface comment is long. The caller must fetch a bucket, refill
-it with the current time, check tokens, and then consume. If those calls
-happen out of order, the rate limiter breaks. The comment has to describe the
-bucket mechanism before a caller can use it. The comment fails the test
-because it is long, order-dependent, and leaks internals. The
-design splits the work by the order the steps run and wraps those steps in a class.
+The comment fails the test because callers must fetch a bucket, refill it with the current time, check tokens, and consume in order. That leaks the token-bucket mechanism and temporal call order into every caller.
 
-**Redesigned interface, built around the one question the module answers, which is
-whether this client may send a request right now:**
+**Redesigned interface around the single question callers ask:**
 
 ```python
 class RateLimiter:
@@ -37,17 +31,13 @@ class RateLimiter:
         buckets, tokens, or time."""
 ```
 
-The complete contract is four sentences and mentions none of its internals. The token count,
-the refill rate, and the clock are now internal to the class. The interface got smaller while the
-class took on more of the work. The step "Keep modules deep, but expose what callers need" in
-`SKILL.md` asks whether the redesign hid anything the caller needs. If callers must show a retry-after hint, expose that one value
-(`allow` returns `RetryAfter | None`) and keep the bucket internal.
+The complete contract is four sentences and mentions none of its internals. If callers must return a `Retry-After` header, expose that one value (`allow` returns `RetryAfter | None`) while keeping buckets and refill timestamps private.
 
 ---
 
-## Example 2 — Frontend: overexposure and leakage in a component
+## 2. Overexposed component
 
-Task: a `UserCard` used in a list, a profile header, and a search result.
+Task: render a user summary in a list, a profile header, and a search result.
 
 **First quick props (reject these):**
 
@@ -58,42 +48,25 @@ Task: a `UserCard` used in a list, a profile header, and a search result.
   theme={theme} dense compactOnMobile />
 ```
 
-The interface comment for this is a paragraph. A caller rendering the common
-case still has to make eight decisions. Making callers choose eight options is overexposure,
-because rarely used options make the common call harder. `theme` passed through here only for a child component
-is information leakage, because `UserCard` doesn't use it.
-
-**Design it twice.** Option A keeps one component and gives the options
-sensible defaults. Option B uses one shared inner component plus a few small wrapper components, one for each use.
-Option B is the better choice because the three real call sites each use the card for a different purpose:
+Callers rendering the common case must choose eight props, and `theme` is passed through only for a child component. Split the surface into purpose-named wrappers over one shared internal component, and read `theme` from context:
 
 ```tsx
 // Each renders the common case with zero required decisions beyond `user`.
 <UserListItem user={user} onSelect={fn} />
 <UserProfileHeader user={user} />
 <UserSearchResult user={user} query={q} />
-// All compose one deep core that handles layout/truncation/theming internally.
 ```
-
-Callers now make one decision, which component to use, down from eight. Theme is read from context
-inside the shared inner component, so theme stops being leaked through props. The shared inner
-component does most of the work. Each wrapper is small and covers one use.
 
 ---
 
-## Example 3 — The design-it-twice comparison, written out
+## 3. Design comparison
 
-Task: an interface for a client to upload a file to storage.
+Task: upload a file to object storage.
 
 | Design | Caller's common-case burden | Generality | Hides | Verdict |
 |---|---|---|---|---|
-| A: `open()`, `writeChunk()`, `close()` | Manage handle, loop chunks, order calls, handle partial failure | Low | Little, because the caller runs the protocol | Hides little and makes callers run the steps in order |
-| B: `upload(bytes, key)` | One call | Medium | Chunking, retries, multipart threshold | Deep, but assumes all-in-memory |
-| C: `upload(source, key)` where source is bytes or a stream | One call | High | Same as B, plus large-file streaming | Deepest, and covers today's needs and the expected next ones |
+| A: `open()`, `writeChunk()`, `close()` | Manage handle, loop chunks, order calls, handle partial failure | Low | Little, because the caller runs the protocol | Shallow and order-dependent |
+| B: `upload(bytes, key)` | One call | Medium | Chunking, retries, multipart threshold | Deep, but loads whole file in memory |
+| C: `upload(source, key)` where source is bytes or a stream | One call | High | Same as B, plus large-file streaming | Deepest, and covers both small and large files |
 
-Design C splits the work differently from B. C exists because B loads the whole
-file into memory, which uses a lot of memory on large files. The interface
-comment for C is short and mentions no internals, so it passes the test.
-
-A caller may need to know that the upload is durable when `upload`
-returns, so `upload` returns only after the data is durably stored. The comment states that guarantee.
+Design C passes the comment test and states in its comment that `upload` returns only after the object is durably stored.

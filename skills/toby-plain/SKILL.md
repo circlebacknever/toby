@@ -12,47 +12,31 @@ argument-hint: "[optional file path or note]"
 
 # Toby Plain
 
-I ran this because I don't understand what you just said. Maybe the words were too technical, or maybe there was so much of it that I lost the point. Say it again so I can follow it.
+Rewrite the previous reply, or the file or passage the user points to, in plain everyday English so a reader who hasn't seen the topic can follow every sentence on the first read.
 
 ## What to rewrite
 
-Rewrite the file or the text I point to. If I don't point to anything, rewrite your last reply.
+Rewrite the file or passage the user names, or rewrite your previous reply when the user names nothing. When the user adds a scope note such as "the part about caching", rewrite only that part. Put the rewrite in chat and leave the file on disk unchanged unless the user asks to edit the file.
 
-If I add a note like "the part about caching", rewrite only that part.
+## Layout and words
 
-Put the rewrite in the chat. Don't change the file unless I ask you to, because someone else might be reading it.
+Order the rewrite in four parts:
 
-## How to say it
+1. When the user must decide something, ask that question first, give at most three options, and recommend one.
+2. State what is happening and what it means for the user in one to three sentences.
+3. Put ordered steps, options, and separate problems in a list, with one idea per item.
+4. End with the user's next action when one exists.
 
-Lay out the rewrite in this order:
+Check every word and sentence:
 
-1. If I need to decide something, ask that first, give at most three options, and recommend one.
-2. Say what's going on and what it means for me, in one to three sentences.
-3. Put steps, options, and separate problems in a list, with one idea in each item.
-4. End with my next step, if I have one.
-
-Then check the words:
-
-- Use the words I'd use, with no metaphors or idioms. When you need a technical word, tell me what it means in everyday words. For example, a cache is a saved copy the app reuses so it doesn't have to fetch the same thing twice.
-- Keep a technical word only if I'll see it again or have to type it. Explain it the first time it comes up.
-- If you mention something that only exists here, like a file, a function, or a term from this lesson, tell me what it is. If you won't explain it, leave it out.
-- Skip labels like finding numbers, rule numbers, and severity tags, unless I need them to find something.
-- Keep sentences short, with one idea in each, and keep each paragraph to three sentences or fewer.
-- Call each thing by the same name the whole way through. If you call it "the cache" once, don't call it "the store" later.
-- If an idea is abstract, give me an example from what I'm working on or learning.
+- Use everyday words without metaphors or idioms. Keep a technical term only when the user will see it again or must type it, and define it in everyday words the first time it appears.
+- Explain any repo-specific file, function, or term, or leave it out, and omit finding numbers, rule numbers, and severity tags unless the user needs them to locate something.
+- Keep one name for each thing throughout, and give a concrete example from the user's task when an idea is abstract.
 
 ## What to keep
 
-Keep every warning, every number, and every question I still need to answer from the original. Cut anything repeated, and cut how you worked it out unless I need that to follow along.
+Keep every warning, number, and open question from the original, and cut repeated points and how you derived the answer unless the user needs that reasoning. Don't add new facts or run new checks. When the original was confusing because it skipped a step or contradicted itself, state which part was missing or contradictory.
 
-Don't add any new facts, and don't run any new checks. The rewrite says the same thing as the original, in words I can follow.
+## Start and finish
 
-If the original was confusing because it skipped a step or contradicted itself, tell me that plainly, and tell me which part is missing.
-
-The rewrite is usually shorter than the original. Make it longer only when the original skipped a step I need.
-
-## How to start and finish
-
-Start with the content. Don't open with "In plain English" or an apology, and don't end by offering more help.
-
-Before you send it, read it as someone who has never seen this topic. If they'd have to read a sentence twice, rewrite that sentence.
+Start directly with the rewritten content without "In plain English" or an apology, and don't end with an offer of more help.

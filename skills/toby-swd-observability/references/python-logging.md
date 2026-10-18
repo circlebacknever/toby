@@ -1,19 +1,19 @@
 # Python logging
 
-This file shows how to pass log fields with Python's `logging` module and with structlog.
+This file shows how to pass structured fields to Python's standard `logging` module and `structlog`.
 
-## The default formatter
+## Default formatter
 
-The default formatter in Python's `logging` prints only the message and drops extra fields. Write `key=value` pairs after the event name, and list a structured formatter as a follow-up.
+The default `logging` formatter prints only the message string and drops `extra` fields. Append `key=value` pairs to the message and list a JSON formatter as a follow-up:
 
 ```python
 log.info("order.cancelled order_id=%s user_id=%s refund_cents=%s", order.id, user.id, refund)
 ```
 
-## A JSON formatter
+## JSON formatter
 
-Python's `logging` with a JSON formatter takes fields as `extra={"order_id": order.id}`. `Logger.info()` raises `KeyError` for an `extra` key that matches a LogRecord attribute, such as `name` or `message`.
+When `logging` uses a JSON formatter, pass fields in `extra={"order_id": order.id}`. Avoid reserved `LogRecord` attribute names (`name`, `message`, `asctime`, `levelname`, `args`, `exc_info`) in `extra`, because `Logger.info()` raises `KeyError` on a collision.
 
 ## structlog
 
-In structlog, pass the fields as keyword arguments, as the `order.cancelled` example in `SKILL.md` does.
+In `structlog`, pass fields as keyword arguments, as shown in `SKILL.md`.

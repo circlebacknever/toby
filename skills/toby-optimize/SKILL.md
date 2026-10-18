@@ -17,46 +17,44 @@ description: >-
 Make working code faster or lighter, and keep only the changes a measurement supports.
 
 ## Steps
-1. Record a baseline with one named command, and quote its output.
-2. Look for a better algorithm, a better data structure, a missing index, or a cache before code-level tuning.
-3. Change one thing, then run the same command again. Run the tests that cover the changed code. When the changed code doesn't have a test, compare its output before and after the change, such as the rendered page or the returned rows.
-4. Revert a change with no measured effect unless it also made the code simpler.
-5. When the code path has a stated budget, such as a latency or memory limit, measure its worst case under load. An average can hide requests over the limit.
-6. Stop once the result meets the user's target or the budget from step 5. When neither exists, stop once the causes the baseline showed are gone.
 
-Open `toby-swd-hardening` for limits and `toby-swd-observability` for metrics when the change adds a cache, a queue, a worker pool, or parallel calls.
+1. Record a baseline with one named command after warmup, run multiple trials, and quote the median and p95 (or range).
+2. Look for a better algorithm, a better data structure, a missing index, or batching before code-level tuning or caching.
+3. Change one thing, then run the same command and the covering tests (or compare the exact output before and after when tests don't exist).
+4. Revert any change whose difference stays within run-to-run noise unless it also simplified the code.
+5. When the code path has a stated latency or memory budget, measure its p95 and p99 under load, because averages hide tail spikes.
+6. Stop once the result meets the user's target or budget, or once the bottlenecks shown in the baseline are gone.
+
+Open `toby-swd-hardening` for pool/concurrency limits and `toby-swd-observability` for metrics when adding a cache, queue, worker pool, or parallel fan-out.
 
 ## Report
-List the baseline, the result, the command, the options you didn't try, and what stays unmeasured, such as production load.
+
+List the baseline, the after measurement, the command and trial count, the options you didn't try, and what stays unmeasured (such as production data volume).
 
 ## Performance design
 
 Think about cost while you design.
 
-**At design time, know what is expensive.** When a fast option is no more complex than a slow one, take the fast one. A cheap operation can exceed the budget when a loop that runs all the time repeats it. In such a loop, reuse memory. Skip or defer work that can't finish now, and don't block the loop to retry it.
-
-**Add complexity only on evidence.** Before a problem appears, add performance complexity only when it is small and the module's interface hides it from callers. When it is large or changes an interface, build the simple version and optimize after a problem appears. The exception is a path with a stated budget it must meet to be correct, such as a latency or memory limit, a frame deadline, a no-allocation policy, or a known hot path. Treat that budget as a design input from the start.
-
-**When something is slow, measure before you change it.** Build a measurement harness only for a stated budget or a measured problem. Writing code in a style whose cost is already known, such as allocation-free code, counts as design and doesn't need a measurement. Redesign the critical path in code only as the last resort, after step 2.
-
-For that redesign, first write the least code the common case needs, ignoring how the code is arranged today. Then change the existing code toward that version. Put one check at the top that sends every special case off the common path. Write the special-case code to be simple even when it runs slower.
+- **Know what is expensive at design time.** When a fast option is as simple as a slow one, pick the fast one. In a hot loop, reuse memory, hoist invariant work out of the loop, and never block the loop on retries or I/O.
+- **Add complexity only on evidence.** Before a slowdown is measured, add performance complexity only when it is small and hidden behind the module's interface. Treat a stated latency, memory, frame-time, or allocation budget as a required design input from the start.
+- **Redesign the critical path last.** After step 2, write the minimum code the common case needs, route special cases off the top with one check, and keep the special-case path simple.
 
 ## Brownfield Work
 
-Brownfield work means changing code that already exists. Before adding a cache or batching path, find the existing ones nearby. When the same caching or batching repeats across call sites, report the copies at file:line and the consolidation that would remove them. Preserve caller-visible errors, response bodies, logs, metrics, and status codes unless the user approves a behavior change.
+Before adding a cache or batcher to existing code, search for nearby ones and report duplicated caching or batching at `file:line`. Preserve caller-visible errors, response bodies, logs, metrics, and status codes unless the user approves a behavior change.
 
 ## Red flags
 
-- A performance change made without a baseline.
-- A cache, queue, batcher, or other performance complexity added for an anticipated problem nobody has observed.
+- A performance change shipped without a before-and-after measurement outside run-to-run noise.
+- A cache, queue, or batcher added for a hypothetical problem nobody has measured.
 
 ## References
 
-Read the reference below that matches the code's platform, such as web or mobile.
+Read the reference that matches the stack:
 
-- `references/caching.md` covers the measurement to take before adding a cache, what a cache costs, stampede tiers, and TTL policy. A stampede is many requests reloading the same expired entry at once. Open it before adding a cache.
-- `references/examples.md` has a worked case of design-time performance.
+- `references/caching.md` covers pre-cache measurements, cache costs, tenant key scoping, stampede tiers, and TTL policy. Open it before adding a cache.
+- `references/examples.md` shows design-time performance fixes.
 - `references/web.md` covers React, Solid, and Svelte memoization, virtualization, and render work.
 - `references/mobile.md` covers React Native lists, images, and bridge calls.
-- `references/backend-apis.md` covers bulk calls.
+- `references/backend-apis.md` covers bulk API calls.
 - `references/databases.md` covers N+1 queries, bulk writes, indexes, and connection pools.

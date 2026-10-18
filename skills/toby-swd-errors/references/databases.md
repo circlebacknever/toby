@@ -1,18 +1,20 @@
 # Databases and Data Access
 
+This file covers transaction retry wrappers and optimistic versus pessimistic concurrency guards.
+
 ## Transaction retry
 
-Add one `WithRetry(ctx, db, fn)` wrapper only when a transaction runs at `SERIALIZABLE` or `REPEATABLE READ`, or when logs or tests show deadlocks. The wrapper retries deadlocks, serialization failures, and connection resets with a bounded attempt count and jittered backoff. Callers then see only conflicts that persist. Leave it out when a caller above already retries the whole operation, such as a webhook sender, a job queue, or the next scheduled run. These rules keep the retry correct:
+Add a `WithRetry(ctx, db, fn)` wrapper when a transaction runs at `SERIALIZABLE` or `REPEATABLE READ`, or when deadlocks or transient connection resets can occur and the caller can't resend the request. Omit the wrapper when a job queue or caller above already retries the operation. Keep the retry safe with three rules:
 
-- Retry a connection reset that happened before COMMIT was sent. After COMMIT is sent, the server may have committed, so retry only when `fn` inserts a row under an idempotency key that the caller sends. When that retry fails on the key's unique constraint, return the first result.
-- `fn` doesn't make a call outside the database, such as an email or an API request, because a retry repeats it. Run those calls after the commit, as `toby-swd-hardening`'s `references/messages.md` describes for dual writes.
-- `fn` reads the rows it computes from. When `fn` uses rows read before `WithRetry` started, each retry repeats the calculation on old data. The commit then overwrites another writer's change and reports no error.
+- Retry a connection reset only when it occurred before `COMMIT` was sent, or when `fn` records an `idempotency key` under a unique constraint and returns the existing result on a constraint conflict.
+- Keep external side effects (emails, HTTP calls, queue publishes) outside `fn` and run them after commit (`toby-swd-hardening`'s `references/messages.md`).
+- Read every row that `fn` computes from inside `fn`, so each retry recomputes on fresh rows and doesn't overwrite concurrent updates with stale values.
 
 ## Concurrent writes
 
-`READ COMMITTED` lets two transactions read the same stock count and both sell the last unit. Pick one guard for each contended resource and use it everywhere:
+Under `READ COMMITTED`, two concurrent transactions can read the same row and both pass a check. Pick one guard per contended table and use it consistently:
 
-- Optimistic: `UPDATE ... SET version = version + 1 WHERE id = $1 AND version = $2`. When zero rows change, another writer updated the row first, so reload it and decide again. Use it when conflicts are rare.
-- Pessimistic: `SELECT ... FOR UPDATE`, then update. Use it under heavy contention, keep the transaction short, and lock rows in a fixed order so the lock doesn't cause a deadlock.
+- **Optimistic:** `UPDATE ... SET version = version + 1 WHERE id = $1 AND version = $2`. When zero rows change, reload the row and re-evaluate. Use this when conflicts are rare.
+- **Pessimistic:** `SELECT ... FOR UPDATE` inside a short transaction that locks rows in a fixed primary-key order to prevent deadlocks. Use this under high contention.
 
-`SERIALIZABLE` makes the database abort one of two conflicting transactions, which `WithRetry` then retries. Mixing optimistic and pessimistic access on one row reopens the race.
+Don't mix optimistic and pessimistic updates on the same table, because a writer skipping the version bump or lock reopens the race.

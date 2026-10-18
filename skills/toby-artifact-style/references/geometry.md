@@ -1,29 +1,20 @@
 # Toby Artifact geometry
 
-Load this file when you put a geometric mark on a slide, panel, or page. A mark is used at one of two scales. At content scale, the mark is the figure the reader studies. At decorative scale, the mark is faint background texture.
+Load this file when placing a geometric mark on a slide, panel, or page. Marks appear at one of two scales: content scale (`120–220 px`, studied as a diagram figure) or decorative scale (`40–80 px`, faint background texture). Never size a mark between `80 px` and `120 px`.
 
-## Two scales
+## Two scales and placement
 
-- **Content scale (120–220 px).** The mark shows part of the content, so pair it with a small UPPERCASE label that names it. The label is mandatory, because unlabeled geometry counts as decoration, which isn't allowed at this scale.
-- **Decorative scale (40–80 px).** The mark adds texture, so set its opacity to ≤ 0.25 and give it no label.
-
-Don't size a mark between 80 px and 120 px. Pick a size inside one of the two ranges.
-
-## Geometry beside a claim
-
-Place each mark next to the claim it clarifies. Don't put a mark on a slide that doesn't make a claim, because a mark only explains the claim beside it.
+- **Content scale (`120–220 px`):** place the mark beside the claim it clarifies, and pair it with an 11px UPPERCASE mono label (`+0.12em` letter-spacing, `--text-muted`) beneath or beside the mark. Never place a content-scale mark without a label or on a slide that makes no claim.
+- **Decorative scale (`40–80 px`):** set opacity to `<= 0.16` without a label, using `--text-on-dark-muted` on ink and `--text-muted` on paper. Place at most one decorative mark on a title, cover, section-divider, or closing slide.
 
 ## Stroke and color
 
-- Draw marks with a 1px monochromatic stroke in `currentColor` or `--text-primary`.
-- Draw marks as outlines with no fill. The only exception is a solid dot for one point, such as an anchor, a body at an orbit's focus, or periapsis.
-- A single red dot (`--toby-accent`) is allowed when the dot marks where the consequence happens, such as periapsis, a threshold breach, or a decision point. Otherwise, draw the mark in ink only.
+- Draw marks as 1px monochromatic outlines in `currentColor` or `--text-primary` with no fill, except a solid dot for an anchor point or orbital focus.
+- Use a single `--toby-accent` red dot only to mark where a consequence, threshold breach, or periapsis occurs, and otherwise draw the mark in ink only.
 
 ---
 
 ## The 20 named marks
-
-Each mark has one purpose. Use a mark at content scale with its label, or at decorative scale as a faint backdrop.
 
 | Mark | Purpose |
 |---|---|
@@ -50,31 +41,14 @@ Each mark has one purpose. Use a mark at content scale with its label, or at dec
 
 ---
 
-## Pairing marks with subject structure
+## Pairing marks with subjects
 
-Pick the mark for the structure of the subject. These defaults cover common subjects.
+Pick the mark that matches the structure of the subject:
 
-- For a network or graph subject, use `matrix-grid` or `triangulation-mesh` as the backdrop and `coordinate-stamp` for nodes.
-- For a measurement-over-time subject, use `timeline-ticks` as the axis, `model-envelope` for the fit, and `threshold-rail` for the alert band.
-- For a trajectory or path subject, use `route-trace` for the path, `uncertainty-fan` for the forecast, and `coordinate-stamp` for waypoints.
-- For an orbital subject, use `orbit-marker` at content scale and `orbital-lattice` as a decorative backdrop.
-- For a signal or transmission subject, use `signal-rings` for the emitter and `coordinate-fan` for sector coverage.
+- **Network or graph:** `matrix-grid` or `triangulation-mesh` backdrop with `coordinate-stamp` nodes.
+- **Time series:** `timeline-ticks` axis, `model-envelope` fit, and `threshold-rail` alert band.
+- **Trajectory or path:** `route-trace` path, `uncertainty-fan` forecast, and `coordinate-stamp` waypoints.
+- **Orbital mechanics:** `orbit-marker` at content scale and `orbital-lattice` at decorative scale.
+- **Signal or broadcast:** `signal-rings` emitter and `coordinate-fan` sector coverage.
 
-Don't use `orbit-marker` for every artifact whatever the subject, `locator-reticle` as decoration when the artifact has nothing to locate, or `calibration-grid` everywhere because it looks technical.
-
-If you can't explain why the mark fits the subject's structure, pick a different mark.
-
----
-
-## Label format
-
-Give each content-scale mark a small UPPERCASE mono label at 11px, with +0.12em letter-spacing, in `--text-muted`. Place the label beneath or beside the mark. Don't put the label inside the mark.
-
-Examples include `ORBIT MARKER`, `UNCERTAINTY FAN`, and `COORDINATE STAMP · 34.05° N, 118.24° W`.
-
----
-
-## Decorative-scale rules
-
-- Use `--text-on-dark-muted` on ink surfaces and `--text-muted` on paper.
-- Put at most one decorative mark on a panel, because two marks in one panel look like clutter.
+Never default to `orbit-marker`, `locator-reticle`, or `calibration-grid` when the subject has a different structure.

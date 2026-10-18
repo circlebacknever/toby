@@ -1,25 +1,27 @@
-# Backend APIs (Java/Kotlin, Go, TypeScript)
+# Backend APIs
+
+This file shows how to replace a `BaseController` and a stateful middleware chain with explicit dependencies in Java, Go, and TypeScript.
 
 ## Base controller
 
-A `BaseController` with protected helpers and shared fields such as `currentUser` couples the base and every controller in both directions. A change to the base means reading every subclass. Move each group of helpers into its own class, and pass an instance of that class into each controller's constructor:
+A `BaseController` with protected helpers and shared fields such as `currentUser` couples the base class and every controller in both directions. Move each helper group into a dedicated dependency injected into the controller, and keep record-level rules inside the service operation:
 
 ```java
 @RestController
 public class OrderController {
     private final OrderService orders;
-    private final AuthzGuard authz;        // was requireRole()
-    private final ResponseBuilder respond; // was ok() and error()
+    private final AuthGuard auth;
+    private final ResponseBuilder respond;
 
     @GetMapping("/orders/{id}")
     public ResponseEntity<?> getOrder(@PathVariable String id, Principal p) {
-        authz.require(p, Role.ORDER_READ);
-        return respond.ok(orders.find(id));
+        Session session = auth.requireRole(p, Role.ORDER_READ);
+        return respond.ok(orders.findForAccount(id, session.accountId()));
     }
 }
 ```
 
-Move access logging, which every handler used to call, into one `HandlerInterceptor` or AOP advice that Spring runs on every request.
+Move request-wide access logging into one framework interceptor or middleware that runs on every route.
 
 ## Middleware chain
 
@@ -31,14 +33,13 @@ app.use(injectTenantContext()); // reads req.user, writes req.tenant
 app.use(audit());               // reads every field above
 ```
 
-This chain is temporal decomposition. Each step reads fields that an earlier step wrote on `req`. So a handler can expect on `req` whatever the earlier steps added. No module writes down that list. Make authentication, authorization, and tenant lookup separate services that return typed values:
+This chain is temporal decomposition: each step mutates `req`, and no type records which fields exist at which step. Replace the chain with a typed session helper at the entry point and pass the tenant scope into the operation:
 
 ```ts
 async getOrder(@Req() req: Request) {
-  const session = this.auth.forRequest(req);              // user and tenant, or throws
-  this.authz.require(session, 'order.read', { id: req.params.id });
+  const session = this.auth.requireSession(req, 'order.read');
   return this.orders.find(req.params.id, session.tenantId);
 }
 ```
 
-Keep middleware or interceptors only for concerns that apply to every request unchanged, such as logging and metrics.
+Keep middleware only for concerns that apply uniformly to every route, such as request logging, metrics, and rate limiting.

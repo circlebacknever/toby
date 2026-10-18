@@ -98,7 +98,7 @@ Build the title slide from these parts:
 - **Logo:** place the per-artifact logo in the top-left.
 - **Eyebrow and scope line:** put an eyebrow with the deck id above the topic and one 22px sentence on the deck's scope below it.
 - **Big topic:** set it in 96–128px Inter 600 with tight negative letter-spacing, end it with a period, and align it left.
-- **Faint decorative shape:** place it on the right at opacity ≤ 0.16, and pick it from `references/geometry.md`.
+- **Faint decorative mark:** place it on the right at opacity ≤ 0.16, and pick it from `references/geometry.md`.
 - **Bottom mono stripe:** show 2–3 facts about the deck, such as its contents, its conventions, and its owner. Give each fact an eyebrow and a mono value.
 
 ---
@@ -129,7 +129,7 @@ These slide types all go between the cover and the end slide. Use them in any or
 | **Worked example** | Use the **Worked Example** component (three rows, info/watch/stable tinted). Pair it with a dark **Code Block** in a side column, and put a cross-check table below. |
 | **Annotated diagram** | Use a card with `position: relative` and an SVG illustration inside. Overlay **Annotation Pins** numbered 1..n, and add a side legend that maps numbers to terms. |
 | **KPI / stat snapshot** | Use an ink tone and a 4-column **Stat Grid** with cycling accent stripes. Pair it with rejected-alternative **Alerts** in a side column. |
-| **Decision** | Use an ink tone with a Stat Grid at the top. Add a dark decision card with a red top hairline and a pill in the corner. Show rejected alternatives as a stack of state-tinted Alerts. |
+| **Decision** | Use an ink tone with a Stat Grid at the top. Add a dark decision card with a `--toby-info` top hairline and a status pill in the corner. Show rejected alternatives as a stack of state-tinted Alerts. |
 | **Section / quote / summary** | Use a sparse ink-toned slide with a single centered claim and a small eyebrow. A KV block beneath the claim is optional. |
 | **References** | Use an ink tone and a reading list table where each entry has a cite block, a type, and a one-line description. Add a narrow "up next" column at the side that lists what to read next. |
 
@@ -145,11 +145,11 @@ Build the end slide from these parts:
 - **Ink-toned:** the background is `#1a1c1f`.
 - **Logo:** place the per-artifact logo in the top-left, with `--text-on-dark` for the strokes and the red dot kept accent red.
 - **One centred claim:** set it in 64–80px Inter 500 and end it with a period. A reader who remembers only the claim still has something useful.
-- **Small eyebrow:** place it above the claim in `--toby-accent`. The end slide is one of the few places where consequence red appears without indicating risk, because the red marks the deck's close.
+- **Small eyebrow:** place it above the claim in `--text-on-dark-muted`.
 - **One-paragraph context:** place it beneath the claim at 16–17px in `--text-on-dark-muted`, and cite the source or historical origin of the claim.
 - **Faint geometric backdrop:** place it behind the claim at opacity ≤ 0.12.
 - **Bottom mono stripe:** show two captions, with the source line on the left and a "begin again at § 02" pointer on the right.
-- **No content cards:** leave out KPIs, tables, and callouts, so the closing slide has only one sentence and a frame.
+- **Single-sentence focus:** omit KPIs, tables, and callouts so the closing slide holds only the final claim and its frame.
 
 Example claim line: `Bound orbits are ellipses, with the Sun at one focus.`
 
@@ -227,7 +227,7 @@ Load Inter and JetBrains Mono from Google Fonts:
 `}</style>
 ```
 
-Use `-apple-system, sans-serif` as the fallback for Inter and `ui-monospace, monospace` as the fallback for JetBrains Mono.
+Use `system-ui, sans-serif` as the fallback for Inter and `ui-monospace, monospace` as the fallback for JetBrains Mono.
 
 Always use `font-variant-numeric: tabular-nums;` on numerals.
 
@@ -299,8 +299,8 @@ If Inter or JetBrains Mono isn't installed, fall back to Calibri (sans) and Cons
 ### Color use in pptx
 - Use `--text-primary` for default text on paper and `--text-on-dark` on ink.
 - Use `--text-muted` for section labels and meta on paper and `--text-on-dark-muted` on ink.
-- Use the status colors for status pills only.
-- Use `--toby-accent` red for consequence callouts only.
+- Use the status colors on status pills, status callout panels, and worked-example rows.
+- Use `--toby-accent` red for consequence callouts and the single logo dot only.
 
 ### Section divider (ink) — recipe
 - Fill the background with ink (`#1a1c1f`).

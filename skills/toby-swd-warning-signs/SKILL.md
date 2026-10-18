@@ -9,68 +9,68 @@ description: >-
 
 # Toby SWD Warning Signs
 
-Ask each question below of the code in scope. A warning sign is code that makes a likely change cost more than it needs to. Fowler calls these code smells. Before you act on a match, read the sentence that says when the code is fine. When the proof needs code outside the scope, quote the search you ran.
+Ask each question below of the code in scope. A warning sign (Fowler's code smell) is structure that makes a likely change cost more than it needs to. Before acting on a match, check the sentence that states when the code is fine, and quote your search when proof requires code outside the file.
 
-Each fix names refactorings from Fowler's catalog. The `toby-refactor` skill lists their steps.
+`toby-refactor` and its `references/catalog.md` give the steps for each named refactoring.
 
 ## Names and comments
 
-**Mysterious Name.** Does a reader have to open the body to learn what a function, variable, or field is for? The name is fine when it is a standard term in the domain or the language, such as `i` in a three-line loop. Fix: Rename Variable, Rename Field, or Change Function Declaration. `toby-swd-clarity` covers how to choose the name.
+**Mysterious Name.** Does a reader have to read the body to learn what a function, variable, or field does? Fine when it is a standard domain or language term, such as `i` in a short loop. Fix: Rename Variable, Rename Field, or Change Function Declaration (`toby-swd-clarity`).
 
-**Comments.** Does a comment explain what a block does, because the code doesn't say it? The comment is fine when it states why, a unit, or an invariant the code can't show. Fix: Extract Function with a name that says what the block does, or Introduce Assertion for an invariant. A comment that still describes code the change replaced gets rewritten in the same step. A comment you only suspect is out of date doesn't count, so quote the line that makes it false.
+**Comments.** Does a comment explain what a block does because the code is hard to follow? Fine when it states why, a unit, or an invariant the type can't express. Fix: Extract Function named for what the block does, or Introduce Assertion. Rewrite any comment the diff made false, and quote the line that falsifies a comment before reporting it.
 
 ## Duplication and size
 
-**Duplicated Code.** Does the same rule appear in two or more places that must change together? The copies are fine when they share text but change for different reasons. Fix: Slide Statements to bring each copy into one block, then Extract Function. Use Pull Up Method when the copies are in sibling subclasses.
+**Duplicated Code.** Does the same business rule appear in two or more places that must change together? Fine when two blocks look similar by coincidence and change for different reasons. Fix: Slide Statements and Extract Function into a shared helper (prefer helper composition over Pull Up Method on a base class).
 
-**Long Function.** Does a function need comments or blank lines to separate its parts, or mix calls to helpers with low-level code? The function is fine when it is low-level all the way through, such as a parser or a numeric loop, and reads top to bottom. Fix: Extract Function for each part, named for what it does. Replace Temp with Query, Introduce Parameter Object, or Decompose Conditional come first when temporaries or conditions block the extraction. A nested ternary or a dense chain that packs several branches or side effects into one expression has the same warning sign. Fix it with Extract Variable or Decompose Conditional.
+**Long Function.** Does a function mix calls to helpers with low-level steps, or pack nested ternaries and side effects into one expression? Fine when it is one deep abstraction whose steps share local state and would become conjoined helpers if split (`toby-swd-modules` check 7), or a top-to-bottom parser or numeric loop. Fix: Extract Variable, Decompose Conditional, or Extract Function for a self-contained subtask.
 
-**Large Class.** Does a class have fields that only some of its methods use, or two groups of methods that don't call each other? The class is fine when most methods use most fields. Fix: Extract Class, Extract Superclass, or Replace Type Code with Subclasses.
+**Large Class.** Does a class have fields used by only a subset of its methods, or two method groups that never interact? Fine when most methods use most fields. Fix: Extract Class and delegate to it.
 
-**Long Parameter List.** Does a caller check the declaration to pass the arguments in order? A boolean or enum argument that picks which of two jobs a function does is the same warning sign. The list is fine when each argument stands alone and keyword arguments keep the call readable. Fix: Introduce Parameter Object, Preserve Whole Object, Replace Parameter with Query, or Remove Flag Argument.
+**Long Parameter List.** Does a caller have to check the declaration to get the argument order right, or pass a boolean/enum flag that switches the function between two jobs? Fine when keyword arguments keep each independent parameter clear. Fix: Introduce Parameter Object, Preserve Whole Object, Replace Parameter with Query, or Remove Flag Argument.
 
-**Data Clumps.** Do two or three values, such as `start` and `end`, go together through several signatures or classes? The values are fine when they appear together in one place. Fix: Extract Class, or Introduce Parameter Object.
+**Data Clumps.** Do the same two or three values (such as `start` and `end`) travel together across multiple signatures? Fine when they appear in one signature. Fix: Introduce Parameter Object or Extract Class.
 
 ## Change
 
-**Divergent Change.** Does one module change for unrelated reasons, such as a new database in one change and a new tax rule in the next? The module is fine when both reasons belong to the one thing it hides. Fix: Split Phase, Extract Class, or Move Function, so each module changes for one reason.
+**Divergent Change.** Does one module change for unrelated reasons (such as database queries and tax rules)? Fine when both reasons belong to the single design decision the module hides. Fix: Split Phase, Extract Class, or Move Function.
 
-**Shotgun Surgery.** Does one change to a rule force small edits in many files? The edits are fine when a tool makes them, as with a rename or generated code. Fix: Move Function and Move Field into one module, Combine Functions into Class, or Inline Class.
+**Shotgun Surgery.** Does changing one rule require small edits across many files? Fine when a codegen or rename tool makes the edits automatically. Fix: Move Function and Move Field into one module, or Combine Functions into Class.
 
-**Repeated Switches.** Does the same switch or if-chain on a type or status appear in two or more places? A single switch is fine, such as the one in a factory. Fix: Replace Conditional with Polymorphism. `toby-swd-extensibility` covers the choice of dispatch.
+**Repeated Switches.** Does the same switch or `if` chain on a type or status appear in multiple places? Fine when there is a single switch, or when two exhaustive switches on the same field compute different domain values. Fix: apply the first matching option in `toby-swd-extensibility` (Move onto Type, Lookup Map, Exhaustive Switch, or Polymorphism).
 
 ## Data
 
-**Global Data.** Can code anywhere change a module-level variable, a singleton's field, or a class variable? The data is fine when it is a constant, or a value set once at startup and only read after. Fix: Encapsulate Variable, then limit who calls the setter, or Move Field.
+**Global Data.** Can code anywhere mutate a module-level variable, singleton field, or class variable? Fine for constants and values initialized once at startup. Fix: Encapsulate Variable and restrict setter access, or Move Field.
 
-**Mutable Data.** Does a value change after it's created in a way callers must track? A function that returns its result by changing an argument has this warning sign, such as `apply_discount(order)` that sets `order.total`. The change is fine for a local variable inside one function and for a method whose job is to change its own object. It's also fine for a buffer the caller passes for speed, and for a language's out-parameter convention, such as C#'s `TryParse`. Fix: Separate Query from Modifier, Split Variable, Replace Derived Variable with Query, Change Reference to Value, or Remove Setting Method.
+**Mutable Data.** Does a function return its result by mutating an input argument, or expose mutable state that callers must track? Fine for local variables, methods whose job is mutating their receiver, caller-supplied performance buffers, or language `TryParse` out-parameters. Fix: Separate Query from Modifier, Change Reference to Value, or Remove Setting Method.
 
-**Primitive Obsession.** Is a domain value, such as money, a phone number, or a date range, a bare string or number whose parsing repeats? A literal that stands for a rule, such as `attempts > 3` in two files, is the same warning sign. The value is fine when its meaning is plain in a small scope, such as an HTTP status checked once. Fix: Replace Primitive with Object, Replace Type Code with Subclasses, or a named constant for the literal.
+**Primitive Obsession.** Is a domain value (such as money, an email, or a date range) passed as a bare string or number whose validation repeats across call sites, or is a rule literal (`attempts > 3`) duplicated across files? Fine for a value checked once in a small scope. Fix: Replace Primitive with Object (enforcing invariants in its constructor), or define a named constant.
 
-**Temporary Field.** Does a class have a field that holds a value only during one operation? Fix: Extract Class for the field and the code that reads it, or Introduce Special Case.
+**Temporary Field.** Does a class hold a field that is populated only during one method call? Fix: Extract Class (method object) or Introduce Parameter Object.
 
 ## Coupling
 
-**Feature Envy.** Does a method mostly read another object's fields? The method is fine when combining several objects is its job, as in a comparator or a mapper. Fix: Extract Function on the part that reads the other object, then Move Function.
+**Feature Envy.** Does a method read another object's fields more than its own? Fine when combining multiple objects is the method's job, as in a mapper or comparator. Fix: Extract Function and Move Function onto that object.
 
-**Message Chains.** Does a line call through three or more objects, as in `order.customer().address().city()`? The chain is fine in a builder or a pipeline, where each call returns the same kind of value. Fix: Hide Delegate, or Extract Function and Move Function on the end of the chain.
+**Message Chains.** Does a caller chain through three or more objects (`order.customer().address().city()`)? Fine in a fluent builder or pipeline where each step returns the same abstraction. Fix: Hide Delegate, or Move Function.
 
-**Middle Man.** Does a class forward most of its methods to one other object? The class is fine when it hides something callers shouldn't depend on, such as a vendor library. Fix: Remove Middle Man, or Inline Function.
+**Middle Man.** Does a class forward most of its methods unchanged to another object? Fine when it hides an unstable vendor SDK behind a domain contract. Fix: Remove Middle Man or Inline Class.
 
-**Insider Trading.** Do two modules read and write each other's internal data? The access is fine inside one module, or between a class and its tests. Fix: Move Function, Move Field, Hide Delegate, or Replace Subclass with Delegate.
+**Insider Trading.** Do two modules read or mutate each other's private fields? Fine inside a single module or between a unit and its test. Fix: Move Function, Move Field, or Hide Delegate.
 
 ## Code that does too little
 
-**Lazy Element.** Does a function, class, or module do so little that its name adds nothing over the code inside it? The element is fine when its name explains a step the code can't, or it hides a dependency. Fix: Inline Function, Inline Class, or Collapse Hierarchy.
+**Lazy Element.** Does a function, class, or wrapper module add no clearer name and hide no decision beyond its one-line body? Fine when the name states why or hides an external dependency. Fix: Inline Function or Inline Class.
 
-**Speculative Generality.** Does code have a hook, parameter, abstract class, or option with one user and no stated second case? Dead code has the same warning sign, which a search for the name as a string confirms. The code is fine when the request, a ticket, or the code states the second case. Exported code, and code reached through reflection, dependency injection, or a test harness, is also fine. Fix: Collapse Hierarchy, Inline Function, Inline Class, Change Function Declaration, or Remove Dead Code.
+**Speculative Generality.** Does code define a hook, parameter, interface, or dead function with only one caller and no second case stated in the request, a ticket, or the code? Fine for exported library APIs and framework reflection hooks. Fix: Change Function Declaration, Inline Class, or Remove Dead Code.
 
-**Loops.** Does a loop filter, map, or sum values that a pipeline, such as `filter` and `map`, would state directly? The loop is fine when the repo doesn't use pipelines elsewhere, or when early exits and side effects make a pipeline harder to read. Fix: Split Loop, then Replace Loop with Pipeline.
+**Loops.** Does an imperative loop filter, map, or sum values where the repo uses collection pipelines? Fine when the repo avoids pipelines or when early exits and side effects make a loop clearer. Fix: Split Loop, then Replace Loop with Pipeline.
 
 ## Classes and inheritance
 
-**Alternative Classes with Different Interfaces.** Do two classes do the same job behind different method names? The classes are fine when callers never choose between them. Fix: Change Function Declaration to match the names, Move Function, then Extract Superclass for the code they share.
+**Alternative Classes with Different Interfaces.** Do two classes solve the same job behind different method names? Fine when callers never swap between them. Fix: Change Function Declaration to align the signatures and extract a shared helper.
 
-**Data Class.** Is a class only fields with getters and setters, while other code does its work? The class is fine when it's a record kept as plain data on purpose, such as a message at a service boundary. Fix: Encapsulate Record, Remove Setting Method, and Move Function to bring the behavior to the data. `toby-swd-interfaces` covers the methods that replace the accessors.
+**Data Class.** Is a class only fields and getters/setters while external callers enforce its invariants? Fine for plain data records at serialization boundaries. Fix: Encapsulate Record, Remove Setting Method, and Move Function (`toby-swd-interfaces`).
 
-**Refused Bequest.** Does a subclass ignore what its parent provides, or override a parent method to throw? The subclass is fine when it skips only internal helpers that callers don't use. Fix: Push Down Method and Push Down Field, or Replace Subclass with Delegate, or Replace Superclass with Delegate.
+**Refused Bequest.** Does a subclass ignore its parent's contract or override a method to throw? Fine when it only omits internal parent helpers that callers never invoke. Fix: Replace Subclass with Delegate or Replace Superclass with Delegate.

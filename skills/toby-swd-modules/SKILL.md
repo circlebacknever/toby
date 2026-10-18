@@ -8,81 +8,64 @@ description: >-
 
 # Toby SWD Modules
 
-A good module is deep, which means it offers a simple interface to substantial functionality.
+A good module is deep: it offers a simple interface to substantial functionality.
 
 ## Where new code goes
 
-Follow "Default structure" in `toby-swd-architecture` for where a feature's entry point, rules, data access, and wiring go. In existing code, put new code where the surrounding code puts that kind of knowledge, but never put a rule in an entry point. When the new code fits awkwardly there, describe the placement problem. Make the smallest boundary change that "Before the first edit" in `toby-swd-campfire` allows, or list it as a follow-up at file:line.
+Follow "Default structure" in `toby-swd-architecture` for entry points, rules, data access, and wiring. In existing code, put new code where the surrounding code puts that knowledge, and never put a business rule in an entry point. When new code fits awkwardly, state the placement problem and make the smallest boundary fix that `toby-swd-campfire` allows, or list it as a follow-up at `file:line`.
 
 ## The checks
 
-Run all of these checks whenever you decide where code goes or where one module ends and another begins. Reserve full restructuring proposals for modules that are exported, have multiple callers, cross a service boundary, or are costly to change later.
+Run these eight checks whenever you place code or set a module boundary. Reserve multi-file restructuring proposals for modules that are exported, have multiple callers, cross a service boundary, or are costly to change later.
 
 ### 1. Split by what each module hides
 
-Give each module one design decision to hide, starting with those most likely to change, such as a file format or a pricing rule. When you describe a split as steps in time order, such as "first read, then parse, then write", the split is temporal decomposition. Divide the code again so each module hides one whole decision.
-
-When two teams change the same code, split that code into two modules, one for each team.
-
-Put two pieces of code in one module when any of these hold:
-
-- both depend on one design decision
-- each is almost always used with the other
-- they fall under one simple higher-level category
-- one can't be understood without the other
+Give each module one design decision to hide, starting with decisions likely to change (such as a file format, wire protocol, or pricing rule). When you describe a split as steps in time order ("first read, then parse, then write"), that is temporal decomposition, so merge or re-split until one module hides the whole format or protocol. Split code when two teams edit it for different reasons. Put two pieces of code in one module when they share a design decision, are always used together, share one simple category, or can't be understood apart.
 
 ### 2. Information-leakage check
 
-Take each significant design decision or implementation detail: a file format, a wire protocol, a storage layout, a policy. Count how many modules would need to change if it changed. More than one is leakage. Move that knowledge so exactly one module has it.
-
-Two modules may share a signature without leakage when each adds its own functionality. Don't report leakage for a caller and an implementer of one interface, or for a dispatcher and its handlers. Also don't report it for several implementations of one interface, or for a decorator and the object it wraps.
+Count how many modules must change when one file format, wire protocol, storage layout, or policy changes. More than one is leakage, so move that knowledge into a single module. Two modules sharing an interface signature without sharing format internals (such as a caller and an implementer, or a dispatcher and its handlers) aren't leaking information.
 
 ### 3. Pull complexity downward
 
-Put unavoidable complexity inside the module when it relates to that module's job and simplifies both the callers and the interface.
-
-When calls cross a process, network, or serialization boundary, prefer one call that does a lot over many small calls.
-
-Prefer computing a value inside the module over adding a configuration parameter or throwing an error that leaves the caller to handle the problem. Before exposing a parameter, ask whether the caller can choose a better value than the module can.
+Handle unavoidable complexity inside the module when it belongs to that module's job and simplifies callers. Across a process, network, or serialization boundary, prefer one coarse call over many fine-grained calls. Prefer computing a tuning value inside the module over exposing a configuration parameter whenever callers can't pick a better value.
 
 ### 4. Give adjacent layers different abstractions
 
-Look for a pass-through method or a pass-through variable. A pass-through usually means that the adjacent layers offer nearly the same abstraction. Open `references/pass-through.md` for the fixes.
+Check for pass-through methods and pass-through variables, which show that adjacent layers expose the same abstraction. Open `references/pass-through.md` for the fixes.
 
 ### 5. Prefer composition over implementation inheritance
 
-Use interface inheritance freely, and default to composition. Open `toby-swd-extensibility` by path when a change adds a case, an implementation, or a subclass.
+Use interface inheritance freely, and default to helper composition over base classes. Open `toby-swd-extensibility` when adding a case, implementation, or subclass.
 
 ### 6. Separate general code from special cases
 
-Special-purpose conditions that exist for one caller don't go inside a general mechanism. Push them up to that caller, or move the branch onto the type, as option 1 in `toby-swd-extensibility` describes.
+Keep caller-specific branches out of general mechanisms, and push the branch up to the caller or move it onto the data type (`toby-swd-extensibility` option 1).
 
 ### 7. Split or merge
 
-Split only when the resulting pieces are independently understandable and each interface is simpler than the original. Before you split, merge, extract, or inline code, open `references/split-or-merge.md`.
+Split a module or function only when each piece is independently understandable and has a simpler interface than the original. Open `references/split-or-merge.md` before splitting, merging, extracting, or inlining code.
 
 ### 8. Depth check
 
-Weigh what the caller must manage to use the module (parameters, preconditions, ordering, error cases) against what it handles internally. When the two are roughly equal, the module is shallow.
-
-Write the module's interface comment, and when it must be long or describe internals to be complete, split the module a different way. A trivial helper may stay shallow.
+Weigh what the caller must manage (parameters, preconditions, call order, error cases) against the work the module handles inside. When the two are roughly equal, or the interface comment must describe internals to be complete, the module is shallow, so merge or re-split it. A tiny local helper may stay shallow.
 
 ## Red flags
 
-Before calling a boundary decision done, check the diff against the checks above and this list.
+Check the diff against the eight checks above and these red flags:
 
-- **Classitis, or too many small modules**: many shallow modules have interfaces that add more complexity than the modules remove. Too many frontend components is the same flag.
-- **Accessors as the public surface**: a module whose surface is mostly per-field get/set is shallow by definition. The `toby-swd-interfaces` red flags give the replacement and the plain-data exception.
-- **Pattern forced onto the problem**: a Visitor, Factory, Observer, or Strategy is applied for its own sake, when the problem doesn't have the structure the pattern solves. A pattern is worth adding only when it removes complexity.
+- **Classitis (too many tiny modules or components):** shallow modules whose interfaces add more mental overhead than their bodies save.
+- **Accessors as the public surface:** per-field getters and setters that expose the storage layout. `toby-swd-interfaces` gives the replacement methods and the plain-data exception.
+- **Pattern forced onto the problem:** a Visitor, Factory, Observer, or Strategy added when direct code or a lookup map is simpler.
 
 ## References
 
-Open the platform file below that matches the repo's framework, and a topic file only when the change is about that topic.
+Open the platform file matching the repo's stack, and a topic file only when relevant:
 
-- `references/examples.md` has worked cases for temporal decomposition, a computed parameter, prop drilling, and too many components. Open it when a check matches and the fix is unclear.
-- `references/placement-note.md` has the rules for a note that tells a reader where code goes. Open it when you explain a placement to the user or state one in a plan.
-- `references/web.md` covers React, Solid, and Svelte server state, shared behavior, store slices, and headless components.
-- `references/mobile.md` covers React Native auth state and data access in screens.
-- `references/backend-apis.md` covers base controllers and middleware chains in Spring and Nest.
-- `references/databases.md` covers ORM placement, one type per audience, and read models.
-- `references/caching.md` covers which layer contains the cache and where eviction runs.
+- `references/examples.md` covers temporal decomposition, computed parameters, prop drilling, and over-componentization.
+- `references/placement-note.md` covers how to write a placement note in chat or a plan.
+- `references/web.md` covers React, Solid, and Svelte server state, shared behavior, store slices, and headless hooks.
+- `references/mobile.md` covers React Native auth state and screen data access.
+- `references/backend-apis.md` covers base controllers and middleware chains.
+- `references/databases.md` covers ORM boundaries, row/domain/DTO splits, and read models.
+- `references/caching.md` covers cache placement and eviction ownership.

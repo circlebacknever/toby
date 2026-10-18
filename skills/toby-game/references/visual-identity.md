@@ -1,17 +1,14 @@
 # Visual identity
 
-The base style stays the same in any genre, but the set of techniques changes with the render mode.
+Every game uses the Toby palette and typography while adapting its rendering technique to 3D, 2D canvas, or DOM cards.
 
-**Base rules.** Use warm paper and near-black ink, and exactly one red that means consequence, such as a denial, a death, or the one dangerous button. If you use the red anywhere else, it stops meaning anything. Mood comes from one source, which is one light in 3D or one accent in 2D. Keep something moving at all times, but reduce the motion when the player asks for reduced motion. Use monospace with steady-width digits for data and a humanist sans for prose. Remove any label that adds no information.
+## Palette and typography
 
-The palette is paper `#fdfaf1`, ink `#1a1c1f`, the one red `#c44e3f`, and a dark field `#0e0f12` for canvas. Draw the rest from a muted set: teal `#2e6a78`, green `#4d7a30`, amber `#b07020`, deep rust `#7a2d22`. Name the tokens `--toby-*`. Build a different set for a different mood, but keep the single red and its rare use. The base hex values for paper, ink, red, teal, green, and amber match the tokens in `toby-artifact-style`.
+Use paper `#fdfaf1`, ink `#1a1c1f`, consequence red `#c44e3f` (reserved strictly for a denial, a hazard, or the one irreversible button), dark canvas `#0e0f12`, and the muted accents teal `#2e6a78`, green `#4d7a30`, amber `#b07020`, and rust `#7a2d22` under `--toby-*` CSS variables. Set numbers in tabular monospace and prose in humanist sans, keep subtle idle motion running (honoring `prefers-reduced-motion`), and omit decorative toolbars and external image assets.
 
-**3D.** Build characters and props from non-uniformly scaled low-poly spheres. A car, a head, and a tail are built from the same primitive, so they look related. Keep everything matte and flat-shaded, but let a ball or an eye use smooth shading. Use one warm or cool light, low fill underneath, and warm dots for windows and fire. Make things bob and sway on a shared clock, with a different offset for each thing, so the crowd doesn't move in unison. Show the scene from above like a model on a table, or let the player rotate the camera around a system they study, within fixed limits. Cuteness is optional, so for an austere premise, replace the spheres with boxes, lines, and the palette. Current three.js uses physical lighting, so old intensity numbers render dim and need retuning.
+## Render modes
 
-**2D.** Use a dark field, additive blending so overlap glows, and a faint full-frame wash each frame so trails fade.
-
-**DOM.** Use the palette to color a board of cards and panels. Use the red for the deny stamp. Show idle motion without a render loop, such as a slow pulse or a stamp fading in under the drag. Build each scrolling list once, and update its rows in place, so the list doesn't re-render while the player's thumb is scrolling it. Order the list by a stable base cost so rows don't reshuffle as scaled prices change. Toggle a panel with an explicit `block` or `flex`, because a bare `display=''` only falls back to a stylesheet `display:none`.
-
-**Dread.** In the dread register, red stops marking what the player did ("you did this") and marks a threat that was already present ("already here"). The red appears, stays on screen, and shows without a label in places where the player didn't act. The warm dots fade out, the idle motion stops, and the camera stays on one shot without cutting. The scare comes from a single red dot that wasn't there in the previous frame.
-
-Use no imported assets, no rainbow, and no boxed toolbar over the scene.
+- **3D (Three.js):** build characters and props from scaled low-poly spheres (or boxes and lines for austere premises) with flat matte shading, one directional light with low ambient fill, and phase-offset idle bobbing.
+- **2D canvas:** use the dark `#0e0f12` field, additive blending where highlights overlap, and a low-alpha frame wash for motion trails.
+- **DOM cards:** build scrolling upgrade or card lists once and update row values in place ordered by base cost so rows don't jump under the player's thumb while scrolling. Toggle visibility with explicit `display: 'block'` or `'flex'`.
+- **Dread register:** stop idle motion and warm lights, hold a fixed camera, and place unlabeled red markers where a threat is already present.

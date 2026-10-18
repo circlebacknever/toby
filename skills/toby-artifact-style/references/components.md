@@ -45,7 +45,7 @@ Build these components to the specs below when a page needs them.
 - **Slider** — It shows a mono value with tabular numerals to the right of the label.
 - **ToggleGroup** — A ToggleGroup is a segmented control. A button with `.tgrp__btn--on` has an ink background and white text. Buttons use `white-space: nowrap`.
 - **Combobox** (covers **Select** and **Autocomplete**) — It is searchable by default, but `searchable={false}` gives a plain Select.
-- **Calendar** — Today gets a 2px `--toby-info` border, bold weight, and info text. The selected day fills with ink. Marked dates show a small red dot.
+- **Calendar** — Today gets a 2px `--toby-info` border, bold weight, and info text. The selected day fills with ink. Marked dates show a small `--toby-info` dot.
 - **DatePicker** — It is a Calendar inside a popover. Its trigger shows the selected date in ISO format in mono.
 
 ### Overlays & menus (consolidated)
@@ -93,7 +93,7 @@ The colors below use the tokens defined in SKILL.md. Change the copy, but never 
 <div class="alert alert--watch">
   <div>
     <div class="alert__title">Watch · retry pressure</div>
-    <div class="alert__body">Retry volume is 18% above baseline. The two-sample rule has not tripped yet.</div>
+    <div class="alert__body">Retry volume is 18% above baseline. The two-sample rule hasn't tripped yet.</div>
   </div>
   <button class="alert__close" aria-label="Dismiss">×</button>
 </div>
@@ -196,7 +196,7 @@ The same `--*-soft / --*-tint / --*-text` triple sets the colors for status pill
     <div>
       <div class="worked__body">The orbital period is approximately 92.8 minutes.</div>
       <div class="worked__math">T ≈ 5568 s ≈ 92.8 min</div>
-      <div class="worked__caveat">Caveat: this assumes a circular orbit. It does not include J2 perturbations.</div>
+      <div class="worked__caveat">Caveat: this assumes a circular orbit and doesn't include J2 perturbations.</div>
     </div>
   </div>
 </div>

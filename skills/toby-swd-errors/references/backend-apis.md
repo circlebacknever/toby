@@ -1,38 +1,37 @@
-# Backend APIs (Java, Go, TypeScript)
+# Backend APIs
+
+This file covers HTTP and gRPC retry rules, deadlines, timeouts, and circuit breakers in backend services.
 
 ## HTTP retries
 
-When step 2 of `toby-swd-errors` calls for a retry, put it in one client wrapper, and pick the handling from the status class:
+When step 2 of `toby-swd-errors` calls for a retry, put it in one client wrapper with jittered exponential backoff:
 
 | Status | Handling |
 |---|---|
-| 4xx except 408 and 429 | Surface. Don't retry. |
-| 408 | Retry on a fresh connection. |
-| 429 | Retry at the `Retry-After` time (seconds or an HTTP date), or after a backoff when the header is missing. When that time falls after the caller's deadline, throw a transient error and skip the retry. |
-| 5xx except 501 | Retry with backoff when the request is safe to repeat. |
-| 501 | Surface. Don't retry. |
+| 4xx except 408 and 429 | Surface immediately without retrying. |
+| 408 | Retry on a fresh connection only when the request is safe to repeat. |
+| 429 | Retry at the `Retry-After` time (or with backoff), unless that time exceeds the caller's deadline. |
+| 5xx except 501, or network timeout | Retry with jittered backoff only when the request is safe to repeat. |
+| 501 | Surface immediately without retrying. |
 
-A network failure or a timeout rejects the call with no status, so the wrapper retries it the same way as a 5xx. The wrapper sets one `permanent` flag on the error it throws, so callers don't re-derive the class or retry again. One response interceptor turns a sustained outage into "service unavailable" and lets a permanent error reach the caller that can act on it.
+Cap total attempts across service hops with a propagated deadline or a retry budget so retries at multiple layers don't multiply load during an outage. Mark terminal errors on the thrown error object so callers above the wrapper don't retry them a second time.
 
 ## gRPC retries
 
-One helper wraps every RPC and reads the status code:
+Wrap RPC calls in one helper that checks the status code and respects the deadline on `ctx`:
 
 | Code | Retry? |
 |---|---|
-| `UNAVAILABLE` | Yes, with backoff, when the RPC is safe to repeat. |
-| `DEADLINE_EXCEEDED` | Only with a fresh, larger deadline, when the RPC is safe to repeat. |
-| `RESOURCE_EXHAUSTED` | Only when the server signals throttling and the RPC is safe to repeat. |
-| `ABORTED` | Re-read state and retry the whole transaction. |
-| `INTERNAL` | No, because it signals a broken invariant. |
-| `INVALID_ARGUMENT`, `NOT_FOUND`, `PERMISSION_DENIED`, and every other code | No. |
-
-The helper passes the deadline in `ctx`, stops sleeping when the deadline expires, and skips an attempt that can't finish before it.
+| `UNAVAILABLE` | Yes, with jittered backoff, when the RPC is safe to repeat. |
+| `DEADLINE_EXCEEDED` | Only with a new deadline when the caller initiates a fresh retry and the RPC is safe to repeat. |
+| `RESOURCE_EXHAUSTED` | Only on explicit server throttling when the RPC is safe to repeat. |
+| `ABORTED` | Re-read state and retry the full transaction. |
+| `INTERNAL`, `INVALID_ARGUMENT`, `NOT_FOUND`, `PERMISSION_DENIED` | Never retry. |
 
 ## Timeouts
 
-Set each timeout at the call's healthy p99.9 latency plus padding, so at most 0.1% of healthy calls time out. For a call with no latency history, such as a new provider, use the timeout the repo's other outbound clients use. With no other client to copy, use a few seconds for a chat webhook. Log the call's duration, and tune the value from those logs. Without a timeout, a slow downstream holds this service's threads, so the slowdown spreads to every caller upstream. Render the page without waiting for a non-critical dependency, such as a recommendations panel, and fill in the panel when its data arrives.
+Set each outbound timeout to the dependency's healthy p99.9 latency plus margin (or match the repo's existing outbound clients, defaulting to a few seconds when unknown). Without a timeout, a slow dependency ties up worker threads and cascades upstream. When a dependency is non-critical (such as a recommendations panel), degrade gracefully when its timeout expires.
 
 ## Circuit breakers
 
-Add a circuit breaker only after a measurement or a post-mortem shows calls piling up on a slow downstream. Add one only for a call made often enough that its failure rate means something. Leave it out for a low-traffic call, for a downstream that already fails fast, and where the retry policy already handles the failure. A breaker has bugs that appear only during incidents and tuning values that are hard to set. It also hides tripped calls from logs and dashboards.
+Add a circuit breaker only after measurements or an incident show requests queuing behind a slow, high-traffic downstream service. Omit circuit breakers on low-traffic calls or services that already fail fast.
