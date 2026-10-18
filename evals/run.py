@@ -363,6 +363,7 @@ This reader has also named these as grating:
 - What would have happened, such as "each failure would have paged the on-call
   engineer", with or without a "Prediction:" label.
 - A given fact placed in a document whose reader does not need it.
+- Passive voice that hides who performs the action ("the token is invalidated", "is observed at"), unexplained jargon or four-noun stacks, and bloated paragraphs that take three or more sentences to state one small point.
 
 Fail these predicted habits as well: a setup question such as "The result?", a
 meta opener such as "Let's break this down", a noun doing a verb's job such as
@@ -485,6 +486,7 @@ This reader has also named these as grating:
 - What would have happened, such as "each failure would have paged the on-call
   engineer", with or without a "Prediction:" label.
 - A given fact placed in a document whose reader does not need it.
+- Passive voice that hides who performs the action ("the token is invalidated", "is observed at"), unexplained jargon or four-noun stacks, and bloated paragraphs that take three or more sentences to state one small point.
 
 Fail these predicted habits as well: a setup question such as "The result?", a
 meta opener such as "Let's break this down", a noun doing a verb's job such as
@@ -592,6 +594,10 @@ Fail a sentence for any of these habits, and give the habit's name:
 - semicolon: a semicolon joining clauses.
 - colon reveal: a colon before a single reveal or answer, such as "The cause is
   simple: CI runs in UTC."
+- passive: a passive verb that hides who acts, such as "the token is invalidated"
+  or "a 409 is returned", where an active actor ("the server", "the handler") belongs.
+- bloated paragraph: a paragraph over three sentences, or a paragraph that takes
+  multiple sentences to state one small point.
 
 Do not fail a sentence for being long, for using a file path or code, or for a
 habit not on this list. These pass: a short social reply to thanks, such as "No

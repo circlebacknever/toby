@@ -1,28 +1,23 @@
 # Skill boundaries
 
-One row per skill. The fourth column decides which skill wins a shared rule. The
-fifth column lists what the description's skip clause has to state.
+This table lists one row per skill. The fourth column states which skill takes priority when two skills share a topic, and the fifth column lists what each description's skip clause covers.
 
-| Skill | Owns alone | Shares | Who wins the shared rule | Never fires on |
+| Skill | Exclusive scope | Shared topics | Priority rule | Skip clause covers |
 |---|---|---|---|---|
-| `toby-swd-strategy` | the design pass before writing, tactical debt, near-future variants | refactors, API changes, special cases | strategy decides whether the design changes at all; modules and interfaces decide what it changes to | renames, formatting, read-only investigation, throwaway spikes, structure already fixed by surrounding code |
-| `toby-swd-modules` | placement, ownership, split and merge, boundary lines | deep module, general-purpose bias, special cases | modules owns where code lives | designing a signature, a one-file edit inside an existing module |
-| `toby-swd-interfaces` | the callable surface, the comment test, parameters, the accessors and shallow red flags | deep module, general-purpose bias, caching surface | interfaces owns the contract | where a file goes, adding a field beside an identical one |
-| `toby-swd-errors` | error paths, retries, validation | special cases | errors decides whether the error path is earned; interfaces designs its surface | throwaway parameter loops, error paths the types already rule out |
-| `toby-optimize` | measured performance, whether a cache or a batch is earned | caching, batching | optimize decides whether the cache is earned; interfaces designs its surface | throwaway parameter loops, new behavior that includes a cache |
-| `toby-swd-clarity` | names, comments, docstrings, control flow a reader trips on | exported contracts | clarity owns the wording; interfaces owns the contract | module docs, contract design |
-| `toby-swd-testing` | test files, assertions, snapshots, regression tests for a fix | tests that follow a code change | testing fires when behavior changed | a rename, a formatting pass, a throwaway spike |
-| `toby-swd-docs` | `AGENTS.md` and `README.md` in the user's own modules | public API changes | docs fires when the module's documented surface moved | code comments and docstrings |
-| `toby-swd-environment` | commands, processes, ports, installs, migrations, state outside the edit | nothing | environment always fires on a command | a pure code edit with nothing to run |
-| `toby-swd-experiment` | spikes, parameter sweeps, throwaway debug surfaces, proof of concept | retries, timeouts, tests, design | the throwaway frame outranks every noun inside it | work the user intends to keep |
-| `toby-build` | mode, acceptance criteria, slicing, the approved plan | features, endpoints, screens | build owns multi-file new behavior and opens the swd method skills | a one-file edit following a pattern already in that file |
-| `toby-code-review` | findings on a diff the user asks about | "review my changes" | code-review fires on the word review | a request to change the code |
-| `toby-refactor` | behavior-preserving cleanup the user asked for | "review my changes" | refactor fires only when the user asked to change the code | a request for findings |
+| `toby-swd-strategy` | design pass before writing, deadline shortcuts, near-future variants | refactors, API changes, special cases | strategy decides whether the design changes, while modules and interfaces decide the target structure | renames, formatting, read-only investigation, throwaway spikes, structure already fixed by surrounding code |
+| `toby-swd-modules` | placement, split and merge, module boundaries | deep modules, general-purpose interfaces, special cases | modules decides where code goes | designing a signature, a one-file edit inside an existing module |
+| `toby-swd-interfaces` | function and API signatures, the comment test, parameters | deep modules, general-purpose interfaces, caching contracts | interfaces designs the signature and comment | where a file goes, adding a field beside an identical one |
+| `toby-swd-errors` | error paths, retries, validation | special cases | errors decides whether an error path is needed, while interfaces designs its signature | throwaway parameter loops, error paths the types already rule out |
+| `toby-optimize` | measured performance, whether a cache or batch is worth its cost | caching, batching | optimize decides whether the cache is worth adding, while interfaces designs its signature | throwaway parameter loops, new behavior that includes a cache |
+| `toby-swd-clarity` | names, comments, docstrings, hard-to-follow control flow | exported contracts | clarity covers the wording, while interfaces covers the contract | module docs, contract design |
+| `toby-swd-testing` | test files, assertions, snapshots, regression tests | tests that follow a code change | testing loads when tests or snapshots change | a rename, a formatting pass, a throwaway spike, or a change that also edits production code |
+| `toby-swd-docs` | `AGENTS.md` and `README.md` in the user's modules | public API changes | docs loads when the module's documented structure or API changes | code comments and docstrings |
+| `toby-swd-environment` | commands, processes, ports, installs, migrations | nothing | environment loads before any state-changing, runtime, or slow command | a code edit that runs only focused tests, formatters, linters, or type-checks, and a snapshot update |
+| `toby-swd-experiment` | spikes, parameter sweeps, throwaway debug code, proof of concept | retries, timeouts, tests, design | the word `throwaway` takes priority over every other noun in the prompt | work the user intends to keep, starting or stopping a server alone |
+| `toby-build` | sizing, acceptance criteria, slicing, the approved plan | features, endpoints, screens | build handles new or changed behavior and opens the `toby-swd-*` method skills | wrong output, slow code, behavior-preserving refactors, throwaways, and one-file edits copying a local pattern |
+| `toby-code-review` | findings on a diff or plan | "review my changes" | code-review loads when the user asks for review findings without edits | a request to change the code, or a question about how code works |
+| `toby-refactor` | behavior-preserving cleanup | "review my changes" | refactor loads only when the user asks to change code while keeping behavior the same | a request for findings without edits, or a behavior change |
 
-## The arbitration rule
+## Routing priority
 
-Two skills matching means one of them owns the decision being made and the other
-owns a decision nobody asked for. Name the decision in one sentence, load the
-skill that owns it, and leave the rest. The Skill Routing section of `base/toby.md`
-tells the agent to load one entry skill per request, picked by its description.
-Each skip clause names the skill that takes the request.
+When two skills appear to match one request, identify the decision the user is asking for and load the skill that covers that decision. Each entry skill's skip clause names the adjacent skill that takes the other requests.

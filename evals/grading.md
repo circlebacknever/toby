@@ -2,10 +2,7 @@
 
 ## Trigger routing
 
-The three runs used the same eight prompts. `baseline/triggering.txt` is the before run.
-`evals/out/triggering-after.txt` is the after run. `evals/out/triggering-blind.txt`
-is a second after run with no mention of skip clauses in the instructions, to
-check whether the first run had only followed a hint.
+The three runs used the same eight prompts. `evals/baselines/triggering-before.txt` holds the run before skip clauses, `evals/baselines/runs/triggering-after.txt` holds the run after, and `evals/baselines/runs/triggering-blind.txt` holds the blind confirmation run.
 
 | Run | False fires across N1-N4 | Missed across P1-P4 |
 |---|---|---|
@@ -13,31 +10,21 @@ check whether the first run had only followed a hint.
 | after | 0 | 0 |
 | after, blind | 0 | 0 |
 
-The seven that stopped firing: `toby-swd-testing` on a rename, `toby-swd-errors`
-and `toby-swd-strategy` and `toby-swd-testing` on a throwaway parameter sweep, and
-`toby-build` and `toby-swd-interfaces` and `toby-swd-strategy` on a one-line
-field addition. Each stopped for a named phrase in its own skip clause.
+Seven false firings stopped after the skip-clause update: `toby-swd-testing` on a rename, `toby-swd-errors`, `toby-swd-strategy`, and `toby-swd-testing` on a throwaway parameter sweep, and `toby-build`, `toby-swd-interfaces`, and `toby-swd-strategy` on a one-line field addition.
 
 ## Code review, before and after
 
-Both skills reviewed the same diff against the same criteria. The diff has one
-seeded security bug and two seeded criteria with no test. The two reviews are in
-`evals/out/review-old.md` and `evals/out/review-new.md`.
+Both versions of the skill reviewed the same diff against the same criteria. The diff has one seeded security bug and two seeded criteria without tests. The two reviews are in `evals/baselines/runs/review-old.md` and `evals/baselines/runs/review-new.md`.
 
-| | Old skill | New skill |
+| Check | Old skill | New skill |
 |---|---|---|
 | Account-scoping bug | caught | caught |
-| Criterion 2 unmet, no test | caught, bundled | caught, named as its own compliance finding |
-| Criterion 3 unmet, no test | caught, bundled | caught, named as its own compliance finding |
+| Criterion 2 unmet, missing test | caught, bundled | caught as its own finding |
+| Criterion 3 unmet, missing test | caught, bundled | caught as its own finding |
 | Unvalidated date params | missed | caught |
-| Owning skill named | no | yes |
+| Toby skill named in finding | no | yes |
 | Question raised for the author | no | yes, on the missing decorator |
 
-The compliance pass separated the two criteria findings from the bug.
-The old skill reported "two of three required tests don't exist" as one line
-under the bug, and the new one checked each criterion against the diff and quoted
-its wording.
+The compliance pass separated the two criteria findings from the bug. The old skill bundled both missing tests into one line under the bug, while the new skill checked each criterion against the diff and quoted its wording.
 
-The run exposed one defect, because the new skill routed the security bug to
-`toby-swd-interfaces`, which has no rule about security bugs. The frame now says a bug or
-a security finding needs no routing, because the finding already states the fix.
+The run also exposed one defect: the new skill routed the security bug to `toby-swd-interfaces`, which doesn't cover security bugs. `toby-code-review` now keeps Toby skill names out of the review findings.

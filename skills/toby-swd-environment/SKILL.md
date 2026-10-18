@@ -2,11 +2,11 @@
 name: toby-swd-environment
 description: >-
   Classify each command before it runs and ask before any command that changes
-  the user's machine. Use it when the user asks to run a migration, a seed
-  script, or a snapshot update, or to install a dependency. Use it to start or
-  stop a server, free a port, clear a cache, or run the full test suite. Skip
-  it for a code edit that runs only focused tests, formatters, linters, or
-  type-checks.
+  the user's machine. Use it when the user asks to run a migration or a seed
+  script, or to install a dependency. Use it to start or stop a server, free a
+  port, clear a cache, or run the full test suite. Skip it for a code edit that
+  runs only focused tests, formatters, linters, or type-checks, and for a
+  snapshot update, which toby-swd-testing covers.
 ---
 
 # Toby SWD Environment

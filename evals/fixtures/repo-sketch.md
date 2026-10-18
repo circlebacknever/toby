@@ -125,10 +125,10 @@ class OrgInvitesView(APIView):                        # line 14
 
 ## Tests
 
-`tests/test_invites.py` covers `create_invite` with a valid and an invalid email. `tests/test_billing_page.py` checks that the page renders for each of the three plans. No test covers `OrgInvitesView`.
+`tests/test_invites.py` covers `create_invite` with a valid and an invalid email, and `tests/test_billing_page.py` checks that the page renders for each of the three plans. `tests/` doesn't have a test for `OrgInvitesView` yet.
 
 ## Facts from the product team
 
 - Seat caps by plan: free 3, team 50, enterprise unlimited.
-- A pending invite counts as a seat, because the product team wants the cap to hold when many invites are accepted at once.
-- The billing page is visible to admins only.
+- A pending invite counts toward the seat cap, so sending many invites at once can't exceed the plan limit.
+- Only org admins can view the billing page.

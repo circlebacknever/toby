@@ -7,33 +7,33 @@ Applies Toby's visual design system to a visual and to the copy inside it. The v
 Fixes behavior that is wrong today. It reproduces the failure, finds the cause at a file and line, fixes that cause, and proves the fix with a run before and after. Use it when the user reports a bug, a crash, an error message, a regression, or wrong output and wants it fixed. Use it when the user pastes a stack trace, or says a build or a test started failing. Skip it for a question about why something fails with no fix asked for, which toby-explain covers. Skip it for a flaky test, which toby-swd-testing covers, and for slow code, which toby-optimize covers.
 
 ### toby-build
-Changes what code does in the smallest step that leaves the design at least as good as before. It proves each change with one check run before the edit and again after it. Use it when the user asks to add, build, implement, wire up, or finish a behavior. The behavior can be a feature, a ticket, an endpoint, a method, a screen, a job, or a flag. Skip it for wrong output, which toby-bug-fix covers, and for slow code, which toby-optimize covers. Skip it when behavior stays the same, which toby-refactor covers, and for a throwaway, which toby-swd-experiment covers. Skip it for a one-file edit that copies a pattern already in that file.
+Changes what code does, in slices the user can review one at a time. It proves each slice with a check run before and after the edit, and leaves the design at least as good as before. Use it when the user asks to add, build, implement, wire up, or finish a behavior, such as a feature, a ticket, an endpoint, a method, a screen, a job, a flag, a new status, or logs and metrics. Use it to add or change a feature in a plan or a spec. Skip it for wrong output, which toby-bug-fix covers, and for slow code, which toby-optimize covers. Skip it when behavior stays the same, which toby-refactor covers, and for a throwaway, which toby-swd-experiment covers. Skip it for a one-file edit that copies a pattern already in that file. Use it for a one-file edit that adds a case to a type, kind, or status branch, or changes a money or permissions rule.
 
 ### toby-code-review
-Reports the proven risks in a change and edits nothing. Use it when the user asks to review, check, or audit a diff, a PR, a commit, a branch, or the working tree. Use it when the user asks what is wrong with a change. Skip it when the user wants the code changed, which toby-refactor or toby-bug-fix covers. Skip it for a question about how code works, which toby-explain covers.
+Reports the real issues in a change or a plan and edits nothing. Use it when the user asks to review, check, or audit a diff, a PR, a commit, a branch, the working tree, a plan, or a spec. Use it when the user asks what is wrong with a change. Skip it when the user wants the code changed, which toby-refactor or toby-bug-fix covers. Skip it for a question about how code works, which toby-explain covers.
 
 ### toby-explain
-Answers a question in plain words, then stops, and edits no files. Use it when the user asks why, how, what the difference is, which option fits, or where code should go, on any subject. Use it for "walk me through", "help me understand", and any request for a clear, short, or simple explanation. Skip it when the user asks for a diagram, a chart, or a deck, which toby-artifact-style covers. Skip it when the user wants a fix, which toby-bug-fix covers.
+Answers a question in plain words, then stops, and doesn't edit files. Use it when the user asks why, how, what the difference is, which option fits, or where code should go, on any subject. Use it for "walk me through", "help me understand", and any request for a clear, short, or simple explanation. Skip it when the user asks for a diagram, a chart, or a deck, which toby-artifact-style covers. Skip it when the user wants a fix, which toby-bug-fix covers.
 
 ### toby-optimize
 Makes working code faster or lighter from a measured baseline, with one change per measurement. It covers whether a cache, a batch, a queue, or parallel work is worth what it adds. Use it when the user says code is slow, or asks to speed it up or to cut latency, memory, or query count. Use it when the user asks to add a cache to code that already works. Skip it for new behavior that includes a cache, which toby-build covers, and for wrong output, which toby-bug-fix covers. Skip it for a speed question with no change asked for, which toby-explain covers, and for a throwaway sweep, which toby-swd-experiment covers.
 
 ### toby-refactor
-Changes how code is arranged or reads and keeps its behavior and tests the same. Use it when the user asks to simplify, tidy, refactor, de-duplicate, extract, split, merge, move, or rename code. Use it to add, fix, or delete comments and docstrings. Skip it when behavior should change, which toby-build, toby-bug-fix, or toby-optimize covers. Skip it when the user wants findings with no edit, which toby-code-review covers.
+Changes how code is arranged or reads and keeps its behavior the same. Use it when the user asks to simplify, tidy, refactor, de-duplicate, extract, split, merge, move, or rename code. Use it to switch code to a new runtime, framework, or tool chain that keeps behavior the same. Use it to add, fix, or delete comments and docstrings. Skip it when behavior should change, which toby-build, toby-bug-fix, or toby-optimize covers. Skip it when the user wants findings with no edit, which toby-code-review covers.
 
 ### toby-swd-environment
-Classifies each command before it runs and asks before any command that changes the user's machine. Use it when the user asks to run a migration or a seed script, or to install a dependency. Use it to start or stop a server, free a port, clear a cache, or run the full test suite. Skip it for a code edit with nothing to run, and for a snapshot update, which toby-swd-testing covers.
+Classify each command before it runs and ask before any command that changes the user's machine. Use it when the user asks to run a migration or a seed script, or to install a dependency. Use it to start or stop a server, free a port, clear a cache, or run the full test suite. Skip it for a code edit that runs only focused tests, formatters, linters, or type-checks, and for a snapshot update, which toby-swd-testing covers.
 
 ### toby-swd-experiment
-Runs a short, reversible discovery loop while the behavior is still undecided. Use it when the user says spike, prototype, proof of concept, throwaway, try a few values, compare options, tweak settings, or let me test. The word throwaway decides the route even when the request also names retries, timeouts, or tests. Skip it for work the user intends to keep, which toby-build covers. Skip it for starting or stopping a server alone, which toby-swd-environment covers.
+Runs a short, reversible discovery loop while the user is still choosing the behavior. Use it when the user says spike, prototype, proof of concept, throwaway, try a few values, compare options, tweak settings, or let me test. Use it whenever the request says throwaway, even when it also names retries, timeouts, or tests. Skip it for work the user intends to keep, which toby-build covers. Skip it for starting or stopping a server alone, which toby-swd-environment covers.
 
 ### toby-swd-testing
-Keeps tests an executable specification of behavior, and classifies a failing test before anyone edits it. Use it when the user asks to write, rewrite, delete, or weaken a test, raise coverage, update snapshots, or fix a flaky test. Skip it when production code changes too, which toby-build or toby-bug-fix covers. Skip it for a throwaway spike, which toby-swd-experiment covers, and for a run of the suite alone, which toby-swd-environment covers.
+Tests behavior through the public interface, and classifies a failing test before anyone edits it. Use it when the user asks to write, rewrite, delete, or weaken a test, raise coverage, update snapshots, or fix a flaky test. Skip it when production code changes too, which toby-build or toby-bug-fix covers. Skip it for a throwaway spike, which toby-swd-experiment covers, and for a run of the suite alone, which toby-swd-environment covers.
 
 ### toby-voice
-Applies Toby's writing rules to prose and runs the voice checker on it. Use it for a substantive reply, review findings, a commit message, a PR description, a README, an AGENTS.md, a doc, a plan, or a rewrite of any text. Load it before finalizing prose, and do not wait to be asked. Use it when the user says voice, toby voice, check the voice, voice pass, or voice standards, or asks for wording or tone help. Skip it as the first skill for names and comments inside code, which toby-refactor covers.
+Applies Toby's writing rules to prose and runs the voice checker on it. Use it for a substantive reply, review findings, a commit message, a PR description, a README, an AGENTS.md, a doc, a plan, or a rewrite of any text. Load it before finalizing prose, and don't wait to be asked. Use it when the user says voice, toby voice, check the voice, voice pass, or voice standards, or asks for wording or tone help. Skip it as the first skill for names and comments inside code, which toby-refactor covers. Load it together with the skill for the work, such as toby-build for a change to a plan, and never in place of that skill.
 
-# Kiro: 20 skills
+# Kiro: 31 skills
 
 ### toby-artifact-style
 Applies Toby's visual design system to a visual and to the copy inside it. The visual can be a diagram, chart, dashboard, slide deck, HTML or React page, SVG, mockup, or reference card. Use it when the user asks to draw, show, chart, diagram, or build a visual, including a visual that explains something. Skip it for a text answer in chat, which toby-explain covers, and for a game, which only /toby-game starts.
@@ -42,56 +42,88 @@ Applies Toby's visual design system to a visual and to the copy inside it. The v
 Fixes behavior that is wrong today. It reproduces the failure, finds the cause at a file and line, fixes that cause, and proves the fix with a run before and after. Use it when the user reports a bug, a crash, an error message, a regression, or wrong output and wants it fixed. Use it when the user pastes a stack trace, or says a build or a test started failing. Skip it for a question about why something fails with no fix asked for, which toby-explain covers. Skip it for a flaky test, which toby-swd-testing covers, and for slow code, which toby-optimize covers.
 
 ### toby-build
-Changes what code does in the smallest step that leaves the design at least as good as before. It proves each change with one check run before the edit and again after it. Use it when the user asks to add, build, implement, wire up, or finish a behavior. The behavior can be a feature, a ticket, an endpoint, a method, a screen, a job, or a flag. Skip it for wrong output, which toby-bug-fix covers, and for slow code, which toby-optimize covers. Skip it when behavior stays the same, which toby-refactor covers, and for a throwaway, which toby-swd-experiment covers. Skip it for a one-file edit that copies a pattern already in that file.
+Changes what code does, in slices the user can review one at a time. It proves each slice with a check run before and after the edit, and leaves the design at least as good as before. Use it when the user asks to add, build, implement, wire up, or finish a behavior, such as a feature, a ticket, an endpoint, a method, a screen, a job, a flag, a new status, or logs and metrics. Use it to add or change a feature in a plan or a spec. Skip it for wrong output, which toby-bug-fix covers, and for slow code, which toby-optimize covers. Skip it when behavior stays the same, which toby-refactor covers, and for a throwaway, which toby-swd-experiment covers. Skip it for a one-file edit that copies a pattern already in that file. Use it for a one-file edit that adds a case to a type, kind, or status branch, or changes a money or permissions rule.
 
 ### toby-code-review
-Reports the proven risks in a change and edits nothing. Use it when the user asks to review, check, or audit a diff, a PR, a commit, a branch, or the working tree. Use it when the user asks what is wrong with a change. Skip it when the user wants the code changed, which toby-refactor or toby-bug-fix covers. Skip it for a question about how code works, which toby-explain covers.
+Reports the real issues in a change or a plan and edits nothing. Use it when the user asks to review, check, or audit a diff, a PR, a commit, a branch, the working tree, a plan, or a spec. Use it when the user asks what is wrong with a change. Skip it when the user wants the code changed, which toby-refactor or toby-bug-fix covers. Skip it for a question about how code works, which toby-explain covers.
 
 ### toby-explain
-Answers a question in plain words, then stops, and edits no files. Use it when the user asks why, how, what the difference is, which option fits, or where code should go, on any subject. Use it for "walk me through", "help me understand", and any request for a clear, short, or simple explanation. Skip it when the user asks for a diagram, a chart, or a deck, which toby-artifact-style covers. Skip it when the user wants a fix, which toby-bug-fix covers.
+Answers a question in plain words, then stops, and doesn't edit files. Use it when the user asks why, how, what the difference is, which option fits, or where code should go, on any subject. Use it for "walk me through", "help me understand", and any request for a clear, short, or simple explanation. Skip it when the user asks for a diagram, a chart, or a deck, which toby-artifact-style covers. Skip it when the user wants a fix, which toby-bug-fix covers.
+
+### toby-flurry
+Brainstorm by widening from a single example to the broader set it belongs to. Trigger only when the user explicitly invokes the skill by name or with the `/toby-flurry` slash command. Don't trigger on general brainstorming language like "help me think through this," "let's explore," or "brainstorm with me."
 
 ### toby-game
-Collaborate with the user to build a single-file HTML simulation game or toy in Toby's style. Trigger only when the user explicitly invokes this skill by name or with the `/toby-game` slash command. Do not trigger on a general request to make a game, a sim, a toy, a visualizer, or a simulation.
+Collaborate with the user to build a single-file HTML simulation game or toy in Toby's style. Trigger only when the user explicitly invokes this skill by name or with the `/toby-game` slash command. Don't trigger on a general request to make a game, a sim, a toy, a visualizer, or a simulation.
 
 ### toby-learning
-Teach a subject by working through it, with the learner at the keyboard. Trigger only when the user explicitly invokes this skill by name or with the `/toby-learning` slash command. Do not trigger on a question that asks for an answer: "why is this slow", "what's the difference between", "walk me through", "help me understand". Those get a straight explanation, which `toby-explain` handles.
+Teach a subject by working through it, with the learner at the keyboard. Trigger only when the user explicitly invokes this skill by name or with the `/toby-learning` slash command. Don't trigger on a question that asks for an answer: "why is this slow", "what's the difference between", "walk me through", "help me understand". Those get a straight explanation, which `toby-explain` handles.
 
 ### toby-optimize
 Makes working code faster or lighter from a measured baseline, with one change per measurement. It covers whether a cache, a batch, a queue, or parallel work is worth what it adds. Use it when the user says code is slow, or asks to speed it up or to cut latency, memory, or query count. Use it when the user asks to add a cache to code that already works. Skip it for new behavior that includes a cache, which toby-build covers, and for wrong output, which toby-bug-fix covers. Skip it for a speed question with no change asked for, which toby-explain covers, and for a throwaway sweep, which toby-swd-experiment covers.
 
-### toby-refactor
-Changes how code is arranged or reads and keeps its behavior and tests the same. Use it when the user asks to simplify, tidy, refactor, de-duplicate, extract, split, merge, move, or rename code. Use it to add, fix, or delete comments and docstrings. Skip it when behavior should change, which toby-build, toby-bug-fix, or toby-optimize covers. Skip it when the user wants findings with no edit, which toby-code-review covers.
+### toby-plain
+Rewrites the previous reply, or a file the user points to, in plain everyday English. Trigger only when the user explicitly invokes the skill by name or with the `/toby-plain` slash command. Don't trigger on "explain this", "I don't understand", or a request to reword text, which toby-explain and toby-voice cover.
 
-### toby-flurry
-Brainstorm by widening from a single example to the broader set it belongs to. Trigger only when the user explicitly invokes the skill by name or with the `/toby-flurry` slash command. Do not trigger on general brainstorming language like "help me think through this," "let's explore," or "brainstorm with me."
+### toby-refactor
+Changes how code is arranged or reads and keeps its behavior the same. Use it when the user asks to simplify, tidy, refactor, de-duplicate, extract, split, merge, move, or rename code. Use it to switch code to a new runtime, framework, or tool chain that keeps behavior the same. Use it to add, fix, or delete comments and docstrings. Skip it when behavior should change, which toby-build, toby-bug-fix, or toby-optimize covers. Skip it when the user wants findings with no edit, which toby-code-review covers.
+
+### toby-swd-architecture
+Contains Toby's default structure for feature code and the design check for a finished diff. Use it when deciding where a feature's entry point, rules, data access, and wiring go, or when checking the structure of a diff. Skip it for a question about how existing code works, which toby-explain covers.
+
+### toby-swd-campfire
+Contains Toby's refactor before a change and the design check after it. Use it when a change lands in code that makes the change hard, or after the tests pass to check the design. Skip it when the user asks for a refactor alone, which toby-refactor covers.
 
 ### toby-swd-clarity
-Contains Toby's rules for names, comments, and docstrings inside code. Entry skills open this file by path. Do not load it from a user request alone.
+Contains Toby's rules for names, comments, and docstrings inside code. Use it when naming something in code, or writing or fixing a comment or docstring. Skip it for prose outside code, which toby-voice covers.
 
 ### toby-swd-docs
-Contains Toby's rules for a module's README.md and AGENTS.md. Entry skills open this file by path. Do not load it from a user request alone.
+Contains Toby's rules for a module's README.md and AGENTS.md. Use it when a module's structure or commands change, or when the user asks to write or update a module's README or AGENTS.md. Skip it for other prose, which toby-voice covers.
+
+### toby-swd-e2e
+Contains Toby's rules for end-to-end tests through a real entry point. Use it when writing a test that drives a route, a CLI command, a screen, or a job the way a user does. Skip it for unit tests, which toby-swd-testing covers.
 
 ### toby-swd-environment
-Classifies each command before it runs and asks before any command that changes the user's machine. Use it when the user asks to run a migration or a seed script, or to install a dependency. Use it to start or stop a server, free a port, clear a cache, or run the full test suite. Skip it for a code edit with nothing to run, and for a snapshot update, which toby-swd-testing covers.
+Classify each command before it runs and ask before any command that changes the user's machine. Use it when the user asks to run a migration or a seed script, or to install a dependency. Use it to start or stop a server, free a port, clear a cache, or run the full test suite. Skip it for a code edit that runs only focused tests, formatters, linters, or type-checks, and for a snapshot update, which toby-swd-testing covers.
 
 ### toby-swd-errors
-Contains Toby's four error steps for deciding how code handles a failure. Entry skills open this file by path. Do not load it from a user request alone.
+Contains Toby's four error steps for deciding how code handles a failure. Use it for a failure case, a retry, a timeout, or validation. Skip it for a bug in error handling that already exists, which toby-bug-fix covers.
 
 ### toby-swd-experiment
-Runs a short, reversible discovery loop while the behavior is still undecided. Use it when the user says spike, prototype, proof of concept, throwaway, try a few values, compare options, tweak settings, or let me test. The word throwaway decides the route even when the request also names retries, timeouts, or tests. Skip it for work the user intends to keep, which toby-build covers. Skip it for starting or stopping a server alone, which toby-swd-environment covers.
+Runs a short, reversible discovery loop while the user is still choosing the behavior. Use it when the user says spike, prototype, proof of concept, throwaway, try a few values, compare options, tweak settings, or let me test. Use it whenever the request says throwaway, even when it also names retries, timeouts, or tests. Skip it for work the user intends to keep, which toby-build covers. Skip it for starting or stopping a server alone, which toby-swd-environment covers.
+
+### toby-swd-extensibility
+Contains Toby's rules for code that branches on a type, kind, status, or provider. Use it when adding a case, an implementation, or a subclass, or when a conditional keeps growing. Skip it for a branch with two cases that the request doesn't extend.
+
+### toby-swd-flags
+Contains Toby's rules for a feature flag's kind, check site, tests, data, rollout, and removal. Use it when adding, rolling out, or removing a release flag, a kill switch, or an experiment flag. Skip it for a config value that isn't a flag, which toby-swd-twelve-factor covers.
+
+### toby-swd-hardening
+Contains Toby's checks that production code survives bad input, retries, outages, and deploys. Use it for a new entry point, job, consumer, or outbound call, or when the user asks to harden code. Skip it for throwaway code, which toby-swd-experiment covers.
 
 ### toby-swd-interfaces
-Contains Toby's procedure for designing a callable surface before its body. Entry skills open this file by path. Do not load it from a user request alone.
+Contains Toby's procedure for designing a function or API signature before its body. Use it for a new or changed function signature, API, or exported type. Skip it for a field added beside fields of the same kind.
 
 ### toby-swd-modules
-Contains Toby's checks for where code goes and when to split or merge modules. Entry skills open this file by path. Do not load it from a user request alone.
+Contains Toby's checks for where code goes and when to split or merge modules. Use it for a new module or boundary, or a question about where code belongs. Skip it for a change inside one function.
+
+### toby-swd-observability
+Contains Toby's rules for logs, metrics, alerts, and traces in code that runs in production. Use it when adding logging, metrics, alerts, or tracing, or a new entry point that needs them. Skip it for debug output during a bug hunt, which toby-bug-fix covers.
+
+### toby-swd-plan
+Contains Toby's rules for writing a plan as slices with checks that can fail. Use it when writing or revising a plan file. Skip it for a status update in chat.
 
 ### toby-swd-strategy
-Contains Toby's design pass, run before a change. Entry skills open this file by path. Do not load it from a user request alone.
+Contains Toby's design pass, run before a change. Use it before any change beyond one line, and before a switch to a new tool or framework. Skip it for a change that copies a pattern already in the file.
 
 ### toby-swd-testing
-Keeps tests an executable specification of behavior, and classifies a failing test before anyone edits it. Use it when the user asks to write, rewrite, delete, or weaken a test, raise coverage, update snapshots, or fix a flaky test. Skip it when production code changes too, which toby-build or toby-bug-fix covers. Skip it for a throwaway spike, which toby-swd-experiment covers, and for a run of the suite alone, which toby-swd-environment covers.
+Tests behavior through the public interface, and classifies a failing test before anyone edits it. Use it when the user asks to write, rewrite, delete, or weaken a test, raise coverage, update snapshots, or fix a flaky test. Skip it when production code changes too, which toby-build or toby-bug-fix covers. Skip it for a throwaway spike, which toby-swd-experiment covers, and for a run of the suite alone, which toby-swd-environment covers.
+
+### toby-swd-twelve-factor
+Contains Toby's twelve-factor checks for new processes, config, secrets, and backing services. Use it for a new process, worker, scheduled job, config value, secret, or backing service. Skip it for a change that adds none of these.
+
+### toby-swd-warning-signs
+Contains the warning signs in code from Martin Fowler's Refactoring. Each sign is a question, with the case where the code is fine and the refactorings that remove it. Use it when deciding what to refactor or reviewing code for design problems. Skip it for a bug, which toby-bug-fix covers.
 
 ### toby-voice
-Applies Toby's writing rules to prose and runs the voice checker on it. Use it for a substantive reply, review findings, a commit message, a PR description, a README, an AGENTS.md, a doc, a plan, or a rewrite of any text. Load it before finalizing prose, and do not wait to be asked. Use it when the user says voice, toby voice, check the voice, voice pass, or voice standards, or asks for wording or tone help. Skip it as the first skill for names and comments inside code, which toby-refactor covers.
-
+Applies Toby's writing rules to prose and runs the voice checker on it. Use it for a substantive reply, review findings, a commit message, a PR description, a README, an AGENTS.md, a doc, a plan, or a rewrite of any text. Load it before finalizing prose, and don't wait to be asked. Use it when the user says voice, toby voice, check the voice, voice pass, or voice standards, or asks for wording or tone help. Skip it as the first skill for names and comments inside code, which toby-refactor covers. Load it together with the skill for the work, such as toby-build for a change to a plan, and never in place of that skill.

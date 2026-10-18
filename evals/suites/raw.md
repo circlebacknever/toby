@@ -1,16 +1,12 @@
 # Raw-material tasks
 
-Eight outputs built from raw material: code, command output, a diff, and eval
-results. The writer forms every sentence. No task hands over a finished
-sentence to copy. These tasks were frozen on 2026-09-14, before any writer ran.
+This suite has eight tasks built from raw material: code, command output, a diff, and eval JSON. The writer forms every sentence from the raw material instead of copying pre-written prose. We froze these tasks on 2026-09-14 before running any writer.
 
-Use only what the material shows, plus arithmetic on it. Tasks 1 and 6 also
-allow standard knowledge of the tools they name.
+Use only what the material shows, plus arithmetic on it. Tasks 1 and 6 also allow standard knowledge of the tools they name.
 
 ## 1. Explanation for a self-learner
 
-The user writes: "what does an index on a database column actually do? I get
-overwhelmed by walls of text"
+The user writes: "what does an index on a database column actually do? I get overwhelmed by walls of text"
 
 Material, from Postgres on an `orders` table with 1,000,000 rows:
 
@@ -61,7 +57,7 @@ Write the chat reply.
 
 ## 3. Review finding
 
-The diff adds this to `src/retention.ts`:
+The diff adds this code to `src/retention.ts`:
 
 ```ts
 52  daysRemaining(row: AuditRow, nowMs: number): number {
@@ -123,7 +119,7 @@ Write the commit message for this staged diff:
 
 ## 5. README install section
 
-Write the `Install` section of the README: a short paragraph, then the commands.
+Write the `Install` section of the README: a short paragraph followed by the commands.
 
 Material:
 
@@ -177,8 +173,7 @@ Write the chat reply.
 
 ## 7. Naming complaint
 
-The user writes: "All the names are so bizarre and confusing. BoundFlags (the
-heck does that mean)"
+The user writes: "All the names are so bizarre and confusing. BoundFlags (the heck does that mean)"
 
 Material:
 
@@ -201,11 +196,9 @@ Write the chat reply.
 
 ## 8. Six replies in one session
 
-Reply to each message in order, as six chat turns in the same session. The
-material for each turn follows the message.
+Reply to each message in order, as six chat turns in the same session, using the material below each message.
 
-1. "One last thing to double check. Will we still generate plans as "Toby's plan
-   for [...]"? That's also important to me to maintain the comedy"
+1. "One last thing to double check. Will we still generate plans as \"Toby's plan for [...]\"? That's also important to me to maintain the comedy"
    ```
    $ grep -n "Toby's plan for" base/toby.md
    247:- Write every plan as a markdown file. Title: `Toby's plan for [task]`, with a specific and plain task name.
@@ -217,23 +210,19 @@ material for each turn follows the message.
    $ ls instructions/claude
    CLAUDE-floor.md  CLAUDE.md
    $ sed -n 2p instructions/claude/CLAUDE-floor.md
-   This file contains Toby's operating floor. The writing rules are in the Toby output style, which Claude Code loads into the system prompt.
+   The writing rules are in the Toby output style.
    $ grep -n "floor" scripts/install.sh
    238:     install_instruction_file "$ROOT/instructions/claude/CLAUDE-floor.md" "$HOME/.claude/CLAUDE.md" merge
    ```
-3. "I think it's strange that the voice checker depends on a different python
-   file?"
+3. "I think it's strange that the voice checker depends on a different python file?"
    ```
    $ grep -n "voice_rules" scripts/voice-check.py scripts/validate-skills.py
    scripts/voice-check.py:35:import voice_rules as v  # noqa: E402
    scripts/validate-skills.py:14:from voice_rules import (  # noqa: E402
    ```
-4. "Oh sorry, it looks like the app restarted to pick up an update.
-   validate-skills is like an internal tool meant to test whether the skills are
-   up to snuff. voice-check.py is like for other stuff outside"
+4. "Oh sorry, it looks like the app restarted to pick up an update. validate-skills is like an internal tool meant to test whether the skills are up to snuff. voice-check.py is like for other stuff outside"
    No new material.
-5. "Hmm Maybe we should gitignore those or something? .DS_Store is always gonna
-   be there"
+5. "Hmm Maybe we should gitignore those or something? .DS_Store is always gonna be there"
    ```
    $ head -2 .gitignore
    # macOS clutter the validator hard-fails on

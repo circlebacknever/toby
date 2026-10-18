@@ -1,38 +1,23 @@
 # Explain suite
 
-A passing answer is clear, backed by evidence, and short. This suite measures whether the
-skill delivers that or writes an essay.
-
-Four questions in `fixtures/explain-questions.md`, each answered as one turn.
-The length numbers below are measured, and everything else is read.
+A passing explanation is clear, backed by evidence, and concise. This suite tests `toby-explain` across the four questions in `fixtures/explain-questions.md`, with each question answered in a single turn.
 
 ## What a passing answer does
 
-- **Answers in the first sentence.** It does not open with context, a
-  restatement of the question, or a preview of the answer.
-- **Runs to two or three sentences** unless the question asks for depth. Q3 asks
-  for brevity outright and a long answer there is a plain failure.
-- **Backs every claim.** Code gets a path and a line. Behavior gets the output.
-  Outside facts get a source. An unbacked claim is named as a guess, in that
-  word. Q4 tests this, because "safe to remove" is a claim about behavior. A
-  passing answer checks the callers or says that the check did not run.
-- **Asks nothing back.** The answer does not quiz the reader, withhold the
-  answer, or ask "what do you think?"
-  That belongs to `toby-learning`, which fires only when invoked.
-
-- **Uses ordinary English.** A word doing a job its normal meaning does not
-  cover costs the reader a guess.
+- **Answers in the first sentence.** It starts with the answer and doesn't open with background context, a restatement of the question, or a preview.
+- **Walks through concrete steps in time order.** On mechanism questions (such as Q2), it traces what happens step by step using active verbs (`hands control`, `runs`, `resumes`) and keeps sentences under 25 words.
+- **Backs every claim.** It cites `path:line` for code claims, quotes output for runtime claims, and marks any unverified claim as a `guess`. Q4 tests whether the agent checks callers and states that the test suite hasn't run before calling a deletion safe.
+- **Never quizzes the user.** It gives the full answer directly without asking check questions, because only `/toby-learning` asks check questions.
+- **Uses everyday English.** It avoids unexplained jargon, four-noun stacks, and invented metaphors (`first-read surface`, `seam`, `lens`).
 
 ## What a failing answer looks like
 
-- Opens with a paragraph before the answer.
-- Runs past three sentences on Q1, Q3, or Q4 with no reason to.
-- Says the retry logic is safe without saying how that was checked.
-- Turns Q2 into a lesson with questions in it.
-- Coins a metaphor: a first-read surface, a seam, a lens.
+- Opens with a setup paragraph or restates the question before answering.
+- Writes a giant multi-clause paragraph for a one-sentence point, or uses passive voice that hides who acts.
+- Claims the retry wrapper is safe to delete without stating that the tests haven't run.
+- Turns Q2 into a Socratic quiz.
+- Uses a metaphor or coined term.
 
 ## Trigger note
 
-Q3 asks for the answer in a clear and concise form. That phrasing used to pull in
-`toby-swd-clarity`, whose job is naming and comments inside code. Both
-descriptions now name the boundary, and the `triggering` suite includes the probe.
+Q3 asks for a "clear and concise" explanation. That phrasing routes to `toby-explain` and must not load `toby-swd-clarity`, which covers identifier names and comments inside code.

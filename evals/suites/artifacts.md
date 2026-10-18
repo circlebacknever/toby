@@ -1,20 +1,14 @@
 # Artifact tasks
 
-Seven outputs, one for each kind of written artifact: code comments, a review, a
-plan, a diagram, slide copy, chart text, and a PR description. Each task gives
-raw material and names the skill files a writer reads before writing it. These
-tasks were frozen on 2026-09-14, before any writer ran.
+This suite has seven tasks, one for each kind of written artifact: code comments, a code review, a plan, a diagram, slide copy, chart text, and a PR description. Each task provides raw material and names the skill files the writer reads before drafting. We froze these tasks on 2026-09-14 before running any writer.
 
-Use only what the material shows, plus arithmetic on it and standard knowledge of
-the language or tool the task names.
+Use only what the material shows, plus arithmetic on it and standard knowledge of the language or tool the task names.
 
 ## 1. Code comments
 
-Skill files: `skills/toby-swd-clarity/SKILL.md`,
-`skills/toby-swd-clarity/references/examples.md`
+Skill files: `skills/toby-swd-clarity/SKILL.md`, `skills/toby-swd-clarity/references/examples.md`
 
-Add the interface docstring and any other comments this function needs. Return
-the whole function.
+Add the interface docstring and any needed inline comments to this function, and return the complete function:
 
 ```python
 def fetch_with_retry(session, url, attempts=4, base_delay=0.5):
@@ -35,14 +29,13 @@ def fetch_with_retry(session, url, attempts=4, base_delay=0.5):
 Facts:
 
 - `billing/sync.py` calls this function for the invoice API.
-- The invoice API returns 409 for a duplicate invoice, and the caller handles a
-  409 itself.
+- The invoice API returns 409 for a duplicate invoice, and the caller handles 409 responses itself.
 
 ## 2. Code review
 
 Skill file: `skills/toby-code-review/SKILL.md`
 
-Review this diff against the agreed criteria. You cannot run the code.
+Review this diff against the agreed criteria. You can't run the code in this environment.
 
 ```diff
 --- a/app/reports/views.py
@@ -83,41 +76,33 @@ Review this diff against the agreed criteria. You cannot run the code.
 
 Agreed criteria:
 
-1. A signed-in user picks a start and end date on /reports and gets a CSV
-   download containing only rows in that range. Check:
-   `pytest tests/test_export.py::test_range_filter`.
-2. A range with no rows returns a CSV with the header row and nothing else, at
-   HTTP 200. Check: `pytest tests/test_export.py::test_empty_range`.
-3. A user cannot export another account's rows. Check:
-   `pytest tests/test_export.py::test_scoping`.
+1. A signed-in user picks a start and end date on `/reports` and gets a CSV download containing only rows in that range. Check: `pytest tests/test_export.py::test_range_filter`.
+2. A date range without matching rows returns a CSV containing only the header row at HTTP 200. Check: `pytest tests/test_export.py::test_empty_range`.
+3. A user can't export another account's rows. Check: `pytest tests/test_export.py::test_scoping`.
 
 ## 3. Plan document
 
-Skill files: `skills/toby-swd-plan/SKILL.md`, its `references/example.md`, and
-the Plan Format section of the guide
+Skill files: `skills/toby-swd-plan/SKILL.md`, `skills/toby-swd-plan/references/example.md`, and the Plan Format section of the operating guide
 
 The user approved writing a plan. Write the plan document.
 
-Request: "Add per-workspace seat limits. When a workspace hits its seat cap, new
-invites should be rejected with a clear message, and admins should see the
-current usage on the billing page. Enforce it on the API too, not just the UI."
+Request: "Add per-workspace seat limits. When a workspace hits its seat cap, new invites should be rejected with a clear message, and admins should see the current usage on the billing page. Enforce it on the API too, not just the UI."
 
 Repo facts:
 
 - `api/invites.ts` defines `createInvite(workspaceId, email, actor)`.
 - `api/billing.ts` defines `getPlan(workspaceId)`, which returns `{ seatCap }`.
 - `api/members.ts` defines `countMembers(workspaceId)`.
-- `screens/Members.tsx` holds the invite form.
-- `screens/Billing.tsx` shows the plan name and price.
+- `screens/Members.tsx` renders the invite form.
+- `screens/Billing.tsx` renders the plan name and price.
 - API tests are in `tests/api/`, and `pnpm test` runs them.
 - Mode: durable implementation.
 
 ## 4. Diagram
 
-Skill file: `skills/toby-artifact-style/SKILL.md` (the section "Copy rules")
+Skill file: `skills/toby-artifact-style/SKILL.md` ("Copy rules")
 
-Write a Mermaid flowchart of the install choices, with a title, and a caption of
-at most two sentences under it.
+Write a Mermaid flowchart of the install choices, with a title sentence and a caption of at most two sentences below it.
 
 Material:
 
@@ -139,12 +124,9 @@ Without `--output-style`, the installer writes the full guide into `CLAUDE.md`.
 
 ## 5. Slide copy
 
-Skill files: `skills/toby-artifact-style/SKILL.md` (the section "Copy rules"),
-`skills/toby-artifact-style/references/decks.md` (the section "Shared slide
-content rules"), `skills/toby-artifact-style/references/copy.md`
+Skill files: `skills/toby-artifact-style/SKILL.md` ("Copy rules"), `skills/toby-artifact-style/references/decks.md` ("Shared slide content rules"), `skills/toby-artifact-style/references/copy.md`
 
-Write the copy for four content slides: a title and the body text for each. The
-deck reports this trial to the team.
+Write the copy for four content slides reporting this trial to the team, with a title sentence and body text for each slide.
 
 Material:
 
@@ -155,25 +137,21 @@ Material:
 | Opus | 5 | 3.1 | 3.6 |
 | Fable | 2 | 13.0 | 7.0 |
 
-- The current guide is 9,539 tokens. The core guide is 2,165 tokens.
-- Opus graded each output twice without knowing the guide. The two runs agreed
-  on 328 of 404 distinct failing sentences.
+- The current guide is 9,539 tokens, and the core guide is 2,165 tokens.
+- Opus graded each output twice without knowing which guide produced it, and the two runs agreed on 328 of 404 failing sentences.
 - The team adopted the core guide.
 
 ## 6. Chart text
 
-Skill files: `skills/toby-artifact-style/references/charts.md`,
-`skills/toby-artifact-style/references/copy.md`
+Skill files: `skills/toby-artifact-style/references/charts.md`, `skills/toby-artifact-style/references/copy.md`
 
-The chart is a grouped bar chart of the table in task 5: one group per writer
-model, one bar per guide. Write its title, both axis labels, the legend entries,
-a caption of at most two sentences, and the source note.
+The chart is a grouped bar chart of the table in task 5, with one group per writer model and one bar per guide. Write its title sentence, both axis labels with units, the legend entries, a caption of at most two sentences, and the source note.
 
 ## 7. PR description
 
 Skill file: `skills/toby-voice/references/examples/artifacts.md`
 
-Write the PR description for this diff.
+Write the PR description for this diff:
 
 ```diff
 --- a/skills/toby-code-review/SKILL.md
@@ -185,5 +163,4 @@ Write the PR description for this diff.
 +- **Consequence** — This line says in plain words what breaks and for whom, at file:line. An example is "The account page returns last month's balance to a logged-in user on first load (api/account.ts:42)."
 ```
 
-The change came from a review where findings were written as fragments, and the
-user could not follow them.
+In an earlier review, the agent wrote findings as sentence fragments without subjects, and the user couldn't tell which component broke.

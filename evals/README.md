@@ -1,26 +1,17 @@
 # Evals
 
-Run this before and after any change to a skill, the operating guide, or a hook.
+Run the deterministic gates before and after any change to a skill, the operating guide, or a hook:
 
 ```bash
 python3 evals/run.py gates
 ```
 
-Green means nothing regressed. Red names what did, and every number it compares
-against is in `baselines/gates.json`.
+Green means no gate regressed, and red names what failed against `baselines/gates.json`.
 
-## The two kinds of check, and why they are separate
+## Gates and model suites
 
-**Gates** run with no model. They are deterministic, they gate, and they are the
-only part safe to wire into CI. A gate that gets worse fails the run. A gate that
-gets better is recorded on purpose with `evals/run.py record`, which makes the
-improvement permanent.
-
-**Model suites** need a subagent to write something, so they can't gate. They
-record a distribution and never a score. Five samples of the voice suite on
-byte-identical inputs scored 1, 1, 4, 4, and 11. A single run of it proves
-nothing, and two runs of it once produced a confident wrong answer that five
-runs reversed.
+- **Gates** run without a model and exit 1 when a metric gets worse. Record an intentional improvement with `python3 evals/run.py record`.
+- **Model suites** prompt a subagent to write prose or review code, so they record a distribution across multiple samples (`Five samples of the voice suite on identical inputs scored 1, 1, 4, 4, and 11`).
 
 ## Gates
 
@@ -28,56 +19,30 @@ runs reversed.
 |---|---|
 | validator errors | a banned word, a broken sync, a skill naming the guide by path, a description with a skill name split across a line wrap |
 | warning counts by class | a new foil, a sentence over the ceiling, a buried lead, a missing skip clause, a cross-skill sentence collision, a coined term |
-| body tokens per skill | a body that grew more than 10 percent |
-| co-load tokens per routing group | a group that grew more than 5 percent, because the group total is the token count a task loads |
-| lost rules | a sentence that left the repo with no reworded survivor |
-| validator fixtures | a check in `validate-skills.py` that stopped being able to fail |
+| body tokens per skill | a skill body that grew more than 10 percent |
+| co-load tokens per routing group | a routing group that grew more than 5 percent |
+| lost rules | a sentence deleted from `skills/` with no reworded survivor |
+| validator fixtures | a check in `validate-skills.py` that stopped failing on a seeded error |
 | stop hook fixtures | the voice hook missing a seeded break, or firing on a clean reply |
-| instruction sync | a copy of the guide edited instead of `base/toby.md` |
+| instruction sync | a synced copy of the guide drifting from `base/toby.md` |
 
-`--slow` adds the install smoke test, which installs into a throwaway HOME.
+Pass `--slow` to run the install smoke test in a temporary `HOME` directory.
 
-The lost-rules gate compares against `baselines/rules.txt`, a snapshot of every
-prose sentence in `skills/`. It reads zero accepted deletions today, because the
-snapshot was retaken once the skill work merged. Re-take it with
-`python3 scripts/rule-inventory.py > evals/baselines/rules.txt` followed by
-`evals/run.py record`, and only after reading what the gate reported.
-
-The gate holds a list, and not a count. A deletion arriving the same
-week as a rewording keeps the count still and swaps the contents, so the
-baseline is the sentences themselves. It also demands a complete match for a
-sentence under eight content words: three common words appearing in an unrelated
-sentence clear a 60 percent overlap on their own, and "Mock external
-dependencies at the system boundary" survived exactly that way while the rule
-was gone.
+The lost-rules gate compares the current prose sentences in `skills/` against `baselines/rules.txt`. When a rewording or deletion is intentional, update the snapshot with `python3 scripts/rule-inventory.py > evals/baselines/rules.txt` followed by `python3 evals/run.py record`.
 
 ## Checking prose by hand
 
-`scripts/voice-check.py` runs the pattern checks against a file, a directory,
-or stdin. It splits findings into FIX and DECIDE. A FIX finding needs no
-judgement and makes the run exit 1. The checker prints each DECIDE sentence,
-and a DECIDE finding never fails the run. The checker then prints READ, the
-rules the patterns don't check.
+`scripts/voice-check.py` runs the pattern checks against a file, directory, or stdin:
 
-`tests/test-voice-recall.py` reads every file in `evals/gold/`. For each file, it reports these counts:
+- `FIX` findings break a rule with no judgment call and make the checker exit 1.
+- `DECIDE` findings flag likely breaks for the writer to verify and never fail the run.
+- `READ` lists the 18 rules that regex patterns can't check.
 
-- the gold sentences that get a FIX or DECIDE finding
-- the FIX findings that are on bad rows
-
-Each row's `labeled_by` field says who set its label. The user set some labels, two agents set the labels they agreed on under the current guide, and a guide rule set one. Rows the two agents disagreed on are `unknown`.
-
-`heldout.jsonl` holds sentences that use each FIX trigger word. They were written for this test and never used to tune a pattern, so the file reports precision and never fails the run.
-
-The split exists because the two get handled differently, and because readers learn
-to ignore a single undifferentiated list. Most DECIDE
-findings are real.
+`tests/test-voice-recall.py` runs the checker across `evals/gold/*.jsonl` and reports how many bad rows trigger `FIX` or `DECIDE`, while failing if any non-heldout `"good"` row triggers `FIX`. `evals/gold/heldout.jsonl` tests literal uses of trigger words to measure precision.
 
 ## Token budget
 
-`scripts/token-budget.py` prints what a turn costs, split into what is resident
-before anything fires, what a firing skill adds, and what opening a reference
-adds on top. The gates hold the per-skill and per-group ceilings. This report prints the
-per-turn token counts behind those ceilings.
+`scripts/token-budget.py` prints the token cost of the resident operating guide, each loaded skill body, and its reference files.
 
 ## Model suites
 
@@ -87,137 +52,32 @@ python3 evals/run.py prompt voice        # hand this to a subagent, once per sam
 python3 evals/run.py compare voice evals/results/voice-*.md
 ```
 
-`compare` prints both distributions and refuses to call a difference real when
-the ranges overlap.
+`compare` prints both distributions and reports a difference only when the sample ranges don't overlap.
 
 | Suite | What it measures | Scored by | Minimum samples |
 |---|---|---|---|
-| `triggering` | which skills a description makes fire, across four positive and six over-triggering prompts | `evals/run.py compare triggering` | 2 |
-| `voice` | banned words, foils, sentence length, clause welds in four written outputs | `scripts/score-voice.py` | 5 |
-| `content` | slogans, claim headings, deck titles, contributor rules, and six chat turns in a row, where register drifts | `scripts/voice-check.py` on each output, then the `content-judge` suite | 5 |
-| `content-judge` | every distracting sentence across the `content` and `voice` results, what passed, and the sentence types the writers produce | a person, reading the judge's file | 1 |
-| `holdout` | the same kinds of output on a product, an incident, and a chat session no rule was tuned against, so a change that only fixes the `content` suite shows up as no change here | a blind `holdout-judge` run over both conditions | 5 |
-| `holdout-judge` | distracting sentences across renamed `holdout` files, where the names don't say which rules wrote each file | a person, with the name key kept outside the repo | 1 |
-| `review` | whether a review catches three seeded defects and reports them the way the skill specifies | a person, against `suites/review.md` | 1 |
-| `feature-dev` | whether the process a request gets matches its size | a person, against `suites/feature-dev.md` | 1 |
-| `learning` | whether a beginner gets taught in steps without a wall of text | a person, against `suites/learning.md` | 1 |
-| `explain` | whether an answer is short, backed, and leads with the answer | a person, against `suites/explain.md` | 1 |
-
-### Recorded results
-
-`baselines/triggering.json` — seven false firings across the over-triggering
-probes before Group 2, zero after, confirmed by a second run whose instructions
-never mentioned skip clauses. The skip-clause pass removed those seven false firings.
-
-N5 and N6 cover `toby-game` and `toby-flurry`, which fire only when the user
-names them. Both stayed silent on a prompt containing every trigger noun in their
-descriptions. `check_invoke_only` in the validator holds the same rule from the
-other side: each of them must state it in its description and have a matching
-invoke-only line in the guide's Skill Routing, and the guide may not route
-either on conditions.
-
-Each scenario has a fenced block of directives — `Required`, `Forbidden`,
-`Optional`, `Exactly one of` — and the runner scores against those. The agent
-writing a run reports only what fired. It used to report its own totals while
-being told not to read the expected sets, so it guessed them, and one run
-counted a correct firing on N1 as a false fire.
-
-`baselines/voice.json` — four arms, none of them separated. Reference loaded:
-1, 1, 4, 4, 11. No reference: 8, 8, 12, 4, 3. Writing-sections extract: 7, 9.
-Extract plus Self Review: 5, 4. **The duplicated operating guide stays because
-it is the status quo, and for no stronger reason.** Anyone reopening that
-question needs a lower-variance measure first, because more samples from this
-suite won't separate the arms.
-
-`baselines/feature-dev.json` — a copy change and a seat-limit feature run
-through the skill. The skill sized the copy change as tactical and declined it
-under the skip clause. The seat limits came back strategic on two triggers at
-once. The run also said the tactical row is still heavy for a one-line copy
-change, which is why the sizing section now says to check the skip clause before
-sizing anything.
-
-`baselines/explain.json` — three runs of the same four questions. The evidence
-rule held from the first run: every claim cited a path and a line, and "safe
-to remove" came back as a guess with the missing test run named. The length rule
-took two tries. Written as prose, the rule changed nothing, and a 42-word
-sentence still appeared in the output. Written as three numbered limits with a word count in them, the
-beginner question went from 108 words and two clause welds to 59 words and none.
-
-`baselines/review.json` — the same seeded diff before and after the compliance
-pass. The old skill caught the bug and bundled the two missing tests into one
-line. The new one named each criterion as its own finding and caught a fourth
-defect, and it routed a security bug to `toby-swd-interfaces`, which owns
-nothing about it. The frame now says a bug needs no routing, so a later run
-repeating that is a regression.
-
-## The coined-term check
-
-Rule 14 of `plain-language.md` says never invent a term, and this check holds it.
-Every entry in `COINED_TERMS` was written in this repo and then flagged by a
-reader who had to stop and work out what was meant. Each one is a real English
-word, so the banned list and the sense-scoped list both pass it, and no other
-check sees it.
-
-`primitive` was tried and removed. It is a real term in graphics and in
-programming, and every hit was correct usage. Add a term only after it has
-confused a reader here.
-
-## The figurative-frame check
-
-This check enforces the guide's ban on invented metaphor. It catches the
-commonest invented metaphor in this repo, which describes an abstract thing as
-if it had a body or clothes.
-
-Every frame in `FIGURATIVE_FRAMES` was written in this repo, and the fixtures in
-`tests/test-validator-checks.py` quote four of them.
-
-The list holds frames, not subjects, so the check misses a new metaphor built
-from a frame nobody has used yet. A reader is the only check for that one.
-
-`moving parts` was tried and left out. It is a dead metaphor, it is in the
-dictionary, and the guide keeps established terms of art.
-
-## The nine `shape` warnings that stay
-
-`toby-artifact-style` names real geometry: a logo primitive, a decorative
-triangle, the outline a drag coefficient belongs to. The sense-scoped rule bans
-`shape` as an intensifier, and in that skill the word means literal geometry. They stay as
-warnings so the count catches a tenth one, which would be a new abstraction
-and not another triangle.
-
-## What the voice scorer can't see
-
-It counts banned words, invented foils, sentence length, and clause welds. It
-doesn't read register. On the sample that scored 11, two flagged foils were
-distinctions the writer needed: "per-account, where it was per-route-per-account"
-describes a real behavior change. Wording that breaks no rule but doesn't
-sound like Toby passes every check in the file. A category noun stands
-where a concrete one belongs, and `move`, `form`, and `frame` do the work
-`habit` and `sentence` should do. That failure is found by reading, and the suite
-doesn't find it.
-
-## Adding a case
-
-**A gate**, when the thing is deterministic: add the check to
-`scripts/validate-skills.py`, add a fixture either side of it in
-`tests/test-validator-checks.py`, add its warning kind to `warning_classes()` in
-`run.py`, then `evals/run.py record`. Prove it fails before you record it.
-
-**A model suite**, when the thing needs writing: add the cases to
-`suites/<name>.md`, add an entry to `SUITES` in `run.py` with its prompt and its
-minimum sample count, run it that many times, and record the distribution in
-`baselines/<name>.json`. Set the minimum from the spread you measure, and not
-from what is convenient.
+| `triggering` | which skills fire across 25 positive and 7 over-triggering prompts | `evals/run.py compare triggering` | 2 |
+| `voice` | banned words, foils, sentence length, and clause welds in six outputs | `scripts/score-voice.py` | 5 |
+| `content` | slogans, claim headings, deck titles, contributor rules, and six chat turns | `scripts/voice-check.py`, then `content-judge` | 5 |
+| `content-judge` | distracting sentences across `content` and `voice` outputs | a person reading the judge output | 1 |
+| `holdout` | six outputs on a product, incident, and chat session no rule was tuned against | a blind `holdout-judge` run | 5 |
+| `holdout-judge` | distracting sentences across blinded `holdout` outputs | a person with the key outside the repo | 1 |
+| `review` | whether code review catches seeded defects in the required format | a person against `suites/review.md` | 1 |
+| `feature-dev` | whether `toby-build` sizes a copy edit and a multi-screen feature accurately | a person against `suites/feature-dev.md` | 1 |
+| `learning` | whether `toby-learning` teaches a beginner in short interactive turns | a person against `suites/learning.md` | 1 |
+| `explain` | whether `toby-explain` answers first, cites evidence, and stays concise | a person against `suites/explain.md` | 1 |
 
 ## Layout
 
-```
+```text
 evals/
   run.py             the runner
-  suites/            the cases, one file per suite
-  fixtures/          inputs a suite gives to a subagent
-  baselines/         recorded numbers, and runs/ for the outputs behind them
-  results/           scratch from a run, ignored by git
-  boundaries.md      which skill owns which decision, behind the skip clauses
-  grading.md         the before-and-after write-up for the Group 2 and 8 changes
+  suites/            the evaluation tasks, one file per suite
+  fixtures/          inputs handed to subagents
+  gold/              labeled good and bad sentences for voice recall and precision
+  rubric/            pass and fail criteria for human and LLM graders
+  baselines/         recorded gate metrics and baseline runs
+  results/           scratch outputs from a run, ignored by git
+  boundaries.md      skill routing ownership and skip-clause coverage
+  grading.md         before-and-after summary for triggering and code review
 ```
