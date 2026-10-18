@@ -34,8 +34,7 @@ finds a different subset each time.
 
 ## Wire up the hooks
 
-Run `scripts/install.sh --hooks --tool claude` and it prints this block with the
-paths filled in. To write it by hand, add this to `~/.claude/settings.json`:
+Run `scripts/install.sh --hooks --write-settings` to copy the hooks to `~/.claude/toby/hooks`, back up `~/.claude/settings.json` to `settings.json.bak`, and merge the hook entries. Run `scripts/install.sh --hooks` without `--write-settings` to print this block with the paths filled in, or add it to `~/.claude/settings.json` by hand:
 
 ```json
 {

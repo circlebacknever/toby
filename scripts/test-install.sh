@@ -145,15 +145,43 @@ else
   pass total "running the checker left the skill folders unchanged"
 fi
 
-# --- 2. re-install without --force must refuse -------------------------------
-# README promises an existing toby-* stays put unless forced. Untested, that
-# promise is the one that quietly overwrites someone's work.
+# --- 2. unmodified re-install updates; modified skill refuses -----------------
 
 if install_into "$FRESH" --tool claude >/dev/null 2>&1; then
-  flunk safety "re-install without --force overwrote existing skills"
+  pass update "unmodified re-install updates without --force"
 else
-  pass safety "re-install without --force refuses"
+  flunk update "unmodified re-install refused without --force"
 fi
+
+# Simulate a skill from an earlier install whose digest is recorded in
+# .toby-manifest: re-running without --force must update it to the repo copy.
+printf 'older repo version\n' > "$FRESH/.claude/skills/toby-voice/SKILL.md"
+python3 - "$FRESH/.claude/skills/toby-voice" "$FRESH/.claude/.toby-manifest" <<'PY'
+import hashlib, sys
+from pathlib import Path
+skill = Path(sys.argv[1])
+manifest = Path(sys.argv[2])
+h = hashlib.sha256()
+for p in sorted(skill.rglob("*")):
+    if p.is_file() and ".DS_Store" not in p.parts and "__pycache__" not in p.parts:
+        h.update(p.relative_to(skill).as_posix().encode() + b"\0" + p.read_bytes() + b"\0")
+lines = [l for l in (manifest.read_text().splitlines() if manifest.exists() else []) if not l.startswith("toby-voice\t")]
+lines.append(f"toby-voice\t{h.hexdigest()}")
+manifest.write_text("\n".join(lines) + "\n")
+PY
+if install_into "$FRESH" --tool claude >/dev/null 2>&1 && diff -q "$ROOT/skills/toby-voice/SKILL.md" "$FRESH/.claude/skills/toby-voice/SKILL.md" >/dev/null 2>&1; then
+  pass update "stale unmodified skill updates without --force"
+else
+  flunk update "stale unmodified skill did not update without --force"
+fi
+
+printf 'hand edit\n' >> "$FRESH/.claude/skills/toby-voice/SKILL.md"
+if install_into "$FRESH" --tool claude >/dev/null 2>&1; then
+  flunk safety "modified skill was overwritten without --force"
+else
+  pass safety "modified skill refuses without --force"
+fi
+install_into "$FRESH" --tool claude --force >/dev/null 2>&1
 
 # A conflict in one tool must stop the install for every tool before anything is
 # written, and the message must list every conflicting file.
@@ -289,6 +317,101 @@ if grep -q "banned word 'robust'" <<<"$hook_out"; then
   pass hooks "write hook runs the skill's checker and skips the old lone copy"
 else
   flunk hooks "the installed write hook did not flag a banned word"
+fi
+
+# --- 5. switching from --output-style back to default removes the style -------
+
+if ! install_into "$STYLE_HOME" --tool claude >/dev/null 2>&1; then
+  flunk claude "switching back to default refused on an unmodified install"
+elif [[ -e "$STYLE" || -L "$STYLE" ]]; then
+  flunk claude "switching back to default left $STYLE on disk"
+elif ! grep -q '^## Five Tests$' "$STYLE_MD"; then
+  flunk claude "switching back to default did not restore the full guide in CLAUDE.md"
+else
+  pass claude "switching from --output-style back to default removes output style file"
+fi
+
+# --- 6. auto-detect installed tools and comma-separated --tool ----------------
+
+AUTO_HOME="$TMP_ROOT/autodetect"
+mkdir -p "$AUTO_HOME/.claude" "$AUTO_HOME/.kiro"
+if install_into "$AUTO_HOME" >/dev/null 2>&1 \
+  && [[ -f "$AUTO_HOME/.claude/skills/toby-voice/SKILL.md" ]] \
+  && [[ -f "$AUTO_HOME/.kiro/skills/toby-voice/SKILL.md" ]] \
+  && [[ ! -e "$AUTO_HOME/.codex" && ! -e "$AUTO_HOME/.copilot" ]]; then
+  pass tools "omitting --tool installs only detected tool homes"
+else
+  flunk tools "omitting --tool did not restrict install to detected tool homes"
+fi
+
+MULTI_HOME="$TMP_ROOT/multi"
+if install_into "$MULTI_HOME" --tool claude,codex >/dev/null 2>&1 \
+  && [[ -f "$MULTI_HOME/.claude/skills/toby-voice/SKILL.md" ]] \
+  && [[ -f "$MULTI_HOME/.codex/skills/toby-voice/SKILL.md" ]] \
+  && [[ ! -e "$MULTI_HOME/.copilot" && ! -e "$MULTI_HOME/.kiro" ]]; then
+  pass tools "--tool claude,codex installs selected tools"
+else
+  flunk tools "--tool claude,codex did not install the selected tools"
+fi
+
+# --- 7. --link symlinks skills and output style to the checkout ---------------
+
+LINK_HOME="$TMP_ROOT/link"
+if install_into "$LINK_HOME" --tool claude --link --output-style >/dev/null 2>&1 \
+  && [[ -L "$LINK_HOME/.claude/skills/toby-voice" ]] \
+  && [[ "$(readlink "$LINK_HOME/.claude/skills/toby-voice")" == "$ROOT/skills/toby-voice" ]] \
+  && [[ -L "$LINK_HOME/.claude/output-styles/toby.md" ]] \
+  && [[ "$(readlink "$LINK_HOME/.claude/output-styles/toby.md")" == "$ROOT/output-styles/toby.md" ]]; then
+  pass link "--link symlinks skills and output style to repo"
+else
+  flunk link "--link did not symlink skills and output style to repo"
+fi
+
+# --- 8. standalone --hooks, Usage synopsis, and --write-settings --------------
+
+help_out="$("$ROOT/scripts/install.sh" --help)"
+if grep -q '^Usage: .*--hooks' <<<"$help_out"; then
+  pass hooks "--help lists --hooks in Usage"
+else
+  flunk hooks "--help omits --hooks from Usage"
+fi
+
+HOOKS_ONLY="$TMP_ROOT/hooks_only"
+mkdir -p "$HOOKS_ONLY/.claude"
+printf '{"theme": "dark"}\n' > "$HOOKS_ONLY/.claude/settings.json"
+if install_into "$HOOKS_ONLY" --hooks --write-settings >/dev/null 2>&1 \
+  && [[ -f "$HOOKS_ONLY/.claude/toby/hooks/voice-write-check.py" ]] \
+  && [[ ! -e "$HOOKS_ONLY/.claude/skills" && ! -e "$HOOKS_ONLY/.codex" ]] \
+  && [[ -f "$HOOKS_ONLY/.claude/settings.json.bak" ]] \
+  && grep -q '"theme": "dark"' "$HOOKS_ONLY/.claude/settings.json" \
+  && grep -q 'voice-write-check.py' "$HOOKS_ONLY/.claude/settings.json" \
+  && grep -q 'voice-stop-check.py' "$HOOKS_ONLY/.claude/settings.json"; then
+  pass hooks "--hooks alone skips other tools and --write-settings merges settings.json"
+else
+  flunk hooks "--hooks alone or --write-settings failed"
+fi
+
+# --- 9. --status and --uninstall ----------------------------------------------
+
+status_ok=0
+status_out="$(install_into "$FRESH" --status 2>&1)" || status_ok=$?
+printf 'drift\n' >> "$FRESH/.claude/skills/toby-voice/SKILL.md"
+drift_rc=0
+drift_out="$(install_into "$FRESH" --status 2>&1)" || drift_rc=$?
+if [[ "$status_ok" -eq 0 && "$status_out" == *"in sync"* && "$drift_rc" -ne 0 && "$drift_out" == *"out of sync"* ]]; then
+  pass status "--status reports sync and drift"
+else
+  flunk status "--status did not report sync and drift"
+fi
+
+if install_into "$MERGE" --tool claude --uninstall >/dev/null 2>&1 \
+  && [[ ! -e "$MERGE/.claude/skills/toby-voice" ]] \
+  && ! grep -q '<!-- BEGIN TOBY INSTRUCTIONS -->' "$MERGE/.claude/CLAUDE.md" \
+  && grep -q 'Keep this line.' "$MERGE/.claude/CLAUDE.md" \
+  && grep -q 'Keep this trailing line too.' "$MERGE/.claude/CLAUDE.md"; then
+  pass uninstall "--uninstall removes Toby files and keeps user notes"
+else
+  flunk uninstall "--uninstall failed to remove Toby files or lost user notes"
 fi
 
 if [[ "$fail" -ne 0 ]]; then

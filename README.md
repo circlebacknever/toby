@@ -30,14 +30,18 @@ Kiro reads steering with `inclusion: always`. Everyone else gets a marked instru
 ```sh
 git clone https://github.com/circlebacknever/toby
 cd toby
-scripts/install.sh --dry-run --tool all          # show what would change
-scripts/install.sh --tool all                    # install for every tool
-scripts/install.sh --tool all --force            # replace Toby files already there
+scripts/install.sh --dry-run                     # show what would change for detected tools
+scripts/install.sh                               # install or update detected tools
+scripts/install.sh --tool all                    # install for every supported tool
+scripts/install.sh --tool all --link             # symlink skills to this checkout
+scripts/install.sh --tool all --force            # overwrite local skill edits and unmarked files
+scripts/install.sh --status                      # check whether installed files match the repo
+scripts/install.sh --uninstall                   # remove Toby files and instruction blocks
 ```
 
-The installer checks every target before it writes anything. If a Toby skill
-folder already exists, or an instruction file doesn't have a Toby marker block, it lists
-each one and stops with nothing changed. A dry run lists the same files.
+When you omit `--tool`, the installer targets the supported tools whose home folders already exist (`~/.codex`, `~/.claude`, `~/.copilot`, `~/.kiro`). Pass `--tool all` to install for every tool, or pass comma-separated names such as `--tool claude,codex`.
+
+The installer checks every target before it writes anything, and it updates unmodified Toby skills and marked instruction blocks in place. If you hand-edited an installed skill or an instruction file lacks the Toby markers, the installer lists each conflict and stops. A dry run lists the same files.
 
 One tool at a time:
 
@@ -62,15 +66,16 @@ python3 ~/.copilot/skills/toby-voice/scripts/voice-check.py draft.md --review
 `--review` prints every prose sentence with its findings under it. Without it,
 the checker prints the findings and the READ list.
 
-The two hooks are Claude Code only, so they have their own flag:
+The two hooks are Claude Code only, so they have their own flags:
 
 ```sh
-scripts/install.sh --hooks --tool claude
+scripts/install.sh --hooks
+scripts/install.sh --hooks --write-settings
 ```
 
-That copies both hooks to `~/.claude/toby/hooks`, then prints the `settings.json`
-block to paste, with the paths already filled in. It doesn't edit
-`settings.json` itself. Merge the block with any hooks already there.
+`--hooks` copies both hooks to `~/.claude/toby/hooks` and prints the `settings.json`
+block to paste, with the paths already filled in. Add `--write-settings` to back up
+`~/.claude/settings.json` to `settings.json.bak` and merge the hook entries automatically.
 
 Without being asked, the agent runs the voice checker on every prose file a turn wrote,
 because the operating guide's Self Review tells it to. The agent fixes everything under FIX and
@@ -140,7 +145,7 @@ The installer edits one marked block and leaves the rest of the file alone:
 <!-- END TOBY INSTRUCTIONS -->
 ```
 
-When the block is already there, only the block changes. When there is no block, the installer waits for `--force` before it adds anything. Skill folders follow the same rule, so an existing `toby-*` folder stays until you pass `--force`.
+When the block is already there, only the block changes. When there is no block, the installer waits for `--force` before it adds anything. Unmodified `toby-*` skill folders update in place, and a hand-edited `toby-*` folder stays until you pass `--force`.
 
 ## Files
 
@@ -251,7 +256,7 @@ scripts/test-install.sh
 
 It installs into a throwaway `HOME`, then checks what it installed. Skill counts are read from the repo, so adding a skill can't leave the test quietly red. Every installed skill is compared byte-for-byte against `skills/`, and every instruction block is compared against `base/toby.md`.
 
-It also tests the installer's marker-block and `--force` rules described above. A re-install without `--force` must refuse, text around a marker block must survive, and a file with no marker block must come back untouched. The temp dirs clear on the way out.
+It also tests the installer's marker-block and `--force` rules described above. Unmodified skills update in place, a hand-edited skill refuses without `--force`, text outside the markers survives, and an unmarked file stays untouched. The temp dirs clear on the way out.
 
 ## Making it yours
 
