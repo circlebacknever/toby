@@ -60,10 +60,15 @@ from voice_fixes import fix_for  # noqa: E402
 
 WELD_RE = re.compile(r"\w\s+—\s+\w|\w;\s+\w")
 LABEL_DASH_RE = re.compile(r"^(?:[-*]\s+)?\**[A-Z][\w-]*(?:\s[\w-]+)?\**\s+—$")
-BARE_PRONOUN_RE = re.compile(r"\b(This|That)\s+(is|was|means|makes|leaves|gets|costs|holds)\b")
+BARE_PRONOUN_RE = re.compile(
+    r"\b(This|That)\s+(is|was|means|makes|leaves|gets|costs|holds|explains|puts|belongs|"
+    r"happens|assumes|shows|causes|prevents|breaks|fails|gives|lets|keeps|turns|requires|"
+    r"allows|fixes|checks|covers|applies|proves)\b"
+)
 CLOSING_OFFER_RE = re.compile(
     r"\b(hope this helps|let me know if|feel free|don'?t hesitate|happy to help|reach out)\b", re.I
 )
+CLI_CLEAN_RE = re.compile(r"\b(?:make|git|cargo|npm|yarn|pnpm|gradle|mvn|go|brew)\s+clean\b", re.I)
 
 # READ_RULES lists the broken patterns that the checks in voice_rules.py cannot
 # find, in the order the READ group prints them. Each entry is the pattern's
@@ -167,9 +172,15 @@ class Finding(NamedTuple):
 
     def text(self) -> str:
         how, fine = fix_for(self.pattern)
-        lines = [f"{self.source}:{self.line}  broken pattern: {self.rule}", f"      {self.sentence}", f"      Fix: {how}"]
-        if self.bucket == "decide" and fine:
-            lines.append(f"      Fine when: {fine}")
+        tag = "FIX — mandatory rewrite" if self.bucket == "fix" else "DECIDE — rewrite unless 'Fine when' holds"
+        lines = [
+            f"{self.source}:{self.line}  [{tag}] broken pattern: {self.rule}",
+            f"      {self.sentence}",
+            f"      Fix: {how}",
+        ]
+        if self.bucket == "decide":
+            when = fine or "Never in normal prose; keep only if the matched words are a literal technical term or quote."
+            lines.append(f"      Fine when: {when}")
         return "\n".join(lines)
 
 
@@ -281,7 +292,29 @@ def undefined_term_findings(text: str, label: str) -> list[Finding]:
 
 # These forms are certain enough to fail the run. Each one is a construction
 # the guide bans outright, and a match is almost never correct prose.
-FIX_FORMS = {"negation on a noun"}
+FIX_FORMS = {
+    "closing offer",
+    "code given senses",
+    "coined name",
+    "count before the items",
+    "deferred antecedent",
+    "double negation",
+    "doubled verb",
+    "dramatic word",
+    "either with no or",
+    "file as the actor",
+    "importance flag",
+    "negation on a noun",
+    "opening phrase that frames the evidence",
+    "picture word",
+    "punchline closer",
+    "reflexive for emphasis",
+    "relation word with its other half missing",
+    "rule as the actor",
+    "sentence about the reply",
+    "sentence that announces the next one",
+    "stock admission",
+}
 
 
 def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
@@ -293,7 +326,7 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
     def add(bucket, rule, offset, pattern):
         line = v.line_for_offset(text, offset)
         name = "fix" if bucket is fix else "decide"
-        bucket.append(Finding(label, name, line, rule, sentence_at(text, offset), pattern))
+        bucket.append(Finding(label, name, line, rule, sentence_at(raw, offset), pattern))
 
     if not defining:
         for word in tiers["hard"]:
@@ -302,6 +335,8 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
             for m in re.finditer(rf"(?<![A-Za-z/._=-]){re.escape(word)}(?![A-Za-z/._=-])", text, re.I):
                 line_start = text.rfind("\n", 0, m.start()) + 1
                 if text.count('"', line_start, m.start()) % 2 == 1:
+                    continue
+                if word == "clean" and CLI_CLEAN_RE.search(text[max(0, m.start() - 10) : m.end() + 2]):
                     continue
                 add(fix, f"banned word {m.group(0)!r}", m.start(), "banned word")
         # One foil finding per line, because the older CONTRAST_PATTERNS and
@@ -365,9 +400,10 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
         sentence = sentence_at(text, m.start())
         if not v.CONTRAST_RE.search(sentence):
             decide.append(Finding(label, "decide", v.line_for_offset(text, m.start()), "intensifier with no contrast",
-                                  sentence, "intensifier with no contrast"))
+                                  sentence_at(raw, m.start()), "intensifier with no contrast"))
     for m in BARE_PRONOUN_RE.finditer(text):
         add(decide, f"bare this or that {m.group(1).lower()!r}", m.start(), "bare this or that")
+    raw_lines = raw.splitlines()
     for number, form, excerpt in v.slogan_findings(text):
         # The guide lists the dramatic words to ban them, like the banned words.
         if defining and form == "dramatic word":
@@ -382,8 +418,9 @@ def findings(raw: str, label: str, defining: bool = False) -> list[Finding]:
             spans = [m.span() for m in re.finditer(r'"[^"\n]+"', line_text)]
             hits = [m.start() for p, f in v.PREDICTED_PATTERNS if f == form for m in p.finditer(line_text)]
             quoted = bool(hits) and all(any(a <= h < b for a, b in spans) for h in hits)
-        bucket = "fix" if form in FIX_FORMS and not quoted else "decide"
-        (fix if bucket == "fix" else decide).append(Finding(label, bucket, number, form, excerpt[:200], form))
+        bucket = "fix" if (form in FIX_FORMS and not quoted and not defining) else "decide"
+        shown_excerpt = " ".join(raw_lines[number - 1].split()) if number <= len(raw_lines) else excerpt
+        (fix if bucket == "fix" else decide).append(Finding(label, bucket, number, form, shown_excerpt[:200], form))
 
     for number, paragraph in v.prose_paragraphs(text):
         count = len(v.sentences_in(" ".join(paragraph.split())))
@@ -455,7 +492,12 @@ def review(sources: list[tuple[str, str]], found: list[Finding]) -> None:
                 count += 1
                 print(f"  {label}:{number}  {count:>3}. {' '.join(sentence.split())[:300]}")
             for finding in by_line.pop((label, number), []):
+                how, fine = fix_for(finding.pattern)
                 print(f"        {finding.bucket.upper()}  {finding.rule}")
+                print(f"          Fix: {how}")
+                if finding.bucket == "decide":
+                    when = fine or "Never in normal prose; keep only if the matched words are a literal technical term or quote."
+                    print(f"          Fine when: {when}")
         print()
     print_patterns(found)
 
@@ -499,7 +541,7 @@ def main() -> int:
         return 1 if all_fix else 0
 
     if all_fix:
-        print(f"FIX  ({len(all_fix)}) — each finding names a broken writing pattern and quotes the sentence that has it. "
+        print(f"FIX  ({len(all_fix)}) — mandatory rewrites. Every finding below is an unconditional voice break. "
               "Rewrite every sentence in this group.\n")
         for finding in all_fix:
             print(f"  {finding.text()}\n")
@@ -509,12 +551,11 @@ def main() -> int:
         print_patterns(all_fix)
         return 1 if all_fix else 0
     if all_decide:
-        print(f"DECIDE  ({len(all_decide)}) — each finding names a broken writing pattern that the checker "
-              "may have matched by mistake. Read each sentence. Apply its fix, unless its \"Fine when\" line "
-              "describes the sentence, and then say which case applies.\n")
+        print(f"DECIDE  ({len(all_decide)}) — conditional rewrites. Rewrite every sentence below using its Fix line, "
+              "unless its \"Fine when\" line literally describes that sentence.\n")
         for finding in all_decide:
             print(f"  {finding.text()}\n")
-        print("  Most of these are real. Don't dismiss the group.\n")
+        print("  Most of these are real. Rewrite every sentence where \"Fine when\" does not hold.\n")
     print_patterns(all_fix + all_decide)
     if not all_fix and not all_decide:
         print("The patterns matched nothing. The broken patterns below still need a read.\n")

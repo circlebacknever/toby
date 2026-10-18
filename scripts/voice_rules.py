@@ -77,7 +77,7 @@ CONTRAST_PATTERNS = [
 # voice-check.py puts these matches in FIX, and hooks/voice-stop-check.py blocks
 # a reply on them, so both checks use a form added here.
 FOIL_PATTERNS = [
-    (re.compile(r",\s+not\s+(?:a|an|the|just|only|because|to|for|from|in|on|by|its|his|her|their|my|your)\b"),
+    (re.compile(r",\s+not\s+(?:a|an|the|just|only|because|to|for|from|in|on|by|per|with|at|as|under|over|without|through|across|between|after|before|its|his|her|their|my|your)\b"),
      "invented foil"),
     (re.compile(r"—\s*not\s"), "invented foil"),
     # "The fixture is built, not run." The rejected half is one word before the
@@ -148,6 +148,8 @@ TIC_PATTERNS = [
     (re.compile(SENTENCE_START + r"This (?:relates|maps|corresponds|ties|applies) to (?:problem|item|rule|step|group|criterion|finding)s? "
                 r"\d+(?: and \d+)?\.", re.M),
      "tag sentence"),
+    (re.compile(SENTENCE_START + r"(?:You asked (?:whether|if|how|why|what|about)|Your question (?:was|is) (?:whether|if|how|why|what))\b", re.M),
+     "restating the question"),
 ]
 
 
@@ -344,8 +346,12 @@ PATTERN_NOTES: dict[str, tuple[str, str]] = {
                                "Each extra clause adds one more thing for the reader to track."),
     "sentence count doesn't match the comment": ("The prose gives a sentence count that differs from the comment above it.",
                                                   "The reader trusts a number that is wrong."),
+    "sentence count does not match the comment": ("The prose gives a sentence count that differs from the comment above it.",
+                                                   "The reader trusts a number that is wrong."),
     "term the skill never defines": ("A reference file uses a term that the other files of its skill never use.",
                                      "The reader has no definition to look up."),
+    "restating the question": ("The sentence repeats the user's question before answering it.",
+                               "The user already knows what they asked, so the repetition delays the answer."),
 }
 
 
@@ -610,6 +616,13 @@ PREDICTED_PATTERNS = [
     (re.compile(r"\b(?:two|three|four|five|six|seven|eight|nine|ten)\s+(?:[a-z-]+\s+)?(?:things|ways|problems|"
                 r"categories|layers|mechanisms)\b(?![^.:\n]*:)", re.I),
      "count before the items"),
+    (re.compile(r"\b(?:has|have|checks|runs?)\s+(?:two|three|four|five|six)\s+(?:more\s+)?(?:[a-z-]+\s+){0,2}"
+                r"(?:things|lines|forms|verbs|tests|choices|rules|limits|steps)\s*:"
+                r"|(?:^|(?<=[.!?]\s))(?:\*\*)?(?:Two|Three|Four|Five)\s+(?:[a-z-]+\s+){0,2}"
+                r"(?:things|limits|choices|changes)\s+(?:your\b|apply\b|prevent\b)"
+                r"|\bin\s+(?:two|three|four)\s+forms\."
+                r"|\bthere are (?:two|three|four),", re.I | re.M),
+     "count before the items"),
     # "This file adds two sections, and both always appear:" flags the count.
     (re.compile(r"\band (?:both|all (?:three|four|five)|each) (?:always )?(?:appear|apply|matter|count)\b", re.I),
      "importance flag"),
@@ -643,10 +656,8 @@ PREDICTED_PATTERNS = [
     (re.compile(r"(?:^|(?<=[.!?]\s))(?:Not|No)\s+[^,.!?]{1,40},\s+(?:not|no)\b", re.M), "fragment"),
     # "an optimization has is worth its cost" keeps two verbs from two drafts.
     (re.compile(r"\b(?:an?|the)\s+[\w-]+\s+has\s+is\b|\bhave\s+are\b", re.I), "doubled verb"),
-    # "The rule is the system itself" stresses a noun that needs no stress. The
-    # form needs `is` before it, because "the code itself can't express" marks
-    # a contrast the docs in this repo draw on purpose.
-    (re.compile(r"\b(?:is|are|was|were)\s+the\s+[a-z][\w-]*\s+itself\b", re.I),
+    # "The rule is the system itself" stresses a noun that needs no stress.
+    (re.compile(r"\bthe\s+[a-z][\w-]*\s+itself\b", re.I),
      "reflexive for emphasis"),
     # "Rule C tests this: the spin" and "the one that matters:" hold the noun
     # back past a colon. The noun has to follow on the same line, because "like
@@ -661,7 +672,7 @@ PREDICTED_PATTERNS = [
      "punchline closer"),
     (re.compile(r"\b(?:provides? the ability to|enables? the creation of|the implementation of|facilitates?|utilization|in terms of|with regard to|with respect to)\b", re.I),
      "noun doing a verb's job"),
-    (re.compile(r"\b(?:the ask|bandwidth|action items?|learnings|net-new|quick win|big lift|touch base|level set|align on|alignment on|double down)\b", re.I),
+    (re.compile(r"\b(?:the ask(?![-a-z])|bandwidth|action items?|learnings|net-new|quick win|big lift|touch base|level set|align on|alignment on|double down)\b", re.I),
      "meeting jargon"),
     (re.compile(r"\b(?:not only\b[^.]{0,60}\bbut also|less \w+, more \w+)\b", re.I), "rhythm device"),
     (re.compile(r"\b(?:super|incredibly|extremely|hugely|massively|insanely|ridiculously)\s+\w+", re.I), "vague intensifier"),
@@ -728,6 +739,12 @@ PREDICTED_PATTERNS = [
                 r"(?:Nothing|Nobody|No one)\s+(?:else\s+)?(?:(?:in|on|from|outside|inside)\s+(?:the\s+|this\s+)?[\w-]+\s+)?(?:can(?:not|'t)?|could|will|would|should|does|did|"
                 r"[a-z]{2,}(?:s|ed))\b", re.I | re.M),
      "negated actor"),
+    (re.compile(r"\b(?:Nothing|Nobody|No one)\s+(?:from\s+[^.\n]{1,40}\s+)?(?:is|was|are|were|has|had)\s+[a-z]+(?:ed|en)\b"
+                r"|\bNone of the\s+[a-z][\w-]*\s+(?:is|are|was|were|has|have|had|can|will|does|did|[a-z]{2,}(?:s|ed))\b"
+                r"|\b[A-Za-z][\w-]*\s+nothing\s+[a-z]{2,}s\b"
+                r"|\b(?:so|and|but)\s+no\s+(?:other\s+)?[a-z][\w-]*(?:\s+(?:in|on|outside|inside)\s+(?:the\s+|this\s+)?[a-z][\w-]*)?\s+"
+                r"(?:depends|uses|calls|reads|writes|touches|reaches)\b", re.I),
+     "negated actor"),
     # "Text holds the answer" and "The line holds the event name" give text a
     # container verb. A database table holds rows, so "table" is left out.
     (re.compile(r"\b(?:text|sentence|paragraph|reply|message|doc|document|page|section|heading|list|"
@@ -735,15 +752,16 @@ PREDICTED_PATTERNS = [
      "container verb"),
     # "`tests/orders/` has no test for `cancelOrder`" puts the negation on the
     # noun. The user wants "doesn't have a test", which puts it on the verb.
-    # "have no idea" is how people talk, so it passes.
     (re.compile(r"\b(?:has|have|had|find|finds|found|need|needs|needed|get|gets|got|see|sees|saw|"
                 r"return|returns|returned|give|gives|gave|take|takes|took|make|makes|made|show|shows|"
-                r"contain|contains|hold|holds|carry|carries|run|runs|ran|leave|leaves|left)\s+(?-i:no)\s+"
-                r"(?!longer\b|more\b|less\b|matter\b|later\b|sooner\b|other\b|idea\b|one\b|doubt\b)[a-z]", re.I),
+                r"contain|contains|hold|holds|carry|carries|run|runs|ran|leave|leaves|left|"
+                r"with|touches|takes|writes|proves|owns|says|does)\s+(?-i:no)\s+"
+                r"(?!longer\b|more\b|less\b|matter\b|later\b|sooner\b|other\b|one\b|doubt\b)[a-z]"
+                r"|\b(?:writes|proves|owns|says|does|means|adds|changes|fixes|solves|explains|checks|tests|covers)\s+nothing\b", re.I),
      "negation on a noun"),
     # "The repo does not have a rate limiter" reads stiff. The user asked on
     # 2026-10-12 for negations written the way people say them, as "doesn't".
-    (re.compile(r"\b(?:does|do|did|is|are|was|were|has|have|had|could|would|should|will)\s+not\b|\bcannot\b", re.I),
+    (re.compile(r"\b(?:does|do|did|is|are|was|were|has|have|had|could|would|should|will)\s+not\b(?!\s+NULL\b)|\bcannot\b", re.I),
      "uncontracted negation"),
     # "only what no widget shows" limits one clause twice.
     (re.compile(r"\bonly\s+(?:what|whatever|when|where|the\s+[\w-]+\s+(?:that|which))\s+"
@@ -770,8 +788,10 @@ PREDICTED_PATTERNS = [
     (re.compile(r"\b(?:you'?re|you are) right,? and I\b|\bI had the cause wrong\b|\bI misread (?:you|your)\b", re.I),
      "stock admission"),
     # "That rule produces the same chopping" gives a rule a person's action.
-    (re.compile(r"\b(?:the|that|this|each|a)\s+(?:rule|choice|decision|constraint)s?\s+"
-                r"(?:produces?|decides?|wants?|pushes|forces?|insists?|cares?)\b", re.I),
+    (re.compile(r"\b(?:the|that|this|each|a)\s+(?:[\w-]+\s+)?(?:rule|choice|decision|constraint|ban|plan|suite|skill|column|catalog)s?\s+"
+                r"(?:produces?|decides?|wants?|pushes|forces?|insists?|cares?|says|trained|lists|owns|ships)\b"
+                r"|\bwords\s+below\s+want\b"
+                r"|\bforces\s+the\s+plan\s+to\b", re.I),
      "rule as the actor"),
     # "`checks.md:12` turns implied work into follow-ups" gives a file a
     # person's action. prose_only blanks the code span, so the sentence
@@ -824,6 +844,30 @@ ABSTRACT_ACTOR_RE = re.compile(
     r"deserves?|forgives?|hates?|loves?|whispers?|shouts?|complains?|remembers?|forgets?)\b",
     re.I,
 )
+
+REPLY_EXTRA_FORMS = {
+    "opening phrase that frames the evidence",
+    "relation word with its other half missing",
+    "double negation",
+    "sentence about the reply",
+    "stock admission",
+    "deferred antecedent",
+    "punchline closer",
+    "code given senses",
+    "code given feelings",
+    "sentence that announces the next one",
+    "doubled verb",
+    "either with no or",
+    "hedge stack",
+    "rhythm device",
+    "closing offer",
+}
+
+REPLY_PATTERNS.extend([(p, "invented foil") for p in CONTRAST_PATTERNS])
+REPLY_PATTERNS.extend(MECHANICAL_PATTERNS)
+REPLY_PATTERNS.append((LITOTES_RE, "litotes"))
+REPLY_PATTERNS.append((ABSTRACT_ACTOR_RE, "abstract noun as actor"))
+REPLY_PATTERNS.extend([(p, f) for p, f in PREDICTED_PATTERNS if f in REPLY_EXTRA_FORMS])
 # A line with one of these is a sentence missing its period, such as the slide
 # title "The queue service costs $400 a month", and is no fragment. The last word
 # is left out of the test, because a plural noun there ends in -s too.

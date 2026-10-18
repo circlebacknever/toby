@@ -82,9 +82,7 @@ sentence gets switched off. Its fixtures hold 31 ordinary replies that must pass
 silently. A false positive on one of them fails the suite, because a hook that
 blocks replies with no breaks gets turned off.
 
-The write hook reports FIX and DECIDE findings. It exits 2 on either
-group. It runs the checker with `--no-read`, because printing the READ list
-after every write repeats 15 rules the agent already has.
+The write hook reports FIX and DECIDE findings with `--no-read`. It exits 2 whenever FIX is non-empty or a new DECIDE finding appears, and it exits 0 on the next edit when FIX is empty and only reviewed DECIDE findings remain.
 
 ## Testing them
 

@@ -103,7 +103,9 @@ FIXES: dict[str, tuple[str, str | None]] = {
     "sentence over 25 words": ("Split the sentence if it holds two ideas, or move separate items into a list.",
                                "The sentence holds one idea, and a split would cut that idea in two."),
     "sentence count doesn't match the comment": ("Change the count to match the comment above it.", None),
+    "sentence count does not match the comment": ("Change the count to match the comment above it.", None),
     "term the skill never defines": ("Define the term in plain words where it first appears, or use plain words.", None),
+    "restating the question": ("Answer the question directly without restating what the user asked.", None),
 }
 
 

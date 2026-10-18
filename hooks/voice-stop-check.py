@@ -78,11 +78,14 @@ DOUBLE_QUOTE_RE = re.compile(r'"[^"\n]{1,300}"|\u201c[^\u201d\n]{1,300}\u201d')
 QUOTE_RE = re.compile(r"^>.*$", re.M)
 # A table row is cells, not a sentence, so it never counts toward the length check.
 TABLE_RE = re.compile(r"^\s*\|.*$", re.M)
+WELD_RE = re.compile(r"\w\s+—\s+\w|\w;\s+\w")
+LABEL_DASH_RE = re.compile(r"^(?:[-*]\s+)?\**[A-Z][\w-]*(?:\s[\w-]+)?\**\s+—$")
+CLI_CLEAN_RE = re.compile(r"\b(?:make|git|cargo|npm|yarn|pnpm|gradle|mvn|go|brew)\s+clean\b", re.I)
 
 
-def last_assistant_text(transcript: Path) -> str:
-    """Return the text of the final assistant message in the transcript."""
-    text = ""
+def assistant_messages(transcript: Path) -> list[str]:
+    """Return the text of each assistant message in the transcript."""
+    messages: list[str] = []
     for line in transcript.read_text(errors="ignore").splitlines():
         try:
             event = json.loads(line)
@@ -92,13 +95,19 @@ def last_assistant_text(transcript: Path) -> str:
         if message.get("role") != "assistant":
             continue
         content = message.get("content")
-        if isinstance(content, str):
-            text = content
+        if isinstance(content, str) and content.strip():
+            messages.append(content)
         elif isinstance(content, list):
             parts = [b.get("text", "") for b in content if isinstance(b, dict) and b.get("type") == "text"]
             if any(parts):
-                text = "\n".join(parts)
-    return text
+                messages.append("\n".join(parts))
+    return messages
+
+
+def last_assistant_text(transcript: Path) -> str:
+    """Return the text of the final assistant message in the transcript."""
+    msgs = assistant_messages(transcript)
+    return msgs[-1] if msgs else ""
 
 
 def prose_only(text: str) -> str:
@@ -112,13 +121,27 @@ def main() -> int:
         payload = json.load(sys.stdin)
     except ValueError:
         return 0
-    if payload.get("stop_hook_active"):
-        return 0
     path = payload.get("transcript_path")
     if not path or not Path(path).exists():
         return 0
 
-    reply = prose_only(last_assistant_text(Path(path)))
+    msgs = assistant_messages(Path(path))
+    if not msgs:
+        return 0
+    # Allow at most two rewrite passes when stop_hook_active is set, so a first
+    # "## Revised reply" that still has a hard voice break is caught once more
+    # without risking an infinite loop.
+    if payload.get("stop_hook_active"):
+        revised_streak = 0
+        for msg in reversed(msgs):
+            if "## Revised reply" in msg:
+                revised_streak += 1
+            else:
+                break
+        if revised_streak >= 2:
+            return 0
+
+    reply = prose_only(msgs[-1])
     if not reply.strip():
         return 0
 
@@ -131,9 +154,25 @@ def main() -> int:
     # Every match is listed, because a list that stops at the first hit tells
     # the agent the fix is local and complete.
     hits = []
+    tiers = v.load_banned_words()
+    for word in tiers.get("hard", []):
+        for match in re.finditer(rf"(?<![A-Za-z/._=-]){re.escape(word)}(?![A-Za-z/._=-])", reply, re.I):
+            if word == "clean" and CLI_CLEAN_RE.search(reply[max(0, match.start() - 10) : match.end() + 2]):
+                continue
+            hits.append(f"{match.group(0).strip()!r}: broken pattern: banned word. {v.explain('banned word')}")
+
     for pattern, reason in v.REPLY_PATTERNS:
         for match in pattern.finditer(reply):
             hits.append(f"{match.group(0).strip()!r}: broken pattern: {reason}. {v.explain(reason)}")
+
+    for match in WELD_RE.finditer(reply):
+        before = reply[max(reply.rfind("\n", 0, match.start()), reply.rfind(". ", 0, match.start())) + 1 : match.start() + 1]
+        if LABEL_DASH_RE.match(before.strip() + " —") and "—" in match.group(0):
+            continue
+        line_end = reply.find("\n", match.start())
+        line_text = reply[reply.rfind("\n", 0, match.start()) + 1 : len(reply) if line_end == -1 else line_end]
+        if v.is_prose_line(line_text) or (v.LIST_ITEM_RE.match(line_text) and ";" in match.group(0)):
+            hits.append(f"{match.group(0).strip()!r}: broken pattern: clause weld. {v.explain('clause weld')}")
 
     for sentence in SENTENCE_SPLIT_RE.split(reply):
         words = sentence.split()

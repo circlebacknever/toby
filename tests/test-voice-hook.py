@@ -39,6 +39,19 @@ BREAKS = [
     "Noted. I'll use specify from now on.",
     "Got it. The plan now covers the hook tests.",
     "Understood. I'll keep the old rubric wording.",
+    "We can leverage the existing retry queue for the webhook failures.",
+    "The new importer gives users a seamless upgrade path from version 3.",
+    "The build passed; the deploy failed on the health check.",
+    "The test is flaky — it depends on wall-clock time.",
+    "Use a lookup map instead of a switch statement.",
+    "You asked whether the timeout is per request, and it applies per connection, not per request.",
+    "Based on the diff, the handler drops the last write.",
+    "A stampede under peak load isn't uncommon.",
+    "Complexity creeps into the handler when retries stay inline.",
+    "You're right, and I had the cause wrong.",
+    "I won't propose a fix in this reply.",
+    "The one that matters: the retry count.",
+    "That's the whole trick.",
 ]
 
 # A figurative frame or a coined term can be a literal use, so the checker
@@ -455,6 +468,56 @@ with _tf.TemporaryDirectory() as skill_dir:
     (skill / "SKILL.md").write_text("# Sample\n\nSkip the outcome laws for a pure toy.\n")
     term_out = subprocess.run([sys.executable, str(CHECKER), str(reference)], capture_output=True, text=True)
     expect_text("a term SKILL.md uses passes", term_out.stdout, "term the skill never defines", False)
+
+# --- new compliance checks: FIX/DECIDE clarity, repeat-write DECIDE, and second-try Stop hook ---
+
+# 1. Unconditional banned constructions in prose (such as framing evidence or stock admission) fail as FIX.
+expect("evidence-framing opener fails as FIX",
+       check_text("Based on the diff, the handler drops the write.\n").returncode, 1)
+expect("stock admission fails as FIX",
+       check_text("You're right, and I had the cause wrong.\n").returncode, 1)
+
+# 2. Inline code spans stay visible in quoted findings so the agent sees the real sentence.
+code_finding_out = check_text("`scripts/install.sh` uses a robust check.\n").stdout
+expect_text("quoted finding preserves inline code span", code_finding_out, "`scripts/install.sh` uses a robust check.", True)
+
+# 3. Every DECIDE finding prints a Fine when line, even when the pattern has no prose exception.
+decide_no_fine_out = check_text("The wrapper provides the ability to retry.\n").stdout
+expect_text("every DECIDE finding includes a Fine when line", decide_no_fine_out, "Fine when:", True)
+
+# 4. --review prints Fix and Fine when lines under findings.
+with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
+    handle.write("The hook return shape is fine here.\n")
+    rev_decide_file = handle.name
+rev_decide_out = subprocess.run([sys.executable, str(CHECKER), rev_decide_file, "--review"],
+                                capture_output=True, text=True).stdout
+Path(rev_decide_file).unlink()
+expect_text("--review prints Fix under a finding", rev_decide_out, "Fix:", True)
+expect_text("--review prints Fine when under a DECIDE finding", rev_decide_out, "Fine when:", True)
+
+# 5. The write hook blocks once on a DECIDE-only finding, then allows a second edit when the DECIDE sentence is kept.
+with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
+    handle.write("The hook return shape is fine here.\n")
+    repeat_file = handle.name
+repeat_payload = json.dumps({
+    "hook_event_name": "PostToolUse", "tool_name": "Edit",
+    "tool_input": {"file_path": repeat_file},
+})
+first_write = subprocess.run([sys.executable, str(WRITE_HOOK)], input=repeat_payload, capture_output=True, text=True)
+second_write = subprocess.run([sys.executable, str(WRITE_HOOK)], input=repeat_payload, capture_output=True, text=True)
+Path(repeat_file).unlink()
+expect("write hook blocks on a new DECIDE finding on first write", first_write.returncode, 2)
+expect("write hook allows the second edit when only the reviewed DECIDE finding remains", second_write.returncode, 0)
+
+# 6. The Stop hook still checks the first ## Revised reply when stop_hook_active is true, and stops after two revisions.
+with _tf.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
+    handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": "Short answer: stale."}]}}) + "\n")
+    handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": "## Revised reply\n\nWe can leverage the cache."}]}}) + "\n")
+    retry_transcript = handle.name
+retry_payload = json.dumps({"transcript_path": retry_transcript, "stop_hook_active": True})
+retry_res = subprocess.run([sys.executable, str(HOOK)], input=retry_payload, capture_output=True, text=True)
+Path(retry_transcript).unlink()
+expect("Stop hook blocks a first revised reply that still has a voice break", retry_res.returncode, 2)
 
 print()
 if failures or notes:

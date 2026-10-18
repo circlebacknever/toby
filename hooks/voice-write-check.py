@@ -31,11 +31,38 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
+sys.dont_write_bytecode = True
+
 PROSE_SUFFIXES = {".md", ".markdown", ".mdx", ".txt"}
+SEEN_FILE = Path(tempfile.gettempdir()) / "toby-voice-write-seen.json"
+DECIDE_BLOCK_RE = re.compile(
+    r"^\s+\S+:\d+\s+\[DECIDE[^\]]*\]\s+broken pattern:\s+(.+?)\n\s+(.+)$",
+    re.M,
+)
+
+
+def decide_keys(stdout: str) -> list[str]:
+    return [f"{m.group(1).strip()}|{' '.join(m.group(2).split())}" for m in DECIDE_BLOCK_RE.finditer(stdout)]
+
+
+def load_seen() -> dict[str, list[str]]:
+    try:
+        return json.loads(SEEN_FILE.read_text()) if SEEN_FILE.is_file() else {}
+    except Exception:
+        return {}
+
+
+def save_seen(data: dict[str, list[str]]) -> None:
+    try:
+        SEEN_FILE.write_text(json.dumps(data))
+    except Exception:
+        pass
 
 
 def find_checker() -> Path | None:
@@ -65,7 +92,8 @@ def main() -> int:
     if payload.get("hook_event_name") != "PostToolUse":
         return 0
 
-    path = (payload.get("tool_input") or {}).get("file_path")
+    tool_input = payload.get("tool_input") or {}
+    path = tool_input.get("file_path") or tool_input.get("path")
     if not path or Path(path).suffix.lower() not in PROSE_SUFFIXES:
         return 0
     target = Path(path)
@@ -86,16 +114,39 @@ def main() -> int:
     # flag. A failed check says nothing about the file, so the hook stays silent.
     if result.returncode not in (0, 1):
         return 0
-    if result.returncode == 0 and "DECIDE  (" not in result.stdout:
+
+    key = str(target.resolve())
+    seen = load_seen()
+    current_decide = decide_keys(result.stdout)
+
+    if result.returncode == 0 and not current_decide:
+        if key in seen:
+            seen.pop(key, None)
+            save_seen(seen)
         return 0
 
-    print(f"voice-check.py found voice breaks in {target.name}. Apply the fix under each FIX finding. "
-          "Apply the fix under each DECIDE finding too, unless its \"Fine when\" line describes the sentence.",
-          file=sys.stderr)
+    # When FIX is empty and every DECIDE finding was already reported on the
+    # previous write to this file, allow the edit so a valid "Fine when" choice
+    # does not trap the agent in a repeat-edit loop.
+    previous_decide = set(seen.get(key, []))
+    if result.returncode == 0 and current_decide and set(current_decide) <= previous_decide:
+        return 0
+
+    seen[key] = current_decide
+    save_seen(seen)
+
+    print(
+        f"voice-check.py found voice issues in {target.name}. Fix them in one edit:\n"
+        "1. FIX findings are mandatory: rewrite every sentence in the FIX group with no exceptions.\n"
+        "2. DECIDE findings are conditional: rewrite each sentence in the DECIDE group using its Fix line, "
+        "UNLESS its \"Fine when\" line is literally true for that sentence.\n",
+        file=sys.stderr,
+    )
     print(result.stdout.strip(), file=sys.stderr)
-    print("These patterns miss 94 of the 170 bad sentences in the repo-review gold set. Before you finish the task, run "
-          "voice-check.py on the file and read every sentence against the READ list it prints.",
-          file=sys.stderr)
+    print(
+        "\nBefore finishing the task, run voice-check.py --review on the file and check every sentence against the READ list.",
+        file=sys.stderr,
+    )
     return 2
 
 
