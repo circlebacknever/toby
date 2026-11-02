@@ -6,7 +6,7 @@ wrong on every reading: the hard banned words, the tic and label forms, clause
 welds, and the two length ceilings. scripts/voice-check.py keeps the full
 pattern list, including style preferences, for on-demand audits. This hook
 fires on literal strings only, because a hook that blocks a clean reply gets
-switched off inside a week.
+switched off.
 
 Wire it up in settings.json:
 

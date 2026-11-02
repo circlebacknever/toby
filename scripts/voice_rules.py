@@ -1078,7 +1078,7 @@ def slogan_findings(text: str) -> list[tuple[int, str, str]]:
 # ---------------------------------------------------------------------------
 # The hard set the two hooks block on. voice-check.py keeps the full pattern
 # list for on-demand audits, but a hook that fires on a borderline sentence
-# gets switched off inside a week, so the hooks run only what is wrong on
+# gets switched off, so the hooks run only what is wrong on
 # every reading: the hard banned words, the tic and label forms, clause welds,
 # and the two length ceilings. Style preferences (contrastive foils and
 # litotes) stay in the checker, where a person decides them. Both hooks

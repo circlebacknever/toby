@@ -16,7 +16,7 @@ Rewrite the text the user names, or your previous reply when the user names noth
 
 ## Fix four things
 
-1. **One point per paragraph.** State the one fact in a single short sentence, and cut the throat-clearing and the recap.
+1. **One point per paragraph.** State the one fact in a single short sentence, and cut the preamble and the recap.
 2. **Actor before verb.** Write `The server cancels the token`.
 3. **Everyday words.** Replace jargon and long noun chains with what happens, and explain any term the user must type or see.
 4. **Outcome before internals.** State what the user sees first, then walk one concrete case in the order it happens.

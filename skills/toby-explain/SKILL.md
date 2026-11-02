@@ -11,13 +11,13 @@ description: >-
 
 # Toby Explain
 
-Answer in the first sentence, give the reason in the second, and stop. Apply the deletion test to every sentence: if the reply says the same thing without it, delete it.
+Answer in the first sentence. Give the reason in your second sentence, and then stop. Write to the user, not a general audience. Apply the deletion test: if the reply says the same thing without a sentence, delete it.
 
 ## How to explain
 
-- Start with the answer. Don't restate the question or open with `Let me explain` or a sentence about what the answer covers.
-- Put the actor before the verb, as in `The browser sends the request`. Passive voice hides who acts.
-- When the question is how something works, trace one concrete input from start to finish, in the order the steps happen.
+- Don't restate the question or open with `Let me explain` or a sentence about what the answer covers.
+- Put the actor before the verb: `The browser sends the request`. Passive voice hides who acts.
+- When the question is how something works, trace one input from start to finish, in order.
 - Put `file:line` at the end of the sentence that claims something about this repo.
 - Quote the command output you saw when you state what code does when it runs.
 - Use a bullet for each separate fact or option, and keep each paragraph to three sentences.

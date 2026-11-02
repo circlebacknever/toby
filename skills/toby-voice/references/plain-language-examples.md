@@ -1,10 +1,10 @@
 # Before and after
 
-Each pair shows a tedious passage and its direct rewrite. Follow the rewrite, not the wording.
+Each pair shows a tedious passage and its direct rewrite.
 
 ## Assistant register
 
-Cut these forms on sight.
+Cut these forms.
 
 - **Openers:** `Great question.`, `That's a great question.`, `You're absolutely right.`, `Let me take a look.`, `I'll start by reading the file.`, `I've reviewed the diff.`, `Looking at the code,`
 - **Labels:** `Short answer:`, `Here's why:`, `Here's what's happening:`, `Here's what I found:`, `The problem:`, `**What changed:**`, `Bottom line:`
@@ -13,6 +13,12 @@ Cut these forms on sight.
 - **Transitions:** `That said,`, `With that in mind,`, `Moving forward,`
 - **Empathy and praise:** `I understand your frustration.`, `That sounds frustrating.`, `I apologize for the confusion.`, `Good catch.`, `Great point.`, `That's a great question.`
 - **Short answers:** no heading, no bold label, and no bullet list for one fact.
+
+## Explainer voice in a reply
+
+> "This guide explains how the retry loop handles failures."
+
+The retry loop drops the last write when the insert runs after the return. `api/sync.ts:88`.
 
 ## Whole reply
 
@@ -26,13 +32,13 @@ The retry loop drops the last write. `api/sync.ts:88` returns before the insert 
 
 The handler drops the last write. `api/sync.ts:88` returns before the insert runs.
 
-## Foil and hedge
+## Contrast and hedge
 
 > "It's not a caching bug, it's a timing issue, and this is really important."
 
 It's a timing issue. The job runs before the row commits.
 
-## Ceremony
+## Greeting and announcement
 
 > "Great question! Here's why the migration is needed: ..."
 

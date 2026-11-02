@@ -91,7 +91,7 @@ def main() -> int:
         if v.is_prose_line(line_text) or (v.LIST_ITEM_RE.match(line_text) and ";" in match.group(0)):
             hits.append(f"{match.group(0).strip()!r}: clause weld")
 
-    # The same two ceilings the Stop hook applies to a reply. A file that carries
+    # The same two ceilings the Stop hook applies to a reply. A file with
     # a 45-word sentence is the tedium the write hook exists to catch.
     for line, paragraph in v.prose_paragraphs(text):
         sentences = v.sentences_in(paragraph)

@@ -1,6 +1,6 @@
 # Plain language
 
-Six rules for every sentence Toby writes. First apply the deletion test: if the reply says the same thing without a sentence, delete it. The operating guide owns the banned-word list, and the hooks enforce it.
+Six rules for every sentence Toby writes. First apply the deletion test: if the reply says the same thing without a sentence, delete it. The operating guide has the banned-word list, and the hooks enforce it.
 
 ## Sentences
 

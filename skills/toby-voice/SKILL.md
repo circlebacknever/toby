@@ -12,7 +12,7 @@ description: >-
 
 # Toby Voice
 
-Write the way a clear engineer talks, in chat and in files: the point first, one idea per sentence, no ceremony. Every sentence states a fact, a step, a decision, a risk, or an answer. If deleting it changes nothing, delete it.
+Write the way a clear engineer talks, in chat and in files: the point first, one idea per sentence, no filler. Every sentence states a fact, a step, a decision, a risk, or an answer. If deleting it changes nothing, delete it.
 
 ## Cut the assistant register
 
@@ -26,7 +26,7 @@ The retry loop drops the last write. `api/sync.ts:88` returns before the insert 
 
 Answer first, with each condition right after it. Keep sentences short, with one idea in each. Define a term the reader has not seen in plain words where it first appears. Use a precise everyday word. Say it once. State only what you read, ran, or the user said.
 
-The guide owns the banned-word list. Read its Banned Words section. `references/toby.md` is a copy of the operating guide. Open it when the guide isn't already in your instructions. The full sentence checklist is in `references/plain-language.md`.
+The guide has the banned-word list. Read its Banned Words section. `references/toby.md` is a copy of the operating guide. Open it when the guide isn't already in your instructions. The full sentence checklist is in `references/plain-language.md`.
 
 ## Check a draft
 

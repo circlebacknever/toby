@@ -10,7 +10,7 @@ The repo has three voice checks, because each one checks text that the other two
 
 ## The hard set
 
-Both hooks run `hook_patterns()` from `scripts/voice_rules.py`: the hard banned words, the tic and label forms, clause welds, and two length ceilings (40 words per sentence, 3 sentences per paragraph). That set is what is wrong on every reading. Style preferences (contrastive foils and litotes) stay in the on-demand checker, where a person decides them, because a hook that fires on a clean reply gets switched off inside a week.
+Both hooks run `hook_patterns()` from `scripts/voice_rules.py`: the hard banned words, the tic and label forms, clause welds, and two length ceilings (40 words per sentence, 3 sentences per paragraph). That set is what is wrong on every reading. Style preferences (contrastive foils and litotes) stay in the on-demand checker, where a person decides them, because a hook that fires on a clean reply gets switched off.
 
 The Stop hook's reprompt is one short paragraph: resend under a `## Revised reply` heading, fix the listed lines, keep every fact. It never asks for a rewrite of the whole reply, because a longer repair instruction produces a longer, more tedious reply.
 
