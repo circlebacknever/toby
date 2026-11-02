@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""Claude Code PostToolUse hook: check prose the agent just wrote.
+"""Claude Code PostToolUse hook: flag hard voice breaks in a file just written.
 
-The Stop hook reads the reply. This one reads the file.
+It fires after Write and Edit on a markdown or text file and runs
+hook_patterns() from voice_rules.py over the prose in the file. Exit 2 prints
+the findings. The write has already happened when the hook runs, so the hook
+undoes nothing; the agent gets the findings while it is still working on the
+file.
 
-It fires after Write and Edit on a markdown or text file, and it runs
-scripts/voice-check.py with --no-read. When the checker reports a FIX or a
-DECIDE finding, the hook exits 2 and prints the findings. The write has already
-happened when the hook runs, so the hook undoes nothing. The agent gets the
-findings while it is still working on the file.
-
-The patterns miss 7 of the 49 bad sentences in evals/gold/labels.jsonl.
-The hook leaves out the READ list, because the same 15 rules would print after
-every write. The Self Review step in base/toby.md tells the agent to read the
-file against that list before it finishes.
+The hook blocks only what is wrong on every reading, never a judgement call,
+so a valid rewrite never traps the agent in a repeat-edit loop. The full
+pattern list stays available on demand as scripts/voice-check.py --review.
 
 Wire it up in settings.json, alongside the Stop hook:
 
@@ -22,55 +19,26 @@ Wire it up in settings.json, alongside the Stop hook:
       "Stop": [{"hooks": [
         {"type": "command", "command": "python3 /abs/path/hooks/voice-stop-check.py"}]}]}}
 
-It looks for scripts/voice-check.py in TOBY_ROOT, then in a checkout that holds
-this hook, then in the installed skill at ~/.claude/skills/toby-voice. Without
-any of those it exits 0 and says nothing, because a hook that fails loudly on a
-machine that never asked for it gets deleted.
+It looks for voice_rules.py in TOBY_ROOT/scripts, then in a checkout that holds
+this hook, then in the installed skill at ~/.claude/skills/toby-voice/scripts.
+Without any of those it exits 0 and says nothing, because a hook that fails
+loudly on a machine that never asked for it gets deleted.
 """
 from __future__ import annotations
 
 import json
 import os
-import re
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 sys.dont_write_bytecode = True
 
 PROSE_SUFFIXES = {".md", ".markdown", ".mdx", ".txt"}
-SEEN_FILE = Path(tempfile.gettempdir()) / "toby-voice-write-seen.json"
-DECIDE_BLOCK_RE = re.compile(
-    r"^\s+\S+:\d+\s+\[DECIDE[^\]]*\]\s+broken pattern:\s+(.+?)\n\s+(.+)$",
-    re.M,
-)
+CLI_CLEAN_RE_STR = r"\b(?:make|git|cargo|npm|yarn|pnpm|gradle|mvn|go|brew)\s+clean\b"
 
 
-def decide_keys(stdout: str) -> list[str]:
-    return [f"{m.group(1).strip()}|{' '.join(m.group(2).split())}" for m in DECIDE_BLOCK_RE.finditer(stdout)]
-
-
-def load_seen() -> dict[str, list[str]]:
-    try:
-        return json.loads(SEEN_FILE.read_text()) if SEEN_FILE.is_file() else {}
-    except Exception:
-        return {}
-
-
-def save_seen(data: dict[str, list[str]]) -> None:
-    try:
-        SEEN_FILE.write_text(json.dumps(data))
-    except Exception:
-        pass
-
-
-def find_checker() -> Path | None:
-    """Return the first complete voice checker, or None.
-
-    A checker counts only with voice_rules.py beside it. An old install left
-    ~/.claude/toby/scripts/voice-check.py on its own, and that copy crashes.
-    """
+def find_rules_dir() -> Path | None:
+    """Return the first scripts folder that holds voice_rules.py, or None."""
     roots = []
     named = os.environ.get("TOBY_ROOT")
     if named:
@@ -78,9 +46,8 @@ def find_checker() -> Path | None:
     roots.extend(Path(__file__).resolve().parents)
     roots.append(Path.home() / ".claude" / "skills" / "toby-voice")
     for root in roots:
-        checker = root / "scripts" / "voice-check.py"
-        if checker.exists() and (root / "scripts" / "voice_rules.py").exists():
-            return checker
+        if (root / "scripts" / "voice_rules.py").exists():
+            return root / "scripts"
     return None
 
 
@@ -100,53 +67,65 @@ def main() -> int:
     if not target.exists():
         return 0
 
-    checker = find_checker()
-    if checker is None:
+    rules_dir = find_rules_dir()
+    if rules_dir is None:
+        return 0
+    sys.path.insert(0, str(rules_dir))
+    import re
+
+    import voice_rules as v
+
+    text = v.prose_only(target.read_text(errors="ignore"))
+    hits = []
+    cli_clean = re.compile(CLI_CLEAN_RE_STR, re.I)
+    for pattern, label in v.hook_patterns():
+        for match in pattern.finditer(text):
+            if label == "banned word" and match.group(0).lower() == "clean" and cli_clean.search(
+                text[max(0, match.start() - 10) : match.end() + 2]
+            ):
+                continue
+            hits.append(f"{match.group(0).strip()!r}: {label}")
+    for match in v.WELD_RE.finditer(text):
+        line_end = text.find("\n", match.start())
+        line_text = text[text.rfind("\n", 0, match.start()) + 1 : len(text) if line_end == -1 else line_end]
+        if v.is_prose_line(line_text) or (v.LIST_ITEM_RE.match(line_text) and ";" in match.group(0)):
+            hits.append(f"{match.group(0).strip()!r}: clause weld")
+
+    # The same two ceilings the Stop hook applies to a reply. A file that carries
+    # a 45-word sentence is the tedium the write hook exists to catch.
+    for line, paragraph in v.prose_paragraphs(text):
+        sentences = v.sentences_in(paragraph)
+        for sentence in sentences:
+            words = sentence.split()
+            if len(words) > v.HOOK_SENTENCE_LIMIT:
+                hits.append(
+                    f"the {len(words)}-word sentence starting {' '.join(words[:6])!r}: over {v.HOOK_SENTENCE_LIMIT} words"
+                )
+        if len(sentences) > v.HOOK_PARAGRAPH_LIMIT:
+            hits.append(
+                f"the {len(sentences)}-sentence paragraph at line {line} starting "
+                f"{' '.join(paragraph.split()[:6])!r}: over {v.HOOK_PARAGRAPH_LIMIT} sentences"
+            )
+
+    # A long bullet buries its point too, and prose_paragraphs skips list items.
+    for number, line in enumerate(text.splitlines(), 1):
+        item = v.LIST_ITEM_RE.match(line)
+        if not item:
+            continue
+        for sentence in v.sentences_in(item.group(1)):
+            words = sentence.split()
+            if len(words) > v.HOOK_SENTENCE_LIMIT:
+                hits.append(
+                    f"the {len(words)}-word bullet at line {number} starting "
+                    f"{' '.join(words[:6])!r}: over {v.HOOK_SENTENCE_LIMIT} words"
+                )
+
+    if not hits:
         return 0
 
-    result = subprocess.run(
-        [sys.executable, str(checker), str(target), "--no-read"],
-        capture_output=True,
-        text=True,
-    )
-    # Exit 0 or 1 is a finished check. Any other code means the checker failed.
-    # An older installed checker fails this way, because it has no --no-read
-    # flag. A failed check says nothing about the file, so the hook stays silent.
-    if result.returncode not in (0, 1):
-        return 0
-
-    key = str(target.resolve())
-    seen = load_seen()
-    current_decide = decide_keys(result.stdout)
-
-    if result.returncode == 0 and not current_decide:
-        if key in seen:
-            seen.pop(key, None)
-            save_seen(seen)
-        return 0
-
-    # When FIX is empty and every DECIDE finding was already reported on the
-    # previous write to this file, allow the edit so a valid "Fine when" choice
-    # does not trap the agent in a repeat-edit loop.
-    previous_decide = set(seen.get(key, []))
-    if result.returncode == 0 and current_decide and set(current_decide) <= previous_decide:
-        return 0
-
-    seen[key] = current_decide
-    save_seen(seen)
-
-    print(
-        f"voice-check.py found voice issues in {target.name}. Fix them in one edit:\n"
-        "1. FIX findings are mandatory: rewrite every sentence in the FIX group with no exceptions.\n"
-        "2. DECIDE findings are conditional: rewrite each sentence in the DECIDE group using its Fix line, "
-        "UNLESS its \"Fine when\" line is literally true for that sentence.\n",
-        file=sys.stderr,
-    )
-    print(result.stdout.strip(), file=sys.stderr)
-    print(
-        "\nBefore finishing the task, run voice-check.py --review on the file and check every sentence against the READ list.",
-        file=sys.stderr,
-    )
+    print(f"voice hook found {len(set(hits))} hard break(s) in {target.name}. Fix them in one edit:", file=sys.stderr)
+    for hit in dict.fromkeys(hits):
+        print(f"  - {hit}", file=sys.stderr)
     return 2
 
 

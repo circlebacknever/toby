@@ -6,7 +6,7 @@ Run the deterministic gates before and after any change to a skill, the operatin
 python3 evals/run.py gates
 ```
 
-Green means no gate regressed, and red names what failed against `baselines/gates.json`.
+Green means no gate regressed, and red says what failed against `baselines/gates.json`.
 
 ## Gates and model suites
 

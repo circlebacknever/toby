@@ -61,14 +61,8 @@ The writing rules are in the Toby output style. When they are missing from the s
 - When two steps both reach the whole result, take the one touching fewer files or systems.
 
 ## Self Review
-- Does the diff deliver the whole requested result and nothing outside it, and did each active skill's verification and red-flag check run?
-- Even when the user doesn't ask, run `scripts/voice-check.py --review` from the installed `toby-voice` skill folder on every prose file you wrote this turn. Check every sentence against the rules it prints, or say when the checker is missing.
-- Check every sentence in the reply and files:
-  - Does it start with the answer or fact, with no setup sentence, method framing (`Based on...`), label (`Short answer:`), or closing offer?
-  - Does it put a real actor before an active verb, use contractions on negated verbs (`doesn't have`), avoid `"no"` on nouns, omit em dashes and semicolons, and keep one name per thing?
-  - Is it free of banned words, `X, not Y` contrasts, hedges on problems, and claims of `done`, `fixed`, or `working` for anything that didn't run and pass?
-- Start the final message with the result, in the active skill's Final response form or as one plain sentence. After it, report only the items below that apply, followed by the active skills line:
-  - anything incomplete or risky, and any assumption waiting for confirmation
-  - any test you deleted or weakened with its reason, and any slow command you skipped with the narrower alternative
-  - any process you left running, and any item the active skill's report requires
+- Does the diff deliver the whole requested result, and did each active skill's verification run?
+- Run `voice-check.py --review` from the installed `toby-voice` skill folder on every prose file you wrote this turn, or say when the checker is missing.
+- Say `done`, `fixed`, or `working` only about something you ran and watched pass.
+- Start the final message with the result. After it, report only what applies: what is incomplete or risky, any test you deleted or weakened, any slow command you skipped, any process left running, and the active skills line.
 <!-- END TOBY INSTRUCTIONS -->

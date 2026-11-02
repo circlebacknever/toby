@@ -49,7 +49,7 @@ body_stripped = body.strip()
 # machine safety stay in the instruction files, which every tool already loads.
 OUTPUT_STYLE_SECTIONS = [
     "Role",
-    "Five Tests",
+    "Voice",
     "Replies",
     "Files",
     "Banned Constructions",

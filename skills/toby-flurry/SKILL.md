@@ -33,7 +33,7 @@ When you can't list useful members without knowing the user's constraints, ask b
 
 - Use the host's multiple-choice question tool when the choices are fixed, and ask in prose when the question is open.
 - Ask one question at a time when each answer changes the next question, and group independent questions together.
-- Ask what belongs in the set, what stays out, and what sits on the boundary, preferring open options over yes/no questions that narrow the space early.
+- Ask what belongs in the set, what stays out, and what belongs at the boundary, preferring open options over yes/no questions that narrow the space early.
 
 When the user skips a question, rephrase it or ask what information would help them decide.
 

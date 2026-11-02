@@ -26,7 +26,7 @@ class User:
         return f"{self.first} {self.last}"
 ```
 
-The branch now sits in one method next to the data it reads. You can remove repeated `None` checks the same way by returning a stand-in guest object with the same methods as `User`.
+The branch is now in one method, next to the data it reads. You can remove repeated `None` checks the same way by returning a stand-in guest object with the same methods as `User`.
 
 ---
 

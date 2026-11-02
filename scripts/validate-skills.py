@@ -164,7 +164,7 @@ OUTPUT_STYLE = REPO_ROOT / "output-styles" / "toby.md"
 # a section dropped from sync.sh fails the build instead of going quiet.
 OUTPUT_STYLE_SECTIONS = [
     "Role",
-    "Five Tests",
+    "Voice",
     "Replies",
     "Files",
     "Banned Constructions",
@@ -707,7 +707,7 @@ BARE_REFERENCE_RE = re.compile(r"`([A-Za-z0-9_-]+\.md)`")
 # reads every mention of AGENTS.md as a broken pointer.
 NOT_A_REFERENCE = {
     "SKILL.md", "AGENTS.md", "README.md", "CLAUDE.md", "CHANGELOG.md",
-    "plan.md", "intent.md", "spec.md", "REVIEW.md",
+    "plan.md", "intent.md", "spec.md", "REVIEW.md", "overview.md",
     "copilot-instructions.md", "toby-instructions.md", "toby.md",
 }
 

@@ -104,7 +104,10 @@ TIC_PATTERNS = [
     # "Good." and "Great!" praise the user and say nothing about the subject.
     # "Right." and "Correct." are left out, because each one can be the answer.
     (re.compile(SENTENCE_START + r"(?:Good|Great|Nice|Perfect|Excellent|Awesome|Wonderful|Lovely)"
-                r"(?: (?:work|job|thinking|question))?[.!]", re.M),
+                r"(?: (?:work|job|thinking|question|point|idea|catch|observation|call))?[.!]", re.M),
+     "praise for the user"),
+    (re.compile(SENTENCE_START + r"That(?:'s| is) a (?:great|good|excellent|fair) "
+                r"(?:question|point|idea|catch|observation)[.!]", re.M),
      "praise for the user"),
     # "right — what happens when the input is empty?" grades the answer, then
     # welds the next clause on with a dash.
@@ -117,10 +120,54 @@ TIC_PATTERNS = [
                 r"Almost there|Close,? but not quite)[.!]", re.M),
      "grade on the user's attempt"),
     (re.compile(SENTENCE_START + r"(?:Here(?:'s| is) (?:why|how|the thing|the catch|the deal|the kicker|"
-                r"the trick|the twist|what happens|what's going on|the idea)|Let me explain|"
+                r"the trick|the twist|what happens|what's going on|what's happening|"
+                r"what I (?:found|changed|did|saw)|what we (?:found|changed|did|saw)|the idea|"
+                r"a breakdown|the breakdown|a quick summary|the quick summary|the plan|the steps)|Let me explain|"
                 r"Let me break (?:it|this|that) down|Think (?:about|of) it (?:this|like this) way|Consider this|"
-                r"Put another way|To put it (?:simply|another way)|In other words)\s*[.:]", re.M),
+                r"Put another way|To put it (?:simply|another way)|In other words|To be clear|"
+                r"To recap|Key points|Main points|(?:a |the )?[Qq]uick summary)\s*[.:]", re.M),
      "sentence that announces the next one"),
+    (re.compile(SENTENCE_START + r"(?:To recap|In short|Overall|All told|To sum up)\s*,", re.M),
+     "sentence that announces the next one"),
+    (re.compile(SENTENCE_START + r"(?:What this means is|The answer is|The point is|What matters is|"
+                r"The bottom line is|The key is|The real (?:issue|problem|bug|cause|question) is)\b", re.M),
+     "labelled answer"),
+    (re.compile(SENTENCE_START + r"(?:This|That|It) is (?:a|the) classic\b", re.M),
+     "stock phrasing"),
+    (re.compile(SENTENCE_START + r"(?:Nice|Great|Good|Excellent) (?:work|job) (?:on|with)\b", re.M),
+     "praise for the user"),
+    # "The card named process narration" uses `named` for `described`. The verb
+    # takes an actual name: a file named `config.yml`, or a named export.
+    (re.compile(r"\b(?:names?|named|naming)\s+(?:the |this |that |these |those |its |their |your |our )?"
+                r"(?:problem|problems|issue|issues|process|narration|behavior|behaviour|"
+                r"cause|reason|risk|risks|change|changes|point|points|finding|findings|"
+                r"failure|failures|gap|gaps)\b", re.I),
+     "named for described"),
+    # "Let me take a look at the handler." and "I'll start by reading the diff."
+    # announce the writer's next action and hold the finding back. "I read the
+    # diff and saw no new allocations" stays legal, because it reports a result.
+    # "Let me know when the deploy finishes" stays legal too, because that asks
+    # the user for something.
+    (re.compile(SENTENCE_START + r"(?:Let me\s+(?:take a look|look|check|read|open|examine|review|walk|dig|"
+                r"think|start|begin|explain|show|see|verify|confirm|run|search|find|inspect|analy[sz]e|help)|"
+                r"Allow me to|I'm going to\s+(?:take a look|look|check|read|open|review|walk|start)|"
+                r"I(?:'ve| have) (?:reviewed|taken a look at|gone through|looked through) (?:the|your)\b|"
+                r"I'll go ahead|I'll take a look|I'll start by|First,? I'll|First,? let's|First things first|"
+                r"Now,? let's|Alright,? let's|Okay,? let's|Let's get started|"
+                r"Let's\s+(?:look|check|walk|go|start|begin|dive|dig|see|examine|review)|Note that)\b", re.M),
+     "process preamble"),
+    # "Remaining limit, stated plainly:" describes the next sentence instead of
+    # stating it. The part after the comma is a meta word (an adverb or a
+    # participle), not content, and a bare "Fix:" label has no comma and stays
+    # legal, because a required format may ask for one.
+    (re.compile(SENTENCE_START + r"[A-Z][\w'&/-]{1,30}(?: [\w'&/-]+){0,4}, (?:[a-z]+ ){0,2}"
+                r"(?:plainly|simply|briefly|honestly|clearly|tersely|short|clear|stated|put|said|"
+                r"written|noted|rephrased|reworded|summarized|recap)\s*:", re.M),
+     "meta label"),
+    (re.compile(SENTENCE_START + r"(?:The problem|The issue)\s*:", re.M),
+     "labelled answer"),
+    (re.compile(SENTENCE_START + r"(?:The good news is|The bad news is)\b", re.M),
+     "labelled answer"),
     (re.compile(SENTENCE_START + r"(?:(?:The )?(?:[Ss]hort|[Ll]ong|[Qq]uick|[Ss]imple|[Dd]irect) (?:answer|version)|"
                 r"(?:The )?[Bb]ottom line|In short|In a nutshell|Put simply|Simply put|"
                 r"The gist|The upshot|The verdict|Spoiler)\s*:", re.M),
@@ -138,7 +185,7 @@ TIC_PATTERNS = [
      "agreement before checking"),
     # "Noted." and "Got it." acknowledge a correction and say nothing. The user
     # flagged "Noted" on 2026-10-08, so a reply opens with the change itself.
-    (re.compile(SENTENCE_START + r"(?:Noted|Got it|Understood)[.!]", re.M),
+    (re.compile(SENTENCE_START + r"(?:Noted|Got it|Understood|Fair enough|Makes sense)[.!]", re.M),
      "stock acknowledgement"),
     # "I'm taking your message as approval" claims a decision the user didn't make.
     (re.compile(r"\b(?:I'm |I am |I'll )?(?:taking|take|treating|treat) (?:that|this|your (?:message|reply|answer|note)) as "
@@ -148,8 +195,20 @@ TIC_PATTERNS = [
     (re.compile(SENTENCE_START + r"This (?:relates|maps|corresponds|ties|applies) to (?:problem|item|rule|step|group|criterion|finding)s? "
                 r"\d+(?: and \d+)?\.", re.M),
      "tag sentence"),
-    (re.compile(SENTENCE_START + r"(?:You asked (?:whether|if|how|why|what|about)|Your question (?:was|is) (?:whether|if|how|why|what))\b", re.M),
+    (re.compile(SENTENCE_START + r"(?:You(?:'re| are) asking (?:whether|if|how|why|what|about)|"
+                r"You asked (?:whether|if|how|why|what|about)|"
+                r"So you (?:want|need) to know|"
+                r"Your question (?:was|is) (?:whether|if|how|why|what))\b", re.M),
      "restating the question"),
+    # "I understand your frustration." and "That sounds frustrating." perform
+    # sympathy and give the reader no fact or next step.
+    (re.compile(SENTENCE_START + r"(?:I (?:understand|know) (?:your|this|that) (?:is |can be )?"
+                r"(?:frustration|concern|situation)|"
+                r"That (?:sounds|must be|is) (?:frustrating|annoying|tough|rough|hard)|"
+                r"I'm sorry (?:to hear|you|that you)|"
+                r"I apolog(?:ize|ise)|My apologies|"
+                r"Sorry (?:about (?:that|the confusion)|for the confusion))", re.M),
+     "performed empathy"),
 ]
 
 
@@ -176,6 +235,8 @@ REPLY_PATTERNS = FOIL_PATTERNS + TIC_PATTERNS + [
     # reply about code almost never means either one.
     (re.compile(r"\bcarr(?:y|ies|ied|ying)\b", re.I), "carry as a metaphor"),
     (re.compile(r"\b(?:hope this helps|feel free|let me know if|don't hesitate)\b", re.I),
+     "closing offer"),
+    (re.compile(r"\b(?:[Dd]oes (?:that|this) make sense|(?:I'd be |I'm )?[Hh]appy to (?:help|walk|show|explain|dig|go|answer|talk|look|share)|[Gg]lad I could help)\b"),
      "closing offer"),
 ]
 
@@ -287,6 +348,8 @@ PATTERN_NOTES: dict[str, tuple[str, str]] = {
                           "Code reads and matches, so the reader has to guess the action."),
     "sentence that announces the next one": ("The sentence announces the next sentence.",
                                              "The reader reads past it to find the content."),
+    "process preamble": ("The sentence announces what the writer will do next.",
+                         "The reader waits for the finding the sentence promises."),
     "coined name": ("The writer made up a name for something the source already names.",
                     "The reader has to learn a second name for one thing."),
     "importance flag": ("A phrase says something matters without saying why.",
@@ -328,6 +391,12 @@ PATTERN_NOTES: dict[str, tuple[str, str]] = {
                                   "The reader can't tell whether the writer checked the claim."),
     "stock acknowledgement": ("The reply opens with \"Noted.\" or \"Got it.\"",
                               "The word says nothing about the change."),
+    "performed empathy": ("The reply performs sympathy.",
+                          "The reader wants the fact or the next step, and the sympathy delays it."),
+    "stock phrasing": ("The sentence uses a stock phrase such as \"a classic bug\".",
+                       "The phrase adds no fact."),
+    "named for described": ("The verb `named` refers to a thing that has no name.",
+                            "The reader expects a name and gets a description."),
     "trailing though": ("A trailing \"though\" follows a complete sentence.",
                         "The word implies a contrast the sentence never states."),
     "that said": ("\"That said\" opens a sentence after a complete claim.",
@@ -398,6 +467,12 @@ TABLE_ROW_RE = re.compile(r"^\|.*$", re.M)
 BLOCKQUOTE_RE = re.compile(r"^>.*$", re.M)
 
 
+# A double-quoted span is a quote too, and the same exemption covers it. The
+# write hook and the stop hook both blank these spans before matching, so quoting
+# a user's sentence never fails the scan.
+DOUBLE_QUOTE_RE = re.compile(r'"[^"\n]{1,300}"|“[^”\n]{1,300}”')
+
+
 # A footnote definition is a citation, and cited titles are exempt. Its
 # indented continuation lines belong to the same footnote.
 FOOTNOTE_RE = re.compile(r"^\[\^[^\]]+\]:.*(?:\n[ \t]+\S.*)*", re.M)
@@ -419,7 +494,8 @@ def prose_only(text: str) -> str:
     def blank(match: re.Match[str]) -> str:
         return "".join(" " if ch != "\n" else "\n" for ch in match.group(0))
 
-    for pattern in (FRONTMATTER_RE, FENCE_RE, FOOTNOTE_RE, INLINE_CODE_RE, TABLE_ROW_RE, BLOCKQUOTE_RE, EMPHASIS_RE):
+    for pattern in (FRONTMATTER_RE, FENCE_RE, FOOTNOTE_RE, INLINE_CODE_RE, TABLE_ROW_RE, BLOCKQUOTE_RE,
+                    DOUBLE_QUOTE_RE, EMPHASIS_RE):
         text = pattern.sub(blank, text)
     return text
 
@@ -573,10 +649,12 @@ PREDICTED_PATTERNS = [
     # one is also a correct reply to "is it done?", so a person decides.
     (re.compile(r"(?:^|(?<=[.!?]\s))(?:Close|Almost|Nearly|Not quite|Exactly|Precisely|Sort of|Kind of|Partially)[.!]", re.M),
      "grade before the answer"),
-    # "Two fixes." and "Three things to know:" give a count and hold the items back.
-    (re.compile(r"(?:^|(?<=[.!?]\s))(?:Two|Three|Four|Five|A few|A couple of|Several)\s+(?:[a-z-]+\s+)?"
-                r"(?:fixes|corrections|things|issues|problems|points|caveats|catches|notes|differences|"
-                r"reasons|tweaks|mistakes|gaps|ideas|parts|pieces|changes)(?:\s+to\s+(?:know|fix|note|check))?"
+    # "One honest caveat:" and "Three things to know:" give a count and hold the
+    # items back. "One thing is clear:" passes, because the noun phrase is
+    # followed by a verb, not a colon.
+    (re.compile(r"(?:^|(?<=[.!?]\s))(?:One|Two|Three|Four|Five|A few|A couple of|Several|\d+)\s+(?:[a-z-]+\s+)?"
+                r"(?:fix(?:es)?|corrections?|things?|issues?|problems?|points?|caveats?|catch(?:es)?|notes?|differences?|"
+                r"reasons?|tweaks?|mistakes?|gaps?|ideas?|parts?|pieces?|changes?)(?:\s+to\s+(?:know|fix|note|check))?"
                 r"(?:\s+here)?(?:[.:](?=\s|$)|,\s+and\s+(?:both|all|each)\b)", re.M),
      "count before the items"),
     # "The theorem would be worthless" and "every system on Earth" add drama to a
@@ -856,11 +934,13 @@ REPLY_EXTRA_FORMS = {
     "code given senses",
     "code given feelings",
     "sentence that announces the next one",
+    "count before the items",
     "doubled verb",
     "either with no or",
     "hedge stack",
     "rhythm device",
     "closing offer",
+    "vague intensifier",
 }
 
 REPLY_PATTERNS.extend([(p, "invented foil") for p in CONTRAST_PATTERNS])
@@ -993,3 +1073,62 @@ def slogan_findings(text: str) -> list[tuple[int, str, str]]:
             ):
                 found.append((number, "label with a period", sentence))
     return found
+
+
+# ---------------------------------------------------------------------------
+# The hard set the two hooks block on. voice-check.py keeps the full pattern
+# list for on-demand audits, but a hook that fires on a borderline sentence
+# gets switched off inside a week, so the hooks run only what is wrong on
+# every reading: the hard banned words, the tic and label forms, clause welds,
+# and the two length ceilings. Style preferences (contrastive foils and
+# litotes) stay in the checker, where a person decides them. Both hooks
+# import this one function, so a pattern added here reaches both.
+HOOK_SENTENCE_LIMIT = 40
+HOOK_PARAGRAPH_LIMIT = 3
+WELD_RE = re.compile(r"\w\s+—\s+\w|\w;\s+\w")
+# A "Label —" line is a heading, not a welded clause, so it stays exempt.
+LABEL_DASH_RE = re.compile(r"^(?:[-*]\s+)?\**[A-Z][\w-]*(?:\s[\w-]+)?\**\s+—$")
+
+HOOK_TIC_LABELS = {
+    "praise for the user",
+    "grade and a dash",
+    "grade on the user's attempt",
+    "sentence that announces the next one",
+    "process preamble",
+    "labelled answer",
+    "meta label",
+    "count before the items",
+    "importance flag",
+    "agreement before checking",
+    "stock acknowledgement",
+    "performed empathy",
+    "that said",
+    "stock phrasing",
+    "named for described",
+    "hedge stack",
+    "vague intensifier",
+    "taking a message as approval",
+    "tag sentence",
+    "restating the question",
+    "closing offer",
+    "opening phrase that frames the evidence",
+    "stock admission",
+    "punchline closer",
+    "sentence about the reply",
+    "stray period at the start of a line",
+    "list number with no text",
+}
+
+
+def hook_patterns() -> list[tuple[re.Pattern, str]]:
+    """Return the (regex, label) pairs both hooks block on."""
+    tiers = load_banned_words()
+    patterns = [
+        # A word at the end of a sentence must still match, so the lookahead
+        # allows a period unless a letter follows it, as in `robust.py`.
+        (re.compile(rf"(?<![A-Za-z/._=-]){re.escape(word)}(?![A-Za-z/_-]|\.(?=[A-Za-z]))", re.I),
+         "banned word")
+        for word in tiers.get("hard", [])
+    ]
+    patterns.extend((p, label) for p, label in REPLY_PATTERNS if label in HOOK_TIC_LABELS)
+    return patterns

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""The Stop hook blocks seeded breaks and stays silent on clean replies.
+"""The hooks block seeded hard breaks and stay silent on clean text.
 
 The second half is the half that matters. A hook that fires on a reply with
 nothing wrong gets turned off, and then nothing is checking anything.
+
+Run: python3 tests/test-voice-hook.py
 """
 from __future__ import annotations
 
@@ -12,23 +14,15 @@ import sys
 import tempfile
 from pathlib import Path
 
-HOOK = Path(__file__).resolve().parents[1] / "hooks" / "voice-stop-check.py"
+REPO = Path(__file__).resolve().parents[1]
+HOOK = REPO / "hooks" / "voice-stop-check.py"
+WRITE_HOOK = REPO / "hooks" / "voice-write-check.py"
+CHECKER = REPO / "scripts" / "voice-check.py"
 
 BREAKS = [
-    "The cache is a correctness fix, not a speed one.",
     "This is a real tension — not a free addition.",
-    "It's not a nit, it's a bug in the retry path.",
-    "The failure is not just slow, it drops writes.",
-    "Use a lookup map rather than a switch statement.",
-    "The migration ran. It has not been verified, though.",
-    "That said, the second run passed.",
     "Fixed the off-by-one in the pager. Hope this helps.",
-    "Two libraries carry the framework.",
-    "The fixture for that fix is built, not run.",
-    "That's not a slip in word choice, it's the failure the guide describes.",
-    "The retry wrapper is at line 88 and the two call sites that reach it are both "
-    "in the same file, which means removing it changes nothing outside that "
-    "module, though the test suite has not run yet so that is still open.",
+    "The retry wrapper is at line 88 and the two call sites that reach it are both in the same file, which means removing it changes nothing outside that module, though the test suite has not run yet so that is still open.",
     "Very close. The score has to be 0 at the center.",
     "Here's why. The constant score never rises under any rule.",
     "Your sentence, repaired: the rule never raises the score.",
@@ -43,33 +37,96 @@ BREAKS = [
     "The new importer gives users a seamless upgrade path from version 3.",
     "The build passed; the deploy failed on the health check.",
     "The test is flaky — it depends on wall-clock time.",
-    "Use a lookup map instead of a switch statement.",
-    "You asked whether the timeout is per request, and it applies per connection, not per request.",
     "Based on the diff, the handler drops the last write.",
-    "A stampede under peak load isn't uncommon.",
-    "Complexity creeps into the handler when retries stay inline.",
+    "You asked whether the timeout is per request, and it applies per connection, not per request.",
     "You're right, and I had the cause wrong.",
     "I won't propose a fix in this reply.",
-    "The one that matters: the retry count.",
     "That's the whole trick.",
+    "We are leveraging the existing retry queue for the webhook failures.",
+    "It is worth noting that the cache is stale.",
+    "Additionally, the tests pass.",
+    "The takeaway is that retries drop writes.",
+    "The key insight is the timeout value.",
+    "The new importer gives a seamlessly upgrade path.",
+    "This section delves into the retry logic.",
+    "Utilizing the map speeds up the lookup.",
+    "The change is empowering for users.",
+    "To summarize, the migration adds the column.",
+    "To be clear, the timeout is per connection.",
+    "Remaining limit, stated plainly: the hooks catch the hard markers.",
+    "The cache is stale, honestly:",
+    "In other words: delete the row.",
+    "In other words, the row is gone.",
+    "I'm happy to help with the migration.",
+    "I should note that the cache is stale.",
+    "Put simply, the timeout is per connection.",
+    "One honest caveat: the hooks need a model to run.",
+    "Three things to know: the cache, the queue, and the timeout.",
+    "Two fixes: the pager and the retry.",
+    "Let me take a look at the handler.",
+    "I'll start by reading the diff.",
+    "Here's what I found: the cache is stale.",
+    "Note that the cache is stale.",
+    "You're absolutely right. The handler drops the write.",
+    "That sounds frustrating. The handler returns early.",
+    "I understand your frustration. The migration ran.",
+    "Great point. The cache is stale.",
+    "Fair enough. The cache is stale.",
+    "Does that make sense?",
+    "To recap, the cache is stale.",
+    "Here's a breakdown:",
+    "Let me check the logs.",
+    "Looking at the code, the handler returns early.",
+    "That said, the second run passed.",
+    "That's a great question.",
+    "I apologize for the confusion.",
+    "The code is robust.",
+    "In short, the migration is safe.",
+    "What this means is the cache is stale.",
+    "The real issue is the missing index.",
+    "The key is to move the insert.",
+    "This is a classic race condition.",
+    "Nice work on the fix.",
+    "Overall, the change is safe.",
+    "This might potentially cause a problem.",
+    "Let's dive in.",
+    "The answer is that the cache is stale.",
+    "Here's a quick summary: the cache is stale.",
+    "The problem: the cache is stale.",
+    "The card named process narration.",
+    "The report names the cause.",
+    "I'd be happy to walk you through it.",
+    "Let's look at the second issue.",
+    "The good news is the cache is stale.",
+    "Here's the plan:",
+    "The migration is extremely slow.",
+    "Basically, the cache is stale.",
 ]
 
-# A figurative frame or a coined term can be a literal use, so the checker
-# reports it as DECIDE and the stop hook lets the reply through.
-DECIDE_ONLY = [
-    "Teaching prose is a first-read surface, so keep it plain.",
-    "A five-bullet list is five sentences wearing a hat.",
-    "That decorator is a shallow pass-through in disguise.",
-    "Narrow the blast radius before you start guessing at the cause.",
-    "The rule lives in AGENTS.md, so read it first.",
-    "This finding rests on reading the diff.",
-    "When the cache is down, the request falls through to load().",
-    "Every lever feeds a formula.",
-    "Checkpoints and caches sit in the stores.",
+# Style preferences the hooks deliberately leave to the on-demand checker:
+# contrastive foils, litotes, and similar forms are a person's call, and a hook
+# that blocks them gets switched off.
+LETS_THROUGH = [
+    "The cache is a correctness fix, not a speed one.",
+    "It's not a nit, it's a bug in the retry path.",
+    "The failure is not just slow, it drops writes.",
+    "Use a lookup map rather than a switch statement.",
+    "The migration ran. It has not been verified, though.",
+    "Two libraries carry the framework.",
+    "The fixture for that fix is built, not run.",
+    "That's not a slip in word choice, it's the failure the guide describes.",
+    "Use a lookup map instead of a switch statement.",
+    "The one that matters: the retry count.",
+    "A stampede under peak load isn't uncommon.",
+    "Complexity creeps into the handler when retries stay inline.",
 ]
 
+# Ordinary replies, and borderline forms the hooks deliberately leave to the
+# on-demand checker, must pass silently.
 CLEAN = [
     "The retry loop drops the last write. api/sync.ts:88.",
+    "Reproduce: run `make test` twice.\nFix: the pager clamps negative offsets to zero.",
+    "One thing is clear: the row is gone.",
     "Three days. Okay, it's personal now. Send me the stack trace.",
     "I don't know why memory climbed. Nothing in the diff allocates, and I have no profiler data.",
     "Renamed `usr` to `user` across session.ts. Tests pass: 41 passed, 0 failed.",
@@ -103,423 +160,177 @@ CLEAN = [
     "Got it working on staging after the second deploy.",
     "I noted the port number in the plan, so the next run uses 5174.",
     "Understood messages get archived after a day.",
+    "The rule lives in AGENTS.md, so read it first.",
+    "A five-bullet list is five sentences wearing a hat.",
+    "When the cache is down, the request falls through to load().",
+    "make clean removes the build folder.",
+    "I read the diff and saw no new allocations.",
+    "I'll check the pager after the migration.",
+    "Let me know when the deploy finishes.",
+    "Overall latency fell 40 percent.",
+    "The file is named `robust.py`.",
+    "The problem is the missing index.",
+    "The file is named `config.yml`.",
+    "A named export has a fixed name.",
+    "Name the function after its job.",
+    "The user named one skill in the sentence.",
+    "The plan is at docs/plan.md.",
+    "The news is bad.",
+    "We're happy to report 41 passing tests.",
 ]
 
+failures = 0
 
-def run(reply: str) -> int:
+
+def run_hook(reply: str, stop_hook_active: bool = False) -> subprocess.CompletedProcess:
     with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
         handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": reply}]}}) + "\n")
         transcript = handle.name
-    payload = json.dumps({"transcript_path": transcript, "stop_hook_active": False})
+    payload = json.dumps({"transcript_path": transcript, "stop_hook_active": stop_hook_active})
     result = subprocess.run([sys.executable, str(HOOK)], input=payload, capture_output=True, text=True)
     Path(transcript).unlink()
-    return result.returncode
+    return result
 
 
-failures = 0
+def expect(label: str, got, want) -> None:
+    global failures
+    if got == want:
+        print(f"ok   {label}")
+    else:
+        print(f"FAIL {label} (got {got!r}, wanted {want!r})")
+        failures += 1
+
+
 for reply in BREAKS:
-    code = run(reply)
-    if code == 2:
+    if run_hook(reply).returncode == 2:
         print(f"ok   blocks: {reply[:56]}")
     else:
         print(f"FAIL allowed a break: {reply}")
         failures += 1
 
-for reply in DECIDE_ONLY:
-    if run(reply) == 0:
-        print(f"ok   lets through: {reply[:56]}")
-    else:
-        print(f"FAIL blocked a DECIDE-only reply: {reply}")
-        failures += 1
-
 false_positives = 0
 for reply in CLEAN:
-    code = run(reply)
-    if code == 0:
+    if run_hook(reply).returncode == 0:
         print(f"ok   allows: {reply[:56]}")
     else:
         print(f"FAIL false positive: {reply}")
         false_positives += 1
         failures += 1
 
+for reply in LETS_THROUGH:
+    if run_hook(reply).returncode == 0:
+        print(f"ok   lets through: {reply[:56]}")
+    else:
+        print(f"FAIL blocked a checker-only form: {reply}")
+        failures += 1
+
 print()
 print(f"{len(BREAKS)} seeded breaks, {len(BREAKS) - failures + false_positives} caught.")
 print(f"{len(CLEAN)} ordinary replies, {false_positives} false positives.")
 
-# --- the write hook, and the FIX/DECIDE split ---------------------------------
-import tempfile as _tf
+# --- reprompt shape ----------------------------------------------------------
 
-WRITE_HOOK = Path(__file__).resolve().parents[1] / "hooks" / "voice-write-check.py"
-CHECKER = Path(__file__).resolve().parents[1] / "scripts" / "voice-check.py"
-notes: list[str] = []
+blocked = run_hook("Short answer: the cache is stale.")
+expect("a block prints nothing on stdout", blocked.stdout, "")
+expect("the reprompt asks for a Revised reply heading", "`## Revised reply`" in blocked.stderr, True)
+expect("the reprompt stays short and does not demand a whole-reply rewrite",
+       "rewrite the whole reply" in blocked.stderr.lower(), False)
+expect("the reprompt lists the matched line", "Short answer:" in blocked.stderr, True)
+
+# --- length ceilings and splitting -------------------------------------------
+
+LONG = " ".join(["word"] * 45) + "."
+LONG_TOO = " ".join(["other"] * 45) + "."
+two_hits = run_hook(f"Hope this helps with the first part. {LONG} Feel free to ask. {LONG_TOO}").stderr
+expect("both long sentences are listed", two_hits.count("-word sentence"), 2)
+expect("both closing offers are listed", "'Hope this helps'" in two_hits and "'Feel free'" in two_hits, True)
+
+bullets = "The test missed the conditions where the failure happens, for these reasons:\n" + "\n".join(
+    f"- **Item {n}.** Each writer read the style as its first step, with only the draft to fix." for n in range(3))
+expect("a label line and its bullets are separate sentences", "-word sentence" in run_hook(bullets).stderr, False)
+
+table = "The new message did best.\n\n| Measure | A | B | C |\n|---|---|---|---|\n" + "\n".join(
+    f"| Unnamed problem types fixed in round {n} | 11 of 13 | 11 of 13 | 12 of 13 |" for n in range(6))
+expect("table rows are not counted as one long sentence", "-word sentence" in run_hook(table).stderr, False)
+
+expect("a four-sentence paragraph is blocked",
+       "over 3 sentences" in run_hook("The cache is stale. The job runs hourly. The job skips weekends. The fix moves it to a queue.").stderr, True)
+expect("a three-sentence paragraph passes",
+       run_hook("The cache is stale. The job runs hourly. The fix moves it.").returncode, 0)
+
+# --- the two-pass revision guard ----------------------------------------------
+
+with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
+    handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": "Short answer: stale."}]}}) + "\n")
+    handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": "## Revised reply\n\nWe can leverage the cache."}]}}) + "\n")
+    retry_transcript = handle.name
+retry_res = subprocess.run([sys.executable, str(HOOK)],
+                           input=json.dumps({"transcript_path": retry_transcript, "stop_hook_active": True}),
+                           capture_output=True, text=True)
+Path(retry_transcript).unlink()
+expect("a first revised reply that still has a hard break is blocked", retry_res.returncode, 2)
+
+with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
+    for text in ("Short answer: stale.", "## Revised reply\n\nWe leverage the cache.",
+                 "## Revised reply\n\nThe cache is stale. We use the queue."):
+        handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": text}]}}) + "\n")
+    twice_transcript = handle.name
+twice_res = subprocess.run([sys.executable, str(HOOK)],
+                           input=json.dumps({"transcript_path": twice_transcript, "stop_hook_active": True}),
+                           capture_output=True, text=True)
+Path(twice_transcript).unlink()
+expect("the hook allows after two revisions", twice_res.returncode, 0)
+
+# --- the write hook ------------------------------------------------------------
 
 
-def run_write_hook(body: str, suffix: str = ".md") -> int:
-    with _tf.NamedTemporaryFile("w", suffix=suffix, delete=False) as handle:
+def run_write_hook(body: str, suffix: str = ".md") -> subprocess.CompletedProcess:
+    with tempfile.NamedTemporaryFile("w", suffix=suffix, delete=False) as handle:
         handle.write(body)
         written = handle.name
     payload = json.dumps({
         "hook_event_name": "PostToolUse", "tool_name": "Write",
         "tool_input": {"file_path": written},
     })
-    result = subprocess.run([sys.executable, str(WRITE_HOOK)], input=payload,
-                            capture_output=True, text=True)
+    result = subprocess.run([sys.executable, str(WRITE_HOOK)], input=payload, capture_output=True, text=True)
     Path(written).unlink()
-    return result.returncode
-
-
-def expect(label: str, got: int, want: int) -> None:
-    if got == want:
-        print(f"ok   {label}")
-    else:
-        print(f"FAIL {label} (exit {got}, wanted {want})")
-        notes.append(label)
+    return result
 
 
 print()
 expect("write hook flags a banned word in a written file",
-       run_write_hook("This uses a robust approach.\n"), 2)
-expect("write hook reports a DECIDE finding in a written file",
-       run_write_hook("The hook return shape is fine here.\n"), 2)
+       run_write_hook("This uses a robust approach.\n").returncode, 2)
+expect("write hook flags a clause weld in a written file",
+       run_write_hook("The build passed; the deploy failed.\n").returncode, 2)
+expect("write hook flags a sentence over 40 words",
+       run_write_hook("The retry wrapper is at line 88 and the two call sites that reach it are both in the same file, "
+                      "which means removing it changes nothing outside that module, though the test suite has not run "
+                      "yet so that is still open.\n").returncode, 2)
+expect("write hook flags a four-sentence paragraph",
+       run_write_hook("The cache is stale. The job runs hourly. The job skips weekends. The fix moves it.\n").returncode, 2)
+expect("write hook flags a bullet over 40 words",
+       run_write_hook("- The retry wrapper is at line 88 and the two call sites that reach it are both in the same file, "
+                      "which means removing it changes nothing outside that module, though the test suite has not run "
+                      "yet so that is still open.\n").returncode, 2)
+expect("write hook flags a label in a written file",
+       run_write_hook("Short answer: the cache is stale.\n").returncode, 2)
 expect("write hook stays quiet on ordinary prose",
-       run_write_hook("The parser reads the header, then the body. Both are UTF-8.\n"), 0)
+       run_write_hook("The parser reads the header, then the body. Both are UTF-8.\n").returncode, 0)
+expect("write hook honors a quoted sentence",
+       run_write_hook('The user wrote "This is a robust approach." and asked for a fix.\n').returncode, 0)
 expect("write hook ignores a non-prose file",
-       run_write_hook("This uses a robust approach.\n", suffix=".py"), 0)
-
-# A judgement call must never gate anything, or the group gets waved away.
-with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
-    handle.write("The hook return shape is fine here.\n")
-    decide_file = handle.name
-out = subprocess.run([sys.executable, str(CHECKER), decide_file], capture_output=True, text=True)
-Path(decide_file).unlink()
-expect("a DECIDE finding does not fail the run", out.returncode, 0)
-
-# The guide lists every banned word. Scanning it for them returned 107 findings
-# once, which is how a tool teaches its reader to ignore it.
-GUIDE = Path(__file__).resolve().parents[1] / "base" / "toby.md"
-guide_out = subprocess.run([sys.executable, str(CHECKER), str(GUIDE), "--fix-only"],
-                           capture_output=True, text=True)
-expect("the guide is not scanned for the words it defines", guide_out.returncode, 0)
-if "states the banned words" not in guide_out.stdout:
-    print("FAIL the checker did not say why the word checks were off")
-    notes.append("defining note")
-if "DECIDE" not in out.stdout:
-    print("FAIL the DECIDE group was not printed")
-    notes.append("decide printed")
-
-# A run with no findings still prints the rules the patterns do not check, because an
-# agent that sees no findings stops reading.
-read_out = subprocess.run([sys.executable, str(CHECKER), "-"], input="The parser reads the header.\n",
-                          capture_output=True, text=True)
-if "READ  (" in read_out.stdout:
-    print("ok   a run with no findings prints the READ list")
-else:
-    print("FAIL a run with no findings left out the READ list")
-    notes.append("read list printed")
-no_read_out = subprocess.run([sys.executable, str(CHECKER), "-", "--no-read"],
-                             input="The parser reads the header.\n", capture_output=True, text=True)
-if "READ  (" in no_read_out.stdout:
-    print("FAIL --no-read printed the READ list")
-    notes.append("no-read flag")
-else:
-    print("ok   --no-read leaves out the READ list")
-
-# Slogans. The five sentences below each passed every check before the slogan
-# forms existed, and each is an agent's doc copy the user rewrote. The checker
-# has to raise every form on them and none on the rewrites.
-SLOGANS = """# Backplane
-
-A multi agent framework platform
-
-Users talk to agents. Agents read, call tools, and pause for people.
-
-No plugin imports an engine. No framework file names a plugin.
-
-A plugin is data. The framework compiles it.
-
-## Uniformity is the failure
-
-Two libraries carry the framework.
-
-One file causes this failure.
-
-Phase 1 of 3 in the queue migration.
-
-- Guard: none.
-
-Follow these steps to add one.
-
-- Approve the $400 monthly cost.
-- Approve the 6-week migration.
-
-A stampede under peak load isn't uncommon, and complexity creeps into the handler.
-
-The result? The build is incredibly slow, and the compiler complains about the types.
-
-The wrapper provides the ability to retry, which may potentially help, and it is the ask from product.
-
-The plan is less prose, more code.
-
-Stop searching the repo, because the cause is outside it. That failure would have paged the engineer.
-
-A plugin never imports an engine directly, and Relay treats model providers as engines.
-
-## Toby is careful, Toby wants to live
-
-The bigger gap is elsewhere. The conformance suite tests exactly that surface.
-
-Five properties keep that true, and the runner checks the third.
-
-A failed demo has one trace to open, and that is the property that makes it checkable.
-
-### The migration moves the highest-risk jobs first
-
-- Phase 1 moves the highest-risk jobs.
-"""
-REWRITES = """# Backplane
-
-Backplane is an extensible multi-agent platform.
-
-Users instruct agents, and agents perform complex actions and wait for human feedback.
-
-New agents are created as plugins.
-
-The queue service costs $400 a month
-
-## Varied replies
-
-The platform consists of a shared generative UI toolkit and features that make it easy to build agents.
-"""
-FORMS = ["noun phrase with no verb", "chained pair", "one-word definition", "heading written as a claim", "sense-scoped 'carry'",
-         "setup sentence before the fact", "label with a period", "label with no value",
-         "sentence about the document", "litotes", "abstract noun as actor",
-         "setup question", "noun doing a verb's job", "meeting jargon", "rhythm device",
-         "vague intensifier", "code given feelings", "hedge stack", "would-have stated as fact",
-         "claim about the user", "what a thing never does", "program given a judgment",
-         "bullet restates its heading", "bare `that` as an object", "rider after a complete claim",
-         "heading joins two clauses"]
-
-
-def check_text(body: str) -> subprocess.CompletedProcess:
-    with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
-        handle.write(body)
-        name = handle.name
-    result = subprocess.run([sys.executable, str(CHECKER), name], capture_output=True, text=True)
-    Path(name).unlink()
-    return result
-
-
-slogan_out = check_text(SLOGANS)
-for form in FORMS:
-    if form in slogan_out.stdout:
-        print(f"ok   checker raises {form}")
-    else:
-        print(f"FAIL checker missed {form}")
-        notes.append(form)
-expect("slogan findings do not fail the run", slogan_out.returncode, 0)
-rewrite_out = check_text(REWRITES)
-for form in FORMS:
-    if form in rewrite_out.stdout:
-        print(f"FAIL checker raised {form} on a plain rewrite")
-        notes.append(f"rewrite {form}")
-expect("the plain rewrites pass", rewrite_out.returncode, 0)
-
-# A figurative verb is a DECIDE finding, so it doesn't fail the run. A plain
-# sentence with the same facts gets no finding.
-verb_out = check_text("The rule lives in AGENTS.md.\n")
-expect("a figurative verb doesn't fail the run", verb_out.returncode, 0)
-expect("a figurative verb is a DECIDE finding", "DECIDE  (" in verb_out.stdout, True)
-plain_out = check_text("The rule is in AGENTS.md.\n")
-expect("the literal version passes", plain_out.returncode, 0)
-
-# A verb for a feeling, given to a system, is a metaphor, and a person decides.
-feeling_out = check_text("Stream resume is the one most likely to embarrass a demo.\n")
-expect("a verb for a feeling is a DECIDE finding", "DECIDE  (" in feeling_out.stdout, True)
-
-# --review prints every sentence, so the reader can answer for each one.
-with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
-    handle.write("# A heading\n\nThe parser reads the header. The repo has no tests.\n")
-    review_file = handle.name
-review_out = subprocess.run([sys.executable, str(CHECKER), review_file, "--review"],
-                            capture_output=True, text=True)
-Path(review_file).unlink()
-expect("--review fails the run on a FIX finding", review_out.returncode, 1)
-for wanted in ("READ  (", "1. A heading", "2. The parser reads the header.",
-               "3. The repo has no tests.", "FIX  negation on a noun"):
-    if wanted in review_out.stdout:
-        print(f"ok   --review prints {wanted!r}")
-    else:
-        print(f"FAIL --review left out {wanted!r}")
-        notes.append(f"review {wanted}")
-
-# A numbered step joins clauses with a semicolon as easily as a paragraph does.
-list_weld_out = check_text("1. An agent starting from a plugin edits; one starting from nothing guesses.\n")
-expect("a semicolon join inside a list item fails the run", list_weld_out.returncode, 1)
-label_out = check_text("- Supported but vague — sharpen it before you evaluate anything.\n")
-expect("a label and a dash in a list item pass", label_out.returncode, 0)
-
-
-
-def expect_text(label: str, out: str, wanted: str, present: bool) -> None:
-    if (wanted in out) == present:
-        print(f"ok   {label}")
-    else:
-        print(f"FAIL {label}")
-        notes.append(label)
-
-
-# Editing leftovers are wrong on every reading, so they fail the run. A code
-# span followed by a period is not a stray period, because prose_only blanks it.
-expect("a period alone at the start of a line fails the run",
-       check_text("The interface looks fine\n. The hidden contract is the cache.\n").returncode, 1)
-expect("a list number with no text fails the run",
-       check_text("1. Measure the latency.\n2.\n\nEstimate the hit ratio.\n").returncode, 1)
-expect("a code span before a period passes",
-       check_text("Record the distribution in\n`baselines/voice.json`. Set the minimum from the spread.\n").returncode, 0)
-
-# The sentence-count claim is checked against the comment above it. The repo
-# review found four of these wrong, and a later pass found twelve more.
-COUNTED = """```ts
-/**
- * Returns the cached value or loads it. A cache outage calls load() directly.
- * The cache never returns stale data.
- */
-```
-
-The comment has {n} sentences.
-"""
-expect_text("a wrong sentence count is reported", check_text(COUNTED.format(n="two")).stdout,
-            "sentence count does not match the comment", True)
-expect_text("a correct sentence count passes", check_text(COUNTED.format(n="three")).stdout,
-            "sentence count does not match the comment", False)
-
-# A sentence made only of code spans has no subject or verb.
-expect_text("a sentence of only code spans is a fragment",
-            check_text("`evals/out/old.md` and `evals/out/new.md`.\n").stdout, "fragment", True)
-expect_text("a sentence with a verb after a code span passes",
-            check_text("`evals/out/old.md` holds the old run.\n").stdout, "fragment", False)
-
-# The guide bans `really` and `actually` when nothing states the contrast.
-expect_text("an intensifier with no contrast is reported",
-            check_text("The query is really slow on large tables.\n").stdout, "intensifier with no contrast", True)
-expect_text("an intensifier with a stated contrast passes",
-            check_text("The query looks fast, but it is really slow on large tables.\n").stdout,
-            "intensifier with no contrast", False)
-
-# The Stop hook lists every hit, and a colon before a bullet ends a sentence.
-def hook_stderr(reply: str) -> str:
-    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
-        handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": reply}]}}) + "\n")
-        transcript = handle.name
-    payload = json.dumps({"transcript_path": transcript, "stop_hook_active": False})
-    result = subprocess.run([sys.executable, str(HOOK)], input=payload, capture_output=True, text=True)
-    Path(transcript).unlink()
-    return result.stderr
-
-
-def hook_stdout(reply: str) -> str:
-    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
-        handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": reply}]}}) + "\n")
-        transcript = handle.name
-    payload = json.dumps({"transcript_path": transcript, "stop_hook_active": False})
-    result = subprocess.run([sys.executable, str(HOOK)], input=payload, capture_output=True, text=True)
-    Path(transcript).unlink()
-    return result.stdout
-
-
-# A blocked reply asks for a rewrite without a banner or a heading, and the
-# hook prints nothing to the user.
-blocked = "Short answer: the cache is stale."
-expect_text("the reprompt has no Toby rewrite heading", hook_stderr(blocked), "## Toby rewrite", False)
-expect_text("the reprompt has no blue row", hook_stderr(blocked), "\U0001f7e6" * 20, False)
-# The user scrolls past the blocked reply, so the rewrite opens with a heading
-# that shows where the new reply starts.
-expect_text("the reprompt asks for a Revised reply heading", hook_stderr(blocked), "`## Revised reply`", True)
-expect_text("a block prints nothing on stdout", repr(hook_stdout(blocked)), "''", True)
-LONG_PARAGRAPH = "The cache is stale. The job runs hourly. The job skips weekends. The fix moves it to a queue."
-expect_text("a four-sentence paragraph is blocked", hook_stderr(LONG_PARAGRAPH), "paragraph over three sentences", True)
-expect_text("a three-sentence paragraph passes", hook_stderr("The cache is stale. The job runs hourly. The fix moves it."), "paragraph over three sentences", False)
-expect_text("a clean reply prints nothing on stdout", repr(hook_stdout(CLEAN[0])), "''", True)
-
-
-LONG = " ".join(["word"] * 45) + "."
-LONG_TOO = " ".join(["other"] * 45) + "."
-two_hits = hook_stderr(f"Hope this helps with the first part. {LONG} Feel free to ask. {LONG_TOO}")
-expect_text("the Stop hook lists both long sentences", two_hits, two_hits.count("-word sentence") == 2 and "-word sentence" or "missing", True)
-expect_text("the Stop hook lists both closing offers", two_hits, "'Hope this helps'" if "'Feel free'" in two_hits else "missing", True)
-expect_text("the Stop hook asks for a rewrite of the whole reply", two_hits, "rewrite the whole reply", True)
-bullets = "The test missed the conditions where the failure happens, for these reasons:\n" + "\n".join(
-    f"- **Item {n}.** Each writer read the style as its first step, with only the draft to fix." for n in range(3))
-expect_text("a label line and its bullets are separate sentences", hook_stderr(bullets), "-word sentence", False)
-table = "The new message did best.\n\n| Measure | A | B | C |\n|---|---|---|---|\n" + "\n".join(
-    f"| Unnamed problem types fixed in round {n} | 11 of 13 | 11 of 13 | 12 of 13 |" for n in range(6))
-expect_text("table rows are not counted as one long sentence", hook_stderr(table), "-word sentence", False)
-
-
-# A reference file that names a concept its skill never defines.
-with _tf.TemporaryDirectory() as skill_dir:
-    skill = Path(skill_dir) / "toby-sample"
-    (skill / "references").mkdir(parents=True)
-    (skill / "SKILL.md").write_text("# Sample\n\nSkip the rules about outcomes for a pure toy.\n")
-    reference = skill / "references" / "play.md"
-    reference.write_text("A pure toy has no verdict, so skip the outcome laws.\n")
-    term_out = subprocess.run([sys.executable, str(CHECKER), str(reference)], capture_output=True, text=True)
-    expect_text("a term the skill never defines is reported", term_out.stdout, "term the skill never defines", True)
-    (skill / "SKILL.md").write_text("# Sample\n\nSkip the outcome laws for a pure toy.\n")
-    term_out = subprocess.run([sys.executable, str(CHECKER), str(reference)], capture_output=True, text=True)
-    expect_text("a term SKILL.md uses passes", term_out.stdout, "term the skill never defines", False)
-
-# --- new compliance checks: FIX/DECIDE clarity, repeat-write DECIDE, and second-try Stop hook ---
-
-# 1. Unconditional banned constructions in prose (such as framing evidence or stock admission) fail as FIX.
-expect("evidence-framing opener fails as FIX",
-       check_text("Based on the diff, the handler drops the write.\n").returncode, 1)
-expect("stock admission fails as FIX",
-       check_text("You're right, and I had the cause wrong.\n").returncode, 1)
-
-# 2. Inline code spans stay visible in quoted findings so the agent sees the real sentence.
-code_finding_out = check_text("`scripts/install.sh` uses a robust check.\n").stdout
-expect_text("quoted finding preserves inline code span", code_finding_out, "`scripts/install.sh` uses a robust check.", True)
-
-# 3. Every DECIDE finding prints a Fine when line, even when the pattern has no prose exception.
-decide_no_fine_out = check_text("The wrapper provides the ability to retry.\n").stdout
-expect_text("every DECIDE finding includes a Fine when line", decide_no_fine_out, "Fine when:", True)
-
-# 4. --review prints Fix and Fine when lines under findings.
-with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
-    handle.write("The hook return shape is fine here.\n")
-    rev_decide_file = handle.name
-rev_decide_out = subprocess.run([sys.executable, str(CHECKER), rev_decide_file, "--review"],
-                                capture_output=True, text=True).stdout
-Path(rev_decide_file).unlink()
-expect_text("--review prints Fix under a finding", rev_decide_out, "Fix:", True)
-expect_text("--review prints Fine when under a DECIDE finding", rev_decide_out, "Fine when:", True)
-
-# 5. The write hook blocks once on a DECIDE-only finding, then allows a second edit when the DECIDE sentence is kept.
-with _tf.NamedTemporaryFile("w", suffix=".md", delete=False) as handle:
-    handle.write("The hook return shape is fine here.\n")
-    repeat_file = handle.name
-repeat_payload = json.dumps({
-    "hook_event_name": "PostToolUse", "tool_name": "Edit",
-    "tool_input": {"file_path": repeat_file},
-})
-first_write = subprocess.run([sys.executable, str(WRITE_HOOK)], input=repeat_payload, capture_output=True, text=True)
-second_write = subprocess.run([sys.executable, str(WRITE_HOOK)], input=repeat_payload, capture_output=True, text=True)
-Path(repeat_file).unlink()
-expect("write hook blocks on a new DECIDE finding on first write", first_write.returncode, 2)
-expect("write hook allows the second edit when only the reviewed DECIDE finding remains", second_write.returncode, 0)
-
-# 6. The Stop hook still checks the first ## Revised reply when stop_hook_active is true, and stops after two revisions.
-with _tf.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as handle:
-    handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": "Short answer: stale."}]}}) + "\n")
-    handle.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": "## Revised reply\n\nWe can leverage the cache."}]}}) + "\n")
-    retry_transcript = handle.name
-retry_payload = json.dumps({"transcript_path": retry_transcript, "stop_hook_active": True})
-retry_res = subprocess.run([sys.executable, str(HOOK)], input=retry_payload, capture_output=True, text=True)
-Path(retry_transcript).unlink()
-expect("Stop hook blocks a first revised reply that still has a voice break", retry_res.returncode, 2)
+       run_write_hook("This uses a robust approach.\n", suffix=".py").returncode, 0)
+expect("write hook prints findings on stderr, not stdout",
+       (run_write_hook("This uses a robust approach.\n").stdout, "banned word" in run_write_hook("This uses a robust approach.\n").stderr),
+       ("", True))
+
+# --- the on-demand checker still runs ------------------------------------------
+
+check = subprocess.run([sys.executable, str(CHECKER), "-"], input="The parser reads the header.\n",
+                       capture_output=True, text=True)
+expect("voice-check.py still runs on stdin", check.returncode, 0)
 
 print()
-if failures or notes:
+if failures:
     raise SystemExit(1)
-print("Voice hook and checker fixtures passed.")
+print("Voice hook fixtures passed.")

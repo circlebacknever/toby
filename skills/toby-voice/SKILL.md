@@ -1,63 +1,48 @@
 ---
 name: toby-voice
 description: >-
-  Applies Toby's writing rules to prose and runs the voice checker on it. Use it
-  for a substantive reply, review findings, a commit message, a PR description,
-  a README, an AGENTS.md, a doc, a plan, or a rewrite of any text. Load it
-  before finalizing prose, and don't wait to be asked. Use it when the user
-  says voice, toby voice, check the voice, voice pass, or voice standards, or
-  asks for wording or tone help. Skip it as the first skill for names and
-  comments inside code, which toby-refactor covers.
-  Load it together with the skill for the work, such as toby-build for a change
-  to a plan, and never in place of that skill.
+  Rewrite prose in a direct voice: the answer first, short plain sentences, no
+  preamble, no filler. Use it for a substantive reply, review findings, a commit
+  message, a PR description, a README, a doc, a plan, or a rewrite of any text,
+  and load it before finalizing prose. Use it when the user says voice, toby
+  voice, check the voice, voice pass, or voice standards, or asks for wording or
+  tone help. Skip it for names and comments inside code, which toby-swd-clarity
+  covers. Load it with the skill for the work, never in place of that skill.
 ---
 
 # Toby Voice
 
-Draft each sentence using the four rules below so the text starts in voice. Then run the deletion check and the voice checker from the operating guide.
+Write the way a clear engineer talks, in chat and in files: the point first, one idea per sentence, no ceremony. Every sentence states a fact, a step, a decision, a risk, or an answer. If deleting it changes nothing, delete it.
 
-When the user's message is `voice`, `toby voice`, `check the voice`, `voice pass`, or `voice standards`, or says a reply is confusing, run these steps on your previous reply or the named file.
+## Cut the assistant register
 
-## Draft in voice
+Never open with praise or a plan to look at something. Never label the answer, close with an offer, or recap. `references/plain-language-examples.md` lists the openers, labels, closings, and recaps to cut.
 
-1. **Start with the answer, fact, or change.** Put each condition right after the claim it qualifies. Delete any sentence that announces, counts, labels, frames, or grades what follows (`Here's why:`, `Two fixes:`, `Short answer:`, `Based on the diff,`, `Good catch.`, `Noted.`).
-2. **Put a real actor before an active verb.** Make `the caller`, `the handler`, `the migration`, `you`, or `I` the subject, with active literal verbs (`runs`, `reads`, `writes`, `calls`, `returns`, `stores`, `is in`). Put negations on the verb as a contraction (`"tests/ doesn't have a test"`), and never use passive voice to hide who acts or put `"no"` or `"nothing"` on a noun.
-3. **Use everyday words and state what is true.** Replace unexplained jargon and four-noun stacks with plain words that say what happens. Leave out what a thing isn't (`X, not Y`, `rather than`, `instead of`, `not just`), double negatives (`not uncommon`), `"X is what makes Y"`, empty adjectives (`actual output`), and closing offers.
-4. **Keep sentences short and paragraphs small.** Keep most sentences to 25 words or fewer with one idea each, joined by `and`, `but`, `because` (cause), or `so` (result), without em dashes (`—`) or semicolons (`;`). Put a noun after `this` or `that` (`this check`), cap paragraphs at three sentences, and turn multi-item explanations into a list.
+## A whole reply
 
-## Deletion tests
+The retry loop drops the last write. `api/sync.ts:88` returns before the insert runs. I moved the insert above the return, and the tests pass: 41 passed, 0 failed.
 
-1. Delete each sentence that fails the Source test or the Job test in the operating guide, and delete any bullet that repeats its heading.
-2. Make every term definition a complete sentence with a subject and a verb, because later sentences rely on it.
-3. Confirm the reply commits to a concrete fact, number, position, refusal, or next step.
+## The rules
 
-## Voice checker
+Answer first, with each condition right after it. Keep sentences short, with one idea in each. Define a term the reader has not seen in plain words where it first appears. Use a precise everyday word. Say it once. State only what you read, ran, or the user said.
+
+The guide owns the banned-word list. Read its Banned Words section. `references/toby.md` is a copy of the operating guide. Open it when the guide isn't already in your instructions. The full sentence checklist is in `references/plain-language.md`.
+
+## Check a draft
+
+Run the checker on a file before you finish it:
 
 ```sh
 python3 <this skill's folder>/scripts/voice-check.py draft.md --review
-some-command | python3 <this skill's folder>/scripts/voice-check.py -
 ```
 
-The checker sorts findings into four groups:
-
-- `FIX` marks a rule break with no judgment involved. Rewrite every matched sentence.
-- `DECIDE` marks a likely rule break. Rewrite the sentence unless its `Fine when` condition holds, and state why.
-- `PATTERNS` explains each matched pattern and why it slows the reader down.
-- `READ` lists the 18 rules that regex patterns can't check. Read every sentence of the draft against that list and rewrite each match, even when `FIX` and `DECIDE` are empty.
-
-Don't write your own grep for these rules. When the checker is missing, say so, and read the draft against `references/plain-language.md`.
-
-## References
-
-When the prose is a module `README.md` or `AGENTS.md`, open `toby-swd-docs` by path.
-
-- `references/plain-language.md` lists the numbered rules that the checker cites. Load it every time this skill loads.
-- `references/toby.md` is a copy of the operating guide. Load it only when the guide isn't already in your instructions.
-- `references/plain-language-examples.md` shows before-and-after rewrites. Open it when a rewrite for a rule isn't working.
-- `references/examples/chat.md` covers pushback, corrections, status reports, and "I don't know" in chat.
-- `references/examples/artifacts.md` covers commit messages, PR descriptions, and README openings.
-- `references/examples/code.md` covers code findings written outside `toby-code-review`.
+Fix every `FIX` finding. Judge each `DECIDE` finding, and keep the sentence only when its reason holds. Read every sentence against the `READ` list, which covers the patterns a regex can't see.
 
 ## Rewrite requests
 
-Return the revised text first. Add a note only when the user asked for the reason or two rules conflicted, and state the rule in plain words.
+Return the revised text first. Add a note only when the user asked for the reason, and state the rule in plain words.
+
+## References
+
+- `references/plain-language.md` holds the sentence rules as a checklist for a sentence-by-sentence read.
+- `references/plain-language-examples.md` holds before-and-after rewrites for replies, findings, and docs. Open it when a rewrite isn't working.

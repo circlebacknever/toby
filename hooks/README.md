@@ -4,9 +4,15 @@ The repo has three voice checks, because each one checks text that the other two
 
 | Mechanism | Reads | Catches |
 |---|---|---|
-| `scripts/voice-check.py` | any file, a directory, or stdin | every pattern, on demand, followed by the rules the patterns don't check |
-| `voice-write-check.py` | a file the agent just wrote | prose in files, as each file is written |
-| `voice-stop-check.py` | the reply the agent just sent | prose in chat, which no file check sees |
+| `scripts/voice-check.py` | any file, a directory, or stdin | the full pattern list, on demand, plus the rules the patterns don't check |
+| `voice-write-check.py` | a file the agent just wrote | the hard set, as each file is written |
+| `voice-stop-check.py` | the reply the agent just sent | the hard set, in chat, which no file check sees |
+
+## The hard set
+
+Both hooks run `hook_patterns()` from `scripts/voice_rules.py`: the hard banned words, the tic and label forms, clause welds, and two length ceilings (40 words per sentence, 3 sentences per paragraph). That set is what is wrong on every reading. Style preferences (contrastive foils and litotes) stay in the on-demand checker, where a person decides them, because a hook that fires on a clean reply gets switched off inside a week.
+
+The Stop hook's reprompt is one short paragraph: resend under a `## Revised reply` heading, fix the listed lines, keep every fact. It never asks for a rewrite of the whole reply, because a longer repair instruction produces a longer, more tedious reply.
 
 ## Run the checker by hand
 
@@ -16,21 +22,7 @@ scripts/voice-check.py skills/
 some-command | scripts/voice-check.py -
 ```
 
-`--review` prints every prose sentence with its findings under it, for the
-sentence-by-sentence read the READ rules need.
-
-It prints four groups. Each finding names a broken writing pattern.
-**FIX** lists rules with no judgement in them, and a FIX finding makes the run
-exit 1. **DECIDE** lists rules a machine can't settle. The checker prints each DECIDE sentence, and a DECIDE finding never
-fails the run. Most DECIDE findings are real, so read each one.
-**PATTERNS** says what each broken pattern in the findings is and why it's
-hard to read.
-**READ** lists the rules the patterns don't check. Every run prints it. The
-patterns miss 7 of the 49 bad sentences in `evals/gold/labels.jsonl`, so
-after you handle the findings, read every sentence against the READ list.
-
-Run this checker for every voice pass. Improvising a grep each time
-finds a different subset each time.
+`--review` prints every prose sentence with its findings under it. Without it, the checker prints the findings and the READ list, the rules the patterns don't check.
 
 ## Wire up the hooks
 
@@ -58,31 +50,9 @@ Run `scripts/install.sh --hooks --write-settings` to copy the hooks to `~/.claud
 }
 ```
 
-Both exit 2 on a break, which puts the findings in front of the agent. The
-write hook fires after the write, so the agent gets the findings while it is
-still working on the file. The Stop hook fires after the reply, so the agent
-gets one pass to repair it.
+Both exit 2 on a hard break, which puts the findings in front of the agent. The write hook fires after the write, so the agent gets the findings while it is still working on the file. The Stop hook fires after the reply, so the agent gets one repair pass, and two at most when `stop_hook_active` is set.
 
-The Stop hook also blocks a paragraph longer than three sentences, so separate
-points reach you as a list. The repaired reply starts with its content, and the
-hook doesn't add a banner or a heading.
-
-The write hook needs `scripts/voice-check.py`. It looks in `TOBY_ROOT`, then in
-a checkout that holds the hook, then in the installed skill at
-`~/.claude/skills/toby-voice`. Installing with `--tool claude` puts the checker
-there, so you don't need to set anything. With none of those it exits 0 and says nothing,
-because a hook that fails loudly on a machine that never asked for it gets
-deleted.
-
-## What each one costs you
-
-The stop hook fires on literal strings and a 40-word sentence. The ceiling is
-25. The hook fires at 40 on purpose, because a hook that argues about a 27-word
-sentence gets switched off. Its fixtures hold 31 ordinary replies that must pass
-silently. A false positive on one of them fails the suite, because a hook that
-blocks replies with no breaks gets turned off.
-
-The write hook reports FIX and DECIDE findings with `--no-read`. It exits 2 whenever FIX is non-empty or a new DECIDE finding appears, and it exits 0 on the next edit when FIX is empty and only reviewed DECIDE findings remain.
+The hooks look for `voice_rules.py` in `TOBY_ROOT/scripts`, then in a checkout that holds the hook, then in the installed skill at `~/.claude/skills/toby-voice/scripts`. Installing with `--tool claude` puts it there, so you don't need to set anything. With none of those the hooks exit 0 and say nothing.
 
 ## Testing them
 
@@ -90,5 +60,4 @@ The write hook reports FIX and DECIDE findings with `--no-read`. It exits 2 when
 python3 tests/test-voice-hook.py
 ```
 
-Seeded breaks must be caught, and ordinary replies must pass untouched. A false positive
-fails the run.
+Seeded breaks must be caught, and ordinary replies must pass untouched. A false positive fails the run.

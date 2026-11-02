@@ -82,10 +82,13 @@ because the operating guide's Self Review tells it to. The agent fixes everythin
 answers every line under DECIDE. Then it reads every sentence against the READ
 list, which covers the rules the patterns don't check. The patterns miss 94 of the 170
 bad sentences in `evals/gold/repo-review.jsonl`, so the agent needs the READ
-pass. The hooks run the patterns on each file the agent writes and each reply
-it sends.
+pass.
 
-`hooks/README.md` covers what each one costs you.
+The hooks block only the hard set from `hook_patterns()` in
+`scripts/voice_rules.py` on each file the agent writes and each reply it sends:
+the hard banned words, the tic and label forms, clause welds, and the length
+ceilings. The Stop hook asks for one short repair pass. `hooks/README.md`
+covers the wiring and what each one costs you.
 
 ### Claude Code: pick one of two layouts
 

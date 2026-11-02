@@ -69,7 +69,7 @@ Report one of these when two modules share knowledge of one format or rule, or w
 - Does an entry point compute a price, limit, or status transition rule that another entry point also needs?
 - Does the diff write another module's table or parse its wire/file format directly, bypassing that module's rules?
 - Does the diff pass a parameter through three or more functions that don't read it?
-- Does the diff add a case to a switch on a type, status, or provider while another switch on that field falls through to a default? The fix adds the case and guards the default with `assert_never` or `never`.
+- Does the diff add a case to a switch on a type, status, or provider while another switch on that field goes to its default? The fix adds the case and guards the default with `assert_never` or `never`.
 - Does a subclass break its parent's contract, such as throwing `NotImplementedError` on a method callers invoke without a `supports_*()` check?
 
 **Special cases and duplication**

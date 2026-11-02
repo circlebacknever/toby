@@ -267,7 +267,7 @@ PLAIN_HOME="$TMP_ROOT/plain"
 install_into "$PLAIN_HOME" --tool claude >/dev/null 2>&1
 if [[ -f "$PLAIN_HOME/.claude/output-styles/toby.md" ]]; then
   flunk claude "default install shipped the output style, which duplicates the guide"
-elif ! grep -q '^## Five Tests$' "$PLAIN_HOME/.claude/CLAUDE.md"; then
+elif ! grep -q '^## Voice$' "$PLAIN_HOME/.claude/CLAUDE.md"; then
   flunk claude "default install left the writing rules out of CLAUDE.md"
 else
   pass claude "default install contains the whole guide, no style"
@@ -278,11 +278,11 @@ STYLE_HOME="$TMP_ROOT/style"
 install_into "$STYLE_HOME" --tool claude --output-style >/dev/null 2>&1
 STYLE="$STYLE_HOME/.claude/output-styles/toby.md"
 STYLE_MD="$STYLE_HOME/.claude/CLAUDE.md"
-if grep -q '^## Five Tests$' "$STYLE_MD"; then
+if grep -q '^## Voice$' "$STYLE_MD"; then
   flunk claude "--output-style left the writing rules in CLAUDE.md as well"
 elif ! grep -q '^## Skill Routing$' "$STYLE_MD"; then
   flunk claude "--output-style dropped the operating floor from CLAUDE.md"
-elif ! grep -q '^## Five Tests$' "$STYLE"; then
+elif ! grep -q '^## Voice$' "$STYLE"; then
   flunk claude "--output-style did not put the writing rules in the style"
 else
   pass claude "--output-style splits the guide, no section in both"
@@ -313,7 +313,7 @@ fi
 
 PAYLOAD="{\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$PROBE\"}}"
 hook_out="$(cd "$TMP_ROOT" && printf '%s' "$PAYLOAD" | HOME="$HOOK_HOME" env -u TOBY_ROOT python3 "$KIT/hooks/voice-write-check.py" 2>&1)" || true
-if grep -q "banned word 'robust'" <<<"$hook_out"; then
+if grep -q "'robust': banned word" <<<"$hook_out"; then
   pass hooks "write hook runs the skill's checker and skips the old lone copy"
 else
   flunk hooks "the installed write hook did not flag a banned word"
@@ -325,7 +325,7 @@ if ! install_into "$STYLE_HOME" --tool claude >/dev/null 2>&1; then
   flunk claude "switching back to default refused on an unmodified install"
 elif [[ -e "$STYLE" || -L "$STYLE" ]]; then
   flunk claude "switching back to default left $STYLE on disk"
-elif ! grep -q '^## Five Tests$' "$STYLE_MD"; then
+elif ! grep -q '^## Voice$' "$STYLE_MD"; then
   flunk claude "switching back to default did not restore the full guide in CLAUDE.md"
 else
   pass claude "switching from --output-style back to default removes output style file"
