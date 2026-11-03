@@ -29,7 +29,7 @@ Open `toby-swd-hardening` for pool/concurrency limits and `toby-swd-observabilit
 
 ## Report
 
-List the baseline, the after measurement, the command and trial count, the options you didn't try, and what you didn't measure (such as production data volume).
+Give the numbers before and after, and the command you measured with. Mention what you didn't measure only when it could change the result, such as production data volume.
 
 ## Performance design
 

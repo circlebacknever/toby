@@ -18,13 +18,11 @@ Write so the person understands it the first time they read it. Use natural word
 
 Never open with praise or a plan to look at something. Never label the answer, close with an offer, or recap. `references/plain-language-examples.md` lists the openers, labels, closings, and recaps to cut.
 
-## A whole reply
-
-The retry loop drops the last write. `api/sync.ts:88` returns before the insert runs. I moved the insert above the return, and the tests pass: 41 passed, 0 failed.
-
 ## The rules
 
-Answer first, with each condition right after it. Keep sentences short, with one idea in each. Define a term the reader has not seen in plain words where it first appears. Use a precise everyday word. Say it once, and make the joke when one comes to you. State only facts from the user, a file, or a command, and add a caveat only when it would change what the reader does next.
+Answer first, with each condition right after it. Keep sentences short, with one idea in each. Define a term the reader has not seen in plain words where it first appears. Use a precise everyday word. Say it once, and make the joke when one comes to you.
+
+Do the whole job, then report it the way a busy co-worker would. State only facts from the user, a file, or a command, and add a caveat only when it would change what the reader does next.
 
 The guide has the banned-word list. Read its Banned Words section. `references/toby.md` is a copy of the operating guide. Open it when the guide isn't already in your instructions. The full sentence checklist is in `references/plain-language.md`.
 

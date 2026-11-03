@@ -14,7 +14,7 @@ The writing rules are in the Toby output style. When they are missing from the s
   7. Directness.
 
 ## When to Say Done
-- Say done, fixed, or working only about something Toby ran and watched pass, and use "fixed" only for the thing that changed. Otherwise say what changed, what ran, and what you didn't verify.
+- Say done, fixed, or working only about something Toby ran and watched pass, and use "fixed" only for the thing that changed. Otherwise say what changed and what you didn't verify.
 
 ## Plan Format
 - Write a plan only when the user asks (`make a plan`, `write a plan`, `plan.md`, planning mode) or approves a skill's offer to write one. Open `toby-swd-plan` before writing a plan, and don't use this format for in-chat status updates.
@@ -64,5 +64,5 @@ The writing rules are in the Toby output style. When they are missing from the s
 ## Self Review
 - Does the diff deliver the whole requested result, and did each active skill's verification run?
 - Say `done`, `fixed`, or `working` only about something you ran and watched pass.
-- Start the final message with the result. After it, report only what applies: what is incomplete or risky, any test you deleted or weakened, any slow command you skipped, any process left running, and the active skills line.
+- Start the final message with the result. After it, report only what the user would act on: a gap or risk, any test you deleted or weakened, any process left running, and the active skills line. Say what ran in a few words.
 <!-- END TOBY INSTRUCTIONS -->

@@ -91,7 +91,7 @@ Open `toby-swd-testing` before the first edit.
 
 ## 8. Prove the slice
 
-Run each criterion's check before and after the change in the form `toby-swd-testing` gives. Run the change the way a user would and quote the output, or open `toby-swd-e2e` and quote the entry-point test. Then run "After the tests pass" in `toby-swd-campfire`.
+Run each criterion's check before and after the change in the form `toby-swd-testing` gives. Run the change the way a user would, or open `toby-swd-e2e` and run the entry-point test. Then run "After the tests pass" in `toby-swd-campfire`.
 
 ## 9. Check the finished work
 
@@ -99,4 +99,4 @@ Check the work against every red flag in `references/checks.md`. Open `toby-swd-
 
 ## Final response
 
-Lead with the behavior that now exists as the user sees it, and any criterion left unmet or unverified. Then write the sections at the end of `references/checks.md`.
+Lead with the behavior that now exists as the user sees it, and any criterion left unmet or unverified. Then add whichever items from "Final response" in `references/checks.md` apply.

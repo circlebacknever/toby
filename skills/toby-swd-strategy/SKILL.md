@@ -37,6 +37,6 @@ Speed alone doesn't qualify. When you take a shortcut, leave a comment stating t
 
 ## Report
 
-After a change with a design decision, report the structure you chose and the main alternative you rejected, plus any cleanup and any shortcut you took.
+After a change with a design decision, say in a sentence how you structured it. Mention any shortcut you took, and mention the alternative you rejected if the user might prefer it.
 
 Open `references/examples.md` when comparing two approaches for a caller-facing change or labeling a deadline shortcut. Open `references/design-note.md` when writing a design note in chat.

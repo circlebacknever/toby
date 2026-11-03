@@ -52,7 +52,7 @@ Skip test-first while the design is open, when the repo lacks a test harness, on
 
 ## Prove a change
 
-Prove each acceptance criterion by running the same named command before and after the edit, and quote both runs under the criterion. For new or fixed behavior, the `before` run fails on the target assertion and the `after` run passes. When you wrote the test after the production edit, revert the production edit first to record the `before` failure:
+Prove each acceptance criterion by running the same named command before and after the edit, and keep both outputs. Quote them when the user asks or when a run surprised you. For new or fixed behavior, the `before` run fails on the target assertion and the `after` run passes. When you wrote the test after the production edit, revert the production edit first to record the `before` failure:
 
     cancelling a shipped order returns 409 and leaves the order untouched
     before  test_cancel_rejects_shipped  FAIL  expected 409, got 200

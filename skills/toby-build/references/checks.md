@@ -33,14 +33,15 @@ Check the finished work against each problem below, fix what you can before the 
 - An edit came before the user approved its step, or a step ran differently from its approved wording without updating the plan.
 - Production code contains a `TODO`, a hardcoded return, an unimplemented branch, a swallowed error, or a test fixture that production code reads at runtime.
 - The handoff moves part of the requested result to a closing note, such as unbuilt slices or "the rest is wiring".
-- You changed a file without a criterion or a reported cleanup explaining it, or the handoff omits an assumption you stated mid-run.
+- You changed a file without a criterion or a reported cleanup explaining it.
 
 ## Final response
 
-After the lead line, list each choice you made as an assumption, and state any decision the next slice needs before it starts. Then write only the items that apply:
+After the first line, add only what the user has to act on. Give each item one line:
 
-1. Each criterion in its pre-code wording, marked met or unmet, with the check that proved it or what blocked it. For multi-slice work, mark each slice done or not done.
-2. The structure you chose and the main alternative you rejected, one line each, or `Structure: follows <path:line>`, plus the plan path when a plan exists.
-3. For work with two or more slices, the whole-feature test with its run before and after the last slice.
-4. Each step you couldn't run, with what blocked it.
-5. Each problem outside the request that you saw in the code and left alone, one line each at `file:line`.
+1. Each criterion that's unmet, or each slice that's not done, with what blocked it.
+2. Each assumption the user might want changed, and any decision the next slice needs.
+3. Each step you couldn't run, with what blocked it.
+4. Each problem you noticed outside the request and didn't fix, at `file:line`.
+
+Leave out what passed and the structure you chose. The user can ask for them.

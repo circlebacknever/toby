@@ -42,4 +42,4 @@ Check the fix against each entry before reporting:
 
 ## Final response
 
-Lead with the cause in one sentence at `file:line`. Then list the fix, the `before` and `after` runs, and what you didn't verify.
+Lead with the cause in one sentence at `file:line`. Then say how you fixed it and how you know it worked. If you couldn't check something, say so.

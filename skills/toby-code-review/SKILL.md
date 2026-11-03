@@ -12,31 +12,21 @@ description: >-
 
 # Toby Code Review
 
-Report a change's real issues in plain English, and fix nothing. When the change doesn't have any of the issues below, reply `"No issues found."` without suggestions.
+Report a change's real issues in plain English, and fix nothing. When the change doesn't have any of the issues below, say so in a line, without suggestions.
 
 ## Report
 
-Write each issue in this format:
+Write each issue as the short comment a co-worker would leave, in Toby's voice:
 
 ```text
-1. Cancelling a shipped order refunds the customer twice (orders/cancel.py:42).
-   Reproduce:
-   1. Create an order and mark it shipped.
-   2. Send POST /orders/{id}/cancel twice.
-   3. The payments table now has two refund rows for that order.
-   Fix: Return 409 from cancel() when the order status is already "refunded".
+1. Cancelling a shipped order refunds the customer twice (orders/cancel.py:42). Cancel it twice and `payments` gets two refund rows. `cancel()` should return 409 when the order is already "refunded".
 
-2. The SLA report will count on-hold tickets as closed once "on_hold" ships (reports/sla.py:21).
-   Reproduce:
-   1. Add "on_hold" to OPEN_STATES in tickets/states.py, as ticket SUP-88 asks.
-   2. Put a ticket on hold, and run the SLA report.
-   3. The report counts that ticket as closed.
-   Fix: Delete the list at reports/sla.py:21 and import OPEN_STATES from tickets/states.py.
+2. The SLA report will count on-hold tickets as closed once "on_hold" ships (reports/sla.py:21). Its list of open states is a private copy. Delete it and import `OPEN_STATES` from tickets/states.py.
 ```
 
-- State what goes wrong and for whom on the first line, at `file:line`, using the code's own identifiers.
-- Show the wrong result in the last Reproduce step.
-- Give one fix at a cited function or file, in at most a five-line code block, without alternatives.
+- Start with what goes wrong and who it hits, at `file:line`, using the code's own identifiers.
+- Say how to see the wrong result in one sentence.
+- Give one fix, in a sentence or a code block of at most five lines.
 - Report one issue per root cause, ordered from most harmful to least, without severity tags.
 - Don't use pattern labels (such as shotgun surgery or SOLID), keep Toby skill names out of the findings, and don't quote the current code back.
 
@@ -47,14 +37,14 @@ End the report with these optional lines when they apply:
 
 ## What to check
 
-Review the current diff unless the user gives a scope, and read a PR's description first. Report only issues the change introduces, trace each cause to its callers, and drop any issue you can't write reproduction steps for.
+Review the current diff unless the user gives a scope, and read a PR's description first. Report only issues the change introduces, trace each cause to its callers, and drop any issue you can't reproduce or trace through the code.
 
 1. **Bugs.** Wrong output, a crash, an error hidden from a caller that needs it, or a changed contract or format that breaks callers or stored data.
-2. **A bug fix without a regression test.** The steps revert the fix and show the test suite still passes.
+2. **A bug fix without a regression test.** Reverting the fix leaves the test suite passing.
 3. **Security.** Authentication, authorization, injection, secrets, path traversal, unsafe deserialization, CSRF, SSRF, XSS, and cross-tenant data exposure. State the attacker's request and what it exposes.
 4. **Acceptance criteria.** An unmet criterion from the request, ticket, or plan group. Quote the criterion and give the command or input that fails it.
 5. **Repo rules.** A break of a rule in the project's `AGENTS.md` or contributing guide. Quote the rule at `path:line` and the `file:line` that breaks it.
-6. **An untested entry point.** A new route, job, or consumer that no test calls through its entry point. The steps delete a required line in the handler and show the suite still passes.
+6. **An untested entry point.** A new route, job, or consumer that no test calls through its entry point. Deleting a required line in the handler leaves the suite passing.
 
 When reviewing a plan or spec, read every file in it and report each promised feature that no step builds at `path:line`. Check each new entry point against `../toby-swd-hardening/SKILL.md`, and check `references/skills-diff.md` when the diff touches a `SKILL.md` or agent config.
 
