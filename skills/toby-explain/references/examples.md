@@ -16,6 +16,6 @@ The old interface forced callers to fetch a bucket and refill it with the curren
 
 ## Verification step mid-task
 
-The user asks what the migration check just proved.
+The user asks what the migration check proved.
 
 Before the migration ran, `orders` rows created before May had `currency = NULL`, which crashed `Invoice.total()` when it formatted the price. The test seeded three pre-May rows with `NULL` currency, ran migration `0044`, and confirmed all three rows now have `currency = 'USD'` and `Invoice.total()` returns `"$12.00"`. Production row counts haven't been timed yet.

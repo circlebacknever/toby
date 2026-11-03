@@ -331,8 +331,7 @@ every such sentence. Do not rewrite anything and do not grade kindly.
 2. Read {repo}/evals/suites/content.md and {repo}/evals/suites/voice.md for the tasks and facts.
 3. Read every file named `content-*.md` and `voice-*.md` in {repo}/evals/results/.
 
-Apply these five tests to every sentence: source, job, literal, whole, and
-nothing around the answer.
+Read {repo}/evals/rubric/pass-fail.md in full and apply its rules to every sentence.
 
 This reader has also listed these as grating:
 - Slogans: a run of short sentences with no connector, two sentences or two
@@ -377,11 +376,18 @@ A first judge made these wrong calls, so do not repeat them. It passed "the
 failing runs land near midnight", "lives in", "the gates it feeds", and "falls
 through". It failed a PR bullet that opens on its verb, such as "Adds a test for
 the 429 path", and a commit subject with no article. Those two are correct.
-A second judge passed "reach a 429", "no cause to point at", and "Relay treats
-each model provider as a swappable engine" as borderline. Fail all three. A
-review issue written with the review skill's labels Reproduce and Fix is the
-required format, so do not fail the label itself. Fail the text after a label
-when it is not a sentence.
+A second judge passed "no cause to point at" and "Relay treats each model
+provider as a swappable engine" as borderline. Fail both. It also passed "reach
+a 429", which is a plain technical use and passes. A review issue written with
+the review skill's labels Reproduce and Fix is the required format, so do not
+fail the label itself. Fail the text after a label when it is not a sentence.
+
+These also pass: an ordinary technical verb in its usual sense (`pin` a version,
+`reach` a limit, `hit` a timeout, `touch` a file), a number derived by arithmetic
+from the task facts, and an option heading such as `Option A: shard Redis`.
+Fail a bare `that` with no noun (`I can't confirm that.`), `just` as an
+intensifier (`just to count them`), and a sentence that repeats a cause or number
+from an earlier turn.
 
 Write {repo}/evals/results/judge-<run>.md with these sections and nothing else.
 
@@ -454,8 +460,7 @@ every such sentence. Do not rewrite anything and do not grade kindly.
 2. Read {repo}/evals/suites/holdout.md for the tasks and facts.
 3. Read every file named `holdout-*.md` in {repo}/evals/results/. The file names say nothing about how each one was written.
 
-Apply these five tests to every sentence: source, job, literal, whole, and
-nothing around the answer.
+Read {repo}/evals/rubric/pass-fail.md in full and apply its rules to every sentence.
 
 This reader has also listed these as grating:
 - Slogans: a run of short sentences with no connector, two sentences or two
@@ -500,11 +505,18 @@ A first judge made these wrong calls, so do not repeat them. It passed "the
 failing runs land near midnight", "lives in", "the gates it feeds", and "falls
 through". It failed a PR bullet that opens on its verb, such as "Adds a test for
 the 429 path", and a commit subject with no article. Those two are correct.
-A second judge passed "reach a 429", "no cause to point at", and "Relay treats
-each model provider as a swappable engine" as borderline. Fail all three. A
-review issue written with the review skill's labels Reproduce and Fix is the
-required format, so do not fail the label itself. Fail the text after a label
-when it is not a sentence.
+A second judge passed "no cause to point at" and "Relay treats each model
+provider as a swappable engine" as borderline. Fail both. It also passed "reach
+a 429", which is a plain technical use and passes. A review issue written with
+the review skill's labels Reproduce and Fix is the required format, so do not
+fail the label itself. Fail the text after a label when it is not a sentence.
+
+These also pass: an ordinary technical verb in its usual sense (`pin` a version,
+`reach` a limit, `hit` a timeout, `touch` a file), a number derived by arithmetic
+from the task facts, and an option heading such as `Option A: shard Redis`.
+Fail a bare `that` with no noun (`I can't confirm that.`), `just` as an
+intensifier (`just to count them`), and a sentence that repeats a cause or number
+from an earlier turn.
 
 Write {repo}/evals/results/holdout-judge-<run>.md with these sections and nothing else.
 

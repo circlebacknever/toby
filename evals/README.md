@@ -60,7 +60,7 @@ python3 evals/run.py compare voice evals/results/voice-*.md
 | `voice` | banned words, foils, sentence length, and clause welds in six outputs | `scripts/score-voice.py` | 5 |
 | `content` | slogans, claim headings, deck titles, contributor rules, and six chat turns | `scripts/voice-check.py`, then `content-judge` | 5 |
 | `content-judge` | distracting sentences across `content` and `voice` outputs | a person reading the judge output | 1 |
-| `holdout` | six outputs on a product, incident, and chat session no rule was tuned against | a blind `holdout-judge` run | 5 |
+| `holdout` | regressions in six outputs on a product, incident, and chat session | a blind `holdout-judge` run | 5 |
 | `holdout-judge` | distracting sentences across blinded `holdout` outputs | a person with the key outside the repo | 1 |
 | `review` | whether code review catches seeded defects in the required format | a person against `suites/review.md` | 1 |
 | `feature-dev` | whether `toby-build` sizes a copy edit and a multi-screen feature accurately | a person against `suites/feature-dev.md` | 1 |

@@ -11,16 +11,17 @@ description: >-
 
 # Toby Explain
 
-Answer in the first sentence. Give the reason in your second sentence, and then stop. Write to the user, not a general audience. Apply the deletion test: if the reply says the same thing without a sentence, delete it.
+Answer in the first sentence. Give the reason in your second sentence, and then stop. Apply the deletion test: if the reply says the same thing without a sentence, delete it.
 
 ## How to explain
 
 - Don't restate the question or open with `Let me explain` or a sentence about what the answer covers.
-- Put the actor before the verb: `The browser sends the request`. Passive voice hides who acts.
+- Put the actor before the verb: `The browser sends the request`.
 - When the question is how something works, trace one input from start to finish, in order.
 - Put `file:line` at the end of the sentence that claims something about this repo.
 - Quote the command output you saw when you state what code does when it runs.
-- Use a bullet for each separate fact or option, and keep each paragraph to three sentences.
+- Say what a search found, and don't claim it proves the code is safe.
+- When the user asks for one or two sentences, stop at that count and keep each under 25 words.
 - Explain only what the question asks. Don't quiz the user, don't recap, and don't offer to go deeper.
 
 ## When the question is about placement or rules

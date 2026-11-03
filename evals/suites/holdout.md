@@ -1,6 +1,6 @@
 # Held-out tasks
 
-This suite has six tasks on a product, an incident, and a chat session that no rule in this repo was tuned against. Each task gives all the facts the output needs, and a writer that invents a fact fails the task.
+This suite has six tasks on a product, an incident, and a chat session. Earlier failures on these tasks changed the rules, so the suite checks for regressions and doesn't show how the rules do on unseen tasks. Each task gives all the facts the output needs, and a writer that invents a fact fails the task.
 
 ## 1. Tool overview
 
@@ -27,7 +27,8 @@ Facts:
 - An alert fired at 14:09 and posted to a Slack channel that the team archived in July.
 - An engineer saw customer reports at 14:31 and renewed the certificate at 14:45.
 - Errors stopped at 14:47, and the database didn't lose any payment data.
-- The team agreed on two follow-ups: renew the certificate automatically, and route payment alerts to PagerDuty.
+- After the incident, the team will renew the certificate automatically.
+- Payment alerts will go to PagerDuty.
 
 ## 3. Design options
 
@@ -56,9 +57,9 @@ Write the changelog entry for version 2.4.
 
 Facts:
 
-- New: `ledgerline export --format xlsx` writes the reconciliation report as an Excel spreadsheet.
-- Fixed: users in time zones east of UTC saw report dates one day early.
-- Removed: the `--legacy-match` flag, which version 2.1 deprecated.
+- `ledgerline export --format xlsx` writes the reconciliation report as an Excel spreadsheet.
+- Users in time zones east of UTC saw report dates one day early. Version 2.4 fixes this.
+- Version 2.1 deprecated the `--legacy-match` flag. Version 2.4 removes it.
 
 ## 6. Five replies in one session
 

@@ -20,6 +20,30 @@ Cut these forms.
 
 The retry loop drops the last write when the insert runs after the return. `api/sync.ts:88`.
 
+## Missing fact
+
+> "My guess is a stale DNS record on the new host."
+
+I don't have the resolver logs yet, so I can't state the cause. The logs from the failed requests will show which host answered.
+
+## Mirrored pair
+
+> "Ten users a day means ten tickets a day."
+
+Each user who sees the bug opens a ticket, and about ten users see it a day.
+
+## Metaphor
+
+> "The config files carry their own defaults, and the map keeps memory."
+
+The config files have their own defaults, and the map uses 80 MB.
+
+## Bare that
+
+> "I can't reproduce that."
+
+I can't reproduce that crash.
+
 ## Whole reply
 
 > "Great question! Let me look at the retry loop. It's worth noting that the handler returns before the insert, which means the last write is dropped. I've moved the insert above the return and the tests pass. Hope this helps!"

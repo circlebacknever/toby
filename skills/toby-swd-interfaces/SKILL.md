@@ -54,7 +54,7 @@ Before changing an existing interface, run the comment test on the new signature
 
 Fix any match in code this change adds or edits, and list matches in unchanged code as follow-ups at `file:line`. When a new or changed interface alters what callers pass, handle, or rely on, also check `toby-swd-modules`.
 
-- **Overexposure**: callers must configure rarely used options just to run the common case.
+- **Overexposure**: callers must configure rarely used options to run the common case.
 - **Getters and setters for every field**: per-field accessors or returned mutable collections let callers bypass invariants. Replace them with behavior methods (`reserve`, `markPaid`) and read-only views or copies, except on plain data records at boundaries.
 - **Fields valid only in some combinations**: optional fields such as `data`, `error`, and `loading` require a comment to explain which combinations are valid. Replace them with a tagged union that has one variant per valid state.
 

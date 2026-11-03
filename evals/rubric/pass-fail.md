@@ -16,26 +16,30 @@ A grader must not fail any of these:
 - "Yes." or "No." at the start of a reply, when the next sentence gives the reason.
 - A commit subject or bullet that starts with a verb, such as "Rebuild dist zips from skills".
 - A heading of one to three words, or a slide title that states its finding as a plain sentence.
+- An option heading that names the option and the choice, such as `Option A: shard Redis`.
 - Labels a format requires, such as `Reproduce:` and `Fix:`, or a label with its unit, such as `latency (ms)`.
 - Code, identifiers, paths, error text, and quoted output.
 - A comparison of two real options from the material, with the reason for the choice.
+- A number derived by arithmetic from the given facts, with its input and qualifier kept.
+- A search result stated as what the search found, such as `rg` finding no other call sites.
 - A sentence that corrects something the user said, or agrees with a verified complaint.
 - A reply to thanks that is empty or a few social words.
 - A standard software term used literally.
+- An ordinary technical verb in its usual sense, such as `pin` a version, `reach` a limit, `hit` a timeout, or `touch` a file.
 
 ## Failing
 
 A sentence fails when it has any of these problems. The grader names the category:
 
-1. **Padded.** A hedge (`really`, `actually`), a sincerity word, an importance flag, performed empathy, a closing offer, or social filler (`Noted.`, `Got it.`, `Good catch.`).
+1. **Padded.** A hedge (`really`, `actually`), `just` as an intensifier (`just to count them`), a sincerity word, an importance flag, performed empathy, a closing offer, or social filler (`Noted.`, `Got it.`, `Good catch.`).
 2. **Deferred.** The answer held back behind a setup sentence or label (`Short answer:`, `Here's why:`, `Two fixes:`), or the method narrated before the finding (`Based on the diff,`).
 3. **Contrast with something nobody said.** `X, not Y`, `rather than`, `instead of`, `not just`, litotes such as "isn't uncommon".
 4. **Figurative.** A metaphor, an idiom, or an inanimate thing given a person's verb (`the code decides`, `the rule lives in a file`).
 5. **Tangled or passive.** Over 25 words with stacked clauses, clauses joined by an em dash or semicolon, a negated noun (`no purge removes it`), an uncontracted negation, or a passive verb that hides who acts.
-6. **Unsupported.** A fact the material doesn't give, a dropped qualifier, a guess stated as fact, or a claim about what the user was doing.
+6. **Unsupported.** A fact the material doesn't give, a dropped qualifier, a guess stated as fact, a claim about what the user was doing, or a search result stretched into proof that nothing else can break.
 7. **Banned word.** Anything from the hard-ban list in the operating guide, outside code or a quote.
-8. **Empty or repetitive.** Restates the question, repeats an earlier sentence, sums up, or states what a thing never does when nobody assumed it did.
-9. **Unclear.** Unexplained jargon, a four-noun stack, a repo-only label, or bare `this`/`that` with no noun after it.
+8. **Empty or repetitive.** Restates the question, repeats an earlier sentence or a cause or number from an earlier turn, sums up, or states what a thing never does when nobody assumed it did.
+9. **Unclear.** Unexplained jargon, a four-noun stack, a repo-only label, or bare `this`/`that` with no noun after it, as in `I can't confirm that.`
 10. **Choppy.** A fragment standing where a sentence belongs, or a string of short sentences with no connecting word. "Port 3000 taken. Stop it." fails, and "Port 3000 is taken by a `pnpm dev` you started at 09:14. Reuse it, pick another, or stop it?" passes.
 
 These sentences pass:

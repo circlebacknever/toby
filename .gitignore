@@ -2,6 +2,8 @@
 .DS_Store
 # editor swap files
 *.swp
+# compiled Python files
+*.pyc
 
 # Eval scratch. The suites and baselines are tracked; a run is not.
 evals/results/*

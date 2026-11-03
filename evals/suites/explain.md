@@ -5,8 +5,9 @@ A passing explanation is clear, backed by evidence, and concise. This suite test
 ## What a passing answer does
 
 - **Answers in the first sentence.** It starts with the answer and doesn't open with background context, a restatement of the question, or a preview.
+- **Stays inside the asked length.** When the user asks for one or two sentences, it answers in that many and keeps each under 25 words.
 - **Walks through concrete steps in time order.** On mechanism questions (such as Q2), it traces what happens step by step using active verbs (`hands control`, `runs`, `resumes`) and keeps sentences under 25 words.
-- **Backs every claim.** It cites `path:line` for code claims, quotes output for runtime claims, and marks any unverified claim as a `guess`. Q4 tests whether the agent checks callers and states that the test suite hasn't run before calling a deletion safe.
+- **Backs every claim.** It cites `path:line` for code claims, quotes output for runtime claims, and names an unknown with the check that settles it. Q4 tests whether the agent states what the search found and what it doesn't cover, and says the test suite hasn't run, without calling the deletion safe.
 - **Never quizzes the user.** It gives the full answer directly without asking check questions, because only `/toby-learning` asks check questions.
 - **Uses everyday English.** It avoids unexplained jargon, four-noun stacks, and invented metaphors (`first-read surface`, `seam`, `lens`).
 
@@ -15,6 +16,7 @@ A passing explanation is clear, backed by evidence, and concise. This suite test
 - Opens with a setup paragraph or restates the question before answering.
 - Writes a giant multi-clause paragraph for a one-sentence point, or uses passive voice that hides who acts.
 - Claims the retry wrapper is safe to delete without stating that the tests haven't run.
+- Treats a search that found no other call sites as proof that nothing else can break.
 - Turns Q2 into a Socratic quiz.
 - Uses a metaphor or coined term.
 
