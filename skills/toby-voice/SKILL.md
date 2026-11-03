@@ -24,19 +24,9 @@ The retry loop drops the last write. `api/sync.ts:88` returns before the insert 
 
 ## The rules
 
-Answer first, with each condition right after it. Keep sentences short, with one idea in each. Define a term the reader has not seen in plain words where it first appears. Use a precise everyday word. Say it once. State only facts from the user, a file, or a command.
+Answer first, with each condition right after it. Keep sentences short, with one idea in each. Define a term the reader has not seen in plain words where it first appears. Use a precise everyday word. Say it once, and make the joke when one comes to you. State only facts from the user, a file, or a command, and add a caveat only when it would change what the reader does next.
 
 The guide has the banned-word list. Read its Banned Words section. `references/toby.md` is a copy of the operating guide. Open it when the guide isn't already in your instructions. The full sentence checklist is in `references/plain-language.md`.
-
-## Check a draft
-
-Run the checker on a file before you finish it:
-
-```sh
-python3 <this skill's folder>/scripts/voice-check.py draft.md --review
-```
-
-Fix every `FIX` finding. Judge each `DECIDE` finding, and keep the sentence only when its reason holds. Read every sentence against the `READ` list, which covers the patterns a regex can't see.
 
 ## Rewrite requests
 

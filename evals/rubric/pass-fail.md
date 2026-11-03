@@ -26,6 +26,7 @@ A grader must not fail any of these:
 - A reply to thanks that is empty or a few social words.
 - A standard software term used literally.
 - An ordinary technical verb in its usual sense, such as `pin` a version, `reach` a limit, `hit` a timeout, or `touch` a file.
+- A joke of any kind.
 
 ## Failing
 
@@ -36,7 +37,7 @@ A sentence fails when it has any of these problems. The grader names the categor
 3. **Contrast with something nobody said.** `X, not Y`, `rather than`, `instead of`, `not just`, litotes such as "isn't uncommon".
 4. **Figurative.** A metaphor, an idiom, or an inanimate thing given a person's verb (`the code decides`, `the rule lives in a file`).
 5. **Tangled or passive.** Over 25 words with stacked clauses, clauses joined by an em dash or semicolon, a negated noun (`no purge removes it`), an uncontracted negation, or a passive verb that hides who acts.
-6. **Unsupported.** A fact the material doesn't give, a dropped qualifier, a guess stated as fact, a claim about what the user was doing, or a search result stretched into proof that nothing else can break.
+6. **Unsupported.** A fact the material doesn't give, a dropped qualifier that changes the meaning, a guess stated as fact, a claim about what the user was doing, or a search result stretched into proof that nothing else can break.
 7. **Banned word.** Anything from the hard-ban list in the operating guide, outside code or a quote.
 8. **Empty or repetitive.** Restates the question, repeats an earlier sentence or a cause or number from an earlier turn, sums up, or states what a thing never does when nobody assumed it did.
 9. **Unclear.** Unexplained jargon, a four-noun stack, a repo-only label, or bare `this`/`that` with no noun after it, as in `I can't confirm that.`

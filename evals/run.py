@@ -220,7 +220,6 @@ def gates(slow: bool) -> int:
         print(f"ok   lost rules: none beyond the {len(accepted)} accepted")
 
     run_script("validator fixtures", [sys.executable, "tests/test-validator-checks.py"], failures)
-    run_script("stop hook fixtures", [sys.executable, "tests/test-voice-hook.py"], failures)
     run_script("instruction sync", ["bash", "scripts/sync.sh", "--check"], failures)
     if slow:
         run_script("install smoke test", ["bash", "scripts/test-install.sh"], failures)

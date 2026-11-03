@@ -52,44 +52,6 @@ scripts/install.sh --tool github   # alias for copilot
 scripts/install.sh --tool kiro
 ```
 
-### The voice checker and the hooks
-
-The voice checker installs with the `toby-voice` skill, for every tool. It runs
-from any directory:
-
-```sh
-python3 ~/.codex/skills/toby-voice/scripts/voice-check.py draft.md --review
-python3 ~/.claude/skills/toby-voice/scripts/voice-check.py draft.md --review
-python3 ~/.copilot/skills/toby-voice/scripts/voice-check.py draft.md --review
-```
-
-`--review` prints every prose sentence with its findings under it. Without it,
-the checker prints the findings and the READ list.
-
-The two hooks are Claude Code only, so they have their own flags:
-
-```sh
-scripts/install.sh --hooks
-scripts/install.sh --hooks --write-settings
-```
-
-`--hooks` copies both hooks to `~/.claude/toby/hooks` and prints the `settings.json`
-block to paste, with the paths already filled in. Add `--write-settings` to back up
-`~/.claude/settings.json` to `settings.json.bak` and merge the hook entries automatically.
-
-Without being asked, the agent runs the voice checker on every prose file a turn wrote,
-because the operating guide's Self Review tells it to. The agent fixes everything under FIX and
-answers every line under DECIDE. Then it reads every sentence against the READ
-list, which covers the rules the patterns don't check. The patterns miss 94 of the 170
-bad sentences in `evals/gold/repo-review.jsonl`, so the agent needs the READ
-pass.
-
-The hooks block only the hard set from `hook_patterns()` in
-`scripts/voice_rules.py` on each file the agent writes and each reply it sends:
-the hard banned words, the tic and label forms, clause welds, and the length
-ceilings. The Stop hook asks for one short repair pass. `hooks/README.md`
-covers the wiring and what each one costs you.
-
 ### Claude Code: pick one of two layouts
 
 The writing rules go in `CLAUDE.md`, or in an output style. Don't use both,
@@ -136,7 +98,7 @@ write something before the style is on.
 | Reaches a subagent | yes | no, a subagent runs its own system prompt |
 
 The last two rows are the ones to weigh. A subagent doesn't read the output style, so
-the file checks in `evals/` and the Stop hook still apply the rules there.
+the file checks in `evals/` still apply the rules there.
 
 ## Toby is careful to avoid breaking things
 
@@ -159,19 +121,17 @@ When the block is already there, only the block changes. When there is no block,
 - `scripts/install.sh` - the installer.
 - `scripts/validate-skills.py` - the validator.
 - `output-styles/toby.md` - the voice rules as a Claude Code output style, generated from `base/toby.md`.
-- `scripts/voice-check.py` - the voice checker. It runs the pattern checks on a file or stdin, splits findings into what to fix and what to decide, and prints the rules the patterns don't check.
-- `scripts/voice_rules.py` - the rules the checker runs. The validator imports them too, so the checker never needs the validator.
-- `hooks/` - a Stop hook that reads the finished reply, and a PostToolUse hook that reads a file as soon as it is written. `hooks/README.md` wires them up.
+- `scripts/voice_rules.py` - the voice rules the validator and the eval scorer run.
 - `scripts/token-budget.py` - what a turn costs, by which skills fire.
 - `evals/` - the regression suite. `evals/README.md` says how to run it and how to add a case.
 
 The operating guide owns safety, work loop, skill routing, verification posture, and voice. Skills own task method.
 
-The instruction files, the output style, and the Stop hook each deliver the voice rules, because each one reaches a place the others miss. The instruction files put them in a user message every tool reads. The output style puts the writing sections in Claude Code's system prompt, which has priority over that and gets restated during a long conversation. The Stop hook reads the finished reply, which no file check can do.
+The instruction files and the output style each deliver the voice rules, because each one reaches a place the other misses. The instruction files put them in a user message every tool reads. The output style puts the writing sections in Claude Code's system prompt, which has priority over that and gets restated during a long conversation.
 
 Turn the style on with `/config`, then Output style, then Toby. It sets `keep-coding-instructions: true`, so the engineering behaviour is untouched.
 
-A subagent runs its own system prompt, so the output style doesn't reach one. The file checks and the hook still matter for that reason. Toby keeps that boundary visible, because two files that both claim the voice rules will disagree by Thursday.
+A subagent runs its own system prompt, so the output style doesn't reach one. The file checks still matter for that reason. Toby keeps that boundary visible, because two files that both claim the voice rules will disagree by Thursday.
 
 A skill points at the guide by calling it "the operating guide" and never by a filename. `base/toby.md` is a path in this repo and nowhere else after install, and the installed name is `CLAUDE.md` on one tool, `AGENTS.md` on another, `copilot-instructions.md` on a third. The guide loads on every turn, so the name is all a skill needs. The validator fails on `base/toby.md` inside `skills/`. It doesn't police the `AGENTS.md` spelling, because `toby-swd-docs` uses that filename for the module doc in the user's own repo.
 

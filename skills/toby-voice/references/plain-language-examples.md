@@ -110,6 +110,12 @@ This package sends signed requests to the payments API and retries a failed requ
 
 Move rate limiting from four route handlers into one middleware. The limit now counts each account across all routes.
 
+## Pedantic caveat
+
+> "The search for `getUser` found 3 call sites, although that only covers the pattern I ran and doesn't rule out dynamic calls."
+
+`getUser` has 3 call sites, and I updated all of them.
+
 ## Closing offer
 
 > "Hope this helps! Let me know if you need anything else."

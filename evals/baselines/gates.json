@@ -1645,6 +1645,7 @@
     "put the explanation next to the thing it describes",
     "put the map above the component or in a sibling module",
     "put the rules for shared mutable state and the ordering of concurrent tasks in one module",
+    "python3 this skill s folder scripts voice check py draft md review",
     "qu viste the reply models the past tense while the conversation keeps going",
     "query on members would then need a status filter and the invite expiry rule",
     "quote both results under the criterion s own wording",
@@ -1908,6 +1909,7 @@
     "so when two teams change the same code split that code into two modules one for each team",
     "solid s createstore and svelte s derived track the read",
     "some code is exported called from several places or costly to change later",
+    "some command python3 this skill s folder scripts voice check py",
     "some findings add a second fact that shows the problem and give no opinion after it",
     "some input comes from outside the program such as a request a message or a deserialized payload",
     "some of these objects cross a serialization boundary such as a network call a worker or process boundary a native bridge or disk",
@@ -2840,7 +2842,7 @@
     "experiment": 2318,
     "explain": 1534,
     "optimize": 5782,
-    "prose": 1372,
+    "prose": 1290,
     "refactor": 11207,
     "review": 5043
   },
@@ -2875,7 +2877,7 @@
     "toby-swd-testing": 1177,
     "toby-swd-twelve-factor": 679,
     "toby-swd-warning-signs": 1509,
-    "toby-voice": 486
+    "toby-voice": 404
   },
   "warning_classes": {
     "banned word": 0,

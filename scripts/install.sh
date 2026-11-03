@@ -13,8 +13,6 @@ TOOL_SET=0
 DRY_RUN=0
 FORCE=0
 OUTPUT_STYLE=0
-HOOKS=0
-WRITE_SETTINGS=0
 LINK=0
 STATUS=0
 UNINSTALL=0
@@ -24,21 +22,16 @@ UNINSTALL=0
 RETIRED_SKILLS=(toby-feature-dev toby-simplify-code toby-swd-complexity toby-squall)
 
 usage() {
-  printf 'Usage: %s [--tool codex|claude|copilot|github|kiro|all] [--link] [--output-style] [--hooks] [--write-settings] [--status] [--uninstall] [--dry-run] [--force]\n' "$0"
+  printf 'Usage: %s [--tool codex|claude|copilot|github|kiro|all] [--link] [--output-style] [--status] [--uninstall] [--dry-run] [--force]\n' "$0"
   printf '       github is an alias for copilot (GitHub Copilot CLI, ~/.copilot).\n'
   printf '       Pass comma-separated names to target multiple tools (--tool claude,codex).\n'
   printf '       When --tool is omitted, the installer targets tools whose home folder exists.\n'
   printf '\n'
   printf '  --link            Symlink skill folders and the Claude output style to this\n'
   printf '                    checkout so git pull updates them in place.\n'
-  printf '  --hooks           Claude Code only. Install the two voice hooks to\n'
-  printf '                    ~/.claude/toby/hooks. When passed without --tool, skips\n'
-  printf '                    skill and instruction installation.\n'
-  printf '  --write-settings  Claude Code only. Back up ~/.claude/settings.json to\n'
-  printf '                    settings.json.bak and merge the voice hook entries.\n'
   printf '  --status          Report whether each tool is installed and in sync with\n'
   printf '                    this checkout. Exits 1 when an installed file differs.\n'
-  printf '  --uninstall       Remove Toby skills, hooks, output style, and instruction\n'
+  printf '  --uninstall       Remove Toby skills, output style, and instruction\n'
   printf '                    marker blocks while keeping surrounding user notes.\n'
   printf '  --force           Replace modified Toby skill directories, and append the\n'
   printf '                    Toby block to instruction files that have no marker block.\n'
@@ -67,15 +60,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     --output-style)
       OUTPUT_STYLE=1
-      shift
-      ;;
-    --hooks)
-      HOOKS=1
-      shift
-      ;;
-    --write-settings)
-      WRITE_SETTINGS=1
-      HOOKS=1
       shift
       ;;
     --link)
@@ -182,8 +166,6 @@ if [[ "$TOOL_SET" -eq 1 ]]; then
   done
 elif [[ "$STATUS" -eq 1 || "$UNINSTALL" -eq 1 ]]; then
   SELECTED_TOOLS=("${ALL_TOOLS[@]}")
-elif [[ "$HOOKS" -eq 1 && "$OUTPUT_STYLE" -eq 0 && "$LINK" -eq 0 ]]; then
-  SELECTED_TOOLS=()
 elif [[ "$OUTPUT_STYLE" -eq 1 ]]; then
   SELECTED_TOOLS=(claude)
 else
@@ -351,108 +333,6 @@ install_skills() {
   if [[ "$DRY_RUN" -eq 0 && "$LINK" -eq 0 ]]; then
     write_skill_manifest "$dest"
   fi
-}
-
-merge_claude_settings() {
-  local kit="$1"
-  local settings="$HOME/.claude/settings.json"
-  run mkdir -p "$(dirname "$settings")"
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    printf '[dry-run] merge voice hooks into %s\n' "$settings"
-    return
-  fi
-  python3 - "$settings" "$kit" <<'PY'
-import json
-import shutil
-import sys
-from pathlib import Path
-
-settings_path = Path(sys.argv[1])
-kit = sys.argv[2]
-
-if settings_path.exists():
-    shutil.copy2(settings_path, settings_path.with_suffix(".json.bak"))
-    data = json.loads(settings_path.read_text())
-else:
-    data = {}
-
-hooks = data.setdefault("hooks", {})
-write_cmd = f"python3 {kit}/hooks/voice-write-check.py"
-stop_cmd = f"python3 {kit}/hooks/voice-stop-check.py"
-
-post_list = hooks.setdefault("PostToolUse", [])
-if not any(
-    isinstance(entry, dict)
-    and any(h.get("command") == write_cmd for h in entry.get("hooks", []) if isinstance(h, dict))
-    for entry in post_list
-):
-    post_list.append(
-        {
-            "matcher": "Write|Edit",
-            "hooks": [{"type": "command", "command": write_cmd}],
-        }
-    )
-
-stop_list = hooks.setdefault("Stop", [])
-if not any(
-    isinstance(entry, dict)
-    and any(h.get("command") == stop_cmd for h in entry.get("hooks", []) if isinstance(h, dict))
-    for entry in stop_list
-):
-    stop_list.append(
-        {
-            "hooks": [{"type": "command", "command": stop_cmd}],
-        }
-    )
-
-settings_path.write_text(json.dumps(data, indent=2) + "\n")
-PY
-}
-
-install_hooks() {
-  # The hooks only. The write hook runs the checker from the installed
-  # toby-voice skill, so the checker is not copied here.
-  local kit="$HOME/.claude/toby"
-  local checker="$HOME/.claude/skills/toby-voice/scripts/voice-check.py"
-  run mkdir -p "$kit/hooks"
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    printf '[dry-run] install the voice hooks to %s/hooks\n' "$kit"
-    if [[ "$WRITE_SETTINGS" -eq 1 ]]; then
-      merge_claude_settings "$kit"
-    fi
-    return
-  fi
-  run cp "$ROOT/hooks/voice-stop-check.py" "$kit/hooks/"
-  run cp "$ROOT/hooks/voice-write-check.py" "$kit/hooks/"
-
-  printf '\nvoice hooks installed to %s/hooks\n' "$kit"
-  if [[ ! -f "$checker" ]]; then
-    printf 'The write hook needs %s.\n' "$checker"
-    printf 'Run this installer with --tool claude to install it.\n'
-  fi
-  if [[ "$WRITE_SETTINGS" -eq 1 ]]; then
-    merge_claude_settings "$kit"
-    printf 'Updated %s/.claude/settings.json (backup at settings.json.bak).\n\n' "$HOME"
-    return
-  fi
-  printf '\n'
-  printf 'To run the hooks as well, add this to %s/.claude/settings.json:\n\n' "$HOME"
-  cat <<JSON
-{
-  "hooks": {
-    "PostToolUse": [
-      { "matcher": "Write|Edit", "hooks": [
-        { "type": "command", "command": "python3 $kit/hooks/voice-write-check.py" } ] }
-    ],
-    "Stop": [
-      { "hooks": [
-        { "type": "command", "command": "python3 $kit/hooks/voice-stop-check.py" } ] }
-    ]
-  }
-}
-JSON
-  printf '\nPass --hooks --write-settings to merge this block automatically,\n'
-  printf 'or paste it into settings.json yourself.\n\n'
 }
 
 install_output_style() {
@@ -632,12 +512,6 @@ if label == "claude":
     style = home / ".claude" / "output-styles" / "toby.md"
     if style.exists() and style.read_text() != (root / "output-styles" / "toby.md").read_text():
         reasons.append("output style modified")
-    hooks_dir = home / ".claude" / "toby" / "hooks"
-    if hooks_dir.exists():
-        for hook_name in ("voice-write-check.py", "voice-stop-check.py"):
-            hook_file = hooks_dir / hook_name
-            if not hook_file.is_file() or hook_file.read_bytes() != (root / "hooks" / hook_name).read_bytes():
-                reasons.append(f"{hook_name} modified")
 
 if reasons:
     print(f"{label}: out of sync ({', '.join(reasons[:5])})")
@@ -704,49 +578,6 @@ PY
       if [[ -e "$HOME/.claude/output-styles/toby.md" || -L "$HOME/.claude/output-styles/toby.md" ]]; then
         run rm -f "$HOME/.claude/output-styles/toby.md"
       fi
-      if [[ -d "$HOME/.claude/toby" ]]; then
-        run rm -rf "$HOME/.claude/toby"
-      fi
-      if [[ -f "$HOME/.claude/settings.json" && "$DRY_RUN" -eq 0 ]]; then
-        python3 - "$HOME/.claude/settings.json" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-try:
-    data = json.loads(path.read_text())
-except Exception:
-    raise SystemExit(0)
-hooks = data.get("hooks")
-if not isinstance(hooks, dict):
-    raise SystemExit(0)
-for event in ("PostToolUse", "Stop"):
-    entries = hooks.get(event)
-    if not isinstance(entries, list):
-        continue
-    kept = []
-    for entry in entries:
-        if not isinstance(entry, dict):
-            kept.append(entry)
-            continue
-        cmds = [
-            h for h in entry.get("hooks", [])
-            if not (isinstance(h, dict) and ("voice-write-check.py" in h.get("command", "") or "voice-stop-check.py" in h.get("command", "")))
-        ]
-        if cmds:
-            entry = dict(entry)
-            entry["hooks"] = cmds
-            kept.append(entry)
-    if kept:
-        hooks[event] = kept
-    else:
-        hooks.pop(event, None)
-if not hooks:
-    data.pop("hooks", None)
-path.write_text(json.dumps(data, indent=2) + "\n")
-PY
-      fi
     fi
   done
   printf 'Toby uninstall complete.\n'
@@ -811,13 +642,7 @@ for candidate in "${ALL_TOOLS[@]}"; do
   fi
 done
 
-if [[ "$HOOKS" -eq 1 ]]; then
-  install_hooks
-fi
-
-if [[ "${#SELECTED_TOOLS[@]}" -eq 0 ]]; then
-  printf 'Toby hooks install complete.\n'
-elif [[ "$TOOL_SET" -eq 1 ]]; then
+if [[ "$TOOL_SET" -eq 1 ]]; then
   printf 'Toby package install complete for --tool %s\n' "$TOOL"
 else
   IFS=','

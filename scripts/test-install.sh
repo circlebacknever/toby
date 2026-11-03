@@ -116,35 +116,6 @@ else
   pass total "$EXPECTED_TOTAL skill files across $TOOL_COUNT tools"
 fi
 
-# Each tool runs the checker from its own installed toby-voice skill, from a
-# directory outside the repo, with no TOBY_ROOT. A skill that tells the agent to
-# run scripts/voice-check.py fails when the skill folder has no such file.
-PROBE="$TMP_ROOT/probe.md"
-CLEAN="$TMP_ROOT/clean.md"
-printf 'This uses a robust approach.\n' > "$PROBE"
-printf 'The job retries twice.\n' > "$CLEAN"
-
-while IFS='|' read -r label skills_rel instr_rel; do
-  checker="$FRESH/$skills_rel/toby-voice/scripts/voice-check.py"
-  if [[ ! -f "$checker" ]]; then
-    flunk "$label" "the toby-voice skill has no scripts/voice-check.py"
-  elif ! (cd "$TMP_ROOT" && env -u TOBY_ROOT python3 "$checker" "$CLEAN" --fix-only >/dev/null 2>&1); then
-    flunk "$label" "the installed checker fails on a clean file"
-  # The checker exits 1 when it finds a problem, and pipefail would carry that
-  # exit through a pipe into grep, so read the output first.
-  elif checker_out="$(cd "$TMP_ROOT" && env -u TOBY_ROOT python3 "$checker" "$PROBE" --fix-only 2>&1)"; [[ "$checker_out" == *"banned word 'robust'"* ]]; then
-    pass "$label" "checker runs from the skill folder and catches a banned word"
-  else
-    flunk "$label" "the installed checker missed a banned word"
-  fi
-done < <(tool_rows)
-
-if find "$FRESH" -name __pycache__ | grep -q .; then
-  flunk total "running the checker left __pycache__ in an installed skill"
-else
-  pass total "running the checker left the skill folders unchanged"
-fi
-
 # --- 2. unmodified re-install updates; modified skill refuses -----------------
 
 if install_into "$FRESH" --tool claude >/dev/null 2>&1; then
@@ -297,28 +268,6 @@ else
   pass claude "output style matches the repo"
 fi
 
-# --hooks ships both hooks. The write hook must find the checker in the installed
-# toby-voice skill with no checkout and no TOBY_ROOT. An old install left a lone
-# voice-check.py in ~/.claude/toby/scripts, and the hook must skip that copy.
-HOOK_HOME="$TMP_ROOT/hooks"
-mkdir -p "$HOOK_HOME/.claude/toby/scripts"
-printf 'import validate_skills\n' > "$HOOK_HOME/.claude/toby/scripts/voice-check.py"
-install_into "$HOOK_HOME" --tool claude --hooks >/dev/null 2>&1
-KIT="$HOOK_HOME/.claude/toby"
-if [[ -f "$KIT/hooks/voice-write-check.py" && -f "$KIT/hooks/voice-stop-check.py" ]]; then
-  pass hooks "--hooks installed both hooks"
-else
-  flunk hooks "--hooks did not install both hooks"
-fi
-
-PAYLOAD="{\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$PROBE\"}}"
-hook_out="$(cd "$TMP_ROOT" && printf '%s' "$PAYLOAD" | HOME="$HOOK_HOME" env -u TOBY_ROOT python3 "$KIT/hooks/voice-write-check.py" 2>&1)" || true
-if grep -q "'robust': banned word" <<<"$hook_out"; then
-  pass hooks "write hook runs the skill's checker and skips the old lone copy"
-else
-  flunk hooks "the installed write hook did not flag a banned word"
-fi
-
 # --- 5. switching from --output-style back to default removes the style -------
 
 if ! install_into "$STYLE_HOME" --tool claude >/dev/null 2>&1; then
@@ -365,30 +314,6 @@ if install_into "$LINK_HOME" --tool claude --link --output-style >/dev/null 2>&1
   pass link "--link symlinks skills and output style to repo"
 else
   flunk link "--link did not symlink skills and output style to repo"
-fi
-
-# --- 8. standalone --hooks, Usage synopsis, and --write-settings --------------
-
-help_out="$("$ROOT/scripts/install.sh" --help)"
-if grep -q '^Usage: .*--hooks' <<<"$help_out"; then
-  pass hooks "--help lists --hooks in Usage"
-else
-  flunk hooks "--help omits --hooks from Usage"
-fi
-
-HOOKS_ONLY="$TMP_ROOT/hooks_only"
-mkdir -p "$HOOKS_ONLY/.claude"
-printf '{"theme": "dark"}\n' > "$HOOKS_ONLY/.claude/settings.json"
-if install_into "$HOOKS_ONLY" --hooks --write-settings >/dev/null 2>&1 \
-  && [[ -f "$HOOKS_ONLY/.claude/toby/hooks/voice-write-check.py" ]] \
-  && [[ ! -e "$HOOKS_ONLY/.claude/skills" && ! -e "$HOOKS_ONLY/.codex" ]] \
-  && [[ -f "$HOOKS_ONLY/.claude/settings.json.bak" ]] \
-  && grep -q '"theme": "dark"' "$HOOKS_ONLY/.claude/settings.json" \
-  && grep -q 'voice-write-check.py' "$HOOKS_ONLY/.claude/settings.json" \
-  && grep -q 'voice-stop-check.py' "$HOOKS_ONLY/.claude/settings.json"; then
-  pass hooks "--hooks alone skips other tools and --write-settings merges settings.json"
-else
-  flunk hooks "--hooks alone or --write-settings failed"
 fi
 
 # --- 9. --status and --uninstall ----------------------------------------------

@@ -1,21 +1,16 @@
 """The voice rules, as code: the banned words, the patterns, and prose splitting.
 
-voice-check.py runs these against any text. validate-skills.py imports them to
-check the skills in this repo. The rules are in their own file so the checker
-runs with this file and the guide alone. The toby-voice skill ships both files,
-so the checker runs from the skill folder any tool installs.
+validate-skills.py imports them to check the skills in this repo, and
+score-voice.py imports them to score eval outputs.
 """
 from __future__ import annotations
 
 import re
 from pathlib import Path
 
-# In the repo, the operating guide is in the base folder beside scripts. In an
-# installed toby-voice skill, the guide is references/toby.md in the same skill
-# folder. sync.sh keeps the two copies of the guide identical.
+# The operating guide is in the base folder beside scripts.
 REPO_ROOT = Path(__file__).resolve().parents[1]
-_REPO_GUIDE = REPO_ROOT / "base" / "toby.md"
-BASE_TOBY = _REPO_GUIDE if _REPO_GUIDE.exists() else REPO_ROOT / "references" / "toby.md"
+BASE_TOBY = REPO_ROOT / "base" / "toby.md"
 
 
 # The banned-word lists are in the operating guide under "## Banned Words" and are read
@@ -74,8 +69,6 @@ CONTRAST_PATTERNS = [
 
 # FOIL_PATTERNS matches a contrast whose rejected half follows a comma or a dash.
 # It also matches "That's not X, it's Y" with any pronoun as the subject.
-# voice-check.py puts these matches in FIX, and hooks/voice-stop-check.py blocks
-# a reply on them, so both checks use a form added here.
 FOIL_PATTERNS = [
     (re.compile(r",\s+not\s+(?:a|an|the|just|only|because|to|for|from|in|on|by|per|with|at|as|under|over|without|through|across|between|after|before|its|his|her|their|my|your)\b"),
      "invented foil"),
@@ -96,7 +89,6 @@ FOIL_PATTERNS = [
 # fails the Job test, because it gives no answer, reason, step, risk, or
 # decision. Each form matches a whole sentence or a fixed tail, so "Almost. Two
 # tables are left." passes.
-# voice-check.py puts these in FIX, and the Stop hook blocks a reply on them.
 # A sentence also starts after an opening quote, because skills quote the reply
 # they want, as in `"Good. You write the guard."`, and an agent copies it.
 SENTENCE_START = r"(?:^|(?<=[.!?]\s)|(?<=[.!?]\s\s)|(?<=\")|(?<=“))"
@@ -223,9 +215,7 @@ MECHANICAL_PATTERNS = [
 ]
 
 
-# The reply check in hooks/voice-stop-check.py runs FOIL_PATTERNS, these forms,
-# TIC_PATTERNS, FIGURATIVE_FRAMES, and COINED_TERMS. Each form here matches a
-# fixed phrase, because a user turns off a hook that blocks correct replies.
+# Each form here matches a fixed phrase, so it doesn't flag correct replies.
 REPLY_PATTERNS = FOIL_PATTERNS + TIC_PATTERNS + [
     (re.compile(r"\bnot just\b"), "invented foil"),
     (re.compile(r"\brather than\b"), "invented foil"),
@@ -239,197 +229,6 @@ REPLY_PATTERNS = FOIL_PATTERNS + TIC_PATTERNS + [
     (re.compile(r"\b(?:[Dd]oes (?:that|this) make sense|(?:I'd be |I'm )?[Hh]appy to (?:help|walk|show|explain|dig|go|answer|talk|look|share)|[Gg]lad I could help)\b"),
      "closing offer"),
 ]
-
-
-# PATTERN_NOTES maps each finding label to what the broken pattern is and why it
-# makes a sentence hard to read. voice-check.py and hooks/voice-stop-check.py
-# print these, so both explain a label the same way. The notes give no rewrite,
-# because the user asked that the agent write its own from the reason.
-PATTERN_NOTES: dict[str, tuple[str, str]] = {
-    # Found by slogan_findings and PREDICTED_PATTERNS.
-    "heading written as a claim": ("The heading states a claim as a full sentence.",
-                                   "Readers scan headings to find a section, and a claim is slower to scan than a label."),
-    "noun phrase with no verb": ("The line is a noun phrase with no verb.",
-                                 "The reader can't tell what the thing does."),
-    "chained pair": ("The second sentence starts on the last word of the first sentence.",
-                     "The reader reads the same word twice to follow one idea."),
-    "one-word definition": ("The sentence defines a thing with one word.",
-                            "The one word doesn't tell the reader what the thing does."),
-    "label with a period": ("A label ends with a period as if it were a sentence.",
-                            "The line has no verb, so the reader can't tell what the label claims."),
-    "label with no value": ("A field label is followed by \"None\".",
-                            "The reader can't tell what is missing or where the writer looked."),
-    "setup sentence before the fact": ("The sentence prepares the reader for a fact and doesn't state it.",
-                                       "The reader has to read on to find the point."),
-    "sentence about the document": ("The sentence describes the document and gives none of its content.",
-                                    "The reader gets no content from it."),
-    "litotes": ("The sentence states a thing by denying its opposite.",
-                "The reader has to undo the \"not\" to find the claim."),
-    "abstract noun as actor": ("An abstract noun does a person's action.",
-                               "The reader can't tell which person or program acted."),
-    "setup question": ("The sentence asks a question that the next sentence answers.",
-                       "The reader waits for an answer the writer already had."),
-    "noun doing a verb's job": ("A noun phrase stands in for a verb.",
-                                "The extra words hide the action from the reader."),
-    "meeting jargon": ("The sentence uses meeting jargon.",
-                       "The reader has to translate the jargon into a plain word."),
-    "rhythm device": ("The sentence uses a balanced frame for its sound.",
-                      "The frame adds rhythm and no meaning, and the reader parses it twice."),
-    "vague intensifier": ("An intensifier scales a claim with no number.",
-                          "The reader can't tell how big the effect is."),
-    "code given feelings": ("The sentence gives code a feeling.",
-                            "Code doesn't feel, so the reader has to guess what the code did."),
-    "hedge stack": ("The sentence stacks two or more hedges.",
-                    "The reader can't tell how sure the writer is or what is unknown."),
-    "would-have stated as fact": ("The sentence states what would have happened as if someone measured it.",
-                                  "The reader can't tell the guess from the result."),
-    "claim about the user": ("The sentence claims something the user didn't say or do.",
-                             "The reader sees a guess about themselves stated as a fact."),
-    "what a thing never does": ("The sentence says what a thing doesn't do.",
-                                "The reader learns nothing about what the thing does, unless they expected it."),
-    "program given a judgment": ("The sentence gives a program a judgment.",
-                                 "Programs don't judge, so the reader has to guess the fact behind the word."),
-    "bullet restates its heading": ("The bullet repeats the words of the heading above it.",
-                                    "The reader reads the same fact twice."),
-    "empty qualifier": ("An adjective fits every noun of its kind.",
-                        "The adjective adds a word and no meaning."),
-    "opening phrase that frames the evidence": ("An opening phrase says how the writer found the fact.",
-                                                "The reader reads the method before the finding."),
-    "relation word with its other half missing": ("A relation word has no second half.",
-                                                  "The reader waits for what was traded, and the sentence never says."),
-    "negated actor": ("\"No\" plus a noun, or \"nothing\" or \"nobody\", does the action.",
-                      "The reader has to picture the action and then cancel it."),
-    "container verb": ("Text, a line, or a document is said to hold something.",
-                       "Text doesn't hold anything, so the reader has to work out what the text says."),
-    "double negation": ("\"Only\" and a negation both limit the same clause.",
-                        "The reader has to undo two negations to find what is allowed. A rewrite that undoes them "
-                        "can change which case the sentence allows."),
-    "negation on a noun": ("A verb is followed by \"no\" and a noun.",
-                           "The reader reads the verb as a positive claim and then has to reverse it at the noun."),
-    "uncontracted negation": ("A negation is written in full.",
-                              "People use contractions when they speak, so the full form reads stiff and slows the reader."),
-    "paragraph over three sentences": ("A paragraph runs past three sentences.",
-                                       "The reader has to hold every sentence to find the separate points, and a list shows them one at a time."),
-    "history in a file": ("The text records what was removed, what someone decided against, or when a choice was made.",
-                          "A doc or plan states what is true now, and the history only adds things the reader has to skip."),
-    "sentence about the reply": ("The sentence talks about the reply in place of giving its content.",
-                                 "The reader reads a sentence and learns nothing about the work."),
-    "stock admission": ("The sentence admits a mistake in a stock form.",
-                        "The reader wants the corrected fact, and the stock form delays it."),
-    "rule as the actor": ("A rule, choice, or decision is written as if it acts.",
-                          "A rule tells someone what to do, so the reader has to work out who acts."),
-    "file as the actor": ("A file is written as if it acts.",
-                          "A file holds text, so the reader has to work out who acts."),
-    "taking a message as approval": ("The reply says it takes a message as approval.",
-                                     "The user didn't give the approval, so the sentence claims a decision the user didn't make."),
-    "tag sentence": ("A short sentence after a fact only points back to a label or a number.",
-                     "The reader has to look up the label to learn the link."),
-    "bare `that` as an object": ("\"That\" stands alone as the object.",
-                                 "The reader has to search back for what \"that\" means."),
-    "rider after a complete claim": ("A clause after a complete sentence repeats what the sentence said.",
-                                     "The reader reads the same claim twice."),
-    "heading joins two clauses": ("The heading joins two clauses with a comma.",
-                                  "Two clauses turn a label into a sentence the reader has to parse."),
-    "grade before the answer": ("A one-word grade comes before the answer.",
-                                "The reader gets a verdict before the content."),
-    "count before the items": ("The sentence gives a count before the items.",
-                               "The reader gets a number with nothing to attach it to."),
-    "dramatic word": ("A dramatic word adds emphasis.",
-                      "The word states a feeling, and the reader can't tell the size of the problem."),
-    "cleft for emphasis": ("The sentence wraps its claim in \"X is what makes Y\".",
-                           "The extra words add emphasis and no meaning."),
-    "reflexive for emphasis": ("\"Itself\" is added for emphasis.",
-                               "The word adds length and no meaning."),
-    "deferred antecedent": ("The sentence says \"this\" and gives its meaning only after a colon.",
-                            "The reader doesn't know what \"this\" means until the end."),
-    "punchline closer": ("The reply ends on a punchline or a summary line.",
-                         "The line repeats or decorates the facts and adds none."),
-    "code given senses": ("The sentence gives code a sense.",
-                          "Code reads and matches, so the reader has to guess the action."),
-    "sentence that announces the next one": ("The sentence announces the next sentence.",
-                                             "The reader reads past it to find the content."),
-    "process preamble": ("The sentence announces what the writer will do next.",
-                         "The reader waits for the finding the sentence promises."),
-    "coined name": ("The writer made up a name for something the source already names.",
-                    "The reader has to learn a second name for one thing."),
-    "importance flag": ("A phrase says something matters without saying why.",
-                        "The reader gets no reason and no consequence."),
-    "picture word": ("A word of place describes code or a rule.",
-                     "A rule is in a file, so the reader has to translate the picture."),
-    "fragment": ("The sentence has no subject or no verb.",
-                 "The reader has to guess who did what."),
-    "doubled verb": ("Two verbs do the same job in one sentence.",
-                     "The reader parses two actions where there is one."),
-    "intensifier with no contrast": ("\"Actually\", \"really\", or \"truly\" appears with no contrast.",
-                                     "The word implies a contrast the sentence never gives."),
-    "either with no or": ("\"Either\" appears with no \"or\".",
-                          "The reader waits for a second option that never comes."),
-    "closing offer": ("The reply ends with an offer of more help.",
-                      "The offer adds no fact, and the reader reads past it."),
-    # Found by the word lists, the foil and tic patterns, and the line checks.
-    "banned word": ("The word is on the banned list in the Toby instructions.",
-                    "The word is vague, inflated, or stock, and the reader learns nothing from it."),
-    "sense-scoped word": ("The word is banned when it only says something matters, and allowed as a plain noun.",
-                          "When the word only adds emphasis, the reader gets no reason."),
-    "carry as a metaphor": ("\"Carry\" describes something other than moving an object or an arithmetic carry.",
-                            "Text and code don't carry things, so the reader has to guess the verb."),
-    "invented foil": ("The sentence contrasts the thing with something nobody claimed.",
-                      "The reader has to process a claim nobody made."),
-    "coined term": ("The term is a phrase made up in this repo.",
-                    "The reader hasn't seen the term and can't look it up."),
-    "figurative frame": ("The phrase is a metaphor or an idiom.",
-                         "The reader has to translate the picture into what the thing does."),
-    "praise for the user": ("The sentence praises the user.",
-                            "The praise says nothing about the subject, and the reader reads past it."),
-    "grade and a dash": ("A grade is joined to the next clause with a dash.",
-                         "The reader gets a verdict before the content."),
-    "grade on the user's attempt": ("The sentence grades the user's attempt.",
-                                    "The reader gets a verdict before the content."),
-    "labelled answer": ("A label comes before the answer.",
-                        "The label delays the answer and adds no fact."),
-    "agreement before checking": ("The reply agrees before any check.",
-                                  "The reader can't tell whether the writer checked the claim."),
-    "stock acknowledgement": ("The reply opens with \"Noted.\" or \"Got it.\"",
-                              "The word says nothing about the change."),
-    "performed empathy": ("The reply performs sympathy.",
-                          "The reader wants the fact or the next step, and the sympathy delays it."),
-    "stock phrasing": ("The sentence uses a stock phrase such as \"a classic bug\".",
-                       "The phrase adds no fact."),
-    "named for described": ("The verb `named` refers to a thing that has no name.",
-                            "The reader expects a name and gets a description."),
-    "trailing though": ("A trailing \"though\" follows a complete sentence.",
-                        "The word implies a contrast the sentence never states."),
-    "that said": ("\"That said\" opens a sentence after a complete claim.",
-                  "The phrase implies a contrast and gives none."),
-    "stray period at the start of a line": ("A line starts with a lone period.",
-                                            "The period is an editing leftover, and the reader stops on it."),
-    "list number with no text": ("A list number has no text after it.",
-                                 "The reader expects an item that is missing."),
-    "clause weld": ("A dash or a semicolon joins two clauses.",
-                    "The mark doesn't say how the clauses relate, so the reader has to guess."),
-    "bare this or that": ("\"This\" or \"that\" stands alone as the subject.",
-                          "The reader has to search back for what the word means."),
-    "sentence over 35 words": ("The sentence runs past 35 words.",
-                               "The reader loses the subject before the sentence ends."),
-    "sentence over 25 words": ("The sentence runs past the 25-word ceiling.",
-                               "Each extra clause adds one more thing for the reader to track."),
-    "sentence count doesn't match the comment": ("The prose gives a sentence count that differs from the comment above it.",
-                                                  "The reader trusts a number that is wrong."),
-    "sentence count does not match the comment": ("The prose gives a sentence count that differs from the comment above it.",
-                                                   "The reader trusts a number that is wrong."),
-    "term the skill never defines": ("A reference file uses a term that the other files of its skill never use.",
-                                     "The reader has no definition to look up."),
-    "restating the question": ("The sentence repeats the user's question before answering it.",
-                               "The user already knows what they asked, so the repetition delays the answer."),
-}
-
-
-def explain(pattern: str) -> str:
-    """Return what a broken pattern is, why it is hard to read, and its fix, on one line."""
-    from voice_fixes import fix_for
-
-    what, why = PATTERN_NOTES[pattern]
-    return f"What it is: {what} Why it is hard to read: {why} Fix: {fix_for(pattern)[0]}"
 
 
 def line_for_offset(text: str, offset: int) -> int:
@@ -449,10 +248,6 @@ VOICE_SCAN_EXEMPT = {
     REPO_ROOT / "skills" / "toby-voice" / "references" / "plain-language-examples.md",
     # A compressed copy of the guide that one eval arm loads in place of it.
     REPO_ROOT / "evals" / "arms" / "core.md",
-    # The same reference files, as they sit in an installed toby-voice skill.
-    REPO_ROOT / "references" / "toby.md",
-    REPO_ROOT / "references" / "plain-language.md",
-    REPO_ROOT / "references" / "plain-language-examples.md",
 }
 
 
@@ -467,9 +262,8 @@ TABLE_ROW_RE = re.compile(r"^\|.*$", re.M)
 BLOCKQUOTE_RE = re.compile(r"^>.*$", re.M)
 
 
-# A double-quoted span is a quote too, and the same exemption covers it. The
-# write hook and the stop hook both blank these spans before matching, so quoting
-# a user's sentence never fails the scan.
+# A double-quoted span is a quote too, and the same exemption covers it, so
+# quoting a user's sentence never fails the scan.
 DOUBLE_QUOTE_RE = re.compile(r'"[^"\n]{1,300}"|“[^”\n]{1,300}”')
 
 
@@ -604,42 +398,6 @@ def sentences_in(body: str) -> list[str]:
     return [s.replace("\0", ".") for s in SENTENCE_SPLIT_RE.split(guarded) if s.strip()]
 
 
-# Slogans. Every form below came from agent-written docs and decks that passed
-# every other check in this file, because each word was plain and each sentence
-# short. A short sentence is often right, so no check here can settle one of
-# these. Each hit is a question for the writer.
-WORD_RE = re.compile(r"[A-Za-z0-9][\w'-]*")
-# "A plugin is data." and "Plugins are data." define a thing by one bare word.
-DEFINITION_RE = re.compile(
-    r"^(?:(?:A|An|Every|Each)\s+[\w-]+\s+is|[A-Z][\w-]*s\s+are)\s+(?:an?\s+)?[\w-]+\.$"
-)
-FRAGMENT_RE = re.compile(r"^(?:A|An|The)\s")
-# Setup sentences name a count or a category and hold the thing back for the
-# next sentence, as in "One file causes this failure." Every writer in the
-# content eval opened its reply to a frustrated user this way.
-SETUP_SENTENCE_RES = [
-    re.compile(r"^(?:One|Two|Three|A single|Only one)\s+[\w-]+\s+(?:causes?|changes?|matters?|remains?|explains?|breaks?|fails?)\b[^.?!]*\.$"),
-    re.compile(r"^(?:This|That|The)\s+[\w-]+\s+(?:has|comes from|traces back to|traces to|comes down to)\s+(?:one|a single|two|three)\s+[\w-]+\.$"),
-    re.compile(r"^There (?:is|are) (?:one|a single|two|three|only one) [\w-]+(?: left)?\.$"),
-    # "The bigger gap is elsewhere." The sentence names no gap.
-    re.compile(r"^The (?:bigger|main|real|other|larger|first|second|only) [\w-]+ (?:is|lies) "
-               r"(?:elsewhere|different|the opposite|simpler|somewhere else)\.$"),
-]
-# "Guard: none." and "Wiring: none new." put a label where a sentence belongs.
-LABEL_NONE_RE = re.compile(r"^\s*(?:[-*]\s+)?\**[A-Z][\w -]{1,30}[:.]\**\s*\**(?:None|none)\b[^.]{0,20}\.")
-# A sentence about the document itself, where the content should be.
-NARRATION_RE = re.compile(
-    r"^(?:Follow these steps|The following steps|Here are the steps|"
-    r"This (?:deck|proposal|document|section|slide|README|guide) (?:proposes|asks|describes|covers|explains|shows|walks))\b"
-)
-# A sentence that opens like a noun phrase and never reaches a verb is a label
-# with a period, as in "Phase 1 of 3 in the queue migration."
-PHRASE_OPENER_RE = re.compile(r"^(?:A|An|The|This|That|These|Those|Phase|Step|Part|Stage|One|Two|Three|Four|Five|Six|\d+)\b")
-IRREGULAR_VERB_RE = re.compile(
-    r"^(?:\w+n't|must|should|would|could|may|might|shall|let|get|got|make|made|take|took|"
-    r"give|gave|go|went|come|came|see|saw|say|said|keep|kept|run|ran|put|set|cut|hit|hold|"
-    r"held|find|found|know|knew|show|shown|become|became|pay|paid|ship|stay|stop|start)$", re.I
-)
 # Habits predicted from what this reader has rejected so far. None of them is
 # in the skills today, and agents write all of them, so each hit is a question.
 PREDICTED_PATTERNS = [
@@ -881,29 +639,8 @@ PREDICTED_PATTERNS = [
     (re.compile(r"\b(?:[Ww]ant me to|[Ww]ould you like me to|[Ss]hould I also|[Ii]f you(?:'d)? like, I can|I can also)\b"),
      "closing offer"),
 ]
-# The guide bans `actually`, `really`, and `truly` when nothing in the
-# sentence states the contrast they imply. voice-check.py reads the whole
-# sentence, because the contrast word can come before or after.
-INTENSIFIER_RE = re.compile(r"\b(?:actually|really|truly)\b", re.I)
-CONTRAST_RE = re.compile(r"\b(?:but|while|whereas|although|though|instead|yet|despite|however|looks?|seems?)\b", re.I)
 
 
-# Words too common to show that a bullet repeats its heading.
-RESTATE_STOPWORDS = set(
-    "a an the of to in on at by for from with and or but so is are was were be been it its this "
-    "that these those there their they them as than then into onto over under which who what when "
-    "where how all any each every no not do does did has have had can will would should may might "
-    "must more most other same one two three four five six".split()
-)
-HEADING_LINE_RE = re.compile(r"^(?:#{1,6}\s+(.+)|\*\*(.+?)\*\*)$")
-
-
-def content_words(text: str) -> set[str]:
-    """The words that carry meaning, lowercased with a plural -s removed."""
-    return {w.lower().rstrip("s") for w in WORD_RE.findall(text) if w.lower() not in RESTATE_STOPWORDS}
-
-
-LIST_ITEM_RE = re.compile(r"^\s*(?:[-*]|\d+[.)])\s+(.*)$")
 # Litotes denies the opposite of what the writer means: "not uncommon" is "common".
 LITOTES_RE = re.compile(
     r"(?:\bnot|n't) (?:uncommon|unusual|unlike|unreasonable|unimportant|unhelpful|unknown|unfamiliar|"
@@ -948,187 +685,5 @@ REPLY_PATTERNS.extend(MECHANICAL_PATTERNS)
 REPLY_PATTERNS.append((LITOTES_RE, "litotes"))
 REPLY_PATTERNS.append((ABSTRACT_ACTOR_RE, "abstract noun as actor"))
 REPLY_PATTERNS.extend([(p, f) for p, f in PREDICTED_PATTERNS if f in REPLY_EXTRA_FORMS])
-# A line with one of these is a sentence missing its period, such as the slide
-# title "The queue service costs $400 a month", and is no fragment. The last word
-# is left out of the test, because a plural noun there ends in -s too.
-VERB_HINT_RE = re.compile(
-    r"^(?:is|are|was|were|has|have|had|can|will|does|do|did|runs?|needs?|\w+(?:s|ed))$", re.I
-)
-HEADING_RE = re.compile(r"^#{1,6}\s+(?:\d+[.)]\s+)?(.+?)\s*$")
-# A heading longer than this reads as a plain description, such as "Toby is
-# careful to avoid breaking things". A short claim is the slogan: "Uniformity
-# is the failure".
-CLAIM_HEADING_LIMIT = 6
-# A heading that opens on one of these words names a topic or asks a question,
-# so it describes the section even when it holds a verb: "When the topic is code".
-DESCRIPTIVE_OPENERS = {"when", "where", "what", "how", "why", "which", "who", "example", "step", "not"}
-CLAIM_VERB_RE = re.compile(
-    r"\b(?:is|are|was|were|never|always|carr(?:y|ies)|fails?|wins|beats|lives|sits|lands|holds)\b", re.I
-)
 
 
-def prose_paragraphs(text: str) -> list[tuple[int, str]]:
-    """Join consecutive prose lines into paragraphs, with each one's first line number."""
-    paragraphs: list[tuple[int, str]] = []
-    lines: list[str] = []
-    start = 0
-    for number, line in enumerate(text.splitlines() + [""], 1):
-        if is_prose_line(line):
-            if not lines:
-                start = number
-            lines.append(line.strip())
-        elif lines:
-            paragraphs.append((start, " ".join(lines)))
-            lines = []
-    return paragraphs
-
-
-def slogan_findings(text: str) -> list[tuple[int, str, str]]:
-    """Return (line, form, excerpt) for each slogan form in text from prose_only.
-
-    The forms are a heading written as a claim, a noun phrase with no verb, a
-    label with a period, a label with no value, a chained pair, a one-word
-    definition, a setup sentence, a sentence about the document, litotes, and an
-    abstract noun given a person's action. voice-check.py maps each form to the
-    rule to apply.
-    """
-    found: list[tuple[int, str, str]] = []
-    lines = text.splitlines()
-    for number, line in enumerate(lines, 1):
-        if LABEL_NONE_RE.match(line):
-            found.append((number, "label with no value", " ".join(line.split())))
-    checks = [(LITOTES_RE, "litotes"), (ABSTRACT_ACTOR_RE, "abstract noun as actor"), *PREDICTED_PATTERNS]
-    for pattern, form in checks:
-        for match in pattern.finditer(text):
-            number = line_for_offset(text, match.start())
-            found.append((number, form, " ".join(lines[number - 1].split())))
-    # A bullet whose content words mostly repeat the heading above it tells the
-    # reader nothing new, as in "Phase 1 moves the highest-risk jobs" under a slide
-    # titled "The migration moves the highest-risk jobs first".
-    heading_words: set[str] = set()
-    for number, line in enumerate(lines, 1):
-        stripped = line.strip()
-        heading = HEADING_LINE_RE.match(stripped)
-        if heading:
-            heading_words = content_words(heading.group(1) or heading.group(2))
-            continue
-        item = LIST_ITEM_RE.match(line)
-        if item and len(heading_words) >= 3:
-            body = content_words(item.group(1))
-            if body and len(body & heading_words) / len(body) >= 0.6:
-                found.append((number, "bullet restates its heading", " ".join(stripped.split())))
-        elif stripped and not item:
-            heading_words = set()
-    for number, line in enumerate(text.splitlines(), 1):
-        heading = HEADING_RE.match(line.strip())
-        if not heading:
-            continue
-        title = " ".join(heading.group(1).split())
-        words = WORD_RE.findall(title)
-        if 3 <= len(words) <= CLAIM_HEADING_LIMIT and words[0].lower() not in DESCRIPTIVE_OPENERS and (
-            title.endswith(".") or CLAIM_VERB_RE.search(title)
-        ):
-            found.append((number, "heading written as a claim", title))
-        # "Toby is careful, Toby wants to live" is two clauses in a heading, and
-        # both start on the same word. A heading is a label, so it holds one.
-        halves = [WORD_RE.findall(half) for half in title.split(",")]
-        if (len(halves) == 2 and all(len(half) >= 2 for half in halves)
-                and halves[0][0].lower() == halves[1][0].lower()):
-            found.append((number, "heading joins two clauses", title))
-
-    for number, paragraph in prose_paragraphs(text):
-        paragraph = " ".join(paragraph.split())
-        sentences = sentences_in(paragraph)
-        if (
-            len(sentences) == 1
-            and FRAGMENT_RE.match(paragraph)
-            and len(WORD_RE.findall(paragraph)) >= 3
-            and not re.search(r"[.!?:;)\"'`]$", paragraph)
-            and not any(VERB_HINT_RE.match(word) for word in WORD_RE.findall(paragraph)[1:-1])
-        ):
-            found.append((number, "noun phrase with no verb", paragraph))
-        for first, second in zip(sentences, sentences[1:]):
-            a, b = WORD_RE.findall(first), WORD_RE.findall(second)
-            if not a or not b:
-                continue
-            pair = f"{first} {second}"
-            last, lead = a[-1].lower().rstrip("s"), b[0].lower().rstrip("s")
-            if last == lead and len(last) > 3:
-                found.append((number, "chained pair", pair))
-        for sentence in sentences:
-            sentence = sentence.strip()
-            words = WORD_RE.findall(sentence)
-            if DEFINITION_RE.match(sentence):
-                found.append((number, "one-word definition", sentence))
-            if any(pattern.match(sentence) for pattern in SETUP_SENTENCE_RES):
-                found.append((number, "setup sentence before the fact", sentence))
-            if NARRATION_RE.match(sentence):
-                found.append((number, "sentence about the document", sentence))
-            if (
-                len(words) >= 3
-                and sentence.endswith(".")
-                and PHRASE_OPENER_RE.match(sentence)
-                and not re.search(r"'(?:s|re)$", words[0])
-                and not any(VERB_HINT_RE.match(w) or IRREGULAR_VERB_RE.match(w) for w in words[1:])
-            ):
-                found.append((number, "label with a period", sentence))
-    return found
-
-
-# ---------------------------------------------------------------------------
-# The hard set the two hooks block on. voice-check.py keeps the full pattern
-# list for on-demand audits, but a hook that fires on a borderline sentence
-# gets switched off, so the hooks run only what is wrong on
-# every reading: the hard banned words, the tic and label forms, clause welds,
-# and the two length ceilings. Style preferences (contrastive foils and
-# litotes) stay in the checker, where a person decides them. Both hooks
-# import this one function, so a pattern added here reaches both.
-HOOK_SENTENCE_LIMIT = 40
-HOOK_PARAGRAPH_LIMIT = 3
-WELD_RE = re.compile(r"\w\s+—\s+\w|\w;\s+\w")
-# A "Label —" line is a heading, not a welded clause, so it stays exempt.
-LABEL_DASH_RE = re.compile(r"^(?:[-*]\s+)?\**[A-Z][\w-]*(?:\s[\w-]+)?\**\s+—$")
-
-HOOK_TIC_LABELS = {
-    "praise for the user",
-    "grade and a dash",
-    "grade on the user's attempt",
-    "sentence that announces the next one",
-    "process preamble",
-    "labelled answer",
-    "meta label",
-    "count before the items",
-    "importance flag",
-    "agreement before checking",
-    "stock acknowledgement",
-    "performed empathy",
-    "that said",
-    "stock phrasing",
-    "named for described",
-    "hedge stack",
-    "vague intensifier",
-    "taking a message as approval",
-    "tag sentence",
-    "restating the question",
-    "closing offer",
-    "opening phrase that frames the evidence",
-    "stock admission",
-    "punchline closer",
-    "sentence about the reply",
-    "stray period at the start of a line",
-    "list number with no text",
-}
-
-
-def hook_patterns() -> list[tuple[re.Pattern, str]]:
-    """Return the (regex, label) pairs both hooks block on."""
-    tiers = load_banned_words()
-    patterns = [
-        # A word at the end of a sentence must still match, so the lookahead
-        # allows a period unless a letter follows it, as in `robust.py`.
-        (re.compile(rf"(?<![A-Za-z/._=-]){re.escape(word)}(?![A-Za-z/_-]|\.(?=[A-Za-z]))", re.I),
-         "banned word")
-        for word in tiers.get("hard", [])
-    ]
-    patterns.extend((p, label) for p, label in REPLY_PATTERNS if label in HOOK_TIC_LABELS)
-    return patterns

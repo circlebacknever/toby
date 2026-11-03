@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-# The voice rules are in voice_rules.py, where voice-check.py reads them too.
+# The voice rules are in voice_rules.py.
 # Every name is imported here so scripts that load this validator keep reading
 # them off it.
 sys.path.insert(0, str(Path(__file__).resolve().parent))

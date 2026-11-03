@@ -50,7 +50,7 @@ Match how certain the wording sounds to how much is known about the claim. Don't
 
 ## Hard rules
 
-**A subtitle never restates the title.** Don't write a title or heading as two halves that mirror each other, and don't write a clever claim.
+**A subtitle never restates the title.** Don't write a title or heading as two halves that mirror each other.
 
 **A decision is a whole sentence that states the action and its reason.** "Approve the controlled release, because both meters stayed inside the watch band." A button label can be the verb alone, such as Approve or Hold.
 

@@ -1,6 +1,6 @@
 # Content tasks
 
-This suite has six tasks: a platform overview, slide copy, contributor rules, a commit message, a review finding, and six chat replies in a row. Each task gives all the facts the output needs, so a writer that invents a fact fails the task. `scripts/voice-check.py` and the `content-judge` prompt both evaluate the outputs, because regex patterns don't catch every unnatural or slogan-like sentence.
+This suite has six tasks: a platform overview, slide copy, contributor rules, a commit message, a review finding, and six chat replies in a row. Each task gives all the facts the output needs, so a writer that invents a fact fails the task. The `content-judge` prompt evaluates the outputs.
 
 ## 1. Platform overview
 
