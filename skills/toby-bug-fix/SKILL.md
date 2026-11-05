@@ -19,16 +19,33 @@ Fix the cause of the wrong behavior, prove the fix with a run before and after, 
 
 To open a skill by path, read `../<skill>/SKILL.md` relative to this skill's folder. State `Mode: durable implementation` (or `investigation` while reproducing). Open `toby-swd-environment` before any command beyond a narrow test, and open `toby-swd-plan` when the user asks for a plan.
 
-1. **Reproduce.** Open `toby-swd-testing` and write the failing test its bug-fix rule describes. When the repo doesn't have a test harness, reproduce the failure with one command and quote its output. When you can't reproduce it, list what you tried and stop before any edit.
+1. **Reproduce.** Open `toby-swd-testing` and reproduce the bug with its test-first procedure. When a test harness isn't available, use a bounded command and keep its output. If reproduction fails, follow the investigation step below before attempting a functional repair.
 2. **Classify a failing test.** When the report is a test that started failing, classify it into one of the four cases in `toby-swd-testing` before editing the test or the code.
-3. **Find the cause.** Trace the path from the failing input to the wrong output, citing `file:line` at each step, and state the cause in one sentence with its `file:line` before the first edit. Call an uncited cause a guess and keep reading.
-4. **Choose the fix.** Fix the cause where it happens. When duplicated logic or a tangled condition hides the cause, run "Before the first edit" from `toby-swd-campfire` with existing passing tests first. Open `toby-swd-architecture` when the fix moves a rule, `toby-swd-strategy` when the fix would work around a design flaw, and `toby-swd-errors` when the cause is in an error, retry, or validation path. When the repair requires new behavior across multiple files, say so and switch to `toby-build` with the reproduction as criterion 1.
+3. **Find the cause.** Trace the failing input to the wrong output using observed evidence and `file:line` citations. State the cause before the first functional edit. A citation locates the code, and the reproduction establishes how it causes the failure. Treat an unproven cause as a guess and gather evidence.
+4. **Choose the fix.** Repair the cause where the relevant knowledge and invariants are managed. Open `toby-swd-strategy` and `toby-swd-architecture` to check the affected design, including an existing pattern you reuse. Run "Before the first edit" from `toby-swd-campfire` when nearby structure obstructs the repair. Open the applicable skills listed below. When the repair adds a feature across multiple files, switch to `toby-build` with the reproduction as criterion 1.
 5. **Prove it.** Run the reproduction before and after the fix in the form `toby-swd-testing` gives, then run the narrowest tests covering the touched code. When you wrote the test after the fix, revert the fix first to watch the test fail on the expected assertion (`before`), then restore the fix (`after`).
-6. **Check the design.** Run "After the tests pass" from `toby-swd-campfire` on the fix, and list flaws outside the fixed function as follow-ups at `file:line`. When finding the cause required state that the logs omitted, add a log field for that state as `toby-swd-observability` describes.
+6. **Check the result.** Run "After the tests pass" from `toby-swd-campfire` and compare the diff with the applicable design checks. Repair diagnostic gaps needed to understand a repeat failure, then execute the diagnostic check in `toby-swd-observability`. Inspect emitted events and preserved error causes, including context across a queue or outbound call when relevant. Report any check you couldn't run.
+
+## Investigation
+
+When the failure won't reproduce, state the competing causes and the observation that would distinguish them. Use bounded, reversible instrumentation or fault injection to collect that observation. Keep it inside the affected path, redact sensitive values, and record the command and output. Follow the operating guide's approval rules for external systems and runtime changes.
+
+Remove temporary instrumentation when the investigation ends, or keep it as a tested diagnostic improvement. If the evidence still doesn't establish the cause, report what you tried and stop before a functional repair.
+
+## Design skills
+
+Route by what the repair affects, including existing behavior:
+
+- Open `toby-swd-modules` for responsibilities, hidden knowledge, dependency boundaries, or caller coordination.
+- Open `toby-swd-interfaces` for changed signatures, side effects, errors, ordering, or lifetime guarantees.
+- Open `toby-swd-errors` for error, retry, timeout, or validation paths, and `toby-swd-extensibility` for changed type or provider branches.
+- Open `toby-swd-hardening` and `toby-swd-observability` for entry points, jobs, consumers, writes, outbound calls, and failure paths.
+- Open `toby-swd-twelve-factor` for dependencies, config, secrets, process state, startup, shutdown, concurrency, or log destinations.
+- Open `toby-swd-clarity` for names, comments, types, or non-obvious control flow, and `toby-swd-docs` when the repair changes documented behavior or constraints.
 
 ## Scope
 
-Keep the diff to the cause, its test, any `toby-swd-campfire` fix inside the fixed function, and any log field from step 6. In shared code, list every caller you checked and the behavior each relies on.
+Keep the causal repair, its regression test, the required structural changes, and diagnostics for a repeat failure in scope. A repair may cross functions or files when the cause does. Defer unrelated cleanup with its reason at `file:line`. In shared code, list every caller you checked and the behavior each relies on.
 
 ## Red flags
 

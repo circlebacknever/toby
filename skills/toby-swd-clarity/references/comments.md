@@ -4,7 +4,7 @@ Open this file when adding or editing a comment, a docstring, or control flow th
 
 ## Comments
 
-Write an interface comment at the entry point that states behavior, arguments, return value, side effects, exceptions, and caller preconditions, without internals (`toby-swd-interfaces`).
+Write an interface comment at the entry point that states behavior, arguments, return value, side effects, exceptions, and caller preconditions (`toby-swd-interfaces`). Describe guarantees callers rely on, including required ordering or durability. Hide implementation steps callers don't need to coordinate. Trace one call to check that the declaration explains its observable result.
 
 Every other comment must add information the code and types can't express:
 
@@ -20,4 +20,4 @@ Reread touched code as a developer new to the file, and fix these four traps:
 - **Unlabeled tuple or array:** replace a positional tuple or array return (`[data, err, loading]`) with an object or tagged union that has named fields.
 - **Declared type broader than allowed values:** narrow the declared type to match the values the code actually accepts.
 - **Surprising side effects:** when a constructor starts threads or a method mutates unrelated state, document that side effect at the declaration and at the call site.
-- **Event handlers and effects:** state above an event handler, callback, or `useEffect` when and why it runs.
+- **Event handlers and effects:** explain when and why a handler, callback, or `useEffect` runs when its name, dependency list, and surrounding code leave that behavior unclear.

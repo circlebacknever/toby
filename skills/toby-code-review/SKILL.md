@@ -12,19 +12,20 @@ description: >-
 
 # Toby Code Review
 
-Report a change's real issues in plain English, and fix nothing. When the change doesn't have any of the issues below, say so in a line, without suggestions.
+Report a change's real issues in plain English, and fix nothing. A finding needs a reachable trigger, a broken contract or invariant, and a concrete consequence. When the change doesn't have any of those issues, say so in a line, without suggestions.
 
 ## Report
 
 Write each issue as the short comment a co-worker would leave, in Toby's voice:
 
 ```text
-1. Cancelling a shipped order refunds the customer twice (orders/cancel.py:42). Cancel it twice and `payments` gets two refund rows. `cancel()` should return 409 when the order is already "refunded".
+1. Cancelling an order twice refunds the customer twice (orders/cancel.py:42). `cancel()` calls `refund()` without checking the order's current status. Repeating the request creates two rows in `payments`. Reject the second cancellation with 409 when the order is already "refunded".
 
 2. The SLA report will count on-hold tickets as closed once "on_hold" ships (reports/sla.py:21). Its list of open states is a private copy. Delete it and import `OPEN_STATES` from tickets/states.py.
 ```
 
 - Start with what goes wrong and who it hits, at `file:line`, using the code's own identifiers.
+- Explain how the current code causes that result. State the missing check, wrong calculation, changed field, or other causal step in the finding itself. A reproduction and a proposed repair don't replace that explanation.
 - Say how to see the wrong result in one sentence.
 - Give one fix, in a sentence or a code block of at most five lines.
 - Report one issue per root cause, ordered from most harmful to least, without severity tags.
@@ -37,7 +38,7 @@ End the report with these optional lines when they apply:
 
 ## What to check
 
-Review the current diff unless the user gives a scope, and read a PR's description first. Report only issues the change introduces, trace each cause to its callers, and drop any issue you can't reproduce or trace through the code.
+Review the current diff unless the user gives a scope, and read a PR's description first. Read the changed code, its callers, tests, and relevant configuration. Compare the old and new behavior before calling something a regression. Trace each reported cause to a caller and a reachable consequence. A request to audit existing code also covers defects already present in that scope.
 
 1. **Bugs.** Wrong output, a crash, an error hidden from a caller that needs it, or a changed contract or format that breaks callers or stored data.
 2. **A bug fix without a regression test.** Reverting the fix leaves the test suite passing.
@@ -46,17 +47,17 @@ Review the current diff unless the user gives a scope, and read a PR's descripti
 5. **Repo rules.** A break of a rule in the project's `AGENTS.md` or contributing guide. Quote the rule at `path:line` and the `file:line` that breaks it.
 6. **An untested entry point.** A new route, job, or consumer that no test calls through its entry point. Deleting a required line in the handler leaves the suite passing.
 
-When reviewing a plan or spec, read every file in it and report each promised feature that no step builds at `path:line`. Check each new entry point against `../toby-swd-hardening/SKILL.md`, and check `references/skills-diff.md` when the diff touches a `SKILL.md` or agent config.
+When reviewing a plan or spec, read every file in it and report each promised feature that no step builds at `path:line`. Check changed entry points against `../toby-swd-hardening/SKILL.md`. Check `references/skills-diff.md` when the scope includes a skill or agent config.
 
 ## Design
 
-Skip design questions on choices the user already approved in a plan.
+Check approved designs and copied patterns against the same contracts and invariants as new code. Approval establishes intent. It doesn't establish correctness. Report the resulting harm and the smallest repair without reopening choices that still meet those requirements.
 
 **Module boundaries and extensibility**
 
-Report one of these when two modules share knowledge of one format or rule, or when the request, a ticket, a TODO, or `git log` shows a follow-on change coming:
+Trace responsibilities, shared knowledge, caller obligations, and dependency construction in the changed path. Report a boundary problem when it breaks an existing guarantee or makes a stated change require coordinated edits:
 
-- Does an entry point compute a price, limit, or status transition rule that another entry point also needs?
+- Does an entry point compute a price, limit, permission, or status transition that differs from the operation other callers use?
 - Does the diff write another module's table or parse its wire/file format directly, bypassing that module's rules?
 - Does the diff pass a parameter through three or more functions that don't read it?
 - Does the diff add a case to a switch on a type, status, or provider while another switch on that field goes to its default? The fix adds the case and guards the default with `assert_never` or `never`.
@@ -72,26 +73,27 @@ Report these even without a second change in `git log`:
 
 **Warning signs**
 
-Open `toby-swd-warning-signs` and check the changed code. Report a warning sign only when the diff introduces it and the request, a ticket, a TODO, or `git log` shows a change it makes harder. State the concrete edit in `Fix:` without naming the smell or refactoring catalog entry.
+Open `toby-swd-warning-signs` and check the changed code. Report a warning sign when you can trace present harm or a stated change it makes harder. State the concrete repair without naming the smell or refactoring catalog entry. Length and taste alone don't establish harm.
 
 ## Production readiness
 
-Check `references/production.md` whenever the diff adds or changes an entry point, job, consumer, outbound call, migration, write, check-before-write, or stored/queued format.
+Check the applicable questions in `references/production.md` whenever the change affects an entry point, job, consumer, outbound call, migration, write, config, failure path, or stored format. Existing functions and unchanged signatures can change those guarantees too.
 
 ## Prove each issue
 
 - Run the focused tests for the changed files, and ask before running broader checks.
 - Test changed arithmetic and conditions with negative, zero, empty, and boundary values.
 - Assume the code is right and search for a validation, type, framework check, or middleware guard that blocks the failure. Drop the issue unless you can explain why that guard misses. When possible, spawn a subagent per candidate issue to search for the guard.
+- Exercise the real entry point when available. For retries, concurrency, persistence, and diagnostics, inspect the resulting state or emitted output. A passing happy-path test doesn't establish those properties.
 - Claim only what your reproduction steps cause, and claim data loss only when the steps delete, overwrite, or corrupt stored data.
-- Confirm your proposed fix doesn't delete anything a caller or interface requires, and count line numbers from the diff's hunk headers.
+- Confirm the proposed repair preserves caller obligations, persisted formats, and necessary error information. Use verified line numbers in the reviewed version.
 
 ## Don't report
 
 - Method length, naming taste, formatting, or awkward code that passes the Design section above.
-- A pattern every sibling file in the repo uses, copied accurately.
+- A copied pattern whose callers, guards, and operational behavior satisfy the same guarantees in the changed path.
 - An unrecoverable error that the code rightly lets crash.
-- A missing rate limit or audit log the diff didn't remove, unless `references/production.md` requires it.
+- A missing rate limit or audit log without a reachable failure or a requirement in `references/production.md`.
 - Environment variables and CLI flags as attacker-controlled input for injection, unless a request or untrusted file sets them. Still report missing startup validation on required config or secrets exposed in a client bundle.
 - Anything hedged with "consider" or "might".
 

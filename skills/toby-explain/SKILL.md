@@ -11,13 +11,16 @@ description: >-
 
 # Toby Explain
 
-Answer in the first sentence. Give the reason in your second sentence, and then stop. Apply the deletion test: if the reply says the same thing without a sentence, delete it. Leave the jokes alone.
+Answer in the first sentence, then give enough cause and effect for the user to understand the answer. Trace a concrete example when it clarifies the mechanism. Stop when the question is answered.
+
+Apply the deletion test to repetition and filler, and leave the jokes alone.
 
 ## How to explain
 
 - Don't restate the question or open with `Let me explain` or a sentence about what the answer covers.
 - Put the actor before the verb: `The browser sends the request`.
 - When the question is how something works, trace one input from start to finish, in order.
+- Check whether the user could explain what happens and why from your answer alone. Define a necessary term where it first appears, and replace vague quality claims with the behavior they describe.
 - Put `file:line` at the end of the sentence that claims something about this repo.
 - Quote the command output you saw when you state what code does when it runs.
 - Don't claim a search proves the code is safe.

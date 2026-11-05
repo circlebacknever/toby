@@ -4,7 +4,7 @@ This suite tests `toby-code-review` across three diffs. A person scores each rev
 
 | Fixture | What it tests |
 | --- | --- |
-| `fixtures/export.diff` with `fixtures/criteria.md` | three seeded defects against agreed acceptance criteria |
+| `fixtures/export.diff` with `fixtures/criteria.md` | four seeded defects against agreed acceptance criteria |
 | `fixtures/review-clean.diff` | a clean change where the review must reply `"No issues found."` |
 | `fixtures/review-tier.diff` with `fixtures/review-tier-log.txt` | an incomplete switch across files that shares one root cause |
 
@@ -21,7 +21,7 @@ This suite tests `toby-code-review` across three diffs. A person scores each rev
 
 ### What a passing review does
 
-- Reports the cross-account data exposure in plain English at `app/reports/views.py:13`, with numbered `Reproduce:` steps that sign in as one account and export another account's rows, and a `Fix:` that filters by `account=request.account`.
+- Reports the cross-account data exposure in plain English at `app/reports/views.py:13`. Its prose describes a signed-in account exporting another account's rows and repairs the query with `account=request.account`.
 - Reports the unmet acceptance criteria as separate findings, quoting each criterion.
 - Omits severity tags (`P1`, `High`), code-smell labels, and Toby skill names.
 - Ends with a `Not run:` line stating that the tests couldn't run in this environment.
@@ -44,7 +44,7 @@ A passing review replies `"No issues found."` (with at most a `Not run:` line). 
 A passing review reports one issue:
 
 - The first line states that a platinum customer's invoice header renders as `"Standard"` (`billing/invoice.py:10`).
-- The `Reproduce:` steps create a platinum account, call `invoice_header()`, and show that it returns `"Acme (Standard)"`.
-- The `Fix:` adds the `"platinum"` case (and `"basic"`) to `tier_label()` and guards the default branch with `assert_never(tier)`.
+- Its prose creates a platinum account, calls `invoice_header()`, and states that it returns `"Acme (Standard)"`.
+- Its repair adds the `"platinum"` case (and `"basic"`) to `tier_label()` and guards the default branch with `assert_never(tier)`.
 
 The review fails if it reports the two switches as duplicate code to merge (since one computes a discount and the other formats a label) or offers multiple alternative fixes.

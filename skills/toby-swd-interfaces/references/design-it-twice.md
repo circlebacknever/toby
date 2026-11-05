@@ -4,6 +4,8 @@ Open this file when a first interface comment fails the comment test, or when a 
 
 ## The loop
 
+When the user or an external contract fixes the interface, preserve it. Compare responsibility boundaries only when a real design choice remains. A candidate that violates the required contract doesn't count as an alternative.
+
 1. Write one candidate design as function signatures with interface comments and empty bodies.
 2. Run the comment test on each signature.
 3. When it fails, state what failed ("the comment had to describe the retry buffer") and write a second design that divides the work differently. A simple rename doesn't count.

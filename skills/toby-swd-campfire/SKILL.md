@@ -11,7 +11,7 @@ description: >-
 
 Leave each file the change touches easier to change than you found it. Make the change easy before the first edit, and check the design after the tests pass.
 
-When the user asked for the smallest diff, or you take a shortcut allowed by `toby-swd-strategy`, skip the refactor edits. Run the design check anyway, and list each skipped fix as a follow-up at `file:line`.
+When the user asked for the smallest diff, avoid unrelated refactors. Keep the boundary or invariant repair necessary for the requested behavior. Run the design check and list optional cleanup separately. A shortcut allowed by `toby-swd-strategy` needs its stated reason.
 
 ## Before the first edit
 
@@ -31,7 +31,7 @@ Run the tests after the refactor and before the feature edit without altering an
 
 ## After the tests pass
 
-Run the 11-point design check in `toby-swd-architecture` on the finished diff, fix what it finds, and rerun the tests. Fix every wrong comment, dead branch, or misleading name in the lines the diff changed. For untouched lines in the same function, fix one or list it as a follow-up at `file:line`. In a planned build, add any design-check fix to the plan before making it, and list fixes in untouched files as follow-ups.
+Run the applicable design questions in `toby-swd-architecture` on the finished diff, including the module, interface, invariant, and operational questions. Fix what the requested behavior requires and rerun the affected checks. Fix every wrong comment, dead branch, or misleading name in changed lines. List optional cleanup outside those lines as a follow-up at `file:line`. In a planned build, update the plan before a design-check repair. A repair required for correctness stays part of the task.
 
 ## Report
 

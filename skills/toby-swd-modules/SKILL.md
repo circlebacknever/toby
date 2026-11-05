@@ -1,9 +1,10 @@
 ---
 name: toby-swd-modules
 description: >-
-  Contains Toby's checks for where code goes and when to split or merge
-  modules. Use it for a new module or boundary, or a question about where code
-  belongs. Skip it for a change inside one function.
+  Checks where code goes and when to split or merge modules. Use it when a
+  change affects a module's responsibility, shared knowledge, dependencies,
+  data flow, or caller burden, even inside one function, or for placement
+  questions. Skip it for implementation details that leave those properties unchanged.
 ---
 
 # Toby SWD Modules
@@ -16,7 +17,7 @@ Follow "Default structure" in `toby-swd-architecture` for entry points, rules, d
 
 ## The checks
 
-Run these eight checks whenever you place code or set a module boundary. Propose multi-file restructuring only for modules that are exported, have multiple callers, cross a service boundary, or are costly to change later.
+Run the applicable checks whenever you place code or change the responsibilities of an existing module. Cite what the module hides and what callers must manage. Check a copied pattern before reusing it. Propose restructuring across files only when the current boundary obstructs the requested change or exposes shared knowledge.
 
 ### 1. Split by what each module hides
 
@@ -32,7 +33,7 @@ Handle unavoidable complexity inside the module when it belongs to that module's
 
 ### 4. Give adjacent layers different abstractions
 
-Check for pass-through methods and pass-through variables, which show that adjacent layers expose the same abstraction. Open `references/pass-through.md` for the fixes.
+Check for pass-through methods and pass-through variables that repeat an abstraction without hiding a decision. A narrow consumer interface or provider boundary can be useful with one implementation. Open `references/pass-through.md` for the fixes.
 
 ### 5. Prefer composition over implementation inheritance
 

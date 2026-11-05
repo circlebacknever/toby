@@ -31,6 +31,10 @@ A single-file plan contains the same sections in the same order.
 
 ## Steps
 
+Before writing implementation steps, open `toby-swd-strategy` and `toby-swd-architecture` for a change that affects behavior or design. Record each affected responsibility, the knowledge its module hides, changed caller contracts, and the reason for the chosen structure. Check any existing pattern before reusing it.
+
+Open `toby-swd-modules` and `toby-swd-interfaces` when boundaries or contracts change. Open `toby-swd-hardening`, `toby-swd-observability`, and `toby-swd-twelve-factor` for the operational behavior the change affects, including existing paths. Put required safeguards and their checks in the slice that needs them.
+
 Give each step the file path, whether it creates, edits, or deletes the file, what changes there, and the criterion number it serves. Give any command on the operating guide's or `toby-swd-environment`'s approval list its own step with the exact command.
 
 Check off each step as it finishes. When work departs from an approved step or turns up a missing step, update the plan and state what changed before continuing. Include a step-level check only when it can fail while the group's end-to-end check passes (such as a unit test for duplicate rejection).
@@ -40,6 +44,8 @@ Check off each step as it finishes. When work departs from an approved step or t
 Start each group's verification with the end-to-end check (`toby-swd-e2e`) that drives the slice's entry point. Run each check before and after the slice's edits and record the output under the check. Checks for new behavior must fail (`FAIL`) before and pass (`PASS`) after, while checks for existing behavior must pass (`PASS`) both before and after.
 
 Leave out checks that pass even when the behavior is broken, such as "`\d invites` lists the columns" or "`grep` finds the new route".
+
+For operational paths, include a controlled failure and inspection of the actual emitted diagnostics. State what identifies the operation, affected request or record, outcome, and cause. Include a check of the finished boundaries and caller contracts against the recorded design.
 
 ## The whole feature
 

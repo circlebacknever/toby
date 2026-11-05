@@ -1,12 +1,14 @@
 # Evals
 
-Run the deterministic gates before and after any change to a skill or the operating guide:
+These checks measure package consistency, agent behavior, and whether a reader understands an explanation.
+
+Run the deterministic gates before and after any change to a skill or the operating guide, with approval under the operating guide:
 
 ```bash
 python3 evals/run.py gates
 ```
 
-Green means no gate regressed, and red says what failed against `baselines/gates.json`.
+A pass means no package metric regressed against `baselines/gates.json`. It doesn't establish that an agent applies the design principles.
 
 ## Gates and model suites
 
@@ -53,8 +55,43 @@ python3 evals/run.py compare voice evals/results/voice-*.md
 | `holdout-judge` | distracting sentences across blinded `holdout` outputs | a person with the key outside the repo | 1 |
 | `review` | whether code review catches seeded defects in the required format | a person against `suites/review.md` | 1 |
 | `feature-dev` | whether `toby-build` sizes a copy edit and a multi-screen feature accurately | a person against `suites/feature-dev.md` | 1 |
+| `build-execution` | implemented behavior, domain boundaries, and emitted success and failure diagnostics | independent execution grader and a person reading the diff | 1 |
+| `bug-fix-execution` | repaired behavior, regression evidence, and diagnostics for a repeat failure | independent execution grader and a person reading the diff | 1 |
+| `review-execution` | reachable regressions across twelve categories and guarded changes that should pass | private before/after probes and a separate reader matching findings | 1 |
 | `learning` | whether `toby-learning` teaches a beginner in short interactive turns | a person against `suites/learning.md` | 1 |
 | `explain` | whether `toby-explain` answers first, cites evidence, and stays concise | a person against `suites/explain.md` | 1 |
+
+## Executable tasks
+
+Use [execution cases](suites/execution.md) for actual build and bug-fix runs.
+Prepare an isolated workspace, give its task to a fresh agent, then run the independent grader after the agent finishes.
+Use the same fixture and prompt for each skill revision, with a separate workspace and fresh session for each run.
+Keep the expected findings and grading code outside the agent's supplied workspace.
+Inspect the resulting diff for module boundaries and contracts because behavior tests don't establish design quality.
+
+Use [review execution](suites/review-execution.md) for fresh code-review sessions.
+Its private probes establish the failures independently. A separate reader checks each submitted finding's trigger, mechanism, consequence, and repair before scoring it.
+Unsupported or duplicate findings lose points, and a real unseeded defect requires separate verification.
+
+Keep a result from each run, including failures and false alarms. Report counts as observations from those cases.
+A single successful task doesn't establish general reliability or an improvement over another revision.
+Read the code and explanation too, and use repeated independent samples before making a broader claim.
+
+## Reader checks
+
+`scripts/score-voice.py` checks syntax patterns. A zero score doesn't establish meaning, accuracy, or useful explanation.
+Use the comprehension judge with the source facts when changing explanations or documentation:
+
+```sh
+python3 evals/run.py prompt readability-judge --folder /absolute/path/to/outputs --out /absolute/path/to/review.md --facts /absolute/path/to/task.md
+```
+
+The judge first writes what it understood, then checks that understanding against the facts.
+Use `--sentences` only for isolated sentence checks that don't assess the document's meaning.
+All judges preserve humor. Check whether the engineering explanation is accurate and understandable independently of its jokes.
+
+Token growth remains a package budget. Before accepting a shorter replacement or recording changed baselines, compare actual behavior on the affected execution cases.
+Record deliberate rule replacements after reviewing their effects. Don't treat a lower token count or syntax score as proof of better engineering.
 
 ## Layout
 

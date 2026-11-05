@@ -1,9 +1,11 @@
 ---
 name: toby-swd-strategy
 description: >-
-  Contains Toby's design pass, run before a change. Use it before any change
-  beyond one line, and before a switch to a new tool or framework. Skip it for
-  a change that copies a pattern already in the file.
+  Checks affected responsibilities, contracts, dependencies, invariants, and
+  failure behavior. Use it for existing code and before a switch to a new tool
+  or framework. A copied pattern still needs the applicable checks.
+  Skip it for prose and formatting edits that leave
+  those design properties unchanged.
 ---
 
 # Toby SWD Strategy
@@ -12,10 +14,12 @@ Leave the code you change easier to change than it was. Don't count working code
 
 ## Design pass
 
-For anything beyond a one-line change, don't implement the first idea. When the change copies a nearby structure or passes an optional parameter unchanged, write `Structure: follows <path:line>` and skip this pass. For a single-function signature whose first comment passes `toby-swd-interfaces`, one design is enough unless the module boundary changes. When replacing a tool or structure, design each option to remove the old one completely.
+Identify the responsibilities, caller contracts, invariants, dependencies, and failure behavior the change affects. Check the applicable parts of `toby-swd-modules`, `toby-swd-interfaces`, and `toby-swd-architecture` before accepting a design. These checks apply to existing code and small changes too.
+
+A nearby pattern can justify one design after it passes those checks. Cite the pattern and the reason it fits. An unchanged signature or an optional parameter doesn't establish that the behavior or caller burden stays unchanged. Compare alternatives when the change introduces a boundary, changes a contract, or exposes a flaw in the existing structure. When replacing a tool or structure, design each option to remove the old one completely.
 
 - State the change in one sentence. List each likely next change that the request, a ticket, a TODO, or `git log` states, and leave out any you guessed.
-- Sketch at least two approaches that differ in which module handles the hard part, what the interface exposes, and what callers must manage. Make the second approach the strongest alternative a competent engineer would pick, and choose the one with the simplest caller-side interface.
+- When comparing approaches, sketch two that differ in which module handles the hard part, what the interface exposes, and what callers must manage. Make the second approach the strongest alternative a competent engineer would pick. Choose using the caller's work, information hidden, invariants enforced, and required operational behavior.
 - Check each stated next change against the design. When one would force callers to change or add a special case, adjust the design now.
 - When those changes add cases picked by a tag or type, choose the dispatch now using `toby-swd-extensibility`. Use a lookup map for small stateless branches, or an interface with implementations when cases keep their own state.
 

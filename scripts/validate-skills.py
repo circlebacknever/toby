@@ -529,6 +529,8 @@ ROUTING_GROUPS = {
     "bug-fix": [
         "toby-bug-fix", "toby-swd-testing", "toby-swd-strategy", "toby-swd-architecture",
         "toby-swd-errors", "toby-swd-campfire", "toby-swd-observability", "toby-swd-environment",
+        "toby-swd-modules", "toby-swd-interfaces", "toby-swd-extensibility",
+        "toby-swd-hardening", "toby-swd-twelve-factor", "toby-swd-clarity", "toby-swd-docs",
     ],
     "optimize": [
         "toby-optimize", "toby-swd-interfaces", "toby-swd-testing", "toby-swd-hardening",

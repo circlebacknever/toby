@@ -10,8 +10,8 @@ description: >-
   Skip it for wrong output, which toby-bug-fix covers, and for
   slow code, which toby-optimize covers. Skip it when behavior stays the same,
   which toby-refactor covers, and for a throwaway, which toby-swd-experiment
-  covers. Skip it for a one-file edit that copies a pattern already in that
-  file. Use it for a one-file edit that adds a case to a type, kind, or status
+  covers. Skip it for a one-file text or formatting edit. Use it for a one-file
+  edit that adds a case to a type, kind, or status
   branch, or changes a money or permissions rule.
 ---
 
@@ -62,19 +62,22 @@ At stop 1 of strategic work, show the criteria under `What done means for [task]
 
 ## 5. Design
 
-When the change copies a nearby structure or passes an optional parameter unchanged, write `Structure: follows <path:line>` and skip `toby-swd-strategy` and `toby-swd-interfaces`. Otherwise open `toby-swd-strategy` and run its design pass, and open `toby-swd-architecture` when the change adds or moves a business rule, a write, or an outbound call.
+Open `toby-swd-strategy` and run its design pass. Reusing a nearby pattern can shorten the comparison only after checking that pattern's boundaries, caller burden, and failure behavior. Cite the checked pattern and any flaw you won't copy.
+
+Open `toby-swd-architecture` when the change affects a business rule, state, a dependency, or an entry point, including existing code. Record the design decisions and applicable checks so you can compare them with the finished diff.
 
 Open `toby-swd-campfire` and run its "Before the first edit" check. Then open each skill whose condition holds:
 
-- Open `toby-swd-modules` for a new module or boundary, or when a value threads through functions that don't read it.
-- Open `toby-swd-interfaces` for a new or changed signature that callers must handle.
+- Open `toby-swd-modules` when the change affects a module's responsibility, hidden knowledge, dependencies, or caller coordination.
+- Open `toby-swd-interfaces` when the change affects a signature or a caller's contract, including side effects, ordering, errors, or resource lifetime.
 - Open `toby-swd-extensibility` when the design branches on a type, kind, status, or provider, or adds an implementation or subclass.
 - Open `toby-swd-errors` for a failure case, retry, timeout, or validation.
 - Open `toby-optimize` for a stated time or memory budget, or when you add a cache, batch, or queue for speed.
-- Open `toby-swd-hardening` and `toby-swd-observability` for a new entry point, job, consumer, outbound call, write, or failure path, or any request about logs, metrics, alerts, or hardening.
-- Open `toby-swd-twelve-factor` for a new process, worker, scheduled job, config value, secret, or backing service.
+- Open `toby-swd-hardening` and `toby-swd-observability` when the change affects an entry point, job, consumer, outbound call, write, or failure path.
+- Open `toby-swd-twelve-factor` when the change affects dependencies, config, secrets, service connections, process state, startup, shutdown, concurrency, or log destinations.
+- Open `toby-swd-clarity` when the change affects names, types, comments, or control flow a reader could misread.
 
-State the structure you chose, the alternative you rejected, any new signature, the one function that computes each new rule, and any refactor you run before the feature edits. Read the installed source of any library behavior the design relies on, or state it as an assumption. Read "Don't build" in `references/checks.md` before writing the plan or the first edit.
+State the structure and its reason, any material alternative, changed contracts, the function that computes each rule, and any refactor before the feature edits. For operational paths, specify how a repeated failure will be diagnosed using the repo's existing tools. Read the installed source of any library behavior the design relies on, or state it as an assumption. Read "Don't build" in `references/checks.md` before writing the plan or the first edit.
 
 ## 6. Write the plan and stop
 
@@ -93,9 +96,11 @@ Open `toby-swd-testing` before the first edit.
 
 Run each criterion's check before and after the change in the form `toby-swd-testing` gives. Run the change the way a user would, or open `toby-swd-e2e` and run the entry-point test. Then run "After the tests pass" in `toby-swd-campfire`.
 
+For changed operational paths, run the diagnostic check in `toby-swd-observability`. Trigger a representative failure and inspect the actual emitted output. Record what identifies the operation, affected record or request, outcome, and cause, and check that sensitive data stays out.
+
 ## 9. Check the finished work
 
-Check the work against every red flag in `references/checks.md`. Open `toby-swd-clarity` when the diff adds a public name or an interface comment.
+Compare the finished diff with the design decisions and every applicable check from step 5, then check the red flags in `references/checks.md`. Revisit the relevant skill when implementation changed a contract or responsibility. A passing behavior test doesn't settle the design or diagnostic checks.
 
 ## Final response
 

@@ -10,6 +10,8 @@ description: >-
 
 Names and types state part of a contract, and comments state the rest: behavior, side effects, reasons, and invariants the type system can't enforce. Where the language allows, encode units, nullability, and valid states in the type. Non-trivial code without an interface comment is unfinished.
 
+Read a changed declaration as a caller who hasn't read its body. Check one normal input, its result or side effect, and a relevant failure. The name, types, and comment together must explain how to use it correctly. Replace a vague quality claim with the concrete behavior or constraint. Keep required ordering and durability guarantees explicit.
+
 ## Naming
 
 Pick each name so a reader who sees only the identifier guesses what the variable holds or what the function does. Make names more specific as their scope widens: `i` fits a three-line loop, while fields, parameters, and exports need exact names. Avoid overly narrow names (such as `selection` on a function that accepts any text range). Use `data`, `value`, `result`, `status`, `flag`, or `count` only in tiny scopes where the meaning is obvious.
@@ -35,5 +37,6 @@ Check the touched code against each item before finishing:
 - A field or parameter omits its units, bounds, or what null means when the type doesn't show them.
 - Non-trivial exported code lacks an interface or field comment.
 - The touched code handles the same concept in two ways, or a quick read misreads the control flow.
+- A comment promises a quality without stating the behavior, invariant, or reason that makes the promise useful.
 
 Open `references/comments.md` when adding or editing a comment, docstring, or non-obvious control flow. Open `references/examples.md` when typing a hook return or documenting units, bounds, null meaning, or callbacks.

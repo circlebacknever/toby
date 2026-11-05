@@ -1,15 +1,15 @@
 ---
 name: toby-swd-twelve-factor
 description: >-
-  Contains Toby's twelve-factor checks for new processes, config, secrets, and
-  backing services. Use it for a new process, worker, scheduled job, config
-  value, secret, or backing service. Skip it for a change that adds none of
-  these.
+  Checks application dependencies, config, secrets, process state, backing
+  services, log output, concurrency, and deploy behavior. Use it whenever a
+  change affects one of those constraints, including inside existing code.
+  Skip it for changes that leave those operational constraints unchanged.
 ---
 
 # Toby SWD Twelve-Factor
 
-Check the diff against each factor below that it touches.
+Check the diff against each factor it affects. Existing processes and services need the same checks when their state lifetime, dependencies, or behavior changes. Record the applicable constraint and how the change preserves it.
 
 ## Dependencies
 

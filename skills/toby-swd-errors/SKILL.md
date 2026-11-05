@@ -25,7 +25,7 @@ Never mask an authentication, authorization, or validation failure as success, a
 
 ## Brownfield Work
 
-Before adding an error, validation, or retry path to existing code, check nearby handlers and report duplicated handling at `file:line`. Preserve caller-visible errors, timing, logs, metrics, and status codes unless the user approves a change.
+Before changing an error, validation, or retry path, check nearby handlers and report duplicated handling at `file:line`. Preserve caller-visible contracts and consumed event or metric names unless the requested repair requires a change. Add safe diagnostic context when needed, and verify the emitted output. Search consumers before changing an existing telemetry contract.
 
 ## Red flags
 

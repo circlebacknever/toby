@@ -66,7 +66,7 @@ def main() -> int:
             if r[key]:
                 print(f"  {key}: {', '.join(r[key])}")
         if not r["defects"]:
-            print("  clear")
+            print("  syntax checks passed. Meaning and accuracy weren't evaluated.")
     return 0
 
 

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {"id": "invoice_cents", "category": "arithmetic", "path": "parcel/billing.py", "meaning": "Tax truncates the subtotal to whole dollars before multiplication. A subtotal of 199 cents at 20 percent becomes 219 total instead of 239.", "probe": "invoice_cents"},
+    {"id": "account_scope", "category": "authorization", "path": "parcel/orders.py", "meaning": "The account predicate disappears. The /orders/get route trusts the supplied order id, so an account can read another account's order.", "probe": "account_scope"},
+    {"id": "shipment_wire", "category": "consumer contract", "path": "parcel/events.py", "meaning": "The producer replaces order_id with id while the separately deployed consumer still requires order_id. Consuming a new message raises KeyError.", "probe": "shipment_wire"},
+    {"id": "stock_race", "category": "concurrency", "path": "parcel/inventory.py", "meaning": "Separate read and unconditional write allow two requests to read the same stock. Both reserve the last unit and both report success.", "probe": "stock_race"},
+    {"id": "charge_retry", "category": "retry idempotency", "path": "parcel/payments.py", "meaning": "A new idempotency key is created inside each attempt. If the provider charges and loses its response, the retry creates a second charge.", "probe": "charge_retry"},
+    {"id": "paid_event", "category": "persistence and recovery", "path": "parcel/dispatch.py", "meaning": "The paid status commits before publishing without an outbox entry. A publication failure leaves paid persisted, and the retry returns early forever without publishing the event.", "probe": "paid_event"},
+    {"id": "page_bound", "category": "resource bounds", "path": "parcel/search.py", "meaning": "The user-supplied limit loses its 100-row cap and lower bound. The list route accepts larger or negative limits and can return an unbounded account history.", "probe": "page_bound"},
+    {"id": "tracking_timeout", "category": "outbound deadline", "path": "parcel/tracking.py", "meaning": "The tracking call no longer supplies its required three-second timeout. A stalled provider can occupy a caller beyond the documented bound.", "probe": "tracking_timeout"},
+    {"id": "sync_context", "category": "diagnostics", "path": "parcel/worker.py", "meaning": "The replacement log passes record and request ids only as extra fields, but the deployed formatter prints only the message. It also drops the original exception and trace. A failed sync cannot be identified or diagnosed from the rendered output.", "probe": "sync_context"},
+    {"id": "required_key", "category": "startup configuration", "path": "parcel/config.py", "meaning": "Missing or blank BILLING_API_KEY no longer fails startup validation. The required credential is accepted as empty.", "probe": "required_key"},
+    {"id": "returns_route", "category": "entry point and coverage", "path": "parcel/routes.py", "meaning": "The /returns registration disappears even though the handler and its direct unit test still pass. Dispatching the documented endpoint returns 404.", "probe": "returns_route"},
+    {"id": "refund_policy", "category": "shared rule and invariants", "path": "parcel/refunds.py", "meaning": "The copied age-only condition bypasses the shared paid-status policy. A recent shipped or already refunded order is refunded through HTTP while support correctly rejects it.", "probe": "refund_policy"}
+  ],
+  "guarded_changes": [
+    {"path": "parcel/admin.py", "reason": "The SQL table identifier comes from a fixed allowlist and the caller's role is checked. The cache key includes the account. Parentheses don't remove either guard."},
+    {"path": "parcel/wire.py", "reason": "The receipt adds an optional source field and preserves both fields the consumer reads."},
+    {"path": "parcel/legacy.py", "reason": "These flawed legacy handlers are unchanged. Report the regressions copied into the changed paths, without presenting the old handlers as newly introduced defects."}
+  ],
+  "matching": "Match a finding only when it explains the same reachable trigger, failure mechanism, and consequence, and proposes a repair that preserves the contract. Exact wording isn't required. A category name, a suggested pattern, a vague risk, or a citation alone doesn't match. One finding can earn one match. Duplicate findings for the same cause count as false positives. Independently check guards and report unseeded real defects for gold review before scoring."
+}

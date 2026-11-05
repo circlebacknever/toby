@@ -1,9 +1,9 @@
 ---
 name: toby-swd-architecture
 description: >-
-  Contains Toby's default structure for feature code and the design check for a
-  finished diff. Use it when deciding where a feature's entry point, rules,
-  data access, and wiring go, or when checking the structure of a diff. Skip it
+  Defines feature structure and checks design in a finished diff. Use it when
+  a change affects responsibilities, rules, writes, dependencies, failure
+  behavior, or startup wiring, including existing paths. Skip it
   for a question about how existing code works, which toby-explain covers.
 ---
 
@@ -13,9 +13,9 @@ This file defines where each part of a feature goes and what to check in the fin
 
 ## Default structure
 
-Use this structure when a change adds or moves a rule, a write, or an outbound call. UI code follows `toby-swd-modules`' `references/web.md`, and libraries accept clients as arguments from the calling app.
+Use this structure when a change affects a rule, write, dependency, responsibility, or failure path, including behavior inside existing functions. UI code follows `toby-swd-modules`' `references/web.md`, and libraries accept clients as arguments from the calling app.
 
-Copy how the nearest sibling feature divides its entry point, rules, and data access, unless that sibling computes business rules inside its entry point.
+Check the nearest sibling feature against the applicable design questions before copying its entry point, rules, and data access. Reuse the parts that pass. A tactical change needs this check too.
 
 - **Entry point.** A route, view, CLI command, queue consumer, or job runs these steps in order:
   1. Authenticate the caller, check route-level role guards, and parse input into a typed value.
@@ -25,7 +25,8 @@ Copy how the nearest sibling feature divides its entry point, rules, and data ac
 - **Operation.** A function or model method named for the business action, such as `renew_loan()`. It enforces every business rule, price, limit, state transition, and record-level permission check.
 - **Writes and API calls.** One module writes each table, and one module calls each third-party API and converts the provider's SDK types into the repo's domain types.
 - **Startup wiring.** Startup code builds clients from typed config. Only the startup wiring and the config module read environment variables.
-- **Tests.** Pass a network client into an operation only when tests can't patch it. Freeze time with the repo's timer tool (`freezegun`, `travel_to`, fake timers) so operations don't take a clock parameter.
+- **Dependencies.** Supply clients and clocks through the repo's ordinary composition mechanism according to responsibility, lifetime, and caller needs. Business rules depend on the behavior they need, with provider details converted at the boundary. Use a narrow consumer interface when it hides that dependency. Test convenience doesn't determine the production boundary.
+- **Tests.** Control time and external effects through those boundaries or the repo's test tools. A fixed clock, fake client, or existing patch can each fit the chosen design.
 
 | Framework | Operation | Startup wiring |
 | --- | --- | --- |
@@ -40,7 +41,7 @@ Compute each price, limit, status transition, or format in one function that eve
 
 ## Design check
 
-Check each question against the finished diff, and fix every `yes`.
+Check the questions that apply to the finished diff, including changed behavior behind an unchanged signature. Fix each problem required for the requested change. Record a blocked correction with its effect and the check that remains unverified.
 
 1. Does an entry point, or a serializer or form only it calls, compute a price, limit, status transition, or record-level permission? Move the rule into an operation (a caller-scoped lookup by id stays).
 2. Does code write a table or call an external API that another module manages? Call a function in that module instead.
@@ -53,3 +54,7 @@ Check each question against the finished diff, and fix every `yes`.
 9. Does a write depend on a value read from its row when concurrent requests or jobs can race? Use a conditional write or row lock (`toby-swd-hardening`).
 10. Does code hold a database transaction or row lock open across an outbound HTTP, RPC, or queue call? Commit or release the lock before the external call.
 11. Does a loop run a database query or outbound API call once per item? Replace it with one batch read or bulk call before the loop.
+12. Does the change expose a format, policy, or coordination step to multiple callers, or add an abstraction that hides nothing? Apply the depth and shared-knowledge checks in `toby-swd-modules`.
+13. Can a caller bypass an invariant, depend on unrelated methods, or misread changed errors, side effects, ordering, or lifetime? Apply `toby-swd-interfaces` and update the contract and affected callers.
+14. Can a changed operation fail without enough emitted context to identify what ran, its outcome, and its cause? Use `toby-swd-observability` and run its diagnostic check. Pure helpers don't need their own outcome logs.
+15. Does the change affect process state, dependencies, config, concurrency, log output, or deploy behavior? Apply the relevant `toby-swd-twelve-factor` and `toby-swd-hardening` checks, even inside an existing process.

@@ -24,6 +24,8 @@ Answer first, with each condition right after it. Keep sentences short, with one
 
 Do the whole job, then report it the way a busy co-worker would. State only facts from the user, a file, or a command, and add a caveat only when it would change what the reader does next.
 
+Name the concrete actor, behavior, and consequence. A short sentence about improved efficiency can still say nothing useful. For an explanation, check what a reader would understand and do from the text alone. Preserve humor while checking the accuracy and clarity of the explanation.
+
 The guide has the banned-word list. Read its Banned Words section. `references/toby.md` is a copy of the operating guide. Open it when the guide isn't already in your instructions. The full sentence checklist is in `references/plain-language.md`.
 
 ## Rewrite requests

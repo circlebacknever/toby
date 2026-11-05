@@ -2,16 +2,17 @@
 name: toby-swd-hardening
 description: >-
   Contains Toby's checks that production code survives bad input, retries,
-  outages, and deploys. Use it for a new entry point, job, consumer, or
-  outbound call, or when the user asks to harden code. Skip it for throwaway
+  outages, and deploys. Use it when a change affects input bounds, auth,
+  writes, retries, concurrency, external calls, or stored formats, including
+  existing paths, or when the user asks to harden code. Skip it for throwaway
   code, which toby-swd-experiment covers.
 ---
 
 # Toby SWD Hardening
 
-Check new production code against the row for its kind, and state the checks that apply before writing the code.
+Check added or changed production behavior against the applicable rows, and state the relevant failure and invariant checks before writing the code. Reusing an existing entry point doesn't waive them.
 
-| Code the change adds | Checks |
+| Code the change affects | Checks |
 | --- | --- |
 | HTTP or RPC endpoint | bounds, auth, outcome log, idempotent writes in the cases below |
 | Queue consumer | bounds, idempotent writes, outcome log, poison messages in `references/messages.md` |
@@ -48,7 +49,11 @@ Make writes safe to repeat in webhooks, queue consumers, scheduled jobs, money m
 
 ## Concurrent writes
 
-When a write (such as claiming a ticket, decrementing stock, or changing status) depends on a value read from its row under concurrency, use a conditional `UPDATE ... WHERE` or `SELECT ... FOR UPDATE` (`toby-swd-errors`'s `references/databases.md`). Test concurrency below the entry point: load the row twice, run the first write, run the second write with a different value, and assert the first write wins.
+When a concurrent write depends on a value read from its row, use a conditional `UPDATE ... WHERE` or `SELECT ... FOR UPDATE`. See `toby-swd-errors`'s `references/databases.md` for transaction handling. Check the invariant with the repo's test database and separate transactions or connections.
+
+Coordinate contenders so the second reaches the contested operation while the first is active. Use a barrier or latch at a safe point. Bound the wait, release both operations, and assert the permitted final state and side-effect count.
+
+Two sequential writes check stale data handling but don't prove locking or race safety. When the environment can't run an overlapping test, state that limit.
 
 ## Outbound calls
 

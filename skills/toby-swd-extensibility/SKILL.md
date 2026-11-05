@@ -11,7 +11,7 @@ description: >-
 
 Use this file when code branches on a type, kind, status, or provider, or adds an implementation or subclass.
 
-Build an extension point only when the request, a ticket, a TODO, a second implementation, or `git log` shows another case coming. An extension point with one implementation adds indirection for a case that may never arrive.
+Add machinery for future cases only when the request, a ticket, a TODO, a second implementation, or `git log` shows another case coming. A narrow consumer interface, invariant boundary, or wrapper that hides a provider contract can justify one implementation today. State the current decision it hides. An extra layer that only forwards the same obligations doesn't qualify.
 
 ## Replace the growing conditional
 
@@ -35,7 +35,7 @@ When two switches on the same field compute different values (such as a fee and 
 
 ## Red flags
 
-- An interface, hook, or option with one implementation and no stated second case.
+- A hook or extension mechanism justified only by an unstated future case, or a forwarding layer that hides no present decision.
 - A subclass that overrides a parent method to throw `NotImplementedError` or accept narrower inputs.
 
 ## References

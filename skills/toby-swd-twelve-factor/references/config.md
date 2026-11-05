@@ -6,7 +6,7 @@ This file shows how to centralize environment configuration, validate it at star
 
 1. **One module reads the environment.** Keep `process.env`, `os.environ`, and `import.meta.env` inside a single config module.
 2. **Parse, validate, and redact at startup.** Parse raw strings into a frozen, typed config object at boot, fail immediately on missing or invalid variables, and redact secrets from errors and serialization.
-3. **Build clients at startup.** Construct database pools, loggers, and API clients once from the typed config at startup (or in `post_fork` when a pool opens sockets on creation). Pass a client as a function argument only when tests can't patch the imported module (`toby-swd-architecture`).
+3. **Build clients at startup.** Construct shared database pools, loggers, and API clients from typed config at startup (or in `post_fork` when a pool opens sockets on creation). Supply dependencies through the repo's composition mechanism according to responsibility and lifetime (`toby-swd-architecture`). Construct a scoped client when its credentials or lifetime require one. Test patching doesn't determine that boundary.
 4. **Select implementations from config maps.** Pick a provider (`GATEWAYS[config.gatewayName]`) once at startup, and don't scatter `if (env === "production")` checks across modules.
 
 ```ts

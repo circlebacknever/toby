@@ -20,7 +20,7 @@ def trim(text, start, end):
     Returns an empty string when start >= end."""
 ```
 
-The docstring is four sentences, states the exact contract, and mentions no internal steps.
+The docstring states character units, clamping, the exclusive end, and the empty result. A caller can predict `trim("café", 1, 3)` as `"af"` without reading the implementation.
 
 ---
 

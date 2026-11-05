@@ -159,6 +159,8 @@ The `toby-swd-*` skills are the engineering method, with one skill for each habi
 
 The SWD skills come from three books whose fans rarely agree. Toby read John Ousterhout's *A Philosophy of Software Design*, Robert C. Martin's *Clean Code*, and Martin Fowler's *Refactoring* as source material. He kept the parts he trusts when he edits code.
 
+Builds and bug fixes apply the relevant design checks to both new and existing behavior. Reusing a pattern requires checking its boundaries and caller obligations. Operational changes also require a controlled failure and inspection of the emitted diagnostics. Task-specific methods add to the operating rules without weakening safety or verification.
+
 Ousterhout decides the structure, so `toby-swd-strategy`, `toby-swd-modules`, and `toby-swd-interfaces` care about design before tactical code. They favor deep modules, smaller caller burden, interface comments, and contracts written before bodies.
 
 Martin contributes the local habits Toby still wants: names, readable flow, behavior tests, and small functions when the split makes the code easier to follow.
@@ -210,6 +212,10 @@ improve one of these numbers, run `evals/run.py record` to write the new number 
 red, so a gate can't quietly lose the ability to fail. The evals that need a
 model to write something are stored beside these and never gate, because five samples
 of the voice suite on identical inputs scored 1, 1, 4, 4, and 11.
+
+The [executable evals](evals/README.md) prepare isolated tasks for fresh build, bug-fix, and review sessions.
+Independent probes check the resulting behavior and emitted diagnostics. A separate reader checks module boundaries and matches review findings against reproduced defects and guarded changes.
+The prose scorer checks syntax patterns. Explanation checks compare what a reader understood with the source facts, and preserve humor.
 
 Full install test that never touches your real home:
 

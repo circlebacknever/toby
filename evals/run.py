@@ -221,6 +221,10 @@ def gates(slow: bool) -> int:
 
     run_script("validator fixtures", [sys.executable, "tests/test-validator-checks.py"], failures)
     run_script("instruction sync", ["bash", "scripts/sync.sh", "--check"], failures)
+    run_script("eval reporting", [sys.executable, "-B", "tests/test-eval-reporting.py"], failures)
+    run_script("execution fixtures", [sys.executable, "-B", "-m", "unittest", "evals/test_execution.py"], failures)
+    run_script("review fixtures", [sys.executable, "-B", "evals/review_cases.py", "verify"], failures)
+    run_script("review grading", [sys.executable, "-B", "tests/test-review-cases.py"], failures)
     if slow:
         run_script("install smoke test", ["bash", "scripts/test-install.sh"], failures)
 
@@ -331,6 +335,9 @@ every such sentence. Do not rewrite anything and do not grade kindly.
 3. Read every file named `content-*.md` and `voice-*.md` in {repo}/evals/results/.
 
 Read {repo}/evals/rubric/pass-fail.md in full and apply its rules to every sentence.
+
+Preserve its exemption for a joke of any kind. Judge the explanation's accuracy
+and clarity separately from humor.
 
 This reader has also listed these as grating:
 - Slogans: a run of short sentences with no connector, two sentences or two
@@ -460,6 +467,9 @@ every such sentence. Do not rewrite anything and do not grade kindly.
 3. Read every file named `holdout-*.md` in {repo}/evals/results/. The file names say nothing about how each one was written.
 
 Read {repo}/evals/rubric/pass-fail.md in full and apply its rules to every sentence.
+
+Preserve its exemption for a joke of any kind. Judge the explanation's accuracy
+and clarity separately from humor.
 
 This reader has also listed these as grating:
 - Slogans: a run of short sentences with no connector, two sentences or two
@@ -599,7 +609,7 @@ Fail a sentence for any of these habits, and give the habit's name:
 - closing offer: an offer of more help or a check-in at the end, such as "Let me
   know if you want me to...", "Happy to help further".
 - recap: a sentence that restates something the output already said, or sums it up.
-- dramatic: a punchline, an aphorism, a stakes word, or a build to a reveal.
+- dramatic: an aphorism, a stakes word, or a build to a reveal in the explanation.
   Examples: "That's the whole trick.", "This is the damning part."
 - dash: an em dash or en dash joining clauses.
 - semicolon: a semicolon joining clauses.
@@ -615,6 +625,9 @@ habit not on this list. These pass: a short social reply to thanks, such as "No
 problem.", and a standard software verb used in its usual sense, such as code
 that moves to another file, a feature that ships, or a script that branches.
 
+A joke of any kind passes. Don't fail a punchline, metaphor, or absurd image
+because it is a joke. Judge the explanation's accuracy and clarity separately.
+
 Write {out} with one section per file, in this format and nothing else:
 
 ## <file name>
@@ -629,6 +642,9 @@ Write "- none" under a file with no fails. Reply with just the word "done".""",
         "prompt": """You are a capable adult who did not see any of the work behind the text you
 are about to read. You read each file once, the way a busy person reads a message
 from a coworker. Read no style guide and no rules file.
+
+Preserve jokes of any kind. Check whether the explanation is understandable
+and accurate separately from its humor.
 
 Read every `.md` file in {folder}. Each file is one output, or a list of
 sentences.
@@ -670,8 +686,8 @@ Write "- none" under a file with no fails. Reply with just the word "done".""",
         "min_samples": 2,
         "prompt": """You are simulating a coding agent's skill-routing decision. Do no engineering work.
 
-Read {repo}/evals/baselines/descriptions-current.txt, and use only its first
-section, headed "# Claude Code, Codex, Copilot: 11 skills". It lists 11 skills,
+Run `python3 {repo}/scripts/trigger-probe.py`, and use only its first
+section, for Claude Code, Codex, and Copilot. It lists the entry skills,
 each with a name and description. That is the entire routing surface those
 hosts show. Ignore the Kiro section below it.
 
@@ -706,6 +722,39 @@ whether that much process fits the request.
 
 Write it to {repo}/evals/results/feature-dev-<run>.md, quoting the line from the
 skill that decided the size.""",
+    },
+    "build-execution": {
+        "file": "suites/execution.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """Complete the task in {folder}/TASK.md inside that prepared workspace.
+Read its AGENTS.md and .toby-skills/toby-build/SKILL.md, then follow their references.
+The task authorizes fixture edits and focused checks. Don't read the source eval
+runner, independent grader, other workspaces, or completed solutions.
+Save the final reply to {folder}/RESULT.md. Keep the actual commands and evidence
+from before and after the change, including any diagnostic checks you run.""",
+    },
+    "bug-fix-execution": {
+        "file": "suites/execution.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """Complete the task in {folder}/TASK.md inside that prepared workspace.
+Read its AGENTS.md and .toby-skills/toby-bug-fix/SKILL.md, then follow their references.
+The task authorizes fixture edits and focused checks. Don't read the source eval
+runner, independent grader, other workspaces, or completed solutions.
+Save the final reply to {folder}/RESULT.md. Keep the actual commands and evidence
+from before and after the change, including any diagnostic checks you run.""",
+    },
+    "review-execution": {
+        "file": "suites/review-execution.md",
+        "scorer": "manual",
+        "min_samples": 1,
+        "prompt": """Complete the review task at {folder}/TASK.md using only that
+prepared directory and temporary local files. Read its GUIDE.md and supplied
+review skill. Don't inspect authoring sources, private probes, gold, other
+reviews, or expected categories. Focused local checks are authorized, with no
+network, installations, or services required. Save the report as the task
+requires. Don't edit the application, supplied guide, or skills.""",
     },
     "learning": {
         "file": "suites/learning.md",
@@ -875,7 +924,14 @@ FACTS_STEP = """3. After step 2, read {facts} for the facts the writer was given
 FACTS_FORMAT = "Misread:\n- <what you got wrong, or none>\n"
 
 
-def prompt(suite: str, repo: Path = REPO_ROOT, folder: str = "", out: str = "", facts: str = "") -> int:
+def prompt(
+    suite: str, repo: Path = REPO_ROOT, folder: str = "", out: str = "",
+    facts: str = "", sentences: bool = False,
+) -> int:
+    if suite == "readability-judge" and not facts and not sentences:
+        raise ValueError("readability-judge requires --facts, or --sentences for isolated sentence checks")
+    if sentences and (suite != "readability-judge" or facts):
+        raise ValueError("--sentences applies only to readability-judge without --facts")
     print(SUITES[suite]["prompt"].format(
         repo=repo, folder=folder, out=out,
         facts_step=FACTS_STEP.format(facts=facts) if facts else "",
@@ -908,6 +964,7 @@ def main() -> int:
     p.add_argument("--folder", default="", help="the folder a judge reads")
     p.add_argument("--out", default="", help="the file a judge writes")
     p.add_argument("--facts", default="", help="the task file the readability judge checks against")
+    p.add_argument("--sentences", action="store_true", help="check isolated sentences without assessing source meaning")
     c = sub.add_parser("compare")
     c.add_argument("suite", choices=sorted(SUITES))
     c.add_argument("files", nargs="+")
@@ -920,7 +977,10 @@ def main() -> int:
     if args.command == "list":
         return list_suites()
     if args.command == "prompt":
-        return prompt(args.suite, args.repo, args.folder, args.out, args.facts)
+        try:
+            return prompt(args.suite, args.repo, args.folder, args.out, args.facts, args.sentences)
+        except ValueError as error:
+            parser.error(str(error))
     return compare(args.suite, [Path(f) for f in args.files])
 
 

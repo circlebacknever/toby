@@ -1,15 +1,15 @@
 ---
 name: toby-swd-observability
 description: >-
-  Contains Toby's rules for logs, metrics, alerts, and traces in code that runs
-  in production. Use it when adding logging, metrics, alerts, or tracing, or a
-  new entry point that needs them. Skip it for debug output during a bug hunt,
-  which toby-bug-fix covers.
+  Checks whether production behavior can be diagnosed from logs, metrics,
+  alerts, and traces. Use it for changed operations, writes, external calls,
+  retries, or failure paths, including bug fixes, and for telemetry changes.
+  Skip it for temporary debug output alone, which toby-bug-fix covers.
 ---
 
 # Toby SWD Observability
 
-Write logs and metrics so the on-call engineer can tell from the logs alone what ran, for which request and record, and why it failed.
+Emit enough context for an engineer to identify the operation, affected request or record, outcome, and failure cause. Use the repo's logs, metrics, and traces for that task. Pure computations and local helpers don't need their own outcome logs.
 
 ## Use what the repo has
 
@@ -35,14 +35,20 @@ log.info("order.cancelled", order_id=order.id, user_id=user.id, refund_cents=ref
 
 ## The outcome log
 
-When an entry point (HTTP route, RPC, consumer, or job) mutates state or calls an external service, log one summary line when it finishes. Include the event name, record ids, outcome, and `duration_ms`. Read-only entry points that access middleware already logs don't need a second log line.
+For an entry point that mutates state or calls an external service, emit one summary event on success and on failure. Include the operation, safe record ids, outcome, and `duration_ms`. Existing middleware can supply it only when its emitted fields identify the operation and relevant result. An access line with only method, URL, and status doesn't explain a failed business operation. Avoid a duplicate event when the existing event already supplies the required context.
 
 ## Other events
 
 - Log each outbound service call with the target, `duration_ms`, and status or error.
-- Log decisions that branch behavior, such as a feature flag or fallback path.
+- Log consequential decisions needed to explain an outcome, such as a fallback or retry exhaustion. Use bounded reason codes and counts, and avoid a line for every branch or loop iteration.
 - Log an unhandled error once with its stack trace at the handler that catches and responds to it (`log.exception`).
 - Inside a batch loop, rate-limit or sample item-failure logs under high volume, and log one summary line after the loop with `succeeded_count`, `failed_count`, and `duration_ms`.
+
+## Diagnostic check
+
+When a changed operation needs production diagnostics, run a representative success and failure through the repo's existing test or local harness. Inject an external failure safely. Capture the emitted output through the configured formatter or exporter. Check that it identifies the operation, safe request or record context, outcome, and cause. Check relevant duration and retry fields, and confirm the output excludes secrets and raw payloads. A mock assertion that a logger method was called doesn't prove the fields are emitted.
+
+Keep the command and observed evidence with the task's verification. Reuse the check for the behavior when it can capture the output too. If the formatter, exporter, or runtime isn't available, identify what you inspected and mark emitted diagnostics unverified. Don't claim that adding a logging call proves diagnostics work.
 
 ## Redacted data
 

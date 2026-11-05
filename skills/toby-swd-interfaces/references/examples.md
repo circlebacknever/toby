@@ -25,13 +25,12 @@ The comment fails the test because callers must fetch a bucket, refill it with t
 ```python
 class RateLimiter:
     def allow(self, client_id) -> bool:
-        """Return True if a request from client_id may proceed now, and
-        record it. Return False if the client is over its limit. The method is thread-safe.
-        Refill and accounting stay inside the class, so callers don't manage
-        buckets, tokens, or timestamps."""
+        """Return True and record the request if client_id may proceed now.
+        Return False without admitting the request when the client is over
+        its limit. Concurrent calls enforce the same per-client limit."""
 ```
 
-The complete contract is four sentences and mentions none of its internals. If callers must return a `Retry-After` header, expose that one value (`allow` returns `RetryAfter | None`) while keeping buckets and refill timestamps private.
+The contract states admission, its side effect, and the concurrency guarantee without exposing the algorithm. If callers must return a `Retry-After` header, expose that one value (`allow` returns `RetryAfter | None`) while keeping buckets and refill timestamps private.
 
 ---
 
@@ -69,4 +68,4 @@ Task: upload a file to object storage.
 | B: `upload(bytes, key)` | One call | Medium | Chunking, retries, multipart threshold | Deep, but loads whole file in memory |
 | C: `upload(source, key)` where source is bytes or a stream | One call | High | Same as B, plus large-file streaming | Deepest, and covers both small and large files |
 
-Design C passes the comment test and states in its comment that `upload` returns only after object storage durably saves the file.
+Design C passes the comment test and states that `upload` returns only after object storage durably saves the file. That ordering is a caller-visible guarantee. The caller doesn't coordinate multipart steps.

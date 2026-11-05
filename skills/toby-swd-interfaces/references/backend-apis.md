@@ -24,20 +24,21 @@ This ten-argument signature requires callers to pass `null` and `false` for unus
 
 ```java
 public sealed interface PlaceOrderResult {
-    record Placed(Order order) implements PlaceOrderResult {}
-    record Declined(DeclineReason reason) implements PlaceOrderResult {}
+    record Accepted(OrderId orderId) implements PlaceOrderResult {}
     record OutOfStock(List<Sku> unavailable) implements PlaceOrderResult {}
 }
 
 /**
- * Places an order and captures payment atomically: the method either places
- * the order and captures the payment, or does neither. Repeating a call with
- * the same IdempotencyKey within 24h returns the original result.
+ * Reserves available stock and durably accepts the order for payment.
+ * Accepted means payment is pending. Read order status for capture or decline.
+ * Repeating the same request with its IdempotencyKey returns the original result.
  */
 PlaceOrderResult placeOrder(PlaceOrderCommand cmd);
 ```
 
 Remove the `skipTaxValidation` flag and read tax-exemption status from the user's organization inside `placeOrder`.
+
+Write the order, stock reservation, and payment intent in one database transaction. A worker processes the intent with the provider's idempotency mechanism and updates order status. An external payment and a database commit don't form one atomic operation. The interface must state the pending state and how callers observe completion (`toby-swd-hardening`'s `references/messages.md`).
 
 ## Go consumer interface
 
